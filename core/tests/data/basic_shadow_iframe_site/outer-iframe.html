@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shadow DOM Example</title>
+</head>
+<body>
+    <div id="my-host"></div>
+
+    <script>
+        // Get the host element
+        const host = document.getElementById("my-host");
+
+        // Attach a shadow DOM to the host element
+        const shadowRoot = host.attachShadow({ mode: "open" });
+
+        // Create a new HTML document inside the shadow DOM
+        const doc = document.implementation.createHTMLDocument();
+
+        // Set the title of the document
+        const title = doc.createElement("title");
+        title.textContent = "Outer Iframe";
+        doc.head.appendChild(title);
+
+        // Add the HTML code to the body of the document
+        const body = doc.createElement("body");
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "outer-textfield";
+        input.placeholder = "Enter text here";
+        body.appendChild(input);
+        const iframe = document.createElement("iframe");
+        iframe.src = "inner-iframe.html";
+        body.appendChild(iframe);
+        doc.body = body;
+
+        // Append the document to the shadow DOM
+        shadowRoot.appendChild(doc.documentElement);
+    </script>
+</body>
+</html>

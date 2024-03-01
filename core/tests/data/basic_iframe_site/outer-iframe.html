@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shadow DOM Example</title>
+    <style>
+        body {
+            height: 2500px; /* Set the height of the body to 500 pixels */
+            width: 5000px;
+            overflow: auto; /* Enable scrolling for the body */
+            display: flex; /* Use flexbox to center the iframe */
+            justify-content: flex-end; /* Move the iframe to the right */
+            align-items: center; /* Center the iframe vertically */
+        }
+        .iframe-container {
+            width: 50%; /* Set the width of the container to 100% */
+            overflow-x: auto; /* Enable horizontal scrolling for the container */
+        }
+        iframe {
+            position: relative; /* Set the position of the iframe to relative */
+        }
+    </style>
+</head>
+<body>
+    <div id="my-host"></div>
+    <div style="height: 2000px;"></div> <!-- Add a tall element to create space for scrolling -->
+    <div class="iframe-container"> <!-- Wrap the iframe in a container element -->
+        <iframe src="inner-iframe.html"></iframe>
+    </div>
+</body>
+</html>

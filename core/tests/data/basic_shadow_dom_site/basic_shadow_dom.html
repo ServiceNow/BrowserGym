@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Unit Test with Complex Nested Shadow DOM</title>
+</head>
+<body>
+  <div id="host-element-level-1-1"></div>
+  <div id="host-element-level-1-2"></div>
+
+  <script>
+    // Level 1, Shadow DOM 1
+    const hostElement1_1 = document.getElementById("host-element-level-1-1");
+    const shadowRoot1_1 = hostElement1_1.attachShadow({ mode: 'open' });
+    shadowRoot1_1.innerHTML = `
+      <h1>Shadow DOM Level 1.1</h1>
+      <input type="text" name="level1_1-textfield1" placeholder="Level 1.1 Text Field 1">
+      <input type="text" name="level1_1-textfield2" placeholder="Level 1.1 Text Field 2">
+      <div id="host-element-level-2-1"></div>
+      <div id="host-element-level-2-2"></div>
+    `;
+
+    // Level 2, Nested under Level 1.1
+    createNestedShadowDOM(shadowRoot1_1, "2-1", "2.1");
+    createNestedShadowDOM(shadowRoot1_1, "2-2", "2.2");
+
+    // Level 1, Shadow DOM 2
+    const hostElement1_2 = document.getElementById("host-element-level-1-2");
+    const shadowRoot1_2 = hostElement1_2.attachShadow({ mode: 'open' });
+    shadowRoot1_2.innerHTML = `
+      <h1>Shadow DOM Level 1.2</h1>
+      <input type="text" name="level1_2-textfield1" placeholder="Level 1.2 Text Field 1">
+      <input type="text" name="level1_2-textfield2" placeholder="Level 1.2 Text Field 2">
+      <div id="host-element-level-2-3"></div>
+      <div id="host-element-level-2-4"></div>
+    `;
+
+    // Level 2, Nested under Level 1.2
+    createNestedShadowDOM(shadowRoot1_2, "2-3", "2.3");
+    createNestedShadowDOM(shadowRoot1_2, "2-4", "2.4");
+
+    function createNestedShadowDOM(parentShadowRoot, id, level) {
+      const hostElement = parentShadowRoot.querySelector(`#host-element-level-${id}`);
+      const shadowRoot = hostElement.attachShadow({ mode: 'open' });
+      shadowRoot.innerHTML = `
+        <h2>Shadow DOM Level ${level}</h2>
+        <input type="text" name="level${level}-textfield1" placeholder="Level ${level} Text Field 1">
+        <input type="text" name="level${level}-textfield2" placeholder="Level ${level} Text Field 2">
+      `;
+    }
+  </script>
+</body>
+</html>

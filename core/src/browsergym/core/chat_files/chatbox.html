@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Assistant Chat</title>
+    <style>
+        .chat-container {
+            display: flex;
+            flex-flow: column;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            border: 1px solid black;
+            background-color: white;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: 'Source Sans Pro', Arial, Helvetica, sans-serif;
+        }
+
+        .chat-header {
+            background-color: #032D42;
+            color: white;
+            padding: 5px;
+            padding-left: 15px;
+            text-align: center;
+            flex: 0 1 auto;
+        }
+
+        .chat-body {
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        .chat-debug {
+            padding: 10px;
+            max-height: 20%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 auto;
+        }
+
+        .chat-input-area {
+            display: flex;
+            flex-flow: row;
+            margin-top: 5px;
+            margin-top: 5px;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            flex: 0 1 50px;
+        }
+
+        .chat-input-area form {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .input-box {
+            padding: 5px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        .submit-button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            align-self: center;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .message p {
+            padding: 10px;
+            /* Added padding inside the bubble */
+            border-radius: 15px;
+            flex-grow: 1;
+            margin-top: 10;
+            margin-bottom: 0;
+        }
+
+        .chat-debug .message p {
+            padding: 0;
+            border-radius: 0;
+            flex-grow: 1;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .user-message {
+            background-color: #d1f4d1;
+        }
+
+        .assistant-message {
+            background-color: #e0e0e0;
+        }
+
+        .info-message {
+            background-color: #f0f0f0;
+            color: #707070;
+            font-size: 13px;
+        }
+
+        .assistant-image {
+            margin: 0px;
+            padding: 10px;
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>UI Assistant</h2>
+        </div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-debug" id="chatDebug"></div>
+        <div class="chat-input-area">
+            <form id="chatForm">
+                <textarea class="input-box" rows="2" id="inputBox"></textarea>
+                <input type="submit" class="submit-button" value="Send">
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        const assistant_image_data = "<ASSISTANT_IMAGE_URL>";
+
+        var USER_MESSAGE_RECEIVED = false;
+
+        function addChatMessage(role, msg) {
+            const chatBody = document.getElementById('chatBody');
+            const chatDebug = document.getElementById('chatDebug');
+            const msgContainer = document.createElement('div');
+            msgContainer.className = 'message';
+
+            const text = document.createElement('p');
+            text.innerHTML = msg;
+
+            const assistant_img = document.createElement('img');
+            assistant_img.src = assistant_image_data;
+            assistant_img.alt = 'Assistant';
+            assistant_img.className = 'assistant-image';
+
+
+            switch (role) {
+                case "user":
+                    text.className = 'user-message';
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
+                case "assistant":
+                    text.className = 'assistant-message';
+                    msgContainer.appendChild(assistant_img); // Add the image to the message container
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
+                case "info":
+                    text.className = 'info-message';
+                    text.innerHTML = msg;
+                    msgContainer.appendChild(text);
+                    // hide previous debug messages
+                    for (const msg of chatDebug.children) {
+                        msg.style.display = 'none';
+                    }
+                    chatDebug.appendChild(msgContainer);
+                    break;
+                default:
+                    throw new TypeError(`Illegal role "${role}".`);
+            }
+
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            if (role === "user") {
+                USER_MESSAGE_RECEIVED = true;
+            }
+        }
+
+        if (typeof send_user_message !== 'function') {
+            function send_user_message(msg) {
+                // This will be overloaded by playwright
+            }
+        }
+
+        const inputBox = document.getElementById('inputBox');
+
+        function send_msg(msg) {
+            if (msg.trim()) {
+                send_user_message(msg);
+                addChatMessage('user', msg);
+                inputBox.value = '';
+            }
+        }
+
+        inputBox.onkeypress = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send_msg(inputBox.value);
+            }
+        };
+
+        document.getElementById('chatForm').onsubmit = function (event) {
+            event.preventDefault();
+            send_msg(inputBox.value);
+            return false;
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Input Button</h2>
+
+<input type="button" onclick="alert('Hello World!')" value="Click Me!">
+
+</body>
+</html>

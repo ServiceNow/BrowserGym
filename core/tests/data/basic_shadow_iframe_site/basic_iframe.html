@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe Example</title>
+</head>
+<body>
+    <input type='text' name='level1-textfield1' placeholder='Level 1 Text Field 1'>
+    <input type='text' name='level1-textfield2' placeholder='Level 1 Text Field 2'>
+    <iframe srcdoc="
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Iframe Level 2.1</title>
+        </head>
+        <body>
+            <h2>Iframe Level 2.1</h2>
+            <input type='text' name='level2_1-textfield1' placeholder='Level 2.1 Text Field 1'>
+            <input type='text' name='level2_1-textfield2' placeholder='Level 2.1 Text Field 2'>
+        </body>
+        </html>
+    "></iframe>
+    <iframe srcdoc="
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Iframe Level 2.2</title>
+        </head>
+        <body>
+            <h2>Iframe Level 2.2</h2>
+            <input type='text' name='level2_2-textfield1' placeholder='Level 2.2 Text Field 1'>
+            <input type='text' name='level2_2-textfield2' placeholder='Level 2.2 Text Field 2'>
+        </body>
+        </html>
+    "></iframe>
+
+</body>
+</html>

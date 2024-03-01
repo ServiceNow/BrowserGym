@@ -1,0 +1,7 @@
+playwright>=1.32,<1.40
+gymnasium>=0.27
+numpy>=1.14
+pyparsing>=3
+Pillow>=10.1
+beautifulsoup4>=4.12
+lxml>=4.9

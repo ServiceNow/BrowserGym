@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Unit Test with Complex Nested Shadow DOM</title>
+</head>
+<body>
+  <div id="host-element"></div>
+
+  <script>
+    // Level 1, Shadow DOM 1
+    const hostElement1_1 = document.getElementById("host-element");
+    const shadowRoot1_1 = hostElement1_1.attachShadow({ mode: 'open' });
+    shadowRoot1_1.innerHTML = `
+      <h1>Shadow DOM Level 1</h1>
+      <input type="text" name="level1_1-textfield1" placeholder="Level 1.1 Text Field 1">
+      <input type="text" name="level1_1-textfield2" placeholder="Level 1.1 Text Field 2">
+
+    `;
+
+  </script>
+</body>
+</html>
