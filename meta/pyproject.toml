@@ -1,0 +1,33 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[project]
+name = "browsergym"
+description = "BrowserGym: a gym environment for web task automation on the Chrome browser"
+authors = [
+    {name = "Rim Assouel"},
+    {name = "Léo Boisvert"},
+    {name = "Massimo Caccia"},
+    {name = "Alex Drouin"},
+    {name = "Maxime Gasse"},
+    {name = "Alex Lacoste"},
+    {name = "Tom Marty"},
+]
+readme = "README.md"
+requires-python = ">3.7"
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: Apache Software License",
+]
+version="0.0.1a7"
+dependencies = [
+    "browsergym-core==0.0.1a7",
+    "browsergym-miniwob==0.0.1a7",
+    "browsergym-webarena==0.0.1a7",
+]
