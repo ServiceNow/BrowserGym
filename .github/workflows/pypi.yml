@@ -25,7 +25,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
-          path: core/dist/
+          path: dist/
 
     publish-to-pypi:
       name: Publish to PyPI
