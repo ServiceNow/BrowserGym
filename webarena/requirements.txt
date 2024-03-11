@@ -1,2 +1,2 @@
 browsergym-core
-webarena @ git+https://github.com/gasse/webarena.git@9bebd1a2468eb28a45a53853c2ad58ecd4ba95e1
+libwebarena>=0.0.1
