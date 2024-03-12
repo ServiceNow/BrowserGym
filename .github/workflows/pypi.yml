@@ -28,7 +28,7 @@ jobs:
         run: python3 -m build webarena/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym)
-        run: python3 -m build meta/ --outdir dist/
+        run: python3 -m build . --outdir dist/
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
@@ -99,23 +99,23 @@ jobs:
           '${{ github.ref_name }}' dist/**
           --repo '${{ github.repository }}'
 
-    publish-to-testpypi:
-      name: Publish to TestPyPI
-      needs:
-      - build
-      runs-on: ubuntu-latest
-      environment: testpypi
-      permissions:
-        id-token: write  # IMPORTANT: mandatory for trusted publishing
+    # publish-to-testpypi:
+    #   name: Publish to TestPyPI
+    #   needs:
+    #   - build
+    #   runs-on: ubuntu-latest
+    #   environment: testpypi
+    #   permissions:
+    #     id-token: write  # IMPORTANT: mandatory for trusted publishing
 
-      steps:
-      - name: Download all the distribution packages
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
+    #   steps:
+    #   - name: Download all the distribution packages
+    #     uses: actions/download-artifact@v4
+    #     with:
+    #       name: python-package-distributions
+    #       path: dist/
 
-      - name: Publish distribution packages to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
+    #   - name: Publish distribution packages to TestPyPI
+    #     uses: pypa/gh-action-pypi-publish@release/v1
+    #     with:
+    #       repository-url: https://test.pypi.org/legacy/
