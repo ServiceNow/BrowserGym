@@ -43,18 +43,17 @@ jobs:
         - build
       runs-on: ubuntu-latest
       environment: pypi
-
       permissions:
         id-token: write  # IMPORTANT: mandatory for trusted publishing
 
       steps:
-        - name: Download all the dists
+        - name: Download all the distribution packages
           uses: actions/download-artifact@v4
           with:
             name: python-package-distributions
             path: dist/
 
-        - name: Publish distribution 📦 to PyPI
+        - name: Publish all distribution packages to PyPI
           uses: pypa/gh-action-pypi-publish@release/v1
 
     github-release:
@@ -62,7 +61,6 @@ jobs:
       needs:
       - publish-to-pypi
       runs-on: ubuntu-latest
-
       permissions:
         contents: write  # IMPORTANT: mandatory for making GitHub Releases
         id-token: write  # IMPORTANT: mandatory for sigstore
@@ -106,20 +104,18 @@ jobs:
       needs:
       - build
       runs-on: ubuntu-latest
-
       environment: testpypi
-
       permissions:
         id-token: write  # IMPORTANT: mandatory for trusted publishing
 
       steps:
-      - name: Download all the dists
+      - name: Download all the distribution packages
         uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
-      - name: Publish distribution 📦 to TestPyPI
+      - name: Publish distribution packages to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
