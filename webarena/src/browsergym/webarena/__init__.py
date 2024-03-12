@@ -1,4 +1,4 @@
-__version__ = "0.0.1a9"
+__version__ = "0.0.1a10"
 
 from browsergym.core.registration import register_task
 
