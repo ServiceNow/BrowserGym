@@ -33,6 +33,8 @@ dependencies = [
     "browsergym-workarena==0.0.1a9",
 ]
 
+[tool.setuptools]
+packages = [""]
 
 [tool.black]
 line-length = 100
