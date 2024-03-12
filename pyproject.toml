@@ -34,7 +34,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = [""]
+packages = []  # meta distribution, packages are included as dependencies
 
 [tool.black]
 line-length = 100
