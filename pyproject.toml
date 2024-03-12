@@ -4,7 +4,7 @@ requires = ["setuptools"]
 
 [project]
 name = "browsergym"
-description = "BrowserGym: a gym environment for web task automation on the Chrome browser"
+description = "BrowserGym: a gym environment for web task automation in the Chromium browser"
 authors = [
     {name = "Rim Assouel"},
     {name = "Léo Boisvert"},
@@ -25,9 +25,38 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: Apache Software License",
 ]
-version="0.0.1a8"
+version="0.0.1a9"
 dependencies = [
-    "browsergym-core==0.0.1a8",
-    "browsergym-miniwob==0.0.1a8",
-    "browsergym-webarena==0.0.1a8",
+    "browsergym-core==0.0.1a9",
+    "browsergym-miniwob==0.0.1a9",
+    "browsergym-webarena==0.0.1a9",
+    "browsergym-workarena==0.0.1a9",
+]
+
+
+[tool.black]
+line-length = 100
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    'ignore::UserWarning:gymnasium.*:',  # too many "The obs is not within the observation space." warnings.
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
