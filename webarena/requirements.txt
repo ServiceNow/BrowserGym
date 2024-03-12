@@ -1,2 +1,2 @@
-browsergym-core
-libwebarena>=0.0.1
+browsergym-core==0.0.1a7
+libwebarena==0.0.2

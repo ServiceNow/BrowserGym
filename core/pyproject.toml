@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "browsergym-core"
-description = "BrowserGym: a gym environment for web task automation on the Chrome browser"
+description = "BrowserGym: a gym environment for web task automation in the Chromium browser"
 authors = [
     {name = "Rim Assouel"},
     {name = "Léo Boisvert"},
