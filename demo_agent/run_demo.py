@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
-from ui_assist.agents.dynamic_prompting import Flags
-from ui_assist.agents.generic_agent import GenericAgentArgs
-from ui_assist.utils.exp_utils import ExpArgs, str2bool
-from ui_assist.utils.chat_api import ChatModelArgs
+from agents.dynamic_prompting import Flags
+from agents.generic_agent import GenericAgentArgs
+from utils.exp_utils import ExpArgs, str2bool
+from utils.chat_api import ChatModelArgs
 
 
 def parse_args():

@@ -24,11 +24,11 @@ from PIL import Image
 import pandas as pd
 from tqdm import tqdm
 
-from ui_assist.agents import AgentArgs
-from ui_assist.agents.base import Agent
+from agents import AgentArgs
+from agents.base import Agent
 import os
 
-from ui_assist.utils.llm_utils import count_messages_token, count_tokens
+from utils.llm_utils import count_messages_token, count_tokens
 
 
 class DataclassJSONEncoder(json.JSONEncoder):

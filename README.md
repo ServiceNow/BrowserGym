@@ -2,6 +2,10 @@
 
 This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
 
+- [Setup]()
+- [Usage]()
+- [Demos]()
+
 ## Setup
 
 To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena` and `browsergym-workarena` packages, or you can simply install `browsergym` which includes all of these by default.
@@ -18,15 +22,6 @@ Finally, each benchmark comes with its its own specific setup that requires to f
  - for miniwob, see [miniwob/README.md](miniwob/README.md)
  - for webarena, see [webarena/README.md](webarena/README.md)
  - for workarena, see the [WorkArena README](https://github.com/ServiceNow/WorkArena/README.md)
-
-4. (optional) if you want to run the UI assistant to create demos
-
-```sh
-cd ui_assist
-conda env create -f environment.yml; conda activate ui-assist
-# or simply `pip install -r requirements`
-playwright install
-```
 
 
 ## Usage
@@ -110,3 +105,27 @@ List of all the available WorkArena environments
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
 ```
+
+
+## Demo
+
+If you want to experiment with an agent in BrowserGym, follow these steps:
+
+```sh
+cd ui_assist
+conda env create -f environment.yml; conda activate ui-assist
+# or simply use `pip install -r requirements.txt`
+playwright install
+```
+
+Optional: Set your `OPENAI_API_KEY` if you want to use a GPT agent.
+
+Launch the demo on the open web:
+
+```sh
+python run_demo.py --task_name openended --start_url www.google.com
+```
+
+You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
+
+TODO: add 2x2 grid

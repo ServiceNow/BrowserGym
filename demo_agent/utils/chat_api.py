@@ -1,7 +1,7 @@
 from dataclasses import asdict, dataclass
 import io
 import json
-from ui_assist.utils.prompt_templates import PromptTemplate, get_prompt_template
+from .prompt_templates import PromptTemplate, get_prompt_template
 from langchain.schema import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from functools import partial
 from typing import Optional, List, Any

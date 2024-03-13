@@ -5,11 +5,11 @@ from warnings import warn
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str
 from langchain.schema import HumanMessage, SystemMessage
 
-from ui_assist.agents.base import Agent
-from ui_assist.agents import dynamic_prompting
-from ui_assist.agents.prompt_utils import prune_html
-from ui_assist.utils.llm_utils import ParseError, retry
-from ui_assist.utils.chat_api import ChatModelArgs
+from agents.base import Agent
+from agents import dynamic_prompting
+from agents.prompt_utils import prune_html
+from utils.llm_utils import ParseError, retry
+from utils.chat_api import ChatModelArgs
 
 
 @dataclass

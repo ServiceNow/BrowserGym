@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from ui_assist.utils.chat_api import ChatModelArgs
+from utils.chat_api import ChatModelArgs
 
 
 @dataclass
@@ -11,7 +11,7 @@ class AgentArgs:
     def make_agent(self):
         match self.agent_name:
             case "GenericAgent":
-                from ui_assist.agents.generic_agent import GenericAgent
+                from agents.generic_agent import GenericAgent
 
                 return GenericAgent(chat_model_args=self.chat_model_args, **self.kwargs)
             case _:
