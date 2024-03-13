@@ -131,3 +131,18 @@ python run_demo.py --task_name openended --start_url www.google.com
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
+
+
+## Citing This Work
+
+Please use the following BibTeX to cite our work:
+```
+@misc{workarena2024,
+      title={WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks?}, 
+      author={Alexandre Drouin and Maxime Gasse and Massimo Caccia and Issam H. Laradji and Manuel Del Verme and Tom Marty and Léo Boisvert and Megh Thakkar and Quentin Cappart and David Vazquez and Nicolas Chapados and Alexandre Lacoste},
+      year={2024},
+      eprint={2403.07718},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+```
