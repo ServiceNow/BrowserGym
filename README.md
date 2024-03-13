@@ -2,9 +2,7 @@
 
 [[Setup]](#setup) ♦ [[Usage]](#usage) ♦ [[Demo]](#demo)
 
-This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
-
-BrowserGym includes these benchmarks by default:
+This package provides `browsergym`, a gym environment for web task automation in the Chromium browser. It includes these benchmarks by default:
  - [MiniWob++](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
