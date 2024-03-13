@@ -2,14 +2,16 @@
 
 [[Setup]](#setup) ♦ [[Usage]](#usage) ♦ [[Demo]](#demo)
 
-This package provides `browsergym`, a gym environment for web task automation in the Chromium browser. BrowserGym includes the following benchmarks by default:
- - [MiniWob++](https://miniwob.farama.org/)
- - [WebArena](https://webarena.dev/)
- - [WorkArena](https://github.com/ServiceNow/WorkArena)
+This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
 
 _Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)_
+
+BrowserGym includes the following benchmarks by default:
+ - [MiniWob++](https://miniwob.farama.org/)
+ - [WebArena](https://webarena.dev/)
+ - [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
