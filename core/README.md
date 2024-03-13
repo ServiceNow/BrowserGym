@@ -8,17 +8,3 @@ This package provides `browsergym.core`, which provides the core functionalities
 ```sh
 pip install browsergym-core
 ```
-
-2. Install playwright browsers
-```sh
-playwright install
-```
-
-## Usage
-
-```python
-import gymnasium as gym
-import browsergym.core  # register gym environments
-
-env = gym.make("browsergym/openended")
-```
