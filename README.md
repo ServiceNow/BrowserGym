@@ -43,8 +43,6 @@ while not done:
     obs, reward, terminated, truncated, info = env.step(action)
 ```
 
-
-
 ### MiniWoB++ task example
 
 Boilerplate code to run an agent on a miniwob task:
@@ -133,7 +131,3 @@ You can customize your experience by changing the `model_name` to your preferred
 _multiple agent demos on the open web, WorkArena and WebArena_
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
-
-
-
-

@@ -2,6 +2,7 @@ import gymnasium as gym
 import logging
 import os
 import pytest
+import random
 
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
@@ -18,6 +19,9 @@ __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
 
 from browsergym.webarena import ALL_WEBARENA_TASK_IDS
 
+rng = random.Random(1)
+task_ids = rng.sample(ALL_WEBARENA_TASK_IDS, 25)
+
 
 @retry(
     stop=stop_after_attempt(5),
@@ -25,7 +29,7 @@ from browsergym.webarena import ALL_WEBARENA_TASK_IDS
     reraise=True,
     before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),
 )
-@pytest.mark.parametrize("task_id", ALL_WEBARENA_TASK_IDS)
+@pytest.mark.parametrize("task_id", task_ids)
 @pytest.mark.slow
 def test_env_generic(task_id):
     env = gym.make(

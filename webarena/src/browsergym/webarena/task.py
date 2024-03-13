@@ -113,13 +113,14 @@ class GenericWebArenaTask(AbstractBrowserTask):
 
         # This note is present in all webarena's agent prompts
         # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/agent/prompts/raw/p_cot_id_actree_2s.py#L34
-        goal += f"""
+        if self.with_homepage_hint:
+            goal += f"""
 
 (Note: if you want to visit other websites, check out the homepage at {self.webarena_instance.home_url}. It has a list of websites you can visit. {self.webarena_instance.home_url}/password.html lists all the account name and password for the websites. You can use them to log in to the websites.)
 """
 
         # This note is present in some of webarena's agent prompts
-        if self.with_na:
+        if self.with_na_hint:
             goal += """\
 
 If you believe the task is impossible to complete, provide the answer "N/A".
@@ -178,23 +179,3 @@ If you believe the task is impossible to complete, provide the answer "N/A".
             return score, True, "", {}
         else:
             return score, False, "", {}
-
-    def get_goal(self) -> str:
-        goal = self.config["intent"]
-
-        if self.with_homepage_hint:
-            goal += f"""
-
-(Note: if you want to visit other websites, check out the homepage at {self.webarena_instance.home_url}. It has a list of websites you can visit. {self.webarena_instance.home_url}/password.html lists all the account name and password for the websites. You can use them to log in to the websites.)
-"""
-        # This note is present in all webarena's agent prompts
-        # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/agent/prompts/raw/p_cot_id_actree_2s.py#L34
-
-        # This note is present in some of webarena's agent prompts
-        if self.with_na_hint:
-            goal += """\
-
-If you believe the task is impossible to complete, provide the answer "N/A".
-"""
-
-        return goal
