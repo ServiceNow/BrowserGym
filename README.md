@@ -2,9 +2,9 @@
 
 This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
 
-- [Setup]()
-- [Usage]()
-- [Demos]()
+- [Setup](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#usage)
+- [Usage](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#usage)
+- [Demo](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#demo)
 
 ## Setup
 
