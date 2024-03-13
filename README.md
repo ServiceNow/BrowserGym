@@ -2,6 +2,10 @@
 
 This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
 
+_Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (top row, scripted)_
+
+https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
+
 - [Setup](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#usage)
 - [Usage](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#usage)
 - [Demo](https://github.com/ServiceNow/BrowserGym/tree/main?tab=readme-ov-file#demo)
@@ -127,7 +131,3 @@ python run_demo.py --task_name openended --start_url www.google.com
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
-
-_multiple agent demos on the open web, WorkArena and WebArena_
-
-https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
