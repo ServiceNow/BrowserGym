@@ -48,6 +48,8 @@ while not done:
     obs, reward, terminated, truncated, info = env.step(action)
 ```
 
+
+
 ### MiniWoB++ task example
 
 Boilerplate code to run an agent on a miniwob task:
@@ -110,3 +112,9 @@ List of all the available WorkArena environments
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
 ```
+
+Example run on task `browsergym/workarena.servicenow.knowledge-base-search`
+
+https://github.com/ServiceNow/BrowserGym/assets/1726818/83076e8d-d8f2-40bc-a51c-4f741ff651e8
+
+
