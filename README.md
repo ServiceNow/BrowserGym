@@ -130,7 +130,10 @@ python run_demo.py --task_name openended --start_url www.google.com
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
 
-TODO: add 2x2 grid
+_multiple agent demos on the open web, WorkArena and WebArena_
+
+https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
+
 
 
 
