@@ -31,18 +31,3 @@ export WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_
 export MAP="$BASE_URL:3000"
 export HOMEPAGE="$BASE_URL:4399"
 ```
-
-## Usage
-
-```python
-import gymnasium as gym
-import browsergym.webarena  # register gym environments
-
-env = gym.make("browsergym/webarena.310")
-```
-
-List of all the available WebArena environments
-```python
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webarena")]
-print("\n".join(env_ids))
-```

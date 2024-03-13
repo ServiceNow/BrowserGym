@@ -21,18 +21,3 @@ export MINIWOB_URL="file://<PATH_TO_MINIWOB_CLONED_REPO>/miniwob/html/miniwob/"
 ```
 
 Alternatively, one can [setup a simple HTTP server](https://miniwob.farama.org/content/viewing/) and use a proper URL.
-
-## Usage
-
-```python
-import gymnasium as gym
-import browsergym.miniwob  # register gym environments
-
-env = gym.make("browsergym/miniwob.choose-list")
-```
-
-List of all the available MiniWoB++ environments
-```python
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/miniwob")]
-print("\n".join(env_ids))
-```

@@ -147,7 +147,9 @@ class BrowserEnv(gym.Env, ABC):
         )
         # create the chat at the same time to make sure videos are synced
         self.chat = Chat(
-            headless=self.playwright_kwargs["headless"], record_video_dir=self.record_video_dir
+            headless=self.playwright_kwargs["headless"],
+            chat_size=(500, max(self.viewport["height"], 800)),
+            record_video_dir=self.record_video_dir,
         )
         t_after = time.time()
         recording_start_time = (t_before + t_after) / 2  # recording start time
@@ -215,6 +217,9 @@ document.addEventListener("visibilitychange", () => {
         self.last_action = ""
         self.last_action_error = ""
 
+        # if asked, wait for user message
+        self._wait_for_user_message()
+
         # extract obs and info from environment
         obs = self._get_obs()
 
@@ -245,21 +250,24 @@ document.addEventListener("visibilitychange", () => {
         time.sleep(0.5)  # wait for JS events to be fired (half a second)
         self.context.cookies()  # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
 
+        # wait for the network to idle before extracting the observation, reward etc.
+        self._wait_dom_loaded()
+
         # after the action is executed, the active page might have changed
         # perform a safety check
         self._active_page_check()
 
-        # wait for the network to idle before extracting the observation, reward etc.
-        self._wait_dom_loaded()
+        # if asked, wait for user message
+        self._wait_for_user_message()
 
-        # reward, done, user_message, info are task-specific
+        # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
 
         # add any user message sent by the task to the chat
         if user_message:
             self.chat.add_message(role="user", msg=user_message)
 
-        # extract obs, reward etc.
+        # extract observation (generic)
         obs = self._get_obs()
 
         # new step API wants a 5-tuple (gymnasium)
@@ -267,6 +275,12 @@ document.addEventListener("visibilitychange", () => {
         truncated = False
 
         return obs, reward, terminated, truncated, info
+
+    def _wait_for_user_message(self):
+        # if last message is from the assistant, wait for a user message to continue
+        # TODO: be smarter about when to wait for a user message (different action from the assistant?)
+        if self.chat.messages[-1]["role"] == "assistant" and self.wait_for_user_message:
+            self.chat.wait_for_user_message()
 
     def _wait_dom_loaded(self):
         for page in self.context.pages:
@@ -321,11 +335,6 @@ document.addEventListener("visibilitychange", () => {
             raise RuntimeError(f"Unexpected: active page has been closed ({self.page}).")
 
     def _get_obs(self):
-
-        # if last message is from the assistant, wait for a user message to continue
-        # TODO: be smarter about when to wait for a user message (different action from the assistant?)
-        if self.chat.messages[-1]["role"] == "assistant" and self.wait_for_user_message:
-            self.chat.wait_for_user_message()
 
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
