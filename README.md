@@ -21,7 +21,7 @@ playwright install
 Finally, each benchmark comes with its its own specific setup that requires to follow additional steps.
  - for miniwob, see [miniwob/README.md](miniwob/README.md)
  - for webarena, see [webarena/README.md](webarena/README.md)
- - for workarena, see the [WorkArena README](https://github.com/ServiceNow/WorkArena/README.md)
+ - for workarena, see the [WorkArena](https://github.com/ServiceNow/WorkArena) repo
 
 
 ## Usage
@@ -42,6 +42,8 @@ while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
 ```
+
+
 
 ### MiniWoB++ task example
 
@@ -129,3 +131,6 @@ python run_demo.py --task_name openended --start_url www.google.com
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
 
 TODO: add 2x2 grid
+
+
+
