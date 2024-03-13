@@ -17,7 +17,7 @@ playwright install
 Finally, each benchmark comes with its its own specific setup that requires to follow additional steps.
  - for miniwob, see [miniwob/README.md](miniwob/README.md)
  - for webarena, see [webarena/README.md](webarena/README.md)
- - for workarena, see the [WorkArena README](https://github.com/ServiceNow/WorkArena/README.md)
+ - for workarena, see the [WorkArena](https://github.com/ServiceNow/WorkArena) repo
 
 4. (optional) if you want to run the UI assistant to create demos
 
