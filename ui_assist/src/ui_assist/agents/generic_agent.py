@@ -65,10 +65,12 @@ does not support vision. Disabling use_screenshot."""
             obs["pruned_html"] = prune_html(obs["dom_txt"])
 
         self.obs_history.append(obs)
+
         main_prompt = dynamic_prompting.MainPrompt(
             obs_history=self.obs_history,
             actions=self.actions,
             memories=self.memories,
+            thoughts=self.thoughts,
             flags=self.flags,
         )
 
@@ -127,6 +129,7 @@ does not support vision. Disabling use_screenshot."""
         self.seed = seed
         self.memories = []
         self.actions = []
+        self.thoughts = []
         self.obs_history = []
 
     def preprocess_obs(self, obs: dict) -> dict:

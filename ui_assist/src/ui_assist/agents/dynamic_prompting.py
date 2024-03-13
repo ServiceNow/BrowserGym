@@ -396,11 +396,12 @@ class MainPrompt(Shrinkable):
         obs_history,
         actions,
         memories,
+        thoughts,
         flags: Flags,
     ) -> None:
         super().__init__()
         self.flags = flags
-        self.history = History(obs_history, actions, memories, flags)
+        self.history = History(obs_history, actions, memories, thoughts, flags)
         if self.flags.enable_chat:
             self.instructions = ChatInstructions(obs_history[-1]["chat_messages"])
         else:
@@ -685,7 +686,9 @@ class HistoryStep(Shrinkable):
 
 
 class History(Shrinkable):
-    def __init__(self, history_obs, actions, memories, flags: Flags, shrink_speed=1) -> None:
+    def __init__(
+        self, history_obs, actions, memories, thoughts, flags: Flags, shrink_speed=1
+    ) -> None:
         super().__init__(visible=lambda: flags.use_history)
         assert len(history_obs) == len(actions) + 1
         assert len(history_obs) == len(memories) + 1
@@ -754,6 +757,7 @@ if __name__ == "__main__":
     ]
     ACTIONS = ["click('41')", "click('42')"]
     MEMORIES = ["memory A", "memory B"]
+    THOUGHTS = ["thought A", "thought B"]
 
     flags = Flags(
         use_html=True,
@@ -776,6 +780,7 @@ if __name__ == "__main__":
             obs_history=OBS_HISTORY,
             actions=ACTIONS,
             memories=MEMORIES,
+            thoughts=THOUGHTS,
             step=0,
             flags=flags,
         ).prompt

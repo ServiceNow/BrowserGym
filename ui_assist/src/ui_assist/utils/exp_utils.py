@@ -28,6 +28,8 @@ from ui_assist.agents import AgentArgs
 from ui_assist.agents.base import Agent
 import os
 
+from ui_assist.utils.llm_utils import count_messages_token, count_tokens
+
 
 class DataclassJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -179,19 +181,14 @@ class StepStats:
     openai_prompt_tokens: int = None
 
     def set_obs_stats(self, obs):
-        # self.n_token_dom_txt = count_tokens(obs["dom_txt"])
-        # self.n_token_pruned_html = count_tokens(obs["pruned_html"])
-        # self.n_token_axtree_txt = count_tokens(obs["axtree_txt"])
-        self.n_token_dom_txt = 0
-        self.n_token_pruned_html = 0
-        self.n_token_axtree_txt = 0
+        self.n_token_dom_txt = count_tokens(obs["dom_txt"])
+        self.n_token_pruned_html = count_tokens(obs["pruned_html"])
+        self.n_token_axtree_txt = count_tokens(obs["axtree_txt"])
 
     def set_action_stats(self, agent_info, openai_cb: OpenAICallbackHandler):
         messages = agent_info.get("chat_messages", None)
         if messages is not None:
-            # self.n_token_prompt = count_messages_token(messages)
-            self.n_token_prompt = 0
-            # TODO
+            self.n_token_prompt = count_messages_token(messages)
 
         n_retry = agent_info.get("n_retry", None)
         if n_retry is not None:
