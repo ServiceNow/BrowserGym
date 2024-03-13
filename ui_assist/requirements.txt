@@ -1,0 +1,11 @@
+browsergym-core==0.0.1a10
+#joblib>=1.2.0
+openai>=1.7,<1.8
+langchain>=0.1,<0.2
+langchain_openai
+tiktoken
+huggingface_hub
+contexttimer
+ipython
+pyyaml>=6
+pandas

@@ -19,6 +19,16 @@ playwright install
  - for webarena, see [webarena/README.md](webarena/README.md)
  - for workarena, see the [WorkArena](https://github.com/ServiceNow/WorkArena/README.md) repository
 
+4. (optional) if you want to run the UI assistant to create demos
+
+```sh
+cd ui_assist
+conda env create -f environment.yml; conda activate ui-assist
+# or simply `pip install -r requirements`
+playwright install
+```
+
+
 ## Usage
 
 ### Open-ended task example
@@ -82,3 +92,6 @@ while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
 ```
+
+## UI assistant
+
