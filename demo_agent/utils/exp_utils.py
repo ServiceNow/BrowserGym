@@ -9,24 +9,25 @@ import sys
 import time
 import traceback
 import uuid
+import pandas as pd
+
 from datetime import datetime
 from pathlib import Path
 from warnings import warn
 from langchain_community.callbacks import get_openai_callback
 from langchain_community.callbacks.openai_info import OpenAICallbackHandler
 from contexttimer import Timer
+from PIL import Image
+from tqdm import tqdm
 
+import gymnasium as gym
 import browsergym.miniwob  # important, registers "browsergym/miniwob.*" gym environment
 import browsergym.workarena  # important, registers "browsergym/workarena.*" gym environment
 import browsergym.webarena  # important, registers "browsergym/webarena.*" gym environment
-import gymnasium as gym
-from PIL import Image
-import pandas as pd
-from tqdm import tqdm
+from browsergym.core.chat import Chat
 
 from agents import AgentArgs
 from agents.base import Agent
-import os
 
 from utils.llm_utils import count_messages_token, count_tokens
 
@@ -84,7 +85,6 @@ class ExpArgs:
     max_steps: int = 10
     headless: bool = True
     sleep_at_each_step: float = None
-    enable_debug: bool = True
     order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
 
     def prepare(self, savedir_base):
@@ -141,6 +141,8 @@ class ExpArgs:
                 if action is None:
                     break
 
+                send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
+
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
                 step_info.perform_step(env, action, obs_processor=agent.preprocess_obs)
@@ -153,7 +155,7 @@ class ExpArgs:
             stack_trace = traceback.format_exc()
 
             warn(err_msg)
-            if _is_debugging() and self.enable_debug:
+            if _is_debugging():
                 raise
 
         finally:
@@ -162,6 +164,13 @@ class ExpArgs:
                 env.close()
             except Exception as e:
                 logging.error(f"Error while closing the environment: {e}")
+
+
+def send_chat_info(chat: Chat, action: str, agent_info: dict):
+    info = {"think": agent_info.get("think", None), "action": action}
+    msg = "\n\n".join([f"{key}:\n{val}" for key, val in info.items() if val is not None])
+    logging.info(msg)
+    chat.add_message(role="info", msg=msg)
 
 
 @dataclasses.dataclass
