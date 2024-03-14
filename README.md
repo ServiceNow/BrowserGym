@@ -121,7 +121,7 @@ print("\n".join(env_ids))
 If you want to experiment with an agent in BrowserGym, follow these steps:
 
 ```sh
-cd dem-agent
+cd demo-agent
 conda env create -f environment.yml; conda activate demo-agent
 # or simply use `pip install -r requirements.txt`
 playwright install
