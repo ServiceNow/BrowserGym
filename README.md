@@ -27,7 +27,7 @@ Then, a required step is to setup playwright by running
 playwright install
 ```
 
-Finally, each benchmark comes with its its own specific setup that requires to follow additional steps.
+Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
  - for miniwob, see [miniwob/README.md](miniwob/README.md)
  - for webarena, see [webarena/README.md](webarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
@@ -37,7 +37,7 @@ Finally, each benchmark comes with its its own specific setup that requires to f
 
 ### Open-ended task example
 
-Boilerplate code to run an agent on an interactive, openended task:
+Boilerplate code to run an agent on an interactive, open-ended task:
 ```python
 import gymnasium as gym
 import browsergym.core  # register the openended task as a gym environment
@@ -54,7 +54,7 @@ while not done:
 
 ### MiniWoB++ task example
 
-Boilerplate code to run an agent on a miniwob task:
+Boilerplate code to run an agent on a MiniWoB++ task:
 ```python
 import gymnasium as gym
 import browsergym.miniwob  # register miniwob tasks as gym environments
@@ -75,7 +75,7 @@ print("\n".join(env_ids))
 
 ### WebArena task example
 
-Boilerplate code to run an agent on a webarena task:
+Boilerplate code to run an agent on a WebArena task:
 ```python
 import gymnasium as gym
 import browsergym.webarena  # register webarena tasks as gym environments
@@ -96,7 +96,7 @@ print("\n".join(env_ids))
 
 ### WorkArena task example
 
-Boilerplate code to run an agent on a workarena task:
+Boilerplate code to run an agent on a WorkArena task:
 ```python
 import gymnasium as gym
 import browsergym.workarena  # register workarena tasks as gym environments
@@ -132,7 +132,7 @@ Optional: Set your `OPENAI_API_KEY` if you want to use a GPT agent.
 Launch the demo on the open web:
 
 ```sh
-python run_demo.py --task_name openended --start_url www.google.com
+python run_demo.py --task_name openended --start_url https://www.google.com
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
