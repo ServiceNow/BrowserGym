@@ -1,4 +1,4 @@
-# BrowserGym: a gym environment for web task automation
+# BrowserGym: a Gym Environment for Web Task Automation
 
 [[Setup]](#setup) ♦ [[Usage]](#usage) ♦ [[Demo]](#demo)
 
