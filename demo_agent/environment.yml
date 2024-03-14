@@ -1,4 +1,4 @@
-name: ui-assist
+name: demo-agent
 
 channels:
   - huggingface
