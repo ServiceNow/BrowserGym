@@ -1,4 +1,4 @@
-from pathlib import Path
+import copy
 import gymnasium as gym
 import logging
 import numpy as np
@@ -6,6 +6,7 @@ import playwright.sync_api
 import time
 
 from abc import ABC
+from pathlib import Path
 from typing import Optional, Literal
 
 from .chat import Chat
@@ -375,7 +376,7 @@ document.addEventListener("visibilitychange", () => {
 
         # obs is generic to all tasks
         obs = {
-            "chat_messages": self.chat.messages,
+            "chat_messages": copy.deepcopy(self.chat.messages),
             "goal": goal,  # TODO: redundant with chat messages, to be removed?
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
