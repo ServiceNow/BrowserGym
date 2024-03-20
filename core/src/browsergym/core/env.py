@@ -262,7 +262,7 @@ document.addEventListener("visibilitychange", () => {
         self._wait_for_user_message()
 
         # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
+        reward, done, user_message, info = self._task_validate()
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -276,6 +276,24 @@ document.addEventListener("visibilitychange", () => {
         truncated = False
 
         return obs, reward, terminated, truncated, info
+
+    def _task_validate(self):
+        # back-up these in case validate() navigates pages and messes the history
+        prev_active_page = self.page
+        prev_page_history = self.page_history.copy()
+
+        # call validate
+        reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
+
+        # safety fix, in case validate() did mess up the active page and/or page history
+        if prev_active_page != self.page or prev_page_history != self.page_history:
+            logging.warning(
+                "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
+            )
+            self.page = prev_active_page
+            self.page_history = prev_page_history
+
+        return reward, done, user_message, info
 
     def _wait_for_user_message(self):
         # if last message is from the assistant, wait for a user message to continue

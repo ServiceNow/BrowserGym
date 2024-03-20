@@ -1,4 +1,4 @@
-__version__ = "0.1.0rc5"
+__version__ = "0.1.0rc6"
 
 from browsergym.core.registration import register_task
 
@@ -14,6 +14,6 @@ for task_id in TASK_IDS:
     register_task(
         gym_id,
         GenericWebArenaTask,
-        kwargs={"task_id": task_id, "viewport": {"width": 1280, "height": 720}},
+        kwargs={"task_id": task_id, "viewport": {"width": 1280, "height": 720}, "timeout": 10000},
     )
     ALL_WEBARENA_TASK_IDS.append(gym_id)
