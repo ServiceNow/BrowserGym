@@ -399,6 +399,7 @@ document.addEventListener("visibilitychange", () => {
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
+            "html": self.page.content(),
             "screenshot": extract_screenshot(self.page),
             "dom_object": dom,
             "axtree_object": axtree,
