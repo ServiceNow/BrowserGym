@@ -1,0 +1,194 @@
+name: Unit tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  browsergym-core:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Run browsergym-core Unit Tests
+        run: pytest -n 1 --durations=10 -m 'not pricy' -v browsergym/core/tests
+
+  browsergym-miniwob:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Fetch MiniWob
+        uses: actions/checkout@v4
+        with:
+          repository: "Farama-Foundation/miniwob-plusplus"
+          ref: "7fd85d71a4b60325c6585396ec4f48377d049838"
+          path: "miniwob-plusplus"
+
+      - name: Serve MiniWob
+        uses: Eun/http-server-action@v1
+        with:
+          directory: "${{ github.workspace }}/miniwob-plusplus/miniwob/html"
+          port: 8080
+
+      - name: Run browsergym-miniwob Unit Tests
+        env:
+          MINIWOB_URL: "http://localhost:8080/miniwob/"
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v browsergym/miniwob/tests
+
+  browsergym-webarena-fast:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Run browsergym-webarena not slow Unit Tests
+        env:
+          SHOPPING: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770/"
+          SHOPPING_ADMIN: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin"
+          REDDIT: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999"
+          GITLAB: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023"
+          WIKIPEDIA: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
+          MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
+          HOMEPAGE: "PASS:4399"
+          WEBARENA_PATH: "${{ github.workspace }}/webarena/"
+        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v browsergym/webarena/tests
+
+  browsergym-webarena-slow:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Run browsergym-webarena slow Unit Tests
+        env:
+          SHOPPING: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770/"
+          SHOPPING_ADMIN: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin"
+          REDDIT: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999"
+          GITLAB: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023"
+          WIKIPEDIA: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
+          MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
+          HOMEPAGE: "PASS:4399"
+          WEBARENA_PATH: "${{ github.workspace }}/webarena/"
+        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v browsergym/webarena/tests
+
+  ui_copilot:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Run ui_copilot Unit Tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v ui_copilot
