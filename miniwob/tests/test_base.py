@@ -30,8 +30,8 @@ def test_validate_teardown(task_cls):
     context = browser.new_context()
     page = context.new_page()
 
-    task = task_cls()
-    task.setup(seed=42, page=page)
+    task = task_cls(seed=42)
+    task.setup(page=page)
 
     reward, done, msg, info = task.validate(page, [])
 
@@ -51,8 +51,8 @@ def test_episode_max_time(task_cls):
     context = browser.new_context()
     page = context.new_page()
 
-    task = task_cls(episode_max_time=0.2)
-    task.setup(seed=42, page=page)
+    task = task_cls(seed=42, episode_max_time=0.2)
+    task.setup(page=page)
 
     time.sleep(0.5)
 
@@ -78,8 +78,8 @@ def test_remove_human_display(task_cls):
     context = browser.new_context()
     page = context.new_page()
 
-    task = task_cls(remove_human_display=True)
-    task.setup(seed=42, page=page)
+    task = task_cls(seed=42, remove_human_display=True)
+    task.setup(page=page)
 
     for element_id in ["reward-display", "click-canvas", "sync-task-cover"]:
         element_in_dom = page.evaluate(f"!!document.getElementById('{element_id}')")
@@ -100,8 +100,8 @@ def test_remove_human_display(task_cls):
     context = browser.new_context()
     page = context.new_page()
 
-    task = task_cls(remove_human_display=False)
-    task.setup(seed=42, page=page)
+    task = task_cls(seed=42, remove_human_display=False)
+    task.setup(page=page)
 
     for element_id in ["reward-display", "click-canvas", "sync-task-cover"]:
         element_in_dom = page.evaluate(f"!!document.getElementById('{element_id}')")

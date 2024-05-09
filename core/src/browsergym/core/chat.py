@@ -4,18 +4,20 @@ from typing import Literal
 import logging
 import playwright.sync_api
 import re
+import time
 
 from importlib import resources
 
 from . import _get_global_playwright, chat_files
 
 
-CHATBOX_HTML_PATH = str(resources.files(chat_files).joinpath("chatbox.html"))
-ASSISTANT_IMG_PATH = str(resources.files(chat_files).joinpath("assistant.png"))
+CHATBOX_DIR = resources.files(chat_files)
 
 
 class Chat:
-    def __init__(self, headless: bool, chat_size=(500, 800), record_video_dir=None) -> None:
+    def __init__(
+        self, headless: bool, chat_size=(500, 800), record_video_dir=None, modern=True
+    ) -> None:
         self.messages = []
 
         # create a new browser, browser context and page for the chat
@@ -29,13 +31,17 @@ class Chat:
             record_video_size=dict(width=chat_size[0], height=chat_size[1]),
         )
         self.page = self.context.new_page()
+        self.recording_start_time = time.time() if record_video_dir else None
 
         # setup the chat page
         self.page.expose_function(
             "send_user_message", lambda msg: self.add_message(role="user", msg=msg, from_js=True)
         )
 
-        self.page.set_content(get_chatbox_html())
+        if modern:
+            self.page.set_content(get_chatbox_modern(CHATBOX_DIR))
+        else:
+            self.page.set_content(get_chatbox_classic(CHATBOX_DIR))
 
     def add_message(
         self, role: Literal["user", "assistant", "info"], msg: str, from_js: bool = False
@@ -46,8 +52,6 @@ class Chat:
         if role in ("user", "assistant"):
             self.messages.append({"role": role, "message": msg})
         if not from_js:
-            # change new lines to html
-            msg = msg.replace("\n", "<br>")
             self.page.evaluate(f"addChatMessage({repr(role)}, {repr(msg)});")
 
     def wait_for_user_message(self):
@@ -63,16 +67,19 @@ class Chat:
         self.browser.close()
 
 
-def get_chatbox_html() -> str:
-    with open(CHATBOX_HTML_PATH, "r") as file:
+def get_chatbox_modern(chatbox_dir) -> str:
+    with open(chatbox_dir / "chatbox_modern.html", "r") as file:
         chatbox_html = file.read()
 
-    with open(ASSISTANT_IMG_PATH, "rb") as f:
-        # image = Image.open(f)
+    return chatbox_html
+
+
+def get_chatbox_classic(chatbox_dir) -> str:
+    with open(chatbox_dir / "chatbox.html", "r") as file:
+        chatbox_html = file.read()
+    with open(chatbox_dir / "assistant.png", "rb") as f:
         image_base64 = base64.b64encode(f.read()).decode("utf-8")
 
-    # hard-code the assistant image in the HTML
     assistant_image_url = f"data:image/png;base64,{image_base64}"
     chatbox_html = re.sub("<ASSISTANT_IMAGE_URL>", assistant_image_url, chatbox_html)
-
     return chatbox_html

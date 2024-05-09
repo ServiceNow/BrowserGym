@@ -20,11 +20,19 @@ class GenericWebArenaTask(AbstractBrowserTask):
 
     def __init__(
         self,
+        seed: int,
         task_id: Optional[int] = None,
         intent_template_id: Optional[int] = None,
         with_na_hint: bool = False,
         with_homepage_hint: bool = False,
     ) -> None:
+        super().__init__(seed)
+
+        # task properties, will be used to set up the browsergym environment
+        self.viewport = {"width": 1280, "height": 720}
+        self.slow_mo = 1000  # ms
+        self.timeout = 10000  # ms
+
         self.webarena_instance = WebArenaInstance()
         self.config_file: str = None
         self.with_na_hint = with_na_hint
@@ -74,11 +82,9 @@ class GenericWebArenaTask(AbstractBrowserTask):
 
         self.task_configs = task_configs
 
-    def setup(self, seed: int, page: playwright.sync_api.Page) -> tuple[str, dict]:
+    def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         # import webarena on instanciation
         from webarena.evaluation_harness.evaluators import evaluator_router
-
-        self.random = np.random.RandomState(seed)
 
         # pick a task at random
         self.config = self.random.choice(self.task_configs)

@@ -23,7 +23,7 @@ __TIMEOUT = 500
 __DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 TEST_PAGE = f"file://{__DATA_DIR}/test_page.html"
 BASIC_IFRAME_PAGE = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
-DEMO_MODES = ["default", "only_visible_elements"]
+DEMO_MODES = ["default", "only_visible_elements", "all_blue"]
 
 
 def test_gym_env():
@@ -31,7 +31,7 @@ def test_gym_env():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -92,7 +92,7 @@ def test_max_episode_steps():
     # no max_steps
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -112,7 +112,7 @@ def test_max_episode_steps():
     # max_steps = 2
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -137,7 +137,7 @@ def test_active_page():
     action_set = PythonActionSet()
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -191,11 +191,10 @@ def test_nested_iframes_default_demo_mode():
     action_set = HighLevelActionSet(demo_mode=demo_mode)
     env = gym.make(
         "browsergym/openended",
-        start_url=BASIC_IFRAME_PAGE,
+        task_kwargs={"start_url": BASIC_IFRAME_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
-        demo_mode=demo_mode,
         action_mapping=action_set.to_python_code,
     )
     obs, info = env.reset()
@@ -228,12 +227,11 @@ def test_demo_mode(demo_mode):
     action_set = HighLevelActionSet(demo_mode=demo_mode)
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
         action_mapping=action_set.to_python_code,
-        demo_mode=demo_mode,
     )
     obs, info = env.reset()
     assert not obs["last_action_error"]
@@ -280,5 +278,25 @@ click({repr(checkbox.get(BID_ATTR))})
     checkbox = soup.find("input", attrs={"type": "checkbox", "id": "subscribe"})
     # box is checked
     assert checkbox.has_attr("checked")
+
+    env.close()
+
+
+@pytest.mark.parametrize("resizeable_window", (True, False))
+@pytest.mark.parametrize("size", ((1600, 1200), (800, 800)))
+def test_resizeable_window(resizeable_window, size):
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEST_PAGE},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        viewport={"width": size[0], "height": size[1]},
+        resizeable_window=resizeable_window,
+    )
+    obs, info = env.reset()
+    assert not obs["last_action_error"]
+
+    assert (obs["screenshot"].shape[1], obs["screenshot"].shape[0]) == size
 
     env.close()

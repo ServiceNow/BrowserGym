@@ -4,22 +4,25 @@ import logging
 import numpy as np
 import playwright.sync_api
 import time
+import re
 
 from abc import ABC
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Optional
 
 from .chat import Chat
 from .task import AbstractBrowserTask
-from .spaces import Unicode, AnyDict
+from .spaces import Unicode, AnyDict, AnyBox
 from .constants import TEXT_MAX_LENGTH, BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
 from .observation import (
     _pre_extract,
     _post_extract,
     extract_screenshot,
     extract_dom_snapshot,
+    extract_dom_extra_properties,
     extract_merged_axtree,
     extract_focused_element_bid,
+    MarkingError,
 )
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
@@ -28,45 +31,65 @@ from . import _get_global_playwright
 
 
 class BrowserEnv(gym.Env, ABC):
+    """The main BrowserGym class, which encapsulates instruction-following Web browsing into a Gymnasium environment."""
+
     # gym metadata
     metadata = {"render_modes": None}
 
     def __init__(
         self,
+        # task-related arguments
         task_entrypoint: type[AbstractBrowserTask],
+        task_kwargs: dict = {},
+        viewport: Optional[dict] = None,  # will override the task's viewport
+        slow_mo: Optional[int] = None,  # will override the task's slow_mo
+        timeout: Optional[int] = None,  # will override the task's timeout
+        # interactive / debugging arguments
         headless: bool = True,
-        viewport: dict = {"width": 1280, "height": 720},
-        slow_mo: int = 1000,  # in milliseconds
-        timeout: int = 5000,
         wait_for_user_message: bool = False,
-        demo_mode: Literal["off", "default", "only_visible_elements"] = "off",
-        record_video_dir: str = None,
-        playwright_kwargs: dict = {},
+        resizeable_window: bool = False,
+        record_video_dir: Optional[str] = None,
+        pw_chromium_kwargs: dict = {},
+        pw_context_kwargs: dict = {},
+        # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
-        **task_kwargs,
     ):
+        """
+        Instantiate a ready to use BrowserEnv gym environment.
+
+        Args:
+            task_entrypoint: a callable that returns a new task object from a seed. Used for creating a new task during `reset()`.
+            task_kwargs: additional arguments passed to `task_entrypoint`.
+            viewport: desired viewport size. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            slow_mo: desired slow_mo value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            timeout: desired timeout value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            headless: whether the browser should run in headless mode or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Headless mode should only be disabled for debugging/testing.
+            wait_for_user_message: whether the environment should pause and wait for a user message in the chat after a new message is sent by the agent. Useful for running agents in interactive mode.
+            resizeable_window: whether the browser window should be resizeable or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Should only be set for debugging/testing.
+            record_video_dir: if set, indicates a directory to which viewport videos will be recorded.
+            pw_chromium_kwargs: extra parameters for the playwright Browser. Should only be used for debugging/testing.
+            pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
+            action_mapping: if set, the environment will use this function to map every received action to executable Python code.
+
+        """
         super().__init__()
         self.task_entrypoint = task_entrypoint
-        self.task_kwargs = task_kwargs
-        self.headless = headless
+        self.task_kwargs = dict(**task_kwargs)
         self.viewport = viewport
         self.slow_mo = slow_mo
         self.timeout = timeout
+        self.headless = headless
         self.wait_for_user_message = wait_for_user_message
-        self.demo_mode = demo_mode
-        self.action_mapping = action_mapping
+        self.resizeable_window = resizeable_window
         self.record_video_dir = record_video_dir
+        self.pw_chromium_kwargs = pw_chromium_kwargs
+        self.pw_context_kwargs = pw_context_kwargs
+        self.action_mapping = action_mapping
 
         # task
         self.task = None
 
         # playwright
-        self.playwright_kwargs = playwright_kwargs
-        self.playwright_kwargs.setdefault("headless", self.headless)
-        self.playwright_kwargs.setdefault("slow_mo", self.slow_mo)
-        self.playwright_kwargs.setdefault(
-            "args", [f"--window-size={self.viewport['width']},{self.viewport['height']}"]
-        )
         self.browser: playwright.sync_api.Browser = None
         self.context: playwright.sync_api.BrowserContext = None
         self.page: playwright.sync_api.Page = None
@@ -93,14 +116,15 @@ class BrowserEnv(gym.Env, ABC):
                 ),
                 "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
                 "url": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "screenshot": gym.spaces.Box(
-                    0,
-                    255,
-                    shape=(viewport["height"], viewport["width"], 3),
+                "screenshot": AnyBox(
+                    low=0,
+                    high=255,
+                    shape=(-1, -1, 3),
                     dtype=np.uint8,
-                ),  # swapped axes (height first)
+                ),  # swapped axes (height, width, RGB)
                 "dom_object": AnyDict(),
                 "axtree_object": AnyDict(),
+                "extra_element_properties": AnyDict(),
                 "focused_element_bid": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "last_action": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "last_action_error": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
@@ -124,39 +148,67 @@ class BrowserEnv(gym.Env, ABC):
             self.task = None
 
     def reset(self, seed=None, *args, **kwargs):
-        # we need the following line to seed self.np_random
         super().reset(seed=seed, *args, **kwargs)
+        self.np_random = None  # make sure all randomness is handled by the task
 
         if self.task:
             self.task.teardown()
             self.context.close()
             self.chat.close()
-        else:
-            pw: playwright.sync_api.Playwright = _get_global_playwright()
-            # important: change playwright's test id attribute from "data-testid" to "bid"
-            pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
-            self.browser = pw.chromium.launch(**self.playwright_kwargs)
+            self.browser.close()
+
+        # create a new task
+        self.task = self.task_entrypoint(seed=seed, **self.task_kwargs)
+
+        def override_property(task, env, property):
+            """Extract property value from env if not None, otherwise from task."""
+            env_value = getattr(env, property)
+            task_value = getattr(task, property)
+            if env_value is None:
+                return task_value
+            else:
+                logging.warning(
+                    f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
+                )
+                return env_value
+
+        # fetch task's desired parameters for browser setup
+        viewport = override_property(self.task, self, "viewport")
+        slow_mo = override_property(self.task, self, "slow_mo")
+        timeout = override_property(self.task, self, "timeout")
+
+        # use the global Playwright instance
+        pw: playwright.sync_api.Playwright = _get_global_playwright()
+        # important: change playwright's test id attribute from "data-testid" to "bid"
+        pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
+
+        # create a new browser
+        self.browser = pw.chromium.launch(
+            headless=self.headless,
+            slow_mo=slow_mo,
+            args=(
+                [f"--window-size={viewport['width']},{viewport['height']}"]
+                if self.resizeable_window
+                else None
+            ),
+            # will raise an Exception if above args are overriden
+            **self.pw_chromium_kwargs,
+        )
 
         # create a new browser context for pages
-        t_before = time.time()
         self.context = self.browser.new_context(
-            no_viewport=True,
+            no_viewport=True if self.resizeable_window else None,
+            viewport=viewport,
             record_video_dir=(
                 Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
             ),
-            record_video_size=self.viewport,
+            record_video_size=viewport,
+            # will raise an Exception if above args are overriden
+            **self.pw_context_kwargs,
         )
-        # create the chat at the same time to make sure videos are synced
-        self.chat = Chat(
-            headless=self.playwright_kwargs["headless"],
-            chat_size=(500, max(self.viewport["height"], 800)),
-            record_video_dir=self.record_video_dir,
-        )
-        t_after = time.time()
-        recording_start_time = (t_before + t_after) / 2  # recording start time
 
         # set default timeout
-        self.context.set_default_timeout(self.timeout)
+        self.context.set_default_timeout(timeout)
 
         # hack: keep track of the active page with a javascript callback
         # there is no concept of active page in playwright
@@ -188,13 +240,19 @@ document.addEventListener("visibilitychange", () => {
 """
         )
 
+        # create the chat
+        self.chat = Chat(
+            headless=self.headless,
+            chat_size=(500, max(viewport["height"], 800)),
+            record_video_dir=self.record_video_dir,
+        )
+
         # create a new page
         self.page = self.context.new_page()
+        recording_start_time = time.time()
 
-        # create and setup a new task
-        task_seed = self.np_random.integers(np.iinfo(np.int32).max + 1)
-        self.task = self.task_entrypoint(**self.task_kwargs)
-        goal, info = self.task.setup(seed=task_seed, page=self.page)
+        # setup the task
+        goal, task_info = self.task.setup(page=self.page)
 
         # initialize the chat
         self.chat.add_message(
@@ -224,13 +282,26 @@ document.addEventListener("visibilitychange", () => {
         # extract obs and info from environment
         obs = self._get_obs()
 
+        info = {}
+        info["task_info"] = task_info
+
+        # TODO this is a bit hacky, find a better solution to record videos
         if self.record_video_dir:
             info["recording_start_time"] = recording_start_time
+            info["recording_file"] = str(self.page.video.path())
+            info["chat"] = {
+                "recording_start_time": self.chat.recording_start_time,
+                "recording_file": str(self.chat.page.video.path()),
+            }
 
         return obs, info
 
     def step(self, action: str) -> tuple:
         self.last_action = action
+
+        info = {}
+        info["action_exec_start"] = time.time()
+        info["action_exec_timeout"] = 0
 
         # try to execute the action
         try:
@@ -246,6 +317,11 @@ document.addEventListener("visibilitychange", () => {
             self.last_action_error = ""
         except Exception as e:
             self.last_action_error = f"{type(e).__name__}: {e}"
+            match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
+            if match:
+                info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
+
+        info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
         time.sleep(0.5)  # wait for JS events to be fired (half a second)
@@ -262,7 +338,8 @@ document.addEventListener("visibilitychange", () => {
         self._wait_for_user_message()
 
         # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, info = self._task_validate()
+        reward, done, user_message, task_info = self._task_validate()
+        info["task_info"] = task_info
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -287,7 +364,7 @@ document.addEventListener("visibilitychange", () => {
 
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
-            logging.warning(
+            logging.info(
                 "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
             )
             self.page = prev_active_page
@@ -363,13 +440,16 @@ document.addEventListener("visibilitychange", () => {
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
                 focused_element_bid = extract_focused_element_bid(self.page)
-            except playwright.sync_api.Error as e:
+                extra_properties = extract_dom_extra_properties(dom)
+            except (playwright.sync_api.Error, MarkingError) as e:
                 err_msg = str(e)
                 # try to add robustness to async events (detached / deleted frames)
                 if retries_left > 0 and (
                     "Frame was detached" in err_msg
                     or "Frame with the given frameId is not found" in err_msg
                     or "Execution context was destroyed" in err_msg
+                    or "Frame has been detached" in err_msg
+                    or "Cannot mark a child frame without a bid" in err_msg
                 ):
                     logging.warning(
                         f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
@@ -402,6 +482,7 @@ document.addEventListener("visibilitychange", () => {
             "screenshot": extract_screenshot(self.page),
             "dom_object": dom,
             "axtree_object": axtree,
+            "extra_element_properties": extra_properties,
             "focused_element_bid": focused_element_bid,
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,

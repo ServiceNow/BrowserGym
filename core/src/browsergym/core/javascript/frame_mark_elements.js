@@ -2,11 +2,7 @@
  * Go through all DOM elements in the frame (including shadowDOMs), give them unique browsergym
  * identifiers (bid), and store custom data in the aria-roledescription attribute.
  */
-var { innerWidth: windowWidth, innerHeight: windowHeight } = window;
-var scrollX = window.scrollX || document.documentElement.scrollLeft;
-var scrollY = window.scrollY || document.documentElement.scrollTop;
-
-([parent_bid, bid_attr_name, iframe_position, super_iframe_offset]) => {
+async ([parent_bid, bid_attr_name]) => {
 
     // standard html tags
     // https://www.w3schools.com/tags/
@@ -25,30 +21,39 @@ var scrollY = window.scrollY || document.documentElement.scrollTop;
         "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead",
         "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"
     ];
-
-    if (super_iframe_offset == null) {
-
-        iframe_offset = { x: scrollX, y: scrollY, right: windowWidth, bottom: windowHeight };
-    }
-    else {
-        [super_x, super_y, super_right, super_bottom] = [super_iframe_offset["x"], super_iframe_offset["y"], super_iframe_offset["right"], super_iframe_offset["bottom"]];
-
-        x = Math.max(-iframe_position.x, 0);
-        y = Math.max(-iframe_position.y, 0);
-        right = Math.min(...[super_right, windowWidth,  super_right - iframe_position.x]);
-        bottom = Math.min(...[super_bottom, windowHeight, super_bottom - iframe_position.y]);
-        iframe_offset = { x: x, y: y, right: right, bottom: bottom };
-    }
+    const set_of_marks_tags = [
+        "input", "textarea", "select", "button", "a", "iframe", "video", "li", "td", "option"
+    ];
 
     let browsergym_first_visit = false;
     // if no yet set, set the frame (local) element counter to 0
-    if (!("browsergym_frame_elem_counter" in window)) {
-        window.browsergym_frame_elem_counter = 0;
+    if (!("browsergym_elem_counter" in window)) {
+        window.browsergym_elem_counter = 0;
+        window.browsergym_frame_id_generator = new IFrameIdGenerator();
         browsergym_first_visit = true;
     }
+    // mechanism for computing all element's visibility
+    // the intersection observer will set the visibility ratio of elements entering / exiting the viewport
+    // a set is used to keep track of not-yet-visited elements
+    let elems_to_be_visited = new Set()
+    let intersection_observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            let elem = entry.target;
+            elem.setAttribute('browsergym_visibility_ratio', Math.round(entry.intersectionRatio * 100) / 100);
+            if (elems_to_be_visited.has(elem)) {
+                elems_to_be_visited.delete(elem);
+            }
+          })
+        },
+        {
+            threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        }
+    )
 
     // get all DOM elements in the current frame (does not include elements in shadowDOMs)
     let elements = Array.from(document.querySelectorAll('*'));
+    let som_buttons = [];
     i = 0;
     while (i < elements.length) {
         const elem = elements[i];
@@ -64,10 +69,14 @@ var scrollY = window.scrollY || document.documentElement.scrollTop;
         i++;
         // we will mark only standard HTML tags
         if (!elem.tagName || !html_tags.includes(elem.tagName.toLowerCase())) {
-            // console.log(`Skipping element ${elem.outerHTML}`)
+            // Skipping element
             continue;  // stop and move on to the next element
         }
-        // console.log(`Processing element ${elem.outerHTML}`)
+        // Processing element
+        // register intersection callback on element, and keep track of element for waiting later
+        elem.setAttribute('browsergym_visibility_ratio', 0);
+        elems_to_be_visited.add(elem);
+        intersection_observer.observe(elem);
         // write dynamic element values to the DOM
         if (typeof elem.value !== 'undefined') {
             elem.setAttribute("value", elem.value);
@@ -81,7 +90,7 @@ var scrollY = window.scrollY || document.documentElement.scrollTop;
                 elem.removeAttribute("checked");
             }
         }
-        // add the element global id to a custom HTML attribute
+        // add the element global id (browsergym id) to a custom HTML attribute
         // https://playwright.dev/docs/locators#locate-by-test-id
         // recover the element id if it has one already, else compute a new element id
         let elem_global_bid;
@@ -93,100 +102,169 @@ var scrollY = window.scrollY || document.documentElement.scrollTop;
             elem_global_bid = elem.getAttribute(bid_attr_name);
         }
         else {
-            let elem_local_id = window.browsergym_frame_elem_counter++;
+            let elem_local_id = null;
+            // iFrames get alphabetical ids: 'a', 'b', ..., 'z'.
+            // if more than 26 iFrames are present, raise an Error
+            if (['iframe', 'frame'].includes(elem.tagName.toLowerCase())) {
+                elem_local_id = `${window.browsergym_frame_id_generator.next()}`;
+                if (elem_local_id.length > 1) {
+                    throw new Error(`More than 26? Such iFrames. BrowserGym not like.`);
+                }
+            }
+            // other elements get numerical ids: '0', '1', '2', ...
+            else {
+                elem_local_id = `${window.browsergym_elem_counter++}`;
+            }
             if (parent_bid == "") {
                 elem_global_bid = `${elem_local_id}`;
             }
             else {
-                elem_global_bid = `${parent_bid}-${elem_local_id}`;
+                elem_global_bid = `${parent_bid}${elem_local_id}`;
             }
             elem.setAttribute(bid_attr_name, `${elem_global_bid}`);
         }
+
         // Hack: store custom data inside the aria-roledescription attribute (will be available in DOM and AXTree)
         //  - elem_global_bid: global element identifier (unique over multiple frames)
         // TODO: add more data if needed (x, y coordinates, bounding box, is_visible, is_clickable etc.)
-
-        let [rect, is_in_viewport] = getElementPositionInfo(elem, iframe_offset, iframe_position);
-        let left = (rect.left + iframe_position.x).toString();
-        let top = (rect.top + iframe_position.y ).toString();
-        let right = (rect.right + iframe_position.x ).toString();
-        let bottom = (rect.bottom + iframe_position.y).toString();
-        let center_x = ((rect.left + rect.right) / 2 + iframe_position.x).toString();
-        let center_y = ((rect.top + rect.bottom) / 2 + iframe_position.y).toString();
-
-        elem.setAttribute("browsergym_center", `(${center_x}, ${center_y})`);
-        elem.setAttribute("browsergym_bounding_box", `(${left}, ${top}, ${right}, ${bottom})`);
-        elem.setAttribute("browsergym_is_in_viewport", `${is_in_viewport}`);
-
         let original_content = "";
         if (elem.hasAttribute("aria-roledescription")) {
             original_content = elem.getAttribute("aria-roledescription");
         }
-        let new_content = `${elem_global_bid}_${left}_${top}_${center_x}_${center_y}_${right}_${bottom}_${is_in_viewport}_${original_content}`
+        let new_content = `${elem_global_bid}_${original_content}`
         elem.setAttribute("aria-roledescription", new_content);
 
+        // set-of-marks flag (He et al. 2024)
+        // https://github.com/MinorJerry/WebVoyager/blob/main/utils.py
+        elem.setAttribute("browsergym_set_of_marks", "0");
+        // click at center activates self or a child
+        if (["self", "child"].includes(whoCapturesCenterClick(elem))) {
+            // has valid tag name, or has click event, or triggers a pointer cursor
+            if (set_of_marks_tags.includes(elem.tagName.toLowerCase()) || (elem.onclick != null) || (window.getComputedStyle(elem).cursor == "pointer")) {
+                let rect = elem.getBoundingClientRect();
+                let area = (rect.right - rect.left) * (rect.bottom - rect.top);
+                // area is large enough
+                if (area >= 20) {
+                    // is not a child of a button (role, type, tag) set to be marked
+                    if (som_buttons.every(button => !button.contains(elem))) {
+                        // is not the sole child of span that has a role and is set to be marked
+                        let parent = elem.parentElement;
+                        if (!(parent && parent.tagName.toLowerCase() == "span" && parent.children.length === 1 && parent.getAttribute("role") && parent.getAttribute("browsergym_set_of_marks") === "1")) {
+                            // all checks have passed, flag the element for inclusion in set-of-marks
+                            elem.setAttribute("browsergym_set_of_marks", "1");
+                            if (elem.matches('button, a, input[type="button"], div[role="button"]')) {
+                                som_buttons.push(elem)
+                            }
+                            // lastly, remove the set-of-marks flag from all parents, if any
+                            while (parent) {
+                                if (parent.getAttribute("browsergym_set_of_marks") === "1") {
+                                    parent.setAttribute("browsergym_set_of_marks", "0")
+                                }
+                                parent = parent.parentElement;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
-    return iframe_offset;
 
-}
-function getElementPositionInfo(element, iframe_offset, iframe_position) {
-    var rect = element.getBoundingClientRect();
-    let x = (rect.left + rect.right) / 2 ;
-    let y = (rect.top + rect.bottom) / 2 ;
-    //loop over element ancestors (parent) and refine iframe offset to be the most precise possible
-    var parent = element.parentElement;
-    parent_iframe_offset = { x: 0, y: 0, right: windowWidth, bottom: windowHeight };
-    while (parent !== null) {
-        var parent_rect = parent.getBoundingClientRect();
-        parent_iframe_offset["x"] = Math.max(parent_rect.left , parent_iframe_offset["x"]  );
-        parent_iframe_offset["y"] = Math.max(parent_rect.top , parent_iframe_offset["y"] );
-        parent_iframe_offset["right"] = Math.min(parent_rect.right , parent_iframe_offset["right"]  );
-        parent_iframe_offset["bottom"] = Math.min(parent_rect.bottom , parent_iframe_offset["bottom"] );
-        parent = parent.parentElement;
+    warning_msgs = new Array();
+
+    // wait for all elements to be visited for visibility
+    let visibility_marking_timeout = 1000;  // ms
+    try {
+        await until(() => elems_to_be_visited.size == 0, visibility_marking_timeout);
+    } catch {
+        warning_msgs.push(`Frame marking: not all elements have been visited by the intersection_observer after ${visibility_marking_timeout} ms`);
     }
+    // disconnect intersection observer
+    intersection_observer.disconnect();
 
-    var is_in_viewport = (
-        x >= iframe_offset["x"] &&
-        y >= iframe_offset["y"] &&
-        x <= iframe_offset["right"] &&
-        y <= iframe_offset["bottom"]
-    );
-    //this features is broken for the moment
-    var NotBehindParent = (
-        x >= parent_iframe_offset["x"] &&
-        y >= parent_iframe_offset["y"] &&
-        x <= parent_iframe_offset["right"] &&
-        y <= parent_iframe_offset["bottom"]
-    );
+    return warning_msgs;
+}
 
-    var isVisible = (typeof element.offsetWidth === 'undefined' || typeof element.offsetHeight === 'undefined') || (element.offsetWidth > 0 && element.offsetHeight > 0);
-
-    // Return true if the element is both in the viewport and has non-zero dimensions
-    return [rect, (is_in_viewport  && isVisible && IsInFront(element))? 1 : 0];
+async function until(f, timeout, interval=40) {
+    return new Promise((resolve, reject) => {
+        const start_time = Date.now();
+        // immediate check
+        if (f()) {
+            resolve();
+        }
+        // loop check
+        const wait = setInterval(() => {
+            if (f()) {
+                clearInterval(wait);
+                resolve();
+            } else if (Date.now() - start_time > timeout) {
+                clearInterval(wait);
+                reject();
+            }
+        }, interval);
+    });
 }
 
 
-function IsInFront(element){
+function whoCapturesCenterClick(element){
     var rect = element.getBoundingClientRect();
     var x = (rect.left + rect.right) / 2 ;
     var y = (rect.top + rect.bottom) / 2 ;
-    var newElement = elementFromPoint(x, y); //return the element in the foreground at position (x,y)
-    if(newElement){
-        if(newElement === element)
-            return true;
+    var element_at_center = elementFromPoint(x, y); // return the element in the foreground at position (x,y)
+    if (!element_at_center) {
+        return "nobody";
+    } else if (element_at_center === element) {
+        return "self";
+    } else if (element.contains(element_at_center)) {
+        return "child";
+    } else {
+        return "non-descendant";
     }
-    return false;
 }
 
 function elementFromPoint(x, y) {
-    let node = document.elementFromPoint(x, y);
+    let dom = document;
+    let last_elem = null;
+    let elem = null;
 
-    let child = node?.shadowRoot?.elementFromPoint(x, y);
+    do {
+        last_elem = elem;
+        elem = dom.elementFromPoint(x, y);
+        dom = elem?.shadowRoot;
+    } while(dom && elem !== last_elem);
 
-    while (child && child !== node) {
-      node = child;
-      child = node?.shadowRoot?.elementFromPoint(x, y);
+    return elem;
+}
+
+// https://stackoverflow.com/questions/12504042/what-is-a-method-that-can-be-used-to-increment-letters#answer-12504061
+class IFrameIdGenerator {
+    constructor(chars = 'abcdefghijklmnopqrstuvwxyz') {
+      this._chars = chars;
+      this._nextId = [0];
     }
 
-    return child || node;
+    next() {
+      const r = [];
+      for (const char of this._nextId) {
+        r.unshift(this._chars[char]);
+      }
+      this._increment();
+      return r.join('');
+    }
+
+    _increment() {
+      for (let i = 0; i < this._nextId.length; i++) {
+        const val = ++this._nextId[i];
+        if (val < this._chars.length) {
+          return;
+        }
+        this._nextId[i] = 0;
+      }
+      this._nextId.push(0);
+    }
+
+    *[Symbol.iterator]() {
+      while (true) {
+        yield this.next();
+      }
+    }
   }

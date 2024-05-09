@@ -23,7 +23,7 @@
         if (elem.hasAttribute("aria-roledescription")) {
             let content = elem.getAttribute("aria-roledescription");
             // TODO: handle more data if needed
-            let n_data_items = 8;  // bid, bbox_left, bbox_top, center_x, center_y, bbox_right, bbox_bottom, is_in_viewport
+            let n_data_items = 1;  // bid
             let post_data_index = 0;
             for (let j = 0 ; j < n_data_items ; j++) {
                 post_data_index = content.indexOf("_", post_data_index) + 1;
@@ -35,7 +35,6 @@
             else {
                 elem.removeAttribute("aria-roledescription");
             }
-
         }
     }
 }
