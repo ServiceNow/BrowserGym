@@ -7,6 +7,31 @@ on:
   pull_request:
 
 jobs:
+
+  code-format:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        run: pip install black[jupyter]==24.2.0 blacken-docs
+
+      - name: Code Formatting
+        run: black . --check
+
   browsergym-core:
     runs-on: ubuntu-latest
 
