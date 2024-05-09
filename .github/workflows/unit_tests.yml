@@ -161,34 +161,3 @@ jobs:
           HOMEPAGE: "PASS:4399"
           WEBARENA_PATH: "${{ github.workspace }}/webarena/"
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v browsergym/webarena/tests
-
-  ui_copilot:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    steps:
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-          cache: 'pip' # caching pip dependencies
-
-      - name: Pip install
-        working-directory: ./dev
-        run: pip install -r requirements.txt
-
-      - name: Pip list
-        run: pip list
-
-      - name: Install Playwright
-        run: playwright install --with-deps
-
-      - name: Run ui_copilot Unit Tests
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v ui_copilot
