@@ -30,7 +30,10 @@ def parse_args():
         "--slow_mo", type=int, default=500, help="Slow motion delay for the playwright actions."
     )
     parser.add_argument(
-        "--headless", type=str2bool, default=False, help="Run the experiment in headless mode (hides the browser windows)."
+        "--headless",
+        type=str2bool,
+        default=False,
+        help="Run the experiment in headless mode (hides the browser windows).",
     )
     parser.add_argument(
         "--demo_mode",
@@ -82,16 +85,18 @@ def parse_args():
 def main():
     args = parse_args()
 
-    task_kwargs={
+    task_kwargs = {
         "viewport": {"width": 1500, "height": 1280},
         "slow_mo": args.slow_mo,
     }
 
     if args.task_name == "openended":
-        task_kwargs.update({
-            "start_url": args.start_url,
-            "wait_for_user_message": True,
-        })
+        task_kwargs.update(
+            {
+                "start_url": args.start_url,
+                "wait_for_user_message": True,
+            }
+        )
 
     exp_args = ExpArgs(
         agent_args=GenericAgentArgs(
