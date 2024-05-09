@@ -36,7 +36,7 @@ jobs:
         run: playwright install --with-deps
 
       - name: Run browsergym-core Unit Tests
-        run: pytest -n 1 --durations=10 -m 'not pricy' -v browsergym/core/tests
+        run: pytest -n 1 --durations=10 -m 'not pricy' -v core/tests
 
   browsergym-miniwob:
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
       - name: Run browsergym-miniwob Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v browsergym/miniwob/tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v miniwob/tests
 
   browsergym-webarena-fast:
     runs-on: ubuntu-latest
@@ -121,7 +121,7 @@ jobs:
           MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
           HOMEPAGE: "PASS:4399"
           WEBARENA_PATH: "${{ github.workspace }}/webarena/"
-        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v browsergym/webarena/tests
+        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v webarena/tests
 
   browsergym-webarena-slow:
     runs-on: ubuntu-latest
@@ -160,4 +160,4 @@ jobs:
           MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
           HOMEPAGE: "PASS:4399"
           WEBARENA_PATH: "${{ github.workspace }}/webarena/"
-        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v browsergym/webarena/tests
+        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v webarena/tests
