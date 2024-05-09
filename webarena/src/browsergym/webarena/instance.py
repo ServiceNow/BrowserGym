@@ -99,3 +99,12 @@ class WebArenaInstance:
                 page.get_by_label("Username").fill(username)
                 page.get_by_label("Password").fill(password)
                 page.get_by_role("button", name="Sign in").click()
+
+            case "wikipedia":
+                page.goto(url)
+
+            case "map":
+                page.goto(url)
+
+            case _:
+                raise ValueError

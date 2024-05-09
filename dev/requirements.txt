@@ -1,0 +1,10 @@
+black[jupyter]==24.2.0
+blacken-docs
+pre-commit
+pytest==7.3.2
+pytest-xdist
+pytest-playwright
+tenacity
+-e ../core # local package
+-e ../miniwob # local package
+-e ../webarena # local package

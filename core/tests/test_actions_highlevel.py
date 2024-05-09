@@ -97,7 +97,7 @@ def test_valid_action():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=CHECKBOX_URL,
+        task_kwargs={"start_url": CHECKBOX_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -288,7 +288,7 @@ def test_invalid_action():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=CHECKBOX_URL,
+        task_kwargs={"start_url": CHECKBOX_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -304,7 +304,7 @@ click("INVALID_BID")
     obs, reward, term, trunc, info = env.step(action)
 
     # error
-    assert "TimeoutError" in obs["last_action_error"]
+    assert "ValueError" in obs["last_action_error"]
 
     # invalid bid value type
     action = f"""\
@@ -450,7 +450,7 @@ def test_click_through_frames():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=MULTI_IFRAME_URL,
+        task_kwargs={"start_url": MULTI_IFRAME_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -490,7 +490,7 @@ def test_fill_through_iframe():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=MULTI_IFRAME_URL,
+        task_kwargs={"start_url": MULTI_IFRAME_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -534,7 +534,7 @@ def test_click():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=CHECKBOX_URL,
+        task_kwargs={"start_url": CHECKBOX_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -606,7 +606,7 @@ def test_hover():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=HOVER_URL,
+        task_kwargs={"start_url": HOVER_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -651,7 +651,7 @@ def test_fill_type_press():
     action_set = HighLevelActionSet(subsets=["bid", "coord"])
     env = gym.make(
         "browsergym/openended",
-        start_url=TEXT_INPUT_URL,
+        task_kwargs={"start_url": TEXT_INPUT_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -806,7 +806,7 @@ def test_key_press():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=TEXT_INPUT_URL,
+        task_kwargs={"start_url": TEXT_INPUT_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -848,7 +848,7 @@ def test_goto():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=url1,
+        task_kwargs={"start_url": url1},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -896,26 +896,22 @@ def test_scroll():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=LONG_PAGE_URL,
-        headless=False,
+        task_kwargs={"start_url": LONG_PAGE_URL},
+        headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
         action_mapping=action_set.to_python_code,
     )
 
     def extract_coords_from_elem(elem):
-        x, y = map(
-            float,
-            re.search(
-                r"\(([-+]?[0-9\.]+),[\s]*([-+]?[0-9\.]+)\)",
-                elem.get("center"),
-            ).groups(),
-        )
-        return x, y
+        return ast.literal_eval(elem.get("center"))
 
     def get_top_bottom_elems(obs):
         soup = bs4.BeautifulSoup(
-            flatten_dom_to_str(obs["dom_object"], with_center_coords=True), "lxml"
+            flatten_dom_to_str(
+                obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+            ),
+            "lxml",
         )
         top = soup.find("input", attrs={"type": "checkbox", "id": "top"})
         bottom = soup.find("input", attrs={"type": "checkbox", "id": "bottom"})
@@ -1009,7 +1005,7 @@ def test_scroll():
 # def test_meta_action():
 #     env = BrowserEnv(
 #         task_entrypoint=OpenEndedTask,
-#         start_url=TEXT_INPUT_URL,
+#         task_kwargs={"start_url": TEXT_INPUT_URL},
 #         headless=__HEADLESS__,
 #     )
 #     obs, info = env.reset()
@@ -1143,7 +1139,7 @@ def test_scroll():
 # def test_clear_success():
 #     env = BrowserEnv(
 #         task_entrypoint=OpenEndedTask,
-#         start_url=TEXT_INPUT_URL,
+#         task_kwargs={"start_url": TEXT_INPUT_URL},
 #         headless=__HEADLESS__,
 #     )
 #     obs, info = env.reset()
@@ -1213,7 +1209,7 @@ def test_scroll():
 #     """In this test, we try to build a ClearAction but we use invalid args, and we check that the action fails when executed in the environment"""
 #     env = BrowserEnv(
 #         task_entrypoint=OpenEndedTask,
-#         start_url=TEXT_INPUT_URL,
+#         task_kwargs={"start_url": TEXT_INPUT_URL},
 #         headless=__HEADLESS__,
 #     )
 #     obs, info = env.reset()
@@ -1307,7 +1303,7 @@ def test_mouse_down_up():
 
     env = gym.make(
         "browsergym/openended",
-        start_url=CHECKBOX_URL,
+        task_kwargs={"start_url": CHECKBOX_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -1316,7 +1312,10 @@ def test_mouse_down_up():
 
     def get_checkbox_elem(obs):
         soup = bs4.BeautifulSoup(
-            flatten_dom_to_str(obs["dom_object"], with_center_coords=True), "lxml"
+            flatten_dom_to_str(
+                obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+            ),
+            "lxml",
         )
         checkbox = soup.find("input", attrs={"type": "checkbox", "id": "vehicle1"})
         return checkbox

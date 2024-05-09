@@ -1,0 +1,44 @@
+fail_fast: false
+
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(.*)\.md$
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^(.circleci/recipe|recipe)  # conda build recipes are templated
+      - id: check-added-large-files
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.1.1
+    hooks:
+      - id: clang-format
+        args: [--style=file, -i]
+      - id: clang-tidy
+        args: [--fix, --fix-errors]
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        args: [--config=./pyproject.toml]
+  - repo: https://github.com/asottile/blacken-docs
+    rev: v1.12.1
+    hooks:
+    - id: blacken-docs
+      args: [ '--line-length', '100' ]
+      additional_dependencies: [black]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+    - id: forbid-crlf
+    - id: remove-crlf
+    # Black does not clear tabs in docstrings
+    - id: forbid-tabs
+      files: '.*\.py$'
+    - id: remove-tabs
+      files: '.*\.py$'
+      args: [ '--whitespaces-count', '4' ]

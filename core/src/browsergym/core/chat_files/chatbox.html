@@ -133,7 +133,7 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h2>UI Assistant</h2>
+            <h2>BrowserGym</h2>
         </div>
         <div class="chat-body" id="chatBody"></div>
         <div class="chat-debug" id="chatDebug"></div>
@@ -151,6 +151,15 @@
 
         var USER_MESSAGE_RECEIVED = false;
 
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function addChatMessage(role, msg) {
             const chatBody = document.getElementById('chatBody');
             const chatDebug = document.getElementById('chatDebug');
@@ -158,7 +167,7 @@
             msgContainer.className = 'message';
 
             const text = document.createElement('p');
-            text.innerHTML = msg;
+            text.innerHTML = escapeHtml(msg);
 
             const assistant_img = document.createElement('img');
             assistant_img.src = assistant_image_data;

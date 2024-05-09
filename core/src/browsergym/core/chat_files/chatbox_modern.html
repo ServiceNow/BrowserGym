@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Assistant Chat</title>
+    <style>
+        body {
+            font-family: 'Gilroy', sans-serif;
+        }
+
+        textarea {
+            font-family: 'Gilroy', sans-serif;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            border: 1px solid black;
+            background-color: black;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .gradient {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            background: linear-gradient(180deg, #002239 0%, rgba(0, 34, 57, 0) 100%);
+            z-index: -1;
+        }
+
+        #chatui-generating-indicator {
+            position: absolute;
+            height: 100vh;
+            width: 8px;
+        }
+
+        #chatui-generating-indicator-gradient {
+            height: 100%;
+            width: 100%;
+            animation: 1.5s ease alternate infinite thinking;
+            background: linear-gradient(0deg, #032D42 0%, #50CED8 100%);
+            background-size: 400% 400%;
+        }
+
+        @keyframes thinking {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 0% 100%;
+            }
+        }
+
+
+        .spacer {
+            flex: 1;
+        }
+
+        .chat-wrapper {
+            padding: 0px 48px 48px 48px;
+            display: flex;
+            flex-flow: column;
+            flex: 1;
+            min-height: 0;
+
+        }
+
+        .chat-body {
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .chat-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chat-debug {
+            padding: 10px;
+            max-height: 45%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 auto;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .chat-debug::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chat-input-area {
+            display: flex;
+            flex-flow: row;
+            margin-top: 48px;
+            padding: 10px;
+            padding-left: 18px;
+            flex: 0 1 50px;
+            background-color: #022435;
+            border-radius: 12px;
+
+        }
+
+
+        .chat-input-area form {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .input-box {
+            padding: 5px;
+            margin-right: 10px;
+            border-radius: 5px;
+            width: 100%;
+            background-color: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 18px;
+            min-height: 100px; /* Minimum starting height */
+            max-height: 300px; /* Maximum height */
+            overflow-y: auto; /* Allows scrolling within the input box if content exceeds max height */
+            height: auto; /* Automatically adjust height, but limited by other CSS properties */
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .input-box::-webkit-scrollbar {
+            display: none;
+
+        }
+
+        .submit-button {
+            margin-left: 10px;
+            background-color: #022435;
+            color: #9AABB3;
+            font-weight: bold;
+            cursor: pointer;
+            background-image: url('data:image/svg+xml,<svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.7038 6.04336L0.709549 0.0460291C0.528509 -0.0375275 0.315131 -0.00553368 0.166559 0.127445C0.0179865 0.260423 -0.0373753 0.468963 0.0256778 0.658123L1.97297 6.50001L0.0256778 12.3419C-0.0373753 12.5311 0.0179865 12.7396 0.166559 12.8726C0.315131 13.0056 0.528509 13.0375 0.709549 12.954L13.7038 6.95666C13.8817 6.87718 14.0001 6.69465 14.0001 6.50001C14.0001 6.3048 13.8819 6.12293 13.7038 6.04336ZM2.8604 6.00001L1.33983 1.4383L11.2235 6.00001H2.8604ZM11.2235 7.00001L1.33983 11.5617L2.8604 7.00001H11.2235Z" fill="%234F6C7B"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 60px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 20px 20px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .submit-button:hover {
+            background-color: #03334a;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            margin: 0px;
+            padding: 0px;
+            margin-bottom: 10px;
+        }
+
+        .message p {
+            margin-bottom: 0;
+        }
+
+        .user-message {
+            background-color: transparent;
+            color: white;
+            font-size: 20px;
+        }
+
+        .user-message::before {
+            content: "You";
+            color: #09A2BF;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+
+        .assistant-message {
+            background-color: transparent;
+            color: #7ACA87;
+            font-size: 20px;
+
+        }
+
+        .assistant-message::before {
+            content: "Bot";
+            color: #29A93E;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .info-message {
+            color: #afadad;
+            font-size: 22px;
+            background: #04334b;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .assistant-image {
+            margin: 0px;
+            padding: 10px;
+            width: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-debug" id="chatDebug"></div>
+        <div class="gradient">
+        </div>
+        <div id="chatui-generating-indicator" style="display: none;">
+            <div id="chatui-generating-indicator-gradient"></div>
+        </div>
+        <div class="chat-wrapper">
+            <div class="chat-body" id="chatBody">
+                <div class="spacer"></div>
+            </div>
+            <div class="chat-input-area">
+                <form id="chatForm">
+                    <textarea class="input-box"  id="inputBox"
+                    placeholder="How can I help you?" title="Ask any question or type exit to quit."></textarea>
+                    <input type="submit" class="submit-button" value="">
+                    </input>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const assistant_image_data = "<ASSISTANT_IMAGE_URL>";
+
+        var USER_MESSAGE_RECEIVED = false;
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        function addHtmlLineBreaks(text) {
+            return text.replace(/\n/g, "<br>");
+        }
+
+        function addChatMessage(role, msg) {
+            const chatBody = document.getElementById('chatBody');
+            const chatDebug = document.getElementById('chatDebug');
+            const msgContainer = document.createElement('div');
+            msgContainer.className = 'message';
+
+            const text = document.createElement('p');
+            text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
+
+            // const assistant_img = document.createElement('img');
+            // assistant_img.src = assistant_image_data;
+            // assistant_img.alt = 'Assistant';
+            // assistant_img.className = 'assistant-image';
+
+            switch (role) {
+                case "user":
+                    text.className = 'user-message';
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
+                case "assistant":
+                    text.className = 'assistant-message';
+                    // msgContainer.appendChild(assistant_img); // Add the image to the message container
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
+                case "info":
+                    text.className = 'info-message';
+                    msgContainer.appendChild(text);
+                    // hide previous debug messages
+                    for (const msg of chatDebug.children) {
+                        msg.style.display = 'none';
+                    }
+                    chatDebug.appendChild(msgContainer);
+                    break;
+                default:
+                    throw new TypeError(`Illegal role "${role}".`);
+            }
+
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            if (role === "user") {
+                USER_MESSAGE_RECEIVED = true;
+            }
+        }
+
+        if (typeof send_user_message !== 'function') {
+            function send_user_message(msg) {
+                // This will be overloaded by playwright
+            }
+        }
+
+        const inputBox = document.getElementById('inputBox');
+
+        function send_msg(msg) {
+            if (msg.trim()) {
+                send_user_message(msg);
+                addChatMessage('user', msg);
+                inputBox.value = '';
+            }
+        }
+
+        inputBox.onkeypress = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send_msg(inputBox.value);
+            }
+        };
+
+        document.getElementById('chatForm').onsubmit = function (event) {
+            event.preventDefault();
+            send_msg(inputBox.value);
+            return false;
+        }
+        // addChatMessage('info', 'Hello World');
+        // addChatMessage('assistant', 'Hello assistant');
+        // addChatMessage('user', 'Hello user');
+
+    </script>
+
+</body>
+
+</html>

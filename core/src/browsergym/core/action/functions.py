@@ -5,7 +5,6 @@ from typing import Literal
 
 from .utils import (
     add_demo_mode_effects,
-    check_for_overlay,
     get_elem_by_bid,
     highlight_by_box,
     smooth_move_visual_cursor_to,
@@ -13,7 +12,7 @@ from .utils import (
 
 page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
-demo_mode: Literal["off", "default", "only_visible_elements"] = "off"
+demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
 
 """IMPORTANT
 The following primitives are meant to be included in the browsergym action using
@@ -51,16 +50,16 @@ def fill(bid: str, value: str):
     Examples:
         fill('237', 'example value')
         fill('45', "multi-line\\nexample")
-        fill('32-12', "example with \\"quotes\\"")
+        fill('a12', "example with \\"quotes\\"")
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
     if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=False)
         elem.clear()
         delay = max(2000 / len(value), 10)
         elem.type(value, delay=delay)
     else:
-        elem.fill(value)
+        elem.fill(value, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-check
@@ -71,10 +70,9 @@ def check(bid: str):
     Examples:
         check('55')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=True)
-    elem.check()
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    elem.check(timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-uncheck
@@ -83,12 +81,11 @@ def uncheck(bid: str):
     Ensure a checkbox or radio element is unchecked.
 
     Examples:
-        uncheck('65-5289')
+        uncheck('a5289')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=True)
-    elem.uncheck()
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    elem.uncheck(timeout=500)
 
 
 # https://playwright.dev/docs/input#select-options
@@ -101,10 +98,9 @@ def select_option(bid: str, options: str | list[str]):
         select_option('48', "blue")
         select_option('48', ["red", "green", "blue"])
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=False)
-    elem.select_option(options)
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    elem.select_option(options, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-click
@@ -118,13 +114,11 @@ def click(
 
     Examples:
         click('51')
-        click('69-2', button="right")
+        click('b22', button="right")
         click('48', button="middle", modifiers=["Shift"])
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=True)
-
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
     elem.click(button=button, modifiers=modifiers)
 
 
@@ -139,13 +133,12 @@ def dblclick(
 
     Examples:
         dblclick('12')
-        dblclick('289-5-42', button="right")
+        dblclick('ca42', button="right")
         dblclick('178', button="middle", modifiers=["Shift"])
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=True)
-    elem.dblclick(button=button, modifiers=modifiers, force=True)
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    elem.dblclick(button=button, modifiers=modifiers, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-hover
@@ -154,15 +147,15 @@ def hover(bid: str):
     Hover over an element.
 
     Examples:
-        hover('12-8')
+        hover('b8')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         box = elem.bounding_box()
         if box:
             center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
             smooth_move_visual_cursor_to(page, center_x, center_y)
-    elem.hover()
+    elem.hover(timeout=500)
 
 
 # https://playwright.dev/python/docs/input#keys-and-shortcuts
@@ -179,13 +172,12 @@ def press(bid: str, key_comb: str):
 
     Examples:
         press('88', 'Backspace')
-        press('48-6', 'Control+a')
-        press('48-6', 'Meta+Shift+t')
+        press('a26', 'Control+a')
+        press('a61', 'Meta+Shift+t')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=False)
-    elem.press(key_comb)
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    elem.press(key_comb, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-focus
@@ -194,12 +186,11 @@ def focus(bid: str):
     Focus the matching element.
 
     Examples:
-        focus('87-455')
+        focus('b455')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=False)
-    elem.focus()
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    elem.focus(timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-clear
@@ -210,10 +201,9 @@ def clear(bid: str):
     Examples:
         clear('996')
     """
-    elem = get_elem_by_bid(page, bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode_type=demo_mode, move_cursor=False)
-    elem.clear()
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    elem.clear(timeout=500)
 
 
 # https://playwright.dev/python/docs/input#drag-and-drop
@@ -226,23 +216,21 @@ def drag_and_drop(from_bid: str, to_bid: str):
     Examples:
         drag_and_drop('56', '498')
     """
-    from_elem = get_elem_by_bid(page, from_bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, from_elem, from_bid, move_cursor=True)
-    from_elem.hover()
+    from_elem = get_elem_by_bid(page, from_bid, demo_mode != "off")
+    add_demo_mode_effects(page, from_elem, from_bid, demo_mode=demo_mode, move_cursor=True)
+    from_elem.hover(timeout=500)
     page.mouse.down()
 
-    to_elem = get_elem_by_bid(page, to_bid, demo_mode)
-    if demo_mode != "off":
-        add_demo_mode_effects(page, to_elem, to_bid, move_cursor=True)
-    to_elem.hover()
+    to_elem = get_elem_by_bid(page, to_bid, demo_mode != "off")
+    add_demo_mode_effects(page, to_elem, to_bid, demo_mode=demo_mode, move_cursor=True)
+    to_elem.hover(timeout=500)
     page.mouse.up()
 
 
 # https://playwright.dev/python/docs/api/class-mouse#mouse-wheel
 def scroll(delta_x: float, delta_y: float):
     """
-    Scroll horizontally and vertically. Amounts in pixels. Dispatches a wheel event.
+    Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling. Dispatches a wheel event.
 
     Examples:
         scroll(0, 200)
@@ -370,6 +358,7 @@ def keyboard_press(key: str):
         keyboard_press('Backspace')
         keyboard_press('Control+a')
         keyboard_press('Meta+Shift+t')
+        page.keyboard.press("PageDown")
     """
     page.keyboard.press(key)
 
@@ -521,3 +510,48 @@ def tab_focus(index: int):
     page = page.context.pages[index]
     # trigger the callback that sets this page as active in browsergym
     page.locate("html").dispatch_event("pageshow")
+
+
+# https://playwright.dev/python/docs/input#upload-files
+def upload_file(bid: str, file: str | list[str]):
+    """
+    Click an element and wait for a "filechooser" event, then select one
+    or multiple input files for upload. Relative file paths are resolved
+    relative to the current working directory. An empty list clears the
+    selected files.
+
+    Examples:
+        upload_file("572", "my_receipt.pdf")
+        upload_file("63", ["/home/bob/Documents/image.jpg", "/home/bob/Documents/file.zip"])
+    """
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+
+    with page.expect_file_chooser() as fc_info:
+        elem.click(timeout=500)
+
+    file_chooser = fc_info.value
+    file_chooser.set_files(file)
+
+
+# https://playwright.dev/python/docs/input#upload-files
+def mouse_upload_file(x: float, y: float, file: str | list[str]):
+    """
+    Click a location and wait for a "filechooser" event, then select one
+    or multiple input files for upload. Relative file paths are resolved
+    relative to the current working directory. An empty list clears the
+    selected files.
+
+    Examples:
+        mouse_upload_file(132.1, 547, "my_receipt.pdf")
+        mouse_upload_file(328, 812, ["/home/bob/Documents/image.jpg", "/home/bob/Documents/file.zip"])
+    """
+    if demo_mode != "off":
+        smooth_move_visual_cursor_to(page, x, y)
+        highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
+
+    with page.expect_file_chooser() as fc_info:
+        page.mouse.click(x, y)
+
+    file_chooser = fc_info.value
+    file_chooser.set_files(file)

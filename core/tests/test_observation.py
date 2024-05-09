@@ -17,7 +17,7 @@ from browsergym.utils.obs import (
 )
 
 # bugfix: use same playwright instance in browsergym and pytest
-
+from utils import setup_playwright
 
 from browsergym.core.observation import (
     _pre_extract,
@@ -37,6 +37,7 @@ __VIEWPORT = {"width": 800, "height": 600}
 __DATA_DIR = Path(__file__).resolve().parent / "data"
 
 TEST_PAGE = f"file://{__DATA_DIR}/test_page.html"
+TEST_PAGE_2 = f"file://{__DATA_DIR}/test_page_2.html"
 MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
 SHADOW_DOM_URL = f"file://{__DATA_DIR}/basic_shadow_dom_site/basic_shadow_dom.html"
 SIMPLE_SHADOW_DOM_URL = f"file://{__DATA_DIR}/basic_shadow_dom_site/simple_shadow_dom.html"
@@ -52,7 +53,7 @@ MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
 def test_extract_screenshot():
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -78,7 +79,7 @@ def test_extract_screenshot():
 def test_extract_axtree_simple():
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -101,7 +102,7 @@ def test_extract_axtree_simple():
 def test_extract_axtree_multi_iframe():
     env = gym.make(
         "browsergym/openended",
-        start_url=MULTI_IFRAME_URL,
+        task_kwargs={"start_url": MULTI_IFRAME_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -130,7 +131,7 @@ def test_extract_axtree_multi_iframe():
 def test_extract_dom_simple():
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -151,7 +152,7 @@ def test_extract_dom_simple():
 def test_extract_dom_multi_iframe():
     env = gym.make(
         "browsergym/openended",
-        start_url=MULTI_IFRAME_URL,
+        task_kwargs={"start_url": MULTI_IFRAME_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -172,7 +173,7 @@ def test_extract_dom_multi_iframe():
 def test_simple_shadowdom():
     env = gym.make(
         "browsergym/openended",
-        start_url=SIMPLE_SHADOW_DOM_URL,
+        task_kwargs={"start_url": SIMPLE_SHADOW_DOM_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -206,7 +207,7 @@ def test_simple_shadowdom():
 def test_nested_shadowdom():
     env = gym.make(
         "browsergym/openended",
-        start_url=SHADOW_DOM_URL,
+        task_kwargs={"start_url": SHADOW_DOM_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -252,7 +253,7 @@ def test_nested_shadowdom():
 def test_dom_has_bids_no_aria(url):
     env = gym.make(
         "browsergym/openended",
-        start_url=url,
+        task_kwargs={"start_url": url},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -325,7 +326,7 @@ def test_dom_has_bids_no_aria(url):
 def test_dom_to_text():
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE_2},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -354,13 +355,58 @@ page.get_by_label("Age:", exact=True).press("Tab")
     assert "Janice" in dom
     assert "janice@mail.com" in dom
 
+    dom = flatten_dom_to_str(
+        obs["dom_object"],
+        extra_properties=obs["extra_element_properties"],
+        with_visible=True,
+        with_clickable=True,
+        with_center_coords=True,
+        with_bounding_box_coords=True,
+        with_som=True,
+    )
+    assert 'box="(' in dom
+    assert 'center="(' in dom
+    assert 'clickable="1" som="1" type="submit" value="Submit" visible="1"' in dom
+    assert 'head bid="1" visible="0"' in dom
+    assert 'clickable="1" for="email" visible="1"' in dom
+    assert "Text within in non-html tag" in dom
+    assert "Text that should not be visible" in dom
+
+    dom = flatten_dom_to_str(
+        obs["dom_object"], extra_properties=obs["extra_element_properties"], filter_som_only=True
+    )
+    assert 'for="email"' not in dom
+    assert 'type="submit" value="Submit"' in dom
+    assert "Text within in non-html tag" not in dom
+    assert "Text that should not be visible" not in dom
+
+    dom = flatten_dom_to_str(
+        obs["dom_object"],
+        extra_properties=obs["extra_element_properties"],
+        filter_visible_only=True,
+    )
+    assert "<title bid=" not in dom
+    assert 'type="submit" value="Submit"' in dom
+    assert "Text within in non-html tag" in dom
+    assert "Text that should not be visible" not in dom
+
+    dom = flatten_dom_to_str(
+        obs["dom_object"],
+        extra_properties=obs["extra_element_properties"],
+        filter_with_bid_only=True,
+    )
+    assert "<title bid=" in dom
+    assert 'type="submit" value="Submit"' in dom
+    assert "Text within in non-html tag" not in dom
+    assert "Text that should not be visible" in dom
+
     env.close()
 
 
 def test_axtree_to_text():
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE_2},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -370,7 +416,7 @@ def test_axtree_to_text():
 
     axtree = flatten_axtree_to_str(obs["axtree_object"])
     assert isinstance(axtree, str)
-    assert "checkbox 'Subscribe to newsletter' checked='false'" in axtree
+    assert "checkbox 'Subscribe to newsletter', checked='false'" in axtree
     assert "Janice" not in axtree
 
     obs, reward, term, trunc, info = env.step(
@@ -389,7 +435,51 @@ page.get_by_label("Subscribe to newsletter").click()
     axtree = flatten_axtree_to_str(obs["axtree_object"])
     assert "Janice" in axtree
     assert "janice@mail.com" in axtree
-    assert "checkbox 'Subscribe to newsletter' focused, checked='true'" in axtree
+    assert "checkbox 'Subscribe to newsletter', focused, checked='true'" in axtree
+
+    axtree = flatten_axtree_to_str(
+        obs["axtree_object"],
+        extra_properties=obs["extra_element_properties"],
+        with_visible=True,
+        with_clickable=True,
+        with_center_coords=True,
+        with_bounding_box_coords=True,
+        with_som=True,
+    )
+    assert 'box="(' in axtree
+    assert 'center="(' in axtree
+    assert ', clickable="1", visible="1", som="1"' in axtree
+    assert "heading 'Simple Form', box=\"(" in axtree
+    assert "textbox 'Email:' value='janice@mail.com'" in axtree
+    assert "Text within in non-html tag" in axtree
+    assert "Text that should not be visible" in axtree
+
+    axtree = flatten_axtree_to_str(
+        obs["axtree_object"], extra_properties=obs["extra_element_properties"], filter_som_only=True
+    )
+    assert "LabelText" not in axtree
+    assert "button 'Submit'" in axtree
+    assert "Text within in non-html tag" not in axtree
+    assert "Text that should not be visible" not in axtree
+
+    axtree = flatten_axtree_to_str(
+        obs["axtree_object"],
+        extra_properties=obs["extra_element_properties"],
+        filter_visible_only=True,
+    )
+    assert "RootWebArea" in axtree
+    assert "button 'Submit'" in axtree
+    assert "Text within in non-html tag" in axtree
+    assert "Text that should not be visible" not in axtree
+
+    axtree = flatten_axtree_to_str(
+        obs["axtree_object"],
+        extra_properties=obs["extra_element_properties"],
+        filter_with_bid_only=True,
+    )
+    assert "button 'Submit'" in axtree
+    assert "Text within in non-html tag" not in axtree
+    assert "Text that should not be visible" in axtree
 
     env.close()
 
@@ -438,7 +528,7 @@ def test_simple_webpage():
     """
     env = gym.make(
         "browsergym/openended",
-        start_url=TEST_PAGE,
+        task_kwargs={"start_url": TEST_PAGE},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -450,8 +540,19 @@ def test_simple_webpage():
 
     assert not element.is_checked()
 
-    x, y = map(float, ast.literal_eval(element.get_attribute("browsergym_center")))
+    soup = bs4.BeautifulSoup(
+        flatten_dom_to_str(
+            obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+        ),
+        "lxml",
+    )
+    input_elem = soup.find("input", attrs={"type": "checkbox"})
+    x, y = map(float, ast.literal_eval(input_elem.get("center")))
+
+    # click input elem
     env.page.mouse.click(x, y)
+
+    element = env.page.query_selector('[type="checkbox"]')
 
     assert element.is_checked()
 
@@ -466,12 +567,11 @@ def test_basic_iframe_webpage():
     """
     env = gym.make(
         "browsergym/openended",
-        start_url=BASIC_IFRAME_2_URL,
+        task_kwargs={"start_url": BASIC_IFRAME_2_URL, "goal": "dummy goal"},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
         timeout=__TIMEOUT,
-        goal="dummy goal",
     )
 
     # click on the checkbox in the main frame
@@ -481,30 +581,54 @@ def test_basic_iframe_webpage():
 
     assert not element.is_checked()
 
-    x, y = map(float, ast.literal_eval(element.get_attribute("browsergym_center")))
+    bid = element.get_attribute("bid")
+    soup = bs4.BeautifulSoup(
+        flatten_dom_to_str(
+            obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+        ),
+        "lxml",
+    )
+    input_elem = soup.find("input", attrs={"bid": bid})
+    x, y = map(float, ast.literal_eval(input_elem.get("center")))
     env.page.mouse.click(x, y)
 
     assert element.is_checked()
 
     # click on the checkbox in the inner_frame
-    _, _, _, _, _ = env.step("")
+    obs, _, _, _, _ = env.step("")
     element = env.page.frames[2].query_selector('[type="checkbox"]')
 
     assert element.is_checked()  # instantiated as checked
 
-    x, y = map(float, ast.literal_eval(element.get_attribute("browsergym_center")))
+    bid = element.get_attribute("bid")
+    soup = bs4.BeautifulSoup(
+        flatten_dom_to_str(
+            obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+        ),
+        "lxml",
+    )
+    input_elem = soup.find("input", attrs={"bid": bid})
+    x, y = map(float, ast.literal_eval(input_elem.get("center")))
     env.page.mouse.click(x, y)
 
     assert not element.is_checked()
 
     # scroll inside a frame, and click on the checkbox in the inner_frame
     env.page.frames[1].evaluate("window.scrollTo(0, document.body.scrollHeight);")
-    _, _, _, _, _ = env.step("")
+    obs, _, _, _, _ = env.step("")
     element = env.page.frames[2].query_selector('[type="checkbox"]')
 
     assert not element.is_checked()  # instantiated as checked
 
-    x, y = map(float, ast.literal_eval(element.get_attribute("browsergym_center")))
+    bid = element.get_attribute("bid")
+    soup = bs4.BeautifulSoup(
+        flatten_dom_to_str(
+            obs["dom_object"], obs["extra_element_properties"], with_center_coords=True
+        ),
+        "lxml",
+    )
+    input_elem = soup.find("input", attrs={"bid": bid})
+    x, y = map(float, ast.literal_eval(input_elem.get("center")))
     env.page.mouse.click(x, y)
 
     assert element.is_checked()
@@ -515,7 +639,7 @@ def test_basic_iframe_webpage():
 def test_filter_visible_only():
     env = gym.make(
         "browsergym/openended",
-        start_url=CUSTOM_PAGE_URL,
+        task_kwargs={"start_url": CUSTOM_PAGE_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         viewport=__VIEWPORT,
@@ -543,7 +667,7 @@ def test_filter_visible_only():
 def test_extract_focused_element_bid_through_iframes():
     env = gym.make(
         "browsergym/openended",
-        start_url=MULTI_IFRAME_URL,
+        task_kwargs={"start_url": MULTI_IFRAME_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
@@ -576,7 +700,7 @@ def test_extract_focused_element_bid_through_iframes():
 def test_extract_focused_element_bid_through_shadowdom():
     env = gym.make(
         "browsergym/openended",
-        start_url=SHADOW_DOM_URL,
+        task_kwargs={"start_url": SHADOW_DOM_URL},
         headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,

@@ -11,7 +11,8 @@ class AbstractMiniwobTask(AbstractBrowserTask):
 
     """
 
-    nondeterministic = False
+    # gym metadata (default value, can be overloaded per task)
+    nondeterministic: bool = False
 
     @classmethod
     def get_task_id(cls):
@@ -19,17 +20,26 @@ class AbstractMiniwobTask(AbstractBrowserTask):
 
     def __init__(
         self,
+        seed: int,
         base_url: Optional[str] = None,
         episode_max_time: int = 1000000,
         remove_human_display: bool = True,
     ) -> None:
         """
         Args:
+            seed: random seed.
             base_url: str (optional), the base Miniwob URL where the task's HTML file is to be found. If not provided, the MINIWOB_URL environment variable will be used.
             episode_max_time: int, episode max time in milliseconds. Default: 1000000 ms.
             remove_human_display: bool, whether or not to remove the human display (goal, time left, last reward etc.) from the DOM. Default: True.
 
         """
+        super().__init__(seed)
+
+        # task properties, will be used to set up the browsergym environment
+        self.viewport = {"width": 500, "height": 320}
+        self.slow_mo = 100  # ms
+        self.timeout = 5000  # ms
+
         assert episode_max_time > 0
 
         # if not provided, try to get Miniwob URL from environment variable
@@ -45,7 +55,7 @@ class AbstractMiniwobTask(AbstractBrowserTask):
         self.episode_max_time = episode_max_time
         self.remove_human_display = remove_human_display
 
-    def setup(self, seed: int, page: playwright.sync_api.Page) -> tuple[str, dict]:
+    def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         self.page = page
 
         # navigate to the task's url
@@ -118,7 +128,7 @@ Math.seedrandom({seed});
 core.EPISODE_MAX_TIME = {episode_max_time};
 core.startEpisodeReal();
 """.format(
-                seed=seed,
+                seed=self.random.randint(0, 1000000),
                 episode_max_time=self.episode_max_time,
             )
         )

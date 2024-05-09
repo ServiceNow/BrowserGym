@@ -37,7 +37,9 @@ class Flags:
     use_concrete_example: bool = True
     use_abstract_example: bool = False
     multi_actions: bool = False
-    action_space: Literal["python", "bid", "coord", "bid+coord", "bid+nav", "coord+nav", "bid+coord+nav"] = "bid"
+    action_space: Literal[
+        "python", "bid", "coord", "bid+coord", "bid+nav", "coord+nav", "bid+coord+nav"
+    ] = "bid"
     is_strict: bool = False
     # This flag will be automatically disabled `if not chat_model_args.has_vision()`
     use_screenshot: bool = True

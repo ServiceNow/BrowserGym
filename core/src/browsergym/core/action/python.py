@@ -24,17 +24,17 @@ button.click()
 ```
 Here is another example:
 ```
-frame = page.get_by_test_id("35").frame_locator(":scope")
-frame.get_by_test_id("35-776").click()
+frame = page.get_by_test_id("a").frame_locator(":scope")
+frame.get_by_test_id("a776").click()
 ```
 Note that Playwright's `get_by_test_id()` method is configured to use the `bid` attribute to locate HTML elements,
 instead of the default `data-testid`. Also, Playwright's locators can not traverse iframes, so you have to locate
 parent iframes first in order to locate an element in an iframe. The `bid` attribute contains all the information
-required to recursively locate an element. For example, an element with `bid="23-557-2"` can be retrieved as follows:
+required to recursively locate an element. For example, an element with `bid="ac2"` can be retrieved as follows:
 ```
-frame = page.get_by_test_id("23").frame_locator(":scope")
-frame = frame.get_by_test_id("23-557").frame_locator(":scope")
-elem = frame.get_by_test_id("23-557-2")
+frame = page.get_by_test_id("a").frame_locator(":scope")
+frame = frame.get_by_test_id("ac").frame_locator(":scope")
+elem = frame.get_by_test_id("ac2")
 ```
 """
         else:
@@ -77,10 +77,10 @@ send_message_to_user("There are 7 items to choose from.")
 One single bloc of Python code. Do not include any explanation, only valid Python code."""
         else:
             return """\
-frame = page.get_by_test_id("23").frame_locator(":scope")
-frame = page.get_by_test_id("23-557").frame_locator(":scope")
-frame.get_by_test_id("23-557-2").fill("Hello world!")
-frame.get_by_test_id("23-557-3").click()
+frame = page.get_by_test_id("b").frame_locator(":scope")
+frame = page.get_by_test_id("ba").frame_locator(":scope")
+frame.get_by_test_id("ba2").fill("Hello world!")
+frame.get_by_test_id("ba3").click()
 """
 
     def to_python_code(self, action):

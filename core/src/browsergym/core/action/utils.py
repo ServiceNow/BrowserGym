@@ -1,4 +1,5 @@
 import playwright.sync_api
+from typing import Literal
 
 
 def get_elem_by_bid(
@@ -6,9 +7,9 @@ def get_elem_by_bid(
 ) -> playwright.sync_api.Locator:
     """
     Parse the given bid to sequentially locate every nested frame leading to the bid, then
-    locate the bid element. Bids are expected to take the form "XX-...-YY-ZZ", which means
-    the element ZZ is located inside frame YY, which is located inside frame ..., which is
-    located inside frame XX, which is located inside the page's main frame.
+    locate the bid element. Bids are expected to take the form "abb123", which means
+    the element abb123 is located inside frame abb, which is located inside frame ab, which is
+    located inside frame a, which is located inside the page's main frame.
 
     Args:
         bid: the browsergym id (playwright testid) of the page element.
@@ -24,33 +25,42 @@ def get_elem_by_bid(
     current_frame = page
 
     # dive into each nested frame, to the frame where the element is located
-    for i in range(bid.count("-")):
-        frame_bid = "-".join(bid.split("-")[: i + 1])
+    i = 0
+    while bid[i:] and not bid[i:].isnumeric():
+        i += 1
+        frame_bid = bid[:i]  # bid of the next frame to select
         frame_elem = current_frame.get_by_test_id(frame_bid)
+        if not frame_elem.count():
+            raise ValueError(f'could not find element with bid "{frame_bid}"')
         if scroll_into_view:
-            frame_elem.scroll_into_view_if_needed()
+            frame_elem.scroll_into_view_if_needed(timeout=500)
         current_frame = frame_elem.frame_locator(":scope")
 
     # finally, we should have selected the frame where the target element is
     elem = current_frame.get_by_test_id(bid)
+    if not elem.count():
+        raise ValueError(f'Could not find element with bid "{bid}".')
     if scroll_into_view:
-        elem.scroll_into_view_if_needed()
+        elem.scroll_into_view_if_needed(timeout=500)
     return elem
 
 
-def highlight_by_box(page: playwright.sync_api.Page, box: dict, is_visible: bool = True):
+def highlight_by_box(
+    page: playwright.sync_api.Page, box: dict, color: Literal["blue", "red"] = "blue"
+):
     """Highlights the target element based on its bounding box attributes."""
+
+    assert color in ("blue", "red")
 
     if box:
         left, top, width, height = box["x"], box["y"], box["width"], box["height"]
-        color = "blue" if is_visible else "red"
         page.evaluate(
             f"""\
 const overlay = document.createElement('div');
 document.body.appendChild(overlay);
 overlay.setAttribute('style', `
     all: initial;
-    position: absolute;
+    position: fixed;
     border: 2px solid transparent;  /* Start with transparent border */
     borderRadius: 10px;  /* Add rounded corners */
     boxShadow: 0 0 0px {color};  /* Initial boxShadow with 0px spread */
@@ -111,7 +121,7 @@ def smooth_move_visual_cursor_to(
 `;
             cursor.setAttribute('style', `
                 all: initial;
-                position: absolute;
+                position: fixed;
                 opacity: 0.7; /* Slightly transparent */
                 z-index: 2147483647; /* Maximum value */
                 pointer-events: none; /* Ensures the SVG doesn't interfere with page interactions */
@@ -188,35 +198,39 @@ def smooth_move_visual_cursor_to(
 
 
 def check_for_overlay(
-    page: playwright.sync_api.Page,
-    bid: str,
-    element: playwright.sync_api.ElementHandle,
+    page: playwright.sync_api.Page, bid: str, element: playwright.sync_api.ElementHandle, box: dict
 ):
-    """Checks in a given element is the topmost element at its center position by default.
+    if not element:
+        return False
+
+    visibility = element.get_attribute("browsergym_visibility_ratio")
+    if visibility is not None:
+        return float(visibility) >= 0.5
+
+    """Checks if a given element is the topmost element at its center position by default.
     If check_corners is True, it checks if any of the corners is visible."""
-    if element:
-        box = element.bounding_box()
-        if box:
-            # corners
-            points_to_check = [
-                (box["x"], box["y"]),
-                (box["x"] + box["width"], box["y"]),
-                (box["x"], box["y"] + box["height"]),
-                (box["x"] + box["width"], box["y"] + box["height"]),
-            ]
+    if box:
+        # corners
+        points_to_check = [
+            (box["x"], box["y"]),
+            (box["x"] + box["width"], box["y"]),
+            (box["x"], box["y"] + box["height"]),
+            (box["x"] + box["width"], box["y"] + box["height"]),
+        ]
 
-            for x, y in points_to_check:
-                # Execute JavaScript to find the topmost element at the point.
-                top_element = page.evaluate(
-                    f"""() => {{
-                    const el = document.elementFromPoint({x}, {y});
-                    return el ? el.outerHTML : '';
-                }}"""
-                )
+        for x, y in points_to_check:
+            # Execute JavaScript to find the topmost element at the point.
+            top_element = page.evaluate(
+                f"""() => {{
+                const el = document.elementFromPoint({x}, {y});
+                return el ? el.outerHTML : '';
+            }}"""
+            )
 
-                # Check if the topmost element is the element we're interested in.
-                if top_element and bid in top_element:
-                    return True
+            # Check if the topmost element is the element we're interested in.
+            if top_element and bid in top_element:
+                return True
+
     return False
 
 
@@ -224,16 +238,34 @@ def add_demo_mode_effects(
     page: playwright.sync_api.Page,
     elem: playwright.sync_api.ElementHandle,
     bid: str,
+    demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"],
     move_cursor: bool = True,
-    demo_mode_type: str = "default",
 ):
+    if demo_mode == "off":
+        return
+
     """Adds visual effects to the target element"""
     box = elem.bounding_box()
+    # box = extract_bounds_cdp(page, bid)
     if box:
         center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-        is_top_element = check_for_overlay(page, bid, elem)
+        is_top_element = check_for_overlay(page, bid, elem, box)
 
-        if is_top_element or demo_mode_type == "default":
-            if move_cursor:
-                smooth_move_visual_cursor_to(page, center_x, center_y)
-            highlight_by_box(page, box, is_visible=is_top_element)
+        if demo_mode == "only_visible_elements":
+            if not is_top_element:
+                return
+            else:
+                color = "blue"
+
+        elif demo_mode == "default":
+            if is_top_element:
+                color = "blue"
+            else:
+                color = "red"
+
+        elif demo_mode == "all_blue":
+            color = "blue"
+
+        if move_cursor:
+            smooth_move_visual_cursor_to(page, center_x, center_y)
+        highlight_by_box(page, box, color=color)

@@ -77,3 +77,42 @@ class AnyDict(Space):
     def __eq__(self, other: Any) -> bool:
         """Check whether ``other`` is equivalent to this instance."""
         return isinstance(other, AnyDict)
+
+
+class AnyBox(Space[NDArray[Any]]):
+    """A space representing an arbitrary dictionary object."""
+
+    def __init__(self, low, high, shape, dtype):
+        super().__init__(shape, dtype)
+        self.low = low
+        self.high = high
+
+    def contains(self, x: Any) -> bool:
+        """Return boolean specifying if x is a valid member of this space."""
+        if not isinstance(x, np.ndarray):
+            try:
+                x = np.asarray(x, dtype=self.dtype)
+            except (ValueError, TypeError):
+                return False
+
+        return bool(
+            np.can_cast(x.dtype, self.dtype)
+            and len(x.shape) == len(self.shape)
+            and all([dim in (xdim, -1) for xdim, dim in zip(x.shape, self.shape)])
+            and np.all(x >= self.low)
+            and np.all(x <= self.high)
+        )
+
+    def __repr__(self) -> str:
+        """Gives a string representation of this space."""
+        return f"AnyBox(low={repr(self.low)}, high={repr(self.high)}, shape={repr(self.shape)}, dtype={repr(self.dtype)})"
+
+    def __eq__(self, other: Any) -> bool:
+        """Check whether ``other`` is equivalent to this instance."""
+        return (
+            isinstance(other, AnyBox)
+            and self.low == other.low
+            and self.high == other.high
+            and self.shape == other.shape
+            and self.dtype == other.dtype
+        )
