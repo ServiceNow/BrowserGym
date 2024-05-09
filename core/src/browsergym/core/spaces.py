@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from matplotlib.pylab import Generator
 import numpy as np
 from gymnasium.spaces import Space, Box, Text
 from gymnasium.spaces.utils import flatdim, flatten, flatten_space, unflatten
