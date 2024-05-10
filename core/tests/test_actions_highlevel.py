@@ -62,11 +62,19 @@ def test_action_parser():
 
     function_calls = parser.parse_string('a(x=12, y = 12.2, other = "text")', parseAll=True)
     _, function_args = function_calls[0]
-    assert function_args == [NamedArgument(name='x', value=12), NamedArgument(name="y", value=12.2), NamedArgument(name="other", value="text")]
+    assert function_args == [
+        NamedArgument(name="x", value=12),
+        NamedArgument(name="y", value=12.2),
+        NamedArgument(name="other", value="text"),
+    ]
 
     function_calls = parser.parse_string('a(12, y = 12.2, other = "text")', parseAll=True)
     _, function_args = function_calls[0]
-    assert function_args == [12, NamedArgument(name="y", value=12.2), NamedArgument(name="other", value="text")]
+    assert function_args == [
+        12,
+        NamedArgument(name="y", value=12.2),
+        NamedArgument(name="other", value="text"),
+    ]
 
     with pytest.raises(ParseException):
         function_calls = parser.parse_string('a(x = 12, 12.2, other = "text")', parseAll=True)
@@ -97,7 +105,11 @@ def test_action_parser():
     function_calls = parser.parse_string('fun(12, x="val", y={"aaa": 23})', parseAll=True)
     function_name, function_args = function_calls[0]
     assert function_name == "fun"
-    assert function_args == [12, NamedArgument(name="x", value="val"), NamedArgument(name="y", value={"aaa": 23})]
+    assert function_args == [
+        12,
+        NamedArgument(name="x", value="val"),
+        NamedArgument(name="y", value={"aaa": 23}),
+    ]
 
 
 def test_valid_action():
