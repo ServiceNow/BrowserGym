@@ -1,6 +1,16 @@
 import ast
 import pyparsing as pp
 
+from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class NamedArgument:
+    name: str
+    value: Any
+
+    def __repr__(self):
+        return f"{self.name}={repr(self.value)}"
 
 def _build_highlevel_action_parser() -> pp.ParserElement:
     """
@@ -38,10 +48,12 @@ def _build_highlevel_action_parser() -> pp.ParserElement:
     number = pp.pyparsing_common.number()
     dict = pp.Forward().set_name("dict")  # will be defined later
     list = pp.Forward().set_name("list")  # will be defined later
-    element = (string | number | dict | list | TRUE | FALSE | NONE).set_name("element")
+    _tuple = pp.Forward().set_name("tuple")  # will be defined later
+    element = (string | number | dict | list | _tuple | TRUE | FALSE | NONE).set_name("element")
 
     list_items = pp.DelimitedList(element, allow_trailing_delim=True).set_name(None)
     list << pp.Group(LBRACK + pp.Optional(list_items) + RBRACK, aslist=True)
+    _tuple << pp.Group(LPAREN + pp.Optional(list_items) + RPAREN, aslist=True).set_parse_action(lambda tokens: tuple(tokens[0]))
 
     dict_item = pp.Group(string + COLON + element, aslist=True).set_name("dict item")
     dict_items = pp.DelimitedList(dict_item, allow_trailing_delim=True).set_name(None)
@@ -49,7 +61,7 @@ def _build_highlevel_action_parser() -> pp.ParserElement:
 
     arg = element
     list_args = pp.DelimitedList(arg, allow_trailing_delim=True).set_name(None)
-    named_arg = (pp.pyparsing_common.identifier() + pp.Literal("=")).suppress() + element
+    named_arg = (pp.pyparsing_common.identifier() + pp.Literal("=") + element).set_parse_action(lambda tokens: NamedArgument(name=tokens[0], value=tokens[2]))
     list_named_args = pp.DelimitedList(named_arg, allow_trailing_delim=True).set_name(None)
     function_call = pp.pyparsing_common.identifier() + pp.Group(
         LPAREN + pp.Optional(list_args) + pp.Optional(list_named_args) + RPAREN, aslist=True

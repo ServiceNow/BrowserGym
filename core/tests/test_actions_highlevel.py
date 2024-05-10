@@ -17,7 +17,7 @@ from utils import setup_playwright
 
 from browsergym.utils.obs import flatten_dom_to_str
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.parsers import highlevel_action_parser
+from browsergym.core.action.parsers import highlevel_action_parser, NamedArgument
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 
 
@@ -56,20 +56,23 @@ def test_action_parser():
     function_calls = parser.parse_string("  a ( ) b() \n \tc()", parseAll=True)
     assert [function_name for function_name, _ in function_calls] == ["a", "b", "c"]
 
-    function_calls = parser.parse_string('a(12, 12.2, "text")', parseAll=True)
+    function_calls = parser.parse_string('a(12, 12.2, "text", (1, 2, 3), ["a", 23])', parseAll=True)
     _, function_args = function_calls[0]
-    assert function_args == [12, 12.2, "text"]
+    assert function_args == [12, 12.2, "text", (1, 2, 3), ["a", 23]]
 
     function_calls = parser.parse_string('a(x=12, y = 12.2, other = "text")', parseAll=True)
     _, function_args = function_calls[0]
-    assert function_args == [12, 12.2, "text"]
+    assert function_args == [NamedArgument(name='x', value=12), NamedArgument(name="y", value=12.2), NamedArgument(name="other", value="text")]
 
     function_calls = parser.parse_string('a(12, y = 12.2, other = "text")', parseAll=True)
     _, function_args = function_calls[0]
-    assert function_args == [12, 12.2, "text"]
+    assert function_args == [12, NamedArgument(name="y", value=12.2), NamedArgument(name="other", value="text")]
 
     with pytest.raises(ParseException):
         function_calls = parser.parse_string('a(x = 12, 12.2, other = "text")', parseAll=True)
+
+    with pytest.raises(ParseException):
+        function_calls = parser.parse_string('a(12, 12.2, 1 = "text")', parseAll=True)
 
     with pytest.raises(ParseException):
         function_calls = parser.parse_string("a(1-)", parseAll=True)
@@ -90,6 +93,11 @@ def test_action_parser():
     function_name, function_args = function_calls[0]
     assert function_name == "a"
     assert function_args == ["# not comment"]
+
+    function_calls = parser.parse_string('fun(12, x="val", y={"aaa": 23})', parseAll=True)
+    function_name, function_args = function_calls[0]
+    assert function_name == "fun"
+    assert function_args == [12, NamedArgument(name="x", value="val"), NamedArgument(name="y", value={"aaa": 23})]
 
 
 def test_valid_action():
