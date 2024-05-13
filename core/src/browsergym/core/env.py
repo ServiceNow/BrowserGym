@@ -148,7 +148,7 @@ class BrowserEnv(gym.Env, ABC):
             self.task = None
 
     def reset(self, seed=None, *args, **kwargs):
-        super().reset(seed=seed, *args, **kwargs)
+        super().reset(seed=seed, *args)
         self.np_random = None  # make sure all randomness is handled by the task
 
         if self.task:
