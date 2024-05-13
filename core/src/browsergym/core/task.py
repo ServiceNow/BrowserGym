@@ -78,7 +78,7 @@ class OpenEndedTask(AbstractBrowserTask):
     def get_task_id(cls):
         return "openended"
 
-    def __init__(self, seed: int, start_url: str, goal: str = None) -> None:
+    def __init__(self, seed: int, start_url: str = 'about:blank', goal: str = None) -> None:
         """
         Args:
             seed: random seed.
