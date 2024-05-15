@@ -30,6 +30,7 @@ dependencies = [
     "browsergym-core==0.2.3dev",
     "browsergym-miniwob==0.2.3dev",
     "browsergym-webarena==0.2.3dev",
+    "browsergym-experiments==0.2.3dev",
     "browsergym-workarena",
 ]
 
