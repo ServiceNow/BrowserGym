@@ -78,6 +78,7 @@ class ExpArgs:
     agent_args: AgentArgs
     task_name: str
     task_kwargs: dict = dataclasses.field(default_factory=dict)
+    env_extra_kwargs: dict = dataclasses.field(default_factory=dict)
     exp_dir: str = None
     exp_name: str = None
     task_seed: int = None
@@ -128,7 +129,8 @@ class ExpArgs:
                 max_episode_steps=self.max_steps,
                 headless=self.headless,
                 action_mapping=agent.get_action_mapping(),  # action mapping is provided by the agent
-                **self.task_kwargs,
+                task_kwargs=self.task_kwargs,
+                **self.env_extra_kwargs,
             )
 
             err_msg, stack_trace = None, None
