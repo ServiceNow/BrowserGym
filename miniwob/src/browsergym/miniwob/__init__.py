@@ -1,5 +1,3 @@
-__version__ = "0.2.3dev"
-
 from browsergym.core.registration import register_task
 
 from . import all

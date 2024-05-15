@@ -26,7 +26,7 @@ dynamic = ["dependencies", "version"]
 homepage = "https://github.com/ServiceNow/BrowserGym"
 
 [tool.hatch.version]
-path = "src/browsergym/webarena/__init__.py"
+path = "../core/src/browsergym/core/__init__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
