@@ -7,7 +7,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 from browsergym.experiments.agent import Agent
 from browsergym.experiments.loop import AgentArgs
-from browsergym.experiments.utils import prune_html
+from browsergym.experiments.prompt_utils import prune_html
 
 from agents import dynamic_prompting
 from utils.llm_utils import ParseError, retry
