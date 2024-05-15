@@ -127,7 +127,7 @@ def main():
                 use_concrete_example=True,  # "Prompt the agent with a concrete example."
                 use_screenshot=args.use_screenshot,
                 enable_chat=True,
-                demo_mode=args.demo_mode,
+                demo_mode="default" if args.demo_mode else "off",
             ),
         ),
         max_steps=100,  # "Maximum steps for the experiment."
