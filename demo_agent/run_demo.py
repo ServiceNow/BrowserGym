@@ -85,16 +85,22 @@ def parse_args():
 def main():
     args = parse_args()
 
-    task_kwargs = {
+    # change these as desired
+    env_extra_kwargs = {
         "viewport": {"width": 1500, "height": 1280},
         "slow_mo": args.slow_mo,
     }
+    task_kwargs = {}
 
     if args.task_name == "openended":
+        env_extra_kwargs.update(
+            {
+                "wait_for_user_message": True,
+            }
+        )
         task_kwargs.update(
             {
                 "start_url": args.start_url,
-                "wait_for_user_message": True,
             }
         )
 
@@ -129,6 +135,7 @@ def main():
         task_name=args.task_name,
         task_kwargs=task_kwargs,
         headless=args.headless,
+        env_extra_kwargs=env_extra_kwargs,
     )
 
     exp_args.prepare(Path("./results"))

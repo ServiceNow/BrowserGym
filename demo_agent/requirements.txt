@@ -1,4 +1,4 @@
-browsergym-core>=0.1
+browsergym-core>=0.2
 openai>=1.7,<1.8
 langchain>=0.1,<0.2
 langchain_openai
