@@ -8,3 +8,4 @@ tenacity
 -e ../core # local package
 -e ../miniwob # local package
 -e ../webarena # local package
+-e ../experiments # local package
