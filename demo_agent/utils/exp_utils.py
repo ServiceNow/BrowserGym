@@ -11,6 +11,7 @@ import traceback
 import uuid
 import pandas as pd
 
+from abc import abstractmethod
 from datetime import datetime
 from pathlib import Path
 from warnings import warn
@@ -26,10 +27,13 @@ import browsergym.workarena  # important, registers "browsergym/workarena.*" gym
 import browsergym.webarena  # important, registers "browsergym/webarena.*" gym environment
 from browsergym.core.chat import Chat
 
-from agents import AgentArgs
-from agents.base import Agent
+from browsergym.experiments.agent import Agent
+from browsergym.experiments.loop import AgentArgs
 
 from utils.llm_utils import count_messages_token, count_tokens
+
+from dataclasses import dataclass, field
+from utils.chat_api import ChatModelArgs
 
 
 class DataclassJSONEncoder(json.JSONEncoder):

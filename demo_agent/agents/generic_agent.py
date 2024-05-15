@@ -5,15 +5,17 @@ from warnings import warn
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str
 from langchain.schema import HumanMessage, SystemMessage
 
-from agents.base import Agent
+from browsergym.experiments.agent import Agent
+from browsergym.experiments.loop import AgentArgs
+from browsergym.experiments.utils import prune_html
+
 from agents import dynamic_prompting
-from agents.prompt_utils import prune_html
 from utils.llm_utils import ParseError, retry
 from utils.chat_api import ChatModelArgs
 
 
 @dataclass
-class GenericAgentArgs:
+class GenericAgentArgs(AgentArgs):
     agent_name: str = "GenericAgent"
     chat_model_args: ChatModelArgs = None
     flags: dynamic_prompting.Flags = field(default_factory=lambda: dynamic_prompting.Flags())
@@ -61,8 +63,6 @@ does not support vision. Disabling use_screenshot."""
             warn(f"Warning: Not using any of these arguments when initiating the agent: {kwargs}")
 
     def get_action(self, obs):
-        if not "pruned_html" in obs:
-            obs["pruned_html"] = prune_html(obs["dom_txt"])
 
         self.obs_history.append(obs)
 
