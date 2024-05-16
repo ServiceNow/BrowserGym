@@ -1,9 +1,22 @@
 import argparse
 from pathlib import Path
-from agents.dynamic_prompting import Flags
-from agents.generic_agent import GenericAgentArgs
-from utils.exp_utils import ExpArgs, str2bool
-from utils.chat_api import ChatModelArgs
+
+from browsergym.experiments import ExpArgs, EnvArgs
+
+from agents.legacy.agent import GenericAgentArgs
+from agents.legacy.dynamic_prompting import Flags
+from agents.legacy.utils.chat_api import ChatModelArgs
+
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "y", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "n", "0"):
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
 def parse_args():
@@ -83,28 +96,28 @@ def parse_args():
 
 
 def main():
+    print(
+        """\
+WARNING this demo agent will soon be moved elsewhere. Expect it to be removed at some point."""
+    )
+
     args = parse_args()
 
-    # change these as desired
-    env_extra_kwargs = {
-        "viewport": {"width": 1500, "height": 1280},
-        "slow_mo": args.slow_mo,
-    }
-    task_kwargs = {}
+    env_args = EnvArgs(
+        task_name=args.task_name,
+        task_seed=None,
+        max_steps=100,
+        headless=args.headless,
+        viewport={"width": 1500, "height": 1280},
+        slow_mo=args.slow_mo,
+    )
 
     if args.task_name == "openended":
-        env_extra_kwargs.update(
-            {
-                "wait_for_user_message": True,
-            }
-        )
-        task_kwargs.update(
-            {
-                "start_url": args.start_url,
-            }
-        )
+        env_args.wait_for_user_message = True
+        env_args.task_kwargs = {"start_url": args.start_url}
 
     exp_args = ExpArgs(
+        env_args=env_args,
         agent_args=GenericAgentArgs(
             chat_model_args=ChatModelArgs(
                 model_name=args.model_name,
@@ -130,12 +143,6 @@ def main():
                 demo_mode="default" if args.demo_mode else "off",
             ),
         ),
-        max_steps=100,  # "Maximum steps for the experiment."
-        task_seed=None,
-        task_name=args.task_name,
-        task_kwargs=task_kwargs,
-        headless=args.headless,
-        env_extra_kwargs=env_extra_kwargs,
     )
 
     exp_args.prepare(Path("./results"))

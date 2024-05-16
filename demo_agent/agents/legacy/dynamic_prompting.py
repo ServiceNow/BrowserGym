@@ -13,8 +13,8 @@ from browsergym.core.action.base import AbstractActionSet
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
 
-from utils.llm_utils import ParseError
-from utils.llm_utils import (
+from .utils.llm_utils import ParseError
+from .utils.llm_utils import (
     count_tokens,
     image_to_jpg_base64_url,
     parse_html_tags_raise,
