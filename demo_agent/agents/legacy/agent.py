@@ -1,3 +1,7 @@
+"""
+WARNING DEPRECATED WILL BE REMOVED SOON
+"""
+
 from dataclasses import asdict, dataclass, field
 import traceback
 from warnings import warn

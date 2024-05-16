@@ -1,3 +1,7 @@
+"""
+WARNING DEPRECATED WILL BE REMOVED SOON
+"""
+
 import abc
 import difflib
 import logging
