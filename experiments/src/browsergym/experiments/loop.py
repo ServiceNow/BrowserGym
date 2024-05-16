@@ -19,9 +19,10 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-from browsergym.experiments.agent import Agent
-from browsergym.experiments.prompt_utils import count_messages_token, count_tokens
 from browsergym.core.chat import Chat
+
+from .agent import Agent
+from .utils import count_messages_token, count_tokens
 
 
 def _get_env_name(task_name):
@@ -163,7 +164,7 @@ class ExpArgs:
         try:
             logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            env = self.env_args.make_env(agent.action_set.to_python_code)
+            env = self.env_args.make_env(action_mapping=agent.action_mapping)
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
