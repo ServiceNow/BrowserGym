@@ -23,9 +23,6 @@ from browsergym.experiments.agent import Agent
 from browsergym.experiments.prompt_utils import count_messages_token, count_tokens
 from browsergym.core.chat import Chat
 
-# TODO find a better way to handle "critical" vs normal error
-from ui_copilot.analyze.error_categorization import is_critical_server_error
-
 
 def _get_env_name(task_name):
     """Register tasks if needed (lazy import) and return environment name."""
@@ -124,8 +121,9 @@ class ExpArgs:
     exp_name: str = None
     # exp_date: datetime = None
     enable_debug: bool = True
-    order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
-    raise_critical_server_error = False
+    order: int = None  # use to keep the original order the experiments were meant to be launched.
+    err_msg: str = None
+    stack_trace: str = None
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -188,8 +186,8 @@ class ExpArgs:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
             stack_trace = traceback.format_exc()
 
-            if is_critical_server_error(err_msg, stack_trace):
-                self.raise_critical_server_error = True
+            self.err_msg = err_msg
+            self.stack_trace = stack_trace
 
             logging.warning(err_msg + "\n" + stack_trace)
             if _is_debugging() and self.enable_debug:
