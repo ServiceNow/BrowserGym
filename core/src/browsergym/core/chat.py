@@ -35,7 +35,7 @@ class Chat:
 
         # setup the chat page
         self.page.expose_function(
-            "send_user_message", lambda msg: self.add_message(role="user", msg=msg, from_js=True)
+            "send_user_message", lambda msg: self._js_user_message_received_callback(msg=msg)
         )
 
         if modern:
@@ -43,16 +43,22 @@ class Chat:
         else:
             self.page.set_content(get_chatbox_classic(CHATBOX_DIR))
 
-    def add_message(
-        self, role: Literal["user", "assistant", "info"], msg: str, from_js: bool = False
-    ):
+    def _js_user_message_received_callback(self, msg: str):
+        """Callback function for when a user message is received in the chatbox"""
+        utc_time = time.time()
+        self.messages.append({"role": "user", "timestamp": utc_time, "message": msg})
+        # returning a list as JS doesnt like tuples
+        return ["user", time.strftime("%H:%M", time.localtime(utc_time)), msg]
 
+    def add_message(self, role: Literal["user", "assistant", "info"], msg: str):
+        """Add a message to the chatbox and update the page accordingly."""
+        utc_time = time.time()
         if role not in ("user", "assistant", "info"):
             raise ValueError(f"Invalid role: {role}")
         if role in ("user", "assistant"):
-            self.messages.append({"role": role, "message": msg})
-        if not from_js:
-            self.page.evaluate(f"addChatMessage({repr(role)}, {repr(msg)});")
+            self.messages.append({"role": role, "timestamp": utc_time, "message": msg})
+        timestamp = time.strftime("%H:%M:%S", time.localtime(utc_time))
+        self.page.evaluate(f"addChatMessage({repr(role)}, {repr(timestamp)}, {repr(msg)});")
 
     def wait_for_user_message(self):
         logging.info("Waiting for message from user...")
