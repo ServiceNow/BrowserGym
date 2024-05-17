@@ -30,38 +30,34 @@ class GenericAgentArgs(AbstractAgentArgs):
 
 class GenericAgent(Agent):
 
-    @property
-    def observation_mapping(self):
+    def observation_mapping(self, obs: dict) -> dict:
         """
         Augment observations with text HTML and AXTree representations, which will be stored in
         the experiment traces.
         """
 
-        def augmented_obs(obs):
-            obs = obs.copy()
-            obs["dom_txt"] = flatten_dom_to_str(
-                obs["dom_object"],
-                with_visible=self.flags.extract_visible_tag,
-                with_center_coords=self.flags.extract_coords == "center",
-                with_bounding_box_coords=self.flags.extract_coords == "box",
-                filter_visible_only=self.flags.extract_visible_elements_only,
-            )
-            obs["axtree_txt"] = flatten_axtree_to_str(
-                obs["axtree_object"],
-                with_visible=self.flags.extract_visible_tag,
-                with_center_coords=self.flags.extract_coords == "center",
-                with_bounding_box_coords=self.flags.extract_coords == "box",
-                filter_visible_only=self.flags.extract_visible_elements_only,
-            )
-            obs["pruned_html"] = prune_html(obs["dom_txt"])
-            return obs
+        obs = obs.copy()
+        obs["dom_txt"] = flatten_dom_to_str(
+            obs["dom_object"],
+            with_visible=self.flags.extract_visible_tag,
+            with_center_coords=self.flags.extract_coords == "center",
+            with_bounding_box_coords=self.flags.extract_coords == "box",
+            filter_visible_only=self.flags.extract_visible_elements_only,
+        )
+        obs["axtree_txt"] = flatten_axtree_to_str(
+            obs["axtree_object"],
+            with_visible=self.flags.extract_visible_tag,
+            with_center_coords=self.flags.extract_coords == "center",
+            with_bounding_box_coords=self.flags.extract_coords == "box",
+            filter_visible_only=self.flags.extract_visible_elements_only,
+        )
+        obs["pruned_html"] = prune_html(obs["dom_txt"])
 
-        return augmented_obs
+        return obs
 
-    @property
-    def action_mapping(self):
+    def action_mapping(self, action: str) -> str:
         """Use a BrowserGym AbstractActionSet mapping."""
-        return self.action_space.to_python_code
+        return self.action_space.to_python_code(action)
 
     def __init__(
         self,

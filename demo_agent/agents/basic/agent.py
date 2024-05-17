@@ -3,20 +3,26 @@ import dataclasses
 from browsergym.experiments import Agent, AbstractAgentArgs
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
+from browsergym.utils.obs import flatten_axtree_to_str
 
 
 class DemoAgent(Agent):
     """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
 
-    @property
-    def action_mapping(self):
-        return self.action_space.to_python_code
+    def action_mapping(self, action: str):
+        return self.action_space.to_python_code(action)
+
+    def observation_mapping(self, obs: dict) -> dict:
+        return {
+            "goal": obs["goal"],
+            "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
+        }
 
     def __init__(self, model_name) -> None:
         super().__init__()
         self.model_name = model_name
 
-        action_space = HighLevelActionSet(
+        self.action_space = HighLevelActionSet(
             subsets=["bid"],  # define a subset of the action space
             # subsets=["bid", "coord"] # allows the agent to also use x,y coordinates
             strict=False,  # less strict on the parsing of the actions
@@ -25,7 +31,7 @@ class DemoAgent(Agent):
         )
 
         # uncomment this line to allow the agent to also use Python full python code
-        # action_space = PythonActionSet()
+        # self.action_space = PythonActionSet()
 
         from openai import OpenAI
 

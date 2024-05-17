@@ -257,7 +257,8 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        self.obs = agent.observation_mapping(self.obs)
+        if agent.observation_mapping:
+            self.obs = agent.observation_mapping(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
