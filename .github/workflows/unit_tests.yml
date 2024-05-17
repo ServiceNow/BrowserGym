@@ -61,7 +61,7 @@ jobs:
         run: playwright install --with-deps
 
       - name: Run browsergym-core Unit Tests
-        run: pytest -n 1 --durations=10 -m 'not pricy' -v core/tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v core/tests
 
   browsergym-miniwob:
     runs-on: ubuntu-latest
