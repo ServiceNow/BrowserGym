@@ -1,3 +1,4 @@
 .DS_store
 __pycache__/
 *.py[cod]
+*.egg-info
