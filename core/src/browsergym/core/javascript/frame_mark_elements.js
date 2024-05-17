@@ -35,7 +35,7 @@ async ([parent_bid, bid_attr_name]) => {
     // mechanism for computing all element's visibility
     // the intersection observer will set the visibility ratio of elements entering / exiting the viewport
     // a set is used to keep track of not-yet-visited elements
-    let elems_to_be_visited = new Set();
+    let elems_to_be_visited = new Set()
     let intersection_observer = new IntersectionObserver(
         entries => {
           entries.forEach(entry => {
@@ -50,8 +50,6 @@ async ([parent_bid, bid_attr_name]) => {
             threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         }
     )
-
-    let all_bids = new Set();
 
     // get all DOM elements in the current frame (does not include elements in shadowDOMs)
     let elements = Array.from(document.querySelectorAll('*'));
@@ -95,20 +93,15 @@ async ([parent_bid, bid_attr_name]) => {
         // add the element global id (browsergym id) to a custom HTML attribute
         // https://playwright.dev/docs/locators#locate-by-test-id
         // recover the element id if it has one already, else compute a new element id
-        let elem_global_bid = null;
+        let elem_global_bid;
         if (elem.hasAttribute(bid_attr_name)) {
             // throw an error if the attribute is already set while this is the first visit of the page
             if (browsergym_first_visit) {
                 throw new Error(`Attribute ${bid_attr_name} already used in element ${elem.outerHTML}`);
             }
             elem_global_bid = elem.getAttribute(bid_attr_name);
-            // if the bid has already been encountered, then this is a duplicate and a new bid should be set
-            if (all_bids.has(elem_global_bid)) {
-                console.log(`BrowserGym: duplicate bid ${elem_global_bid} detected, generating a new one`);
-                elem_global_bid = null;
-            }
         }
-        if (elem_global_bid === null) {
+        else {
             let elem_local_id = null;
             // iFrames get alphabetical ids: 'a', 'b', ..., 'z'.
             // if more than 26 iFrames are present, raise an Error
@@ -130,7 +123,6 @@ async ([parent_bid, bid_attr_name]) => {
             }
             elem.setAttribute(bid_attr_name, `${elem_global_bid}`);
         }
-        all_bids.add(elem_global_bid);
 
         // Hack: store custom data inside the aria-roledescription attribute (will be available in DOM and AXTree)
         //  - elem_global_bid: global element identifier (unique over multiple frames)
