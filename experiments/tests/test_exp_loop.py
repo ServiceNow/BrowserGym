@@ -6,9 +6,16 @@ import dataclasses
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.experiments.agent import Agent
 from browsergym.experiments.loop import AbstractAgentArgs, EnvArgs, ExpArgs, get_exp_result
+from browsergym.utils.obs import flatten_axtree_to_str
 
 
 class MiniwobTestAgent(Agent):
+
+    def observation_mapping(self, obs: dict):
+        return {"axtree_txt": flatten_axtree_to_str(obs["axtree_object"])}
+
+    def action_mapping(self, action: str):
+        return self.action_space.to_python_code(action)
 
     def __init__(self):
         self.action_space = HighLevelActionSet(subsets="bid")

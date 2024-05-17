@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any
 
 
 class Agent(ABC):
@@ -8,51 +8,47 @@ class Agent(ABC):
     with a browsergym environment.
     """
 
-    @property
-    @abstractmethod
-    def action_mapping(self) -> Optional[callable]:
+    def action_mapping(self, action: str) -> str:
         """
-        Returns a function that maps the actions returned by `get_action()` to BrowserGym-compatible Python code.
+        This property is meant to be overloaded by your agent (optional).
+
+        Maps the actions returned by `get_action()` to BrowserGym-compatible Python code.
         Why this mapping? This mapping will happen within the BrowserGym environment, so that the experiment loop
         manipulates and records pre-mapping actions and not the resulting Python code (which can be pretty verbose).
 
-        This property is meant to be overloaded by your agent.
-
         Examples:
             # no mapping, the agent directly produces Python code
-            return None
+            return action
 
             # use a pre-defined action set of high-level function
-            action_set = browsergym.core.action.highlevel.HighLevelActionSet(subsets=["chat", "nav", "bid"])
-            return action_set.to_python_code
+            action_space = browsergym.core.action.highlevel.HighLevelActionSet(subsets=["chat", "nav", "bid"])
+            return action_space.to_python_code(action)
 
             # use a pre-defined Python action set which extracts Markdown code snippets
-            action_set = browsergym.core.action.python.PythonActionSet()
-            return action_set.to_python_code
+            action_space = browsergym.core.action.python.PythonActionSet()
+            return action_space.to_python_code(action)
         """
-        return None
+        return action
 
-    @property
-    @abstractmethod
-    def observation_mapping(self) -> Optional[callable]:
+    def observation_mapping(self, obs: dict) -> Any:
         """
+        This method is meant to be overloaded by your agent.
+
         Returns a function that pre-processes the observations before feeding them to `get_action()`.
         Why this mapping? This mapping will happen within the experiment loop, so that the resulting observation gets
         recorded in the execution traces.
 
-        This property is meant to be overloaded by your agent.
-
         Examples:
             from browsergym.utils.obs import flatten_axtree_to_str
-            return lambda obs: {
-                "axtree": flatten_axtree_to_str(obs["axtree_object"]),
+            return {
                 "goal": obs["goal"],
+                "axtree": flatten_axtree_to_str(obs["axtree_object"]),
             }
         """
-        return None
+        return obs
 
     @abstractmethod
-    def get_action(self, obs) -> tuple[str, dict]:
+    def get_action(self, obs: Any) -> tuple[str, dict]:
         """
         Updates the agent with the current observation, and returns its next action (plus an info dict, optional).
 
