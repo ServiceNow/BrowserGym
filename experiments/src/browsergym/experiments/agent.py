@@ -62,7 +62,7 @@ class Agent(ABC):
             The current observation of the environmenti, after it has been processed by `observation_mapping()`.
             By default, a BrowserGym observation is a dict with the following entries:
             - "chat_messages": list[str], messages between the agent and the user.
-            - "goal": stri, the current goal.
+            - "goal": str, the current goal.
             - "open_pages_urls": list[str], open pages.
             - "active_page_index": int, the index of the active page.
             - "url": str, the current URL.
