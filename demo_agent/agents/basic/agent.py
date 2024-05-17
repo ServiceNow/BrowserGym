@@ -1,6 +1,6 @@
 import dataclasses
 
-from browsergym.experiments import Agent, AgentArgs
+from browsergym.experiments import Agent, AbstractAgentArgs
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
 
@@ -15,10 +15,14 @@ class DemoAgent(Agent):
     def __init__(self, model_name) -> None:
         super().__init__()
         self.model_name = model_name
-        self.action_space = HighLevelActionSet(subsets=["bid"], strict=False, multiaction=True)
 
-        # uncomment this line to allow the agent to also use x,y coordinates
-        # action_space = HighLevelActionSet(subsets=["bid", "coord"])
+        action_space = HighLevelActionSet(
+            subsets=["bid"],  # define a subset of the action space
+            # subsets=["bid", "coord"] # allows the agent to also use x,y coordinates
+            strict=False,  # less strict on the parsing of the actions
+            multiaction=True,  # enable to agent to take multiple actions at once
+            demo_mode="default",  # adds visual effects
+        )
 
         # uncomment this line to allow the agent to also use Python full python code
         # action_space = PythonActionSet()
@@ -65,15 +69,18 @@ In order to accomplish my goal I need to click on the button with bid 12
 
 
 @dataclasses.dataclass
-class DemoAgentArgs(AgentArgs):
+class DemoAgentArgs(AbstractAgentArgs):
+    """
+    This class is meant to store the arguments that define the agent.
+
+    By isolating them in a dataclass, this ensures serialization without storing
+    internal states of the agent.
+    """
+
     model_name: str = "gpt-3.5-turbo"
 
     def make_agent(self):
         return DemoAgent(model_name=self.model_name)
-
-    @property
-    def agent_name(self) -> str:
-        return DemoAgent.__name__
 
 
 def main():

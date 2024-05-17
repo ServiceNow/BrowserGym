@@ -1,4 +1,3 @@
-import dataclasses
 import gzip
 import json
 import logging
@@ -8,6 +7,7 @@ import time
 import traceback
 import uuid
 from collections import defaultdict
+from dataclasses import dataclass, field, asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
 from abc import ABC, abstractmethod
@@ -24,38 +24,7 @@ from .agent import Agent
 from .utils import count_messages_token, count_tokens
 
 
-def _get_env_name(task_name):
-    """Register tasks if needed (lazy import) and return environment name."""
-
-    # lazy benchmark import
-    if task_name.startswith("miniwob"):
-        import browsergym.miniwob
-    elif task_name.startswith("workarena"):
-        import browsergym.workarena
-    elif task_name.startswith("webarena"):
-        import browsergym.webarena
-
-    return f"browsergym/{task_name}"
-
-
-def _send_chat_info(chat: Chat, action: str, agent_info: dict):
-    msg = ""
-    if "think" in agent_info:
-        msg += f"""\
-{agent_info["think"]}
-
-"""
-
-    msg += f"""\
-action:
-{action}
-"""
-
-    logging.info(msg)
-    chat.add_message(role="info", msg=msg)
-
-
-@dataclasses.dataclass
+@dataclass
 class EnvArgs:
     task_name: str
     task_seed: int = None
@@ -66,7 +35,7 @@ class EnvArgs:
     viewport: dict = None  # use default value from BrowserGym
     slow_mo: int = None  # use default value from BrowserGym
     storage_state: Optional[str | Path | dict] = None
-    task_kwargs: dict = dataclasses.field(default_factory=lambda: {})
+    task_kwargs: dict = field(default_factory=lambda: {})
 
     def make_env(self, action_mapping):
         extra_kwargs = {}
@@ -91,44 +60,64 @@ class EnvArgs:
         )
 
 
-class AgentArgs(ABC):
+@dataclass
+class AbstractAgentArgs(ABC):
     """A template class that defines the required signature of an agent's arguments."""
 
     @property
-    @abstractmethod
     def agent_name(self) -> str:
         """The name of the agent. Used for naming experiments."""
+        return self.__class__.__name__
 
     @abstractmethod
     def make_agent(self) -> Agent:
         """Comply the experiments.loop API for instantiating the agent."""
 
 
-@dataclasses.dataclass
+@dataclass
 class ExpArgs:
-    """Arguments to run an experiment.
+    """Arguments to run an experiment, i.e. run agent in an environment until done.
 
     This dataclass is used to store experiments arguments. It contains
     agent_args and env_args which follows the same principle. It contains helper
     functions to prepare and run experiments.
 
-
+    Attributes:
+    -----------
+    agent_args: AbstractAgentArgs
+        The arguments to instantiate the agent.
+    env_args: EnvArgs
+        The arguments to instantiate the environment.
+    exp_dir: str
+        The directory where the experiment will be saved.
+    exp_name: str
+        The name of the experiment. If None, it will be generated from the
+        agent and environment names.
+    enable_debug: bool
+        If python is running in debug mode and `enable_debug` is True, errors
+        will be raised instead of only logged
+    error_msg: str
+        Error that occured while running the experiment (if any).
+    stack_trace: str
+        Stack trace of the error (if any).
+    order: int (internal)
+        The order of the experiment in the batch. It is used to keep track of
+        the original order of the experiments in case they are shuffled.
     """
 
-    agent_args: AgentArgs
+    agent_args: AbstractAgentArgs
     env_args: EnvArgs
     exp_dir: str = None
     exp_name: str = None
-    # exp_date: datetime = None
     enable_debug: bool = True
-    order: int = None  # use to keep the original order the experiments were meant to be launched.
     err_msg: str = None
     stack_trace: str = None
+    order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
 
-        This enables visualizing experiments that are not run yet.
+        This enables inspecting experiments that are not run yet.
         """
         if self.env_args.task_seed is None:
             self.env_args.task_seed = np.random.randint(0, 1000)
@@ -202,7 +191,7 @@ class ExpArgs:
                 logging.error(f"Error while closing the environment: {e}")
 
 
-@dataclasses.dataclass
+@dataclass
 class StepTimestamps:
     env_start: float = 0
     action_exec_start: float = 0  # to extract begining of visual action from video
@@ -213,11 +202,35 @@ class StepTimestamps:
     agent_stop: float = 0
 
 
-@dataclasses.dataclass
+@dataclass
 class StepInfo:
     """Collects information about step that will be saved and reloaded.
     Helper functions only modify the dataclass attributes and helps keeping the
-    information organized."""
+    information organized.
+
+    Attributes:
+    -----------
+    step: int
+        The step number of the episode.
+    obs: dict
+        The observation of the environment.
+    reward: float
+        The reward of the step.
+    raw_reward: float
+        The raw reward of the step.
+    terminated: bool
+        Whether the episode is terminated i.e. reached a terminal state.
+    truncated: bool
+        Whether the episode is truncated i.e. reached a maximum number of steps.
+    action: str
+        The action taken by the agent.
+    agent_info: dict
+        Additional information from the agent.
+    stats: dict
+        Extra statistics about the step.
+    profiling: StepTimestamps
+        Timestamps of the different events during the episode.
+    """
 
     step: int = None
     obs: dict = None
@@ -226,9 +239,9 @@ class StepInfo:
     terminated: bool = None
     truncated: bool = None
     action: str = None
-    agent_info: dict = dataclasses.field(default_factory=dict)
+    agent_info: dict = field(default_factory=dict)
     stats: dict = None
-    profiling: StepTimestamps = dataclasses.field(default_factory=StepTimestamps)
+    profiling: StepTimestamps = field(default_factory=StepTimestamps)
 
     def from_step(self, env: gym.Env, action: str):
         t = self.profiling
@@ -244,8 +257,7 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        if agent.observation_mapping:
-            self.obs = agent.observation_mapping(self.obs)
+        self.obs = agent.observation_mapping(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
@@ -317,7 +329,12 @@ def _extract_err_msg(episode_info: list[StepInfo]):
 
 
 def _aggregate_episode_stats(episode_info: list[StepInfo]):
+    """Aggregate StepInfo.stats across episodes.
 
+    It will compute the sum and max of each value in the stats dict.
+    These two summaries should cover many use cases. If more are needed, the
+    user can compute other stats by reloading individual StepInfo.
+    """
     # discard the last step since it was not seen by the agent
     episode_info = episode_info[:-1]
 
@@ -386,6 +403,19 @@ class ExpResult:
     """Helper class to load and visualize the results of an experiment.
 
     attributes are loaded lazily.
+
+    Attributes (lazily loaded):
+        exp_args: ExpArgs, the arguments of the experiment.
+        steps_info: list[StepInfo], the information of each steps so far
+        summary_info: dict, the summary of the experiment.
+        screenshots: list[Image], the screenshots of each step.
+        screenshots_som: list[Image], the screenshots of each step with set of
+            marks inprinted.
+        flat_exp_args: dict, the flattened version of exp_args.
+        chat_video_path: Path, the path to the chat video. (if record_video=True)
+        task_video_path: Path, the path to the task video. (if record_video=True)
+        combined_video_path: Path, the path to the combined video. (if video was
+            combined)
     """
 
     def __init__(self, exp_dir) -> None:
@@ -393,7 +423,7 @@ class ExpResult:
         self._exp_args = None
         self._steps_info = {}
         self._summary_info = None
-        self._screenshots = None  # TODO handle SOM
+        self._screenshots = {}
         self._flat_exp_args = None
 
     @property
@@ -404,6 +434,7 @@ class ExpResult:
         return self._exp_args
 
     def get_step_info(self, step: int) -> StepInfo:
+        """Load the step info from the file and return it."""
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
@@ -425,22 +456,30 @@ class ExpResult:
                 self._summary_info = json.load(f)
         return self._summary_info
 
+    def get_screenshot(self, step: int, som=False) -> Image:
+        key = (step, som)
+        if self._screenshots.get(key, None) is None:
+            file_name = f"screenshot_{'som_' if som else ''}step_{step}.jpg"
+            self._screenshots[key] = Image.open(self.exp_dir / file_name)
+        return self._screenshots[key]
+
     @property
-    def screenshots(self):
-        if self._screenshots is None:
-            screenshots = []
-            for fname in self.exp_dir.glob("screenshot_step_*.jpg"):
-                step = int(fname.name.split("_")[-1].split(".")[0])
-                screenshots.append((step, Image.open(fname)))
-            screenshots.sort(key=lambda x: x[0])
-            self._screenshots = [s[1] for s in screenshots]
-        return self._screenshots
+    def screenshots(self, som=False):
+        files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
+        for file in files:
+            step = int(file.name.split("_")[-1].split(".")[0])
+            self.get_screenshot(step, som=som)
+        return [self._screenshots[(i, som)] for i in range(len(self._screenshots))]
+
+    @property
+    def screenshots_som(self):
+        return self.screenshots(som=True)
 
     @property
     def flat_exp_args(self) -> dict:
         """Return a dict with exp_args flattened."""
         if self._flat_exp_args is None:
-            exp_args = dataclasses.asdict(self.exp_args)
+            exp_args = asdict(self.exp_args)
             # this will flatten nested dicts
             self._flat_exp_args = _flatten_dict(exp_args)
         return self._flat_exp_args
@@ -478,18 +517,6 @@ class ExpResult:
 
 
 EXP_RESULT_CACHE = {}
-
-
-def _flatten_dict(d, parent_key="", sep="."):
-    """Recursively flatten a nested dictionary."""
-    items = []
-    for k, v in d.items():
-        new_key = parent_key + sep + k if parent_key else k
-        if isinstance(v, dict):
-            items.extend(_flatten_dict(v, new_key, sep).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
 
 
 def get_exp_result(exp_dir):
@@ -530,31 +557,10 @@ def yield_all_exp_results(
             yield ExpResult(exp_dir)
 
 
-# TODO needs a unit test otherwise it would be constantly deprecated
-def convert_steps_info_to_json(exp_dir):
-    # read compressed pickle file
-    with gzip.open(f"{exp_dir}/steps_info.pkl.gz", "r") as f:
-        episode = pickle.load(f)
-
-    # make the episode serializable
-    for i in range(len(episode)):
-        episode[i] = episode[i].__dict__
-        episode[i]["stats"] = episode[i]["stats"].__dict__
-        if episode[i]["obs"]:
-            for key in ("screenshot", "screenshot_som", "dom_object", "axtree_object"):
-                episode[i]["obs"][key] = "MISSING"
-            episode[i]["obs"]["active_page_index"] = int(episode[i]["obs"]["active_page_index"][0])
-            episode[i]["obs"]["elapsed_time"] = float(episode[i]["obs"]["elapsed_time"][0])
-
-    # write json file
-    with open(f"{exp_dir}/steps_info.json", "w") as f:
-        json.dump(episode, f, indent=2)
-
-
 class DataclassJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if dataclasses.is_dataclass(obj):
-            return dataclasses.asdict(obj)
+        if is_dataclass(obj):
+            return asdict(obj)
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):
@@ -569,3 +575,47 @@ def _move_old_exp(exp_dir):
     exp_dir = Path(exp_dir)
     if exp_dir.exists():
         exp_dir.rename(exp_dir.with_name("_" + exp_dir.name))
+
+
+def _get_env_name(task_name: str):
+    """Register tasks if needed (lazy import) and return environment name."""
+
+    # lazy benchmark import
+    if task_name.startswith("miniwob"):
+        import browsergym.miniwob
+    elif task_name.startswith("workarena"):
+        import browsergym.workarena
+    elif task_name.startswith("webarena"):
+        import browsergym.webarena
+
+    return f"browsergym/{task_name}"
+
+
+def _send_chat_info(chat: Chat, action: str, agent_info: dict):
+    """Send the think and action info to the chat."""
+    msg = ""
+    if "think" in agent_info:
+        msg += f"""\
+{agent_info["think"]}
+
+"""
+
+    msg += f"""\
+action:
+{action}
+"""
+
+    logging.info(msg)
+    chat.add_message(role="info", msg=msg)
+
+
+def _flatten_dict(d, parent_key="", sep="."):
+    """Recursively flatten a nested dictionary."""
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, dict):
+            items.extend(_flatten_dict(v, new_key, sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
