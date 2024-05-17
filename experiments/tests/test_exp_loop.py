@@ -5,7 +5,7 @@ import dataclasses
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.experiments.agent import Agent
-from browsergym.experiments.loop import AgentArgs, EnvArgs, ExpArgs, get_exp_result
+from browsergym.experiments.loop import AbstractAgentArgs, EnvArgs, ExpArgs, get_exp_result
 
 
 class MiniwobTestAgent(Agent):
@@ -26,13 +26,9 @@ class MiniwobTestAgent(Agent):
 
 
 @dataclasses.dataclass
-class MiniwobTestAgentArgs(AgentArgs):
+class MiniwobTestAgentArgs(AbstractAgentArgs):
     def make_agent(self):
         return MiniwobTestAgent()
-
-    @property
-    def agent_name(self) -> str:
-        return MiniwobTestAgent.__name__
 
 
 def test_run_exp():

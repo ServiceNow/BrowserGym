@@ -9,7 +9,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 from browsergym.core.action.base import AbstractActionSet
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
-from browsergym.experiments import Agent, AgentArgs
+from browsergym.experiments import Agent, AbstractAgentArgs
 
 from ..legacy import dynamic_prompting
 from .utils.llm_utils import ParseError, retry
@@ -17,8 +17,7 @@ from .utils.chat_api import ChatModelArgs
 
 
 @dataclass
-class GenericAgentArgs(AgentArgs):
-    agent_name: str = "GenericAgent"
+class GenericAgentArgs(AbstractAgentArgs):
     chat_model_args: ChatModelArgs = None
     flags: dynamic_prompting.Flags = field(default_factory=lambda: dynamic_prompting.Flags())
     max_retry: int = 4
