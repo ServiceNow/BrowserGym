@@ -134,10 +134,14 @@
             outline: none;
             resize: none;
             font-size: 18px;
-            min-height: 100px; /* Minimum starting height */
-            max-height: 300px; /* Maximum height */
-            overflow-y: auto; /* Allows scrolling within the input box if content exceeds max height */
-            height: auto; /* Automatically adjust height, but limited by other CSS properties */
+            min-height: 100px;
+            /* Minimum starting height */
+            max-height: 300px;
+            /* Maximum height */
+            overflow-y: auto;
+            /* Allows scrolling within the input box if content exceeds max height */
+            height: auto;
+            /* Automatically adjust height, but limited by other CSS properties */
         }
 
         /* Hide scrollbar for Chrome, Safari and Opera */
@@ -186,7 +190,7 @@
         }
 
         .user-message::before {
-            content: "You";
+            content: var(--before-content, "You");
             color: #09A2BF;
             display: block;
             margin-bottom: 4px;
@@ -203,7 +207,7 @@
         }
 
         .assistant-message::before {
-            content: "Bot";
+            content: var(--before-content, "Bot");
             color: #29A93E;
             display: block;
             margin-bottom: 4px;
@@ -242,8 +246,8 @@
             </div>
             <div class="chat-input-area">
                 <form id="chatForm">
-                    <textarea class="input-box"  id="inputBox"
-                    placeholder="How can I help you?" title="Ask any question or type exit to quit."></textarea>
+                    <textarea class="input-box" id="inputBox" placeholder="How can I help you?"
+                        title="Ask any question or type exit to quit."></textarea>
                     <input type="submit" class="submit-button" value="">
                     </input>
                 </form>
@@ -269,13 +273,13 @@
             return text.replace(/\n/g, "<br>");
         }
 
-        function addChatMessage(role, msg) {
+        function addChatMessage(role, timeString, msg) {
             const chatBody = document.getElementById('chatBody');
             const chatDebug = document.getElementById('chatDebug');
             const msgContainer = document.createElement('div');
             msgContainer.className = 'message';
 
-            const text = document.createElement('p');
+            const text = document.createElement('div');
             text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
 
             // const assistant_img = document.createElement('img');
@@ -286,11 +290,13 @@
             switch (role) {
                 case "user":
                     text.className = 'user-message';
+                    text.style.setProperty('--before-content', `"${timeString} - You"`);
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
                     break;
                 case "assistant":
                     text.className = 'assistant-message';
+                    text.style.setProperty('--before-content', `"${timeString} - Bot"`);
                     // msgContainer.appendChild(assistant_img); // Add the image to the message container
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
@@ -323,10 +329,10 @@
 
         const inputBox = document.getElementById('inputBox');
 
-        function send_msg(msg) {
+        async function send_msg(msg) {
             if (msg.trim()) {
-                send_user_message(msg);
-                addChatMessage('user', msg);
+                const strings = await send_user_message(msg);
+                addChatMessage(strings[0], strings[1], strings[2]);
                 inputBox.value = '';
             }
         }
