@@ -137,6 +137,13 @@ python run_demo.py --task_name openended --start_url https://www.google.com
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
 
+To use AzureOpenAI within the demo, set the following environment variables:
+```sh
+export AZURE_OPENAI_API_KEY="<YOUR_API_KEY>"
+export AZURE_OPENAI_ENDPOINT="https://<YOUR_SUBSCRIPTION_NAME>.openai.azure.com"
+export AZURE_OPENAI_API_VERSION="<API_VERSION>"
+export AZURE_OPENAI_CHAT_DEPLOYMENT_NAME="<DEPLOYMENT_NAME>"
+```
 
 ## Citing This Work
 

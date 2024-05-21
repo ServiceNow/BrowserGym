@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+import os
 import io
 import json
 from .prompt_templates import PromptTemplate, get_prompt_template
@@ -10,7 +11,7 @@ from typing import Tuple
 import time
 
 from langchain_community.llms import HuggingFaceHub, HuggingFacePipeline
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain.schema import BaseMessage
 from langchain.chat_models.base import SimpleChatModel
 from langchain.callbacks.manager import CallbackManagerForLLMRun
@@ -78,6 +79,19 @@ class ChatModelArgs:
             _, model_name = self.model_name.split("/")
             return ChatOpenAI(
                 model_name=model_name,
+                temperature=self.temperature,
+                max_tokens=self.max_new_tokens,
+            )
+        elif self.model_name.startswith("azure"):
+            # Set the model name as follows: azure/gpt-3.5-turbo, azure/gpt-4-turbo
+            # Where "gpt-3.5-turbo" is the model name on OpenAI Platform
+            # Required to match the right model on tiktoken
+            # Azure model name is defined using ENV variable `AZURE_OPENAI_CHAT_DEPLOYMENT_NAME`
+            return AzureChatOpenAI(
+                api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+                azure_deployment=os.getenv(
+                    "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+                ),
                 temperature=self.temperature,
                 max_tokens=self.max_new_tokens,
             )

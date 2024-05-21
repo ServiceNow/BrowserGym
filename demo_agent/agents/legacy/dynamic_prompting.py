@@ -37,6 +37,7 @@ class Flags:
     use_action_history: bool = False
     use_memory: bool = False
     use_diff: bool = False
+    use_self_consistency: bool = False
     html_type: str = "pruned_html"
     use_concrete_example: bool = True
     use_abstract_example: bool = False

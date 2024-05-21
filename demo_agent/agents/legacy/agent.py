@@ -3,6 +3,7 @@ WARNING DEPRECATED WILL BE REMOVED SOON
 """
 
 from dataclasses import asdict, dataclass, field
+from collections import Counter
 import traceback
 from warnings import warn
 from langchain.schema import HumanMessage, SystemMessage
@@ -132,7 +133,21 @@ does not support vision. Disabling use_screenshot."""
             return ans_dict, True, ""
 
         try:
-            ans_dict = retry(self.chat_llm, chat_messages, n_retry=self.max_retry, parser=parser)
+            if self.flags.use_self_consistency:
+                # Naive implementation of self-consistency: https://arxiv.org/abs/2203.11171
+                # We assume that for the same predicted action, the model followed the same reasoning path
+                answers_dicts, actions = [], []
+                n_calls = 3 # TODO make this a parameter or fix it to 5
+                for _ in range(n_calls):
+                    ans_dict = retry(self.chat_llm, chat_messages, n_retry=self.max_retry, parser=parser)
+                    answers_dicts.append(ans_dict)
+                    actions.append(ans_dict["action"])
+                    
+                c = Counter(actions)
+                action = c.most_common(1)[0][0]
+                ans_dict = answers_dicts[actions.index(action)]
+            else:
+                ans_dict = retry(self.chat_llm, chat_messages, n_retry=self.max_retry, parser=parser)
             # inferring the number of retries, TODO: make this less hacky
             ans_dict["n_retry"] = (len(chat_messages) - 3) / 2
         except ValueError as e:
