@@ -5,7 +5,6 @@ pytest==7.3.2
 pytest-xdist
 pytest-playwright
 tenacity
--e ../core # local package
--e ../miniwob # local package
--e ../webarena # local package
--e ../experiments # local package
+-e ../browsergym # local package
+-e ../browsergym_bench/miniwob # local package
+-e ../browsergym_bench/webarena # local package

@@ -17,9 +17,9 @@ Designing new web benchmarks with BrowserGym is easy, and simply requires to inh
 
 ## Setup
 
-To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena` and `browsergym-workarena` packages, or you can simply install `browsergym` which includes all of these by default.
+To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena` and `browsergym-workarena` packages, or you can simply install `browsergym[all]` which includes all of these by default.
 ```sh
-pip install browsergym
+pip install browsergym[all]
 ```
 
 Then, a required step is to setup playwright by running
@@ -40,10 +40,12 @@ Finally, each benchmark comes with its own specific setup that requires to follo
 Boilerplate code to run an agent on an interactive, open-ended task:
 ```python
 import gymnasium as gym
-import browsergym.core  # register the openended task as a gym environment
+import browsergym  # register the openended task as a gym environment
 
 env = gym.make(
-    "browsergym/openended", task_kwargs={"start_url": "https://www.google.com/"}, wait_for_user_message=True
+    "browsergym/openended",
+    task_kwargs={"start_url": "https://www.google.com/"},
+    wait_for_user_message=True,
 )
 obs, info = env.reset()
 done = False
@@ -57,7 +59,7 @@ while not done:
 Boilerplate code to run an agent on a MiniWoB++ task:
 ```python
 import gymnasium as gym
-import browsergym.miniwob  # register miniwob tasks as gym environments
+import browsergym_bench.miniwob  # register miniwob tasks as gym environments
 
 env = gym.make("browsergym/miniwob.choose-list")
 obs, info = env.reset()
@@ -78,7 +80,7 @@ print("\n".join(env_ids))
 Boilerplate code to run an agent on a WebArena task:
 ```python
 import gymnasium as gym
-import browsergym.webarena  # register webarena tasks as gym environments
+import browsergym_bench.webarena  # register webarena tasks as gym environments
 
 env = gym.make("browsergym/webarena.310")
 obs, info = env.reset()
@@ -99,7 +101,7 @@ print("\n".join(env_ids))
 Boilerplate code to run an agent on a WorkArena task:
 ```python
 import gymnasium as gym
-import browsergym.workarena  # register workarena tasks as gym environments
+import browsergym_bench.workarena  # register workarena tasks as gym environments
 
 env = gym.make("browsergym/workarena.servicenow.order-ipad-pro")
 obs, info = env.reset()
@@ -137,6 +139,24 @@ python run_demo.py --task_name openended --start_url https://www.google.com
 
 You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
 
+
+## Contributing
+
+Contributions welcome! Install the development environment and pre-commit hooks (optional).
+```sh
+conda env create -f dev/environment.yaml
+conda activate browsergym-dev
+playwright install
+```
+
+Running the tests
+```sh
+pytest -n auto browsergym/tests/  # browsergym
+pytest -n auto browsergym_bench/miniwob/tests/  # miniwob benchmark
+pytest -n auto browsergym_bench/webarena/tests/  # webarena benchmark
+```
+
+Be sure to open an issue before sending your pull request. You're all set :)
 
 ## Citing This Work
 

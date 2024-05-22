@@ -44,7 +44,10 @@ def parse_args():
         help="Starting URL (only for the openended task).",
     )
     parser.add_argument(
-        "--slow_mo", type=int, default=500, help="Slow motion delay for the playwright actions."
+        "--slow_mo",
+        type=int,
+        default=500,
+        help="Slow motion delay for the playwright actions.",
     )
     parser.add_argument(
         "--headless",
@@ -59,7 +62,10 @@ def parse_args():
         help="Add visual effects when the agents performs actions.",
     )
     parser.add_argument(
-        "--use_html", type=str2bool, default=True, help="Use HTML in the agent's observation space."
+        "--use_html",
+        type=str2bool,
+        default=True,
+        help="Use HTML in the agent's observation space.",
     )
     parser.add_argument(
         "--use_ax_tree",
@@ -74,13 +80,24 @@ def parse_args():
         help="Use screenshot in the agent's observation space.",
     )
     parser.add_argument(
-        "--multi_actions", type=str2bool, default=True, help="Allow multi-actions in the agent."
+        "--multi_actions",
+        type=str2bool,
+        default=True,
+        help="Allow multi-actions in the agent.",
     )
     parser.add_argument(
         "--action_space",
         type=str,
         default="bid",
-        choices=["python", "bid", "coord", "bid+coord", "bid+nav", "coord+nav", "bid+coord+nav"],
+        choices=[
+            "python",
+            "bid",
+            "coord",
+            "bid+coord",
+            "bid+nav",
+            "coord+nav",
+            "bid+coord+nav",
+        ],
         help="",
     )
     parser.add_argument(
