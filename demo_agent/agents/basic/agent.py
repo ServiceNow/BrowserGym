@@ -10,13 +10,12 @@ class DemoAgent(Agent):
     """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
 
     action_set = HighLevelActionSet(
-        subsets=["bid"],  # define a subset of the action space
-        # subsets=["bid", "coord"] # allows the agent to also use x,y coordinates
+        subsets=["chat", "bid"],  # define a subset of the action space
+        # subsets=["chat", "bid", "coord"] # allow the agent to also use x,y coordinates
         strict=False,  # less strict on the parsing of the actions
         multiaction=True,  # enable to agent to take multiple actions at once
-        demo_mode="default",  # adds visual effects
+        demo_mode="default",  # add visual effects
     )
-
     # use this instead to allow the agent to directly use Python code
     # action_set = PythonActionSet())
 
