@@ -183,7 +183,7 @@ class ExpArgs:
                 raise
 
         finally:
-            # TODO should save at each step
+            step_info.save_step_info(self.exp_dir)
             _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             try:
                 env.close()
