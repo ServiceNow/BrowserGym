@@ -12,7 +12,7 @@ class PythonActionSet(AbstractActionSet):
 Each action consists of executable Python code (python>=3.10) that uses the Playwright library (playwright==1.32)
 to interact with the current webpage and the browser context. The currently active webpage is accessible via the
 global variable `page`. A function `send_message_to_user(text)` is also accessible and can be used to send a
-message to the user, as well as a function `report_infeasible_instructions(reason)` to notify the user in case their
+message to the user, as well as a function `report_infeasible_instructions(reason)` to notify the user when their
 instructions are infeasible."""
         if with_long_description:
             description += f"""
