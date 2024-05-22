@@ -47,7 +47,7 @@ class BrowserEnv(gym.Env, ABC):
         # interactive / debugging arguments
         headless: bool = True,
         wait_for_user_message: bool = False,
-        terminate_on_infeasible_message: bool = True,
+        terminate_on_infeasible: bool = True,
         resizeable_window: bool = False,
         record_video_dir: Optional[str] = None,
         pw_chromium_kwargs: dict = {},
@@ -81,7 +81,7 @@ class BrowserEnv(gym.Env, ABC):
         self.timeout = timeout
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
-        self.terminate_on_infeasible_message = terminate_on_infeasible_message
+        self.terminate_on_infeasible = terminate_on_infeasible
         self.resizeable_window = resizeable_window
         self.record_video_dir = record_video_dir
         self.pw_chromium_kwargs = pw_chromium_kwargs
@@ -361,7 +361,7 @@ document.addEventListener("visibilitychange", () => {
 
         # new step API wants a 5-tuple (gymnasium)
         terminated = done or (
-            self.terminate_on_infeasible_message and self.infeasible_message_received
+            self.terminate_on_infeasible and self.infeasible_message_received
         )  # task or agent can terminate the episode
         truncated = False
 
