@@ -301,6 +301,12 @@
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
                     break;
+                case "infeasible":
+                    text.className = 'assistant-message';
+                    text.style.setProperty('--before-content', `"${timeString} - Bot (abort)"`);
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
                 case "info":
                     text.className = 'info-message';
                     msgContainer.appendChild(text);
