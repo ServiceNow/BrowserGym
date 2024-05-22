@@ -9,10 +9,18 @@ from browsergym.utils.obs import flatten_axtree_to_str
 class DemoAgent(Agent):
     """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
 
-    def action_mapping(self, action: str):
-        return self.action_space.to_python_code(action)
+    action_set = HighLevelActionSet(
+        subsets=["bid"],  # define a subset of the action space
+        # subsets=["bid", "coord"] # allows the agent to also use x,y coordinates
+        strict=False,  # less strict on the parsing of the actions
+        multiaction=True,  # enable to agent to take multiple actions at once
+        demo_mode="default",  # adds visual effects
+    )
 
-    def observation_mapping(self, obs: dict) -> dict:
+    # use this instead to allow the agent to directly use Python code
+    # action_set = PythonActionSet())
+
+    def obs_preprocessor(self, obs: dict) -> dict:
         return {
             "goal": obs["goal"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
@@ -21,17 +29,6 @@ class DemoAgent(Agent):
     def __init__(self, model_name) -> None:
         super().__init__()
         self.model_name = model_name
-
-        self.action_space = HighLevelActionSet(
-            subsets=["bid"],  # define a subset of the action space
-            # subsets=["bid", "coord"] # allows the agent to also use x,y coordinates
-            strict=False,  # less strict on the parsing of the actions
-            multiaction=True,  # enable to agent to take multiple actions at once
-            demo_mode="default",  # adds visual effects
-        )
-
-        # uncomment this line to allow the agent to also use Python full python code
-        # self.action_space = PythonActionSet()
 
         from openai import OpenAI
 
@@ -52,7 +49,7 @@ and executed by a program, make sure to follow the formatting instructions.
 {obs["axtree_txt"]}
 
 # Action Space
-{self.action_space.describe(with_long_description=False, with_examples=True)}
+{self.action_set.describe(with_long_description=False, with_examples=True)}
 
 Here is an example with chain of thought of a valid action when clicking on a button:
 "

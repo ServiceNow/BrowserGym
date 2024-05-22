@@ -152,7 +152,7 @@ class ExpArgs:
         try:
             logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            env = self.env_args.make_env(action_mapping=agent.action_mapping)
+            env = self.env_args.make_env(action_mapping=agent.action_set.to_python_code)
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
@@ -257,8 +257,8 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        if agent.observation_mapping:
-            self.obs = agent.observation_mapping(self.obs)
+        if agent.obs_preprocessor:
+            self.obs = agent.obs_preprocessor(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
