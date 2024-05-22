@@ -57,6 +57,8 @@ def test_run_exp():
             "truncated": False,
         }
 
+        assert len(exp_result.steps_info) == 2
+
         for key, target_val in target.items():
             assert key in exp_record
             assert exp_record[key] == target_val
