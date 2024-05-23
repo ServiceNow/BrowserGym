@@ -183,12 +183,12 @@ class ExpArgs:
                 raise
 
         finally:
-            # TODO should save at each step
-            _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             try:
+                step_info.save_step_info(self.exp_dir)
+                _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
                 env.close()
             except Exception as e:
-                logging.error(f"Error while closing the environment: {e}")
+                logging.error(f"Error while finalizing the experiment loop: {e}")
 
 
 @dataclass
@@ -234,7 +234,7 @@ class StepInfo:
 
     step: int = None
     obs: dict = None
-    reward: float = 0
+    reward: float = None
     raw_reward: float = None
     terminated: bool = None
     truncated: bool = None
@@ -305,7 +305,7 @@ class StepInfo:
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
 
-        if save_jpg:
+        if save_jpg and self.obs is not None:
             for name in ("screenshot", "screenshot_som"):
                 if name in self.obs:
                     img = Image.fromarray(self.obs[name])
