@@ -183,7 +183,7 @@ class ExpArgs:
                 raise
 
         finally:
-            step_info.save_step_info(self.exp_dir)
+            # TODO should save at each step
             _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             try:
                 env.close()
@@ -234,7 +234,7 @@ class StepInfo:
 
     step: int = None
     obs: dict = None
-    reward: float = None
+    reward: float = 0
     raw_reward: float = None
     terminated: bool = None
     truncated: bool = None
