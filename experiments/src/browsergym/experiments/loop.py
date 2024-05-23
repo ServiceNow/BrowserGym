@@ -236,7 +236,7 @@ class StepInfo:
 
     step: int = None
     obs: dict = None
-    reward: float = 0
+    reward: float = None
     raw_reward: float = None
     terminated: bool = None
     truncated: bool = None
