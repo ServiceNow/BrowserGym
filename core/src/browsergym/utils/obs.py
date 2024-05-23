@@ -242,7 +242,9 @@ def _process_bid(
             skip_element = True
         if filter_visible_only:
             # element without bid have no visibility mark, they could be visible or non-visible
-            pass  # TODO: we consider them as visible. Is this what we want?
+            # TODO: we consider them as non-visible. Is this what we want?
+            # pass # keep elements without visible property
+            skip_element = True  # filter elements without visible property
 
     # parse extra browsergym properties, if node has a bid
     else:
@@ -259,11 +261,11 @@ def _process_bid(
                 skip_element = True
             # print extra attributes if requested (with new names)
             if with_som and node_in_som:
-                attributes_to_print.insert(0, f'som="{int(node_in_som)}"')
-            if with_visible:
-                attributes_to_print.insert(0, f'visible="{int(node_is_visible)}"')
+                attributes_to_print.insert(0, f"som")
+            if with_visible and node_is_visible:
+                attributes_to_print.insert(0, f"visible")
             if with_clickable and node_is_clickable:
-                attributes_to_print.insert(0, f'clickable="{int(node_is_clickable)}"')
+                attributes_to_print.insert(0, f"clickable")
             if with_center_coords and node_bbox is not None:
                 x, y, width, height = node_bbox
                 center = (x + width / 2, y + height / 2)
