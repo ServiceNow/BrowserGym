@@ -242,9 +242,9 @@ def _process_bid(
             skip_element = True
         if filter_visible_only:
             # element without bid have no visibility mark, they could be visible or non-visible
-            # TODO: we consider them as non-visible. Is this what we want?
-            # pass # keep elements without visible property
-            skip_element = True  # filter elements without visible property
+            # TODO: we consider them as visible. Is this what we want? Now that duplicate bids are handles, should we mark all non-html elements?
+            pass  # keep elements without visible property
+            # skip_element = True  # filter elements without visible property
 
     # parse extra browsergym properties, if node has a bid
     else:

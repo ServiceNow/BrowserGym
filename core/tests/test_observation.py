@@ -366,9 +366,9 @@ page.get_by_label("Age:", exact=True).press("Tab")
     )
     assert 'box="(' in dom
     assert 'center="(' in dom
-    assert 'clickable="1" som="1" type="submit" value="Submit" visible="1"' in dom
-    assert 'head bid="1" visible="0"' in dom
-    assert 'clickable="1" for="email" visible="1"' in dom
+    assert 'clickable="" som="" type="submit" value="Submit" visible=""' in dom
+    assert 'head bid="1">' in dom
+    assert 'clickable="" for="email" visible=""' in dom
     assert "Text within in non-html tag" in dom
     assert "Text that should not be visible" in dom
 
@@ -448,7 +448,7 @@ page.get_by_label("Subscribe to newsletter").click()
     )
     assert 'box="(' in axtree
     assert 'center="(' in axtree
-    assert ', clickable="1", visible="1", som="1"' in axtree
+    assert ", clickable, visible, som" in axtree
     assert "heading 'Simple Form', box=\"(" in axtree
     assert "textbox 'Email:' value='janice@mail.com'" in axtree
     assert "Text within in non-html tag" in axtree
