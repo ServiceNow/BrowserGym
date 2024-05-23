@@ -37,10 +37,10 @@ class EnvArgs:
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: dict = field(default_factory=lambda: {})
 
-    def make_env(self, action_mapping):
+    def make_env(self, action_mapping, exp_dir):
         extra_kwargs = {}
         if self.record_video:
-            extra_kwargs["record_video_dir"] = self.exp_dir
+            extra_kwargs["record_video_dir"] = exp_dir
         if self.viewport:
             extra_kwargs["viewport"] = self.viewport
         if self.slow_mo is not None:
@@ -152,7 +152,9 @@ class ExpArgs:
         try:
             logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            env = self.env_args.make_env(action_mapping=agent.action_set.to_python_code)
+            env = self.env_args.make_env(
+                action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
+            )
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
