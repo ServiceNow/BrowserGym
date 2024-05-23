@@ -9,6 +9,7 @@ from .base import AbstractActionSet
 from .functions import (
     noop,
     send_msg_to_user,
+    report_infeasible,
     fill,
     # check,
     # uncheck,
@@ -45,6 +46,8 @@ from .parsers import highlevel_action_parser, action_docstring_parser
 
 
 CHAT_ACTIONS = [send_msg_to_user]
+
+INFEAS_ACTIONS = [report_infeasible]
 
 BID_ACTIONS = [
     scroll,
@@ -98,7 +101,7 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
-    ActionSubset = Literal["chat", "bid", "coord", "nav", "tab", "custom"]
+    ActionSubset = Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
 
     def __init__(
         self,
@@ -131,6 +134,8 @@ class HighLevelActionSet(AbstractActionSet):
                 match subset:
                     case "chat":
                         allowed_actions.extend(CHAT_ACTIONS)
+                    case "infeas":
+                        allowed_actions.extend(INFEAS_ACTIONS)
                     case "bid":
                         allowed_actions.extend(BID_ACTIONS)
                     case "coord":
