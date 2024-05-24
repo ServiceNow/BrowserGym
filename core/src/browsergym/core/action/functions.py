@@ -130,7 +130,7 @@ def click(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.click(button=button, modifiers=modifiers)
+    elem.click(button=button, modifiers=modifiers, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-dblclick
