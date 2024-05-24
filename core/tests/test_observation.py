@@ -393,6 +393,17 @@ page.get_by_label("Age:", exact=True).press("Tab")
     dom = flatten_dom_to_str(
         obs["dom_object"],
         extra_properties=obs["extra_element_properties"],
+        hide_bid_if_invisible=True,
+    )
+    assert "<title" in dom
+    assert "<title bid=" not in dom
+    assert 'type="submit" value="Submit"' in dom
+    assert "Text within in non-html tag" in dom
+    assert "Text that should not be visible" in dom
+
+    dom = flatten_dom_to_str(
+        obs["dom_object"],
+        extra_properties=obs["extra_element_properties"],
         filter_with_bid_only=True,
     )
     assert "<title bid=" in dom
@@ -449,16 +460,17 @@ page.get_by_label("Subscribe to newsletter").click()
     assert 'box="(' in axtree
     assert 'center="(' in axtree
     assert ", clickable, visible, som" in axtree
-    assert "heading 'Simple Form', box=\"(" in axtree
-    assert "textbox 'Email:' value='janice@mail.com'" in axtree
+    assert "] heading 'Simple Form', box=\"(" in axtree
+    assert "] textbox 'Email:' value='janice@mail.com'" in axtree
     assert "Text within in non-html tag" in axtree
     assert "Text that should not be visible" in axtree
+    assert "] paragraph" in axtree
 
     axtree = flatten_axtree_to_str(
         obs["axtree_object"], extra_properties=obs["extra_element_properties"], filter_som_only=True
     )
     assert "LabelText" not in axtree
-    assert "button 'Submit'" in axtree
+    assert "] button 'Submit'" in axtree
     assert "Text within in non-html tag" not in axtree
     assert "Text that should not be visible" not in axtree
 
@@ -468,9 +480,22 @@ page.get_by_label("Subscribe to newsletter").click()
         filter_visible_only=True,
     )
     assert "RootWebArea" in axtree
-    assert "button 'Submit'" in axtree
+    assert "] button 'Submit'" in axtree
     assert "Text within in non-html tag" in axtree
     assert "Text that should not be visible" not in axtree
+    assert "] paragraph" not in axtree
+
+    axtree = flatten_axtree_to_str(
+        obs["axtree_object"],
+        extra_properties=obs["extra_element_properties"],
+        hide_bid_if_invisible=True,
+    )
+    assert "RootWebArea" in axtree
+    assert "] button 'Submit'" in axtree
+    assert "Text within in non-html tag" in axtree
+    assert "Text that should not be visible" in axtree
+    assert "] paragraph '" not in axtree
+    assert "paragraph '" in axtree
 
     axtree = flatten_axtree_to_str(
         obs["axtree_object"],
