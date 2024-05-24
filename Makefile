@@ -1,14 +1,12 @@
 install:
 	@echo "--- 🚀 Installing project dependencies ---"
-	pip install -e .
+	pip install -e core/
+	pip install -e miniwob/
+	pip install -e webarena/
 
 install-demo:
 	@echo "--- 🚀 Installing demo dependencies ---"
 	pip install demo_agent/requirements.txt
-
-install-core:
-	@echo "--- 🚀 Installing core dependencies ---"
-	pip install -e "core/."
 
 test-core:
 	@echo "--- 🧪 Running tests ---"
