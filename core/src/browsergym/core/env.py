@@ -47,6 +47,7 @@ class BrowserEnv(gym.Env, ABC):
         # interactive / debugging arguments
         headless: bool = True,
         wait_for_user_message: bool = False,
+        terminate_on_infeasible: bool = True,
         resizeable_window: bool = False,
         record_video_dir: Optional[str] = None,
         pw_chromium_kwargs: dict = {},
@@ -80,6 +81,7 @@ class BrowserEnv(gym.Env, ABC):
         self.timeout = timeout
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
+        self.terminate_on_infeasible = terminate_on_infeasible
         self.resizeable_window = resizeable_window
         self.record_video_dir = record_video_dir
         self.pw_chromium_kwargs = pw_chromium_kwargs
@@ -275,6 +277,7 @@ document.addEventListener("visibilitychange", () => {
         # no action yet
         self.last_action = ""
         self.last_action_error = ""
+        self.infeasible_message_received = False
 
         # if asked, wait for user message
         self._wait_for_user_message()
@@ -303,6 +306,13 @@ document.addEventListener("visibilitychange", () => {
         info["action_exec_start"] = time.time()
         info["action_exec_timeout"] = 0
 
+        def send_message_to_user(text: str):
+            self.chat.add_message(role="assistant", msg=text)
+
+        def report_infeasible_instructions(reason: str):
+            self.chat.add_message(role="infeasible", msg=reason)
+            self.infeasible_message_received = True
+
         # try to execute the action
         try:
             if self.action_mapping:
@@ -312,7 +322,8 @@ document.addEventListener("visibilitychange", () => {
             execute_python_code(
                 code,
                 self.page,
-                send_message_to_user=lambda text: self.chat.add_message(role="assistant", msg=text),
+                send_message_to_user=send_message_to_user,
+                report_infeasible_instructions=report_infeasible_instructions,
             )
             self.last_action_error = ""
         except Exception as e:
@@ -349,7 +360,9 @@ document.addEventListener("visibilitychange", () => {
         obs = self._get_obs()
 
         # new step API wants a 5-tuple (gymnasium)
-        terminated = done
+        terminated = done or (
+            self.terminate_on_infeasible and self.infeasible_message_received
+        )  # task or agent can terminate the episode
         truncated = False
 
         return obs, reward, terminated, truncated, info

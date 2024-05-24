@@ -11,14 +11,10 @@ from browsergym.utils.obs import flatten_axtree_to_str
 
 class MiniwobTestAgent(Agent):
 
-    def observation_mapping(self, obs: dict):
+    action_set = HighLevelActionSet(subsets="bid")
+
+    def obs_preprocessor(self, obs: dict):
         return {"axtree_txt": flatten_axtree_to_str(obs["axtree_object"])}
-
-    def action_mapping(self, action: str):
-        return self.action_space.to_python_code(action)
-
-    def __init__(self):
-        self.action_space = HighLevelActionSet(subsets="bid")
 
     def get_action(self, obs: dict) -> tuple[str, dict]:
         match = re.search(r"^\s*\[(\d+)\].*button", obs["axtree_txt"], re.MULTILINE | re.IGNORECASE)
@@ -60,6 +56,8 @@ def test_run_exp():
             "terminated": True,
             "truncated": False,
         }
+
+        assert len(exp_result.steps_info) == 2
 
         for key, target_val in target.items():
             assert key in exp_record

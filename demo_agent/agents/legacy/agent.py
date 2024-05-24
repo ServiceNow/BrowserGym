@@ -30,7 +30,7 @@ class GenericAgentArgs(AbstractAgentArgs):
 
 class GenericAgent(Agent):
 
-    def observation_mapping(self, obs: dict) -> dict:
+    def obs_preprocessor(self, obs: dict) -> dict:
         """
         Augment observations with text HTML and AXTree representations, which will be stored in
         the experiment traces.
@@ -55,10 +55,6 @@ class GenericAgent(Agent):
 
         return obs
 
-    def action_mapping(self, action: str) -> str:
-        """Use a BrowserGym AbstractActionSet mapping."""
-        return self.action_space.to_python_code(action)
-
     def __init__(
         self,
         chat_model_args: ChatModelArgs = None,
@@ -70,7 +66,7 @@ class GenericAgent(Agent):
         self.max_retry = max_retry
 
         self.chat_llm = chat_model_args.make_chat_model()
-        self.action_space: AbstractActionSet = dynamic_prompting._get_action_space(self.flags)
+        self.action_set = dynamic_prompting._get_action_space(self.flags)
 
         # consistency check
         if self.flags.use_screenshot:

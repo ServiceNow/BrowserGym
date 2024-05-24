@@ -50,12 +50,12 @@ class Chat:
         # returning a list as JS doesnt like tuples
         return ["user", time.strftime("%H:%M", time.localtime(utc_time)), msg]
 
-    def add_message(self, role: Literal["user", "assistant", "info"], msg: str):
+    def add_message(self, role: Literal["user", "assistant", "info", "infeasible"], msg: str):
         """Add a message to the chatbox and update the page accordingly."""
         utc_time = time.time()
-        if role not in ("user", "assistant", "info"):
+        if role not in ("user", "assistant", "info", "infeasible"):
             raise ValueError(f"Invalid role: {role}")
-        if role in ("user", "assistant"):
+        if role in ("user", "assistant", "infeasible"):
             self.messages.append({"role": role, "timestamp": utc_time, "message": msg})
         timestamp = time.strftime("%H:%M:%S", time.localtime(utc_time))
         self.page.evaluate(f"addChatMessage({repr(role)}, {repr(timestamp)}, {repr(msg)});")

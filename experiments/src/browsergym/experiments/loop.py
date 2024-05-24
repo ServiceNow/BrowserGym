@@ -37,10 +37,10 @@ class EnvArgs:
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: dict = field(default_factory=lambda: {})
 
-    def make_env(self, action_mapping):
+    def make_env(self, action_mapping, exp_dir):
         extra_kwargs = {}
         if self.record_video:
-            extra_kwargs["record_video_dir"] = self.exp_dir
+            extra_kwargs["record_video_dir"] = exp_dir
         if self.viewport:
             extra_kwargs["viewport"] = self.viewport
         if self.slow_mo is not None:
@@ -152,7 +152,9 @@ class ExpArgs:
         try:
             logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            env = self.env_args.make_env(action_mapping=agent.action_mapping)
+            env = self.env_args.make_env(
+                action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
+            )
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
@@ -183,12 +185,12 @@ class ExpArgs:
                 raise
 
         finally:
-            # TODO should save at each step
-            _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             try:
+                step_info.save_step_info(self.exp_dir)
+                _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
                 env.close()
             except Exception as e:
-                logging.error(f"Error while closing the environment: {e}")
+                logging.error(f"Error while finalizing the experiment loop: {e}")
 
 
 @dataclass
@@ -257,8 +259,8 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        if agent.observation_mapping:
-            self.obs = agent.observation_mapping(self.obs)
+        if agent.obs_preprocessor:
+            self.obs = agent.obs_preprocessor(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
@@ -305,7 +307,7 @@ class StepInfo:
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
 
-        if save_jpg:
+        if save_jpg and self.obs is not None:
             for name in ("screenshot", "screenshot_som"):
                 if name in self.obs:
                     img = Image.fromarray(self.obs[name])
