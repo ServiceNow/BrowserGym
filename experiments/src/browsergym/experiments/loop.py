@@ -148,42 +148,42 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
-        self._set_logger()
+        logger = self.get_logger()
 
         episode_info = []
         try:
-            logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
+            logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            logging.debug(f"Agent created.")
+            logger.debug(f"Agent created.")
             env = self.env_args.make_env(
                 action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
             )
-            logging.debug(f"Environment created.")
+            logger.debug(f"Environment created.")
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
             step_info.from_reset(env, seed=self.env_args.task_seed)
-            logging.debug(f"Environment reset.")
+            logger.debug(f"Environment reset.")
 
             while not step_info.is_done:  # set a limit
-                logging.debug(f"Starting step {step_info.step}.")
+                logger.debug(f"Starting step {step_info.step}.")
                 action = step_info.from_action(agent)
-                logging.debug(f"Agent chose action:\n {action}")
+                logger.debug(f"Agent chose action:\n {action}")
 
                 step_info.save_step_info(self.exp_dir)
-                logging.debug(f"Step info saved.")
+                logger.debug(f"Step info saved.")
                 if action is None:
                     break
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
-                logging.debug(f"Chat info sent.")
+                logger.debug(f"Chat info sent.")
 
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
-                logging.debug(f"Sending action to environment.")
+                logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action)
-                logging.debug(f"Environment stepped.")
+                logger.debug(f"Environment stepped.")
 
         except Exception as e:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
@@ -192,24 +192,33 @@ class ExpArgs:
             self.err_msg = err_msg
             self.stack_trace = stack_trace
 
-            logging.warning(err_msg + "\n" + stack_trace)
+            logger.warning(err_msg + "\n" + stack_trace)
             if _is_debugging() and self.enable_debug:
                 raise
 
         finally:
             try:
                 step_info.save_step_info(self.exp_dir)
+            except Exception as e:
+                logger.error(f"Error while saving step info in the finally block: {e}")
+            try:
                 _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
+            except Exception as e:
+                logger.error(f"Error while saving summary info in the finally block: {e}")
+            try:
                 env.close()
             except Exception as e:
-                logging.error(f"Error while finalizing the experiment loop: {e}")
+                logger.error(f"Error while closing the environment in the finally block: {e}")
 
-    def _set_logger(self):
+    def get_logger(self):
         logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
         file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
         file_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-
+        return logging.getLogger("bgym")
 
 @dataclass
 class StepTimestamps:
@@ -254,8 +263,8 @@ class StepInfo:
 
     step: int = None
     obs: dict = None
-    reward: float = None
-    raw_reward: float = None
+    reward: float = 0
+    raw_reward: float = 0
     terminated: bool = None
     truncated: bool = None
     action: str = None
