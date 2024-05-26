@@ -113,6 +113,7 @@ class ExpArgs:
     err_msg: str = None
     stack_trace: str = None
     order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
+    logging_level: int = logging.INFO
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -212,13 +213,18 @@ class ExpArgs:
 
     def get_logger(self):
         logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(self.logging_level)
         file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
-        file_handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setLevel(self.logging_level)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+
+        if self.logging_level < logging.INFO:
+            logging.getLogger("openai._base_client").setLevel(logging.INFO)
+
         return logging.getLogger("bgym")
+
 
 @dataclass
 class StepTimestamps:
@@ -635,7 +641,7 @@ action:
 {action}
 """
 
-    logging.info(msg)
+    logging.getLogger("bgym").info(msg)
     chat.add_message(role="info", msg=msg)
 
 
