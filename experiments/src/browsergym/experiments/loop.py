@@ -114,7 +114,7 @@ class ExpArgs:
     enable_debug: bool = True
     err_msg: str = None
     stack_trace: str = None
-    order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
+    order: int = None  # use to keep the original order the experiments were meant to be launched.
     logging_level: int = logging.INFO
 
     def prepare(self, exp_root):
@@ -147,17 +147,17 @@ class ExpArgs:
             pickle.dump(self, f)
 
         # setup root logger
-        logger = logging.getLogger()
-        logger.setLevel(self.logging_level)
+        root_logger = logging.getLogger()
+        root_logger.setLevel(self.logging_level)
         # output logging traces to a log file
         file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
         file_handler.setLevel(self.logging_level)  # same level as console outputs
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        root_logger.addHandler(file_handler)
         # setup openai logger (do not go below INFO verbosity)
-        logger = logging.getLogger("openai._base_client")
-        logger.setLevel(max(logging.INFO, self.logging_level))
+        openai_logger = logging.getLogger("openai._base_client")
+        openai_logger.setLevel(max(logging.INFO, self.logging_level))
 
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
