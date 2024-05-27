@@ -414,6 +414,7 @@ document.addEventListener("visibilitychange", () => {
                     pass
 
     def _activate_page_from_js(self, page: playwright.sync_api.Page):
+        logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
         if not page.context == self.context:
             raise RuntimeError(
                 f"Unexpected: activating a page that belongs to a different browser context ({page})."
