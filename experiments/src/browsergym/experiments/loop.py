@@ -223,7 +223,7 @@ class ExpArgs:
         if self.logging_level < logging.INFO:
             logging.getLogger("openai._base_client").setLevel(logging.INFO)
 
-        return logging.getLogger("bgym")
+        return logging.getLogger("browsergym")
 
 
 @dataclass
