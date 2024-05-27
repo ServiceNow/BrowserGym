@@ -461,6 +461,7 @@ class ExpResult:
         self._summary_info = None
         self._screenshots = {}
         self._flat_exp_args = None
+        self._logs = None
 
     @property
     def exp_args(self):
@@ -550,6 +551,13 @@ class ExpResult:
     @property
     def combined_video_path(self) -> Path:
         return self.exp_dir / "combined_video.mp4"
+
+    @property
+    def logs(self):
+        if self._logs is None:
+            with open(self.exp_dir / "experiment.log", "r") as f:
+                self._logs = f.read()
+        return self._logs
 
 
 EXP_RESULT_CACHE = {}
