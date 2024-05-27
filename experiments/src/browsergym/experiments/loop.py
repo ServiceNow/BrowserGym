@@ -146,23 +146,13 @@ class ExpArgs:
         with open(self.exp_dir / "exp_args.pkl", "wb") as f:
             pickle.dump(self, f)
 
-        # setup root logger
-        root_logger = logging.getLogger()
-        root_logger.setLevel(self.logging_level)
-        # output logging traces to a log file
-        file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
-        file_handler.setLevel(self.logging_level)  # same level as console outputs
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler)
-        # setup openai logger (do not go below INFO verbosity)
-        openai_logger = logging.getLogger("openai._base_client")
-        openai_logger.setLevel(max(logging.INFO, self.logging_level))
-
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
     def run(self):
         """Run the experiment and save the results"""
+
+        # start writing logs to run logfile
+        self._set_logger()
 
         episode_info = []
         try:
@@ -223,6 +213,28 @@ class ExpArgs:
                 env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
+            # stop writing logs to run logfile
+            self._unset_logger()
+
+    def _set_logger(self):
+        # output logging traces to a log file
+        file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
+        file_handler.setLevel(self.logging_level)  # same level as console outputs
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(formatter)
+        # setup root logger
+        root_logger = logging.getLogger()
+        root_logger.setLevel(self.logging_level)
+        root_logger.addHandler(file_handler)
+        # setup openai logger (don't go below INFO verbosity)
+        openai_logger = logging.getLogger("openai._base_client")
+        openai_logger.setLevel(max(logging.INFO, self.logging_level))
+
+        self.logging_file_handler = file_handler
+
+    def _unset_logger(self):
+        root_logger = logging.getLogger()
+        root_logger.removeHandler(self.logging_file_handler)
 
 
 @dataclass
