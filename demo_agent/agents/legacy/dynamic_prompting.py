@@ -25,9 +25,6 @@ from .utils.llm_utils import (
 )
 
 
-logger = logging.getLogger(__name__)
-
-
 @dataclass
 class Flags:
     use_html: bool = True
@@ -216,7 +213,7 @@ def fit_tokens(
             return prompt
         shrinkable.shrink()
 
-    logger.info(
+    logging.info(
         dedent(
             f"""\
             After {max_iterations} shrink iterations, the prompt is still
@@ -377,7 +374,7 @@ class MainPrompt(Shrinkable):
             self.instructions = ChatInstructions(obs_history[-1]["chat_messages"])
         else:
             if sum([msg["role"] == "user" for msg in obs_history[-1]["chat_messages"]]) > 1:
-                logger.warning(
+                logging.warning(
                     "Agent is in goal mode, but multiple user messages are present in the chat. Consider switching to `enable_chat=True`."
                 )
             self.instructions = GoalInstructions(obs_history[-1]["goal"])
