@@ -4,7 +4,7 @@ install:
 
 install-demo:
 	@echo "--- 🚀 Installing demo dependencies ---"
-	pip install demo_agent/requirements.txt
+	pip install -r demo_agent/requirements.txt
 
 demo:
 	@echo "--- 🚀 Running demo agent ---"
