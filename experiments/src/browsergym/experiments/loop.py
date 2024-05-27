@@ -211,7 +211,7 @@ class ExpArgs:
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
 
-    def get_logger(self):
+    def _get_logger(self):
         logger = logging.getLogger()
         logger.setLevel(self.logging_level)
         file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
