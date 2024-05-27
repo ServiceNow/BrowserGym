@@ -1,6 +1,6 @@
 install:
 	@echo "--- 🚀 Installing project dependencies ---"
-	pip install -e ./core ./miniwob ./webarena ./experiments
+	pip install -e ./core ./miniwob ./webarena ./experiments ./
 
 install-demo:
 	@echo "--- 🚀 Installing demo dependencies ---"
