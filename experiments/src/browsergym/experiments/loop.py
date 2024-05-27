@@ -213,8 +213,10 @@ class ExpArgs:
                 env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
-            # stop writing logs to run logfile
-            self._unset_logger()
+            try:
+                self._unset_logger()  # stop writing logs to run logfile
+            except Exception as e:
+                logger.error(f"Error while unsetting the logger in the finally block: {e}")
 
     def _set_logger(self):
         # output logging traces to a log file
