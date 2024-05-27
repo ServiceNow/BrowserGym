@@ -300,6 +300,9 @@ document.addEventListener("visibilitychange", () => {
         return obs, info
 
     def step(self, action: str) -> tuple:
+
+        logger = logging.getLogger("bgym")
+
         self.last_action = action
 
         info = {}
@@ -314,6 +317,7 @@ document.addEventListener("visibilitychange", () => {
             self.infeasible_message_received = True
 
         # try to execute the action
+        logger.debug(f"Executing action")
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -331,7 +335,7 @@ document.addEventListener("visibilitychange", () => {
             match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
             if match:
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
-
+        logger.debug(f"Action executed")
         info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
@@ -344,13 +348,17 @@ document.addEventListener("visibilitychange", () => {
         # after the action is executed, the active page might have changed
         # perform a safety check
         self._active_page_check()
+        logger.debug(f"Active page checked")
 
         # if asked, wait for user message
         self._wait_for_user_message()
+        logger.debug(f"User message done")
 
+        logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, task_info = self._task_validate()
         info["task_info"] = task_info
+        logger.debug(f"Task validation done")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -358,6 +366,7 @@ document.addEventListener("visibilitychange", () => {
 
         # extract observation (generic)
         obs = self._get_obs()
+        logger.debug(f"Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
         terminated = done or (
