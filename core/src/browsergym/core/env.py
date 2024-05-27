@@ -30,6 +30,9 @@ from .action.base import execute_python_code
 from . import _get_global_playwright
 
 
+logger = logging.getLogger(__name__)
+
+
 class BrowserEnv(gym.Env, ABC):
     """The main BrowserGym class, which encapsulates instruction-following Web browsing into a Gymnasium environment."""
 
@@ -169,7 +172,7 @@ class BrowserEnv(gym.Env, ABC):
             if env_value is None:
                 return task_value
             else:
-                logging.warning(
+                logger.warning(
                     f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
                 )
                 return env_value
@@ -300,6 +303,7 @@ document.addEventListener("visibilitychange", () => {
         return obs, info
 
     def step(self, action: str) -> tuple:
+
         self.last_action = action
 
         info = {}
@@ -314,6 +318,7 @@ document.addEventListener("visibilitychange", () => {
             self.infeasible_message_received = True
 
         # try to execute the action
+        logger.debug(f"Executing action")
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -331,7 +336,7 @@ document.addEventListener("visibilitychange", () => {
             match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
             if match:
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
-
+        logger.debug(f"Action executed")
         info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
@@ -344,13 +349,17 @@ document.addEventListener("visibilitychange", () => {
         # after the action is executed, the active page might have changed
         # perform a safety check
         self._active_page_check()
+        logger.debug(f"Active page checked")
 
         # if asked, wait for user message
         self._wait_for_user_message()
+        logger.debug(f"User message done")
 
+        logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, task_info = self._task_validate()
         info["task_info"] = task_info
+        logger.debug(f"Task validation done")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -358,6 +367,7 @@ document.addEventListener("visibilitychange", () => {
 
         # extract observation (generic)
         obs = self._get_obs()
+        logger.debug(f"Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
         terminated = done or (
@@ -377,7 +387,7 @@ document.addEventListener("visibilitychange", () => {
 
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
-            logging.info(
+            logger.info(
                 "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
             )
             self.page = prev_active_page
@@ -404,6 +414,7 @@ document.addEventListener("visibilitychange", () => {
                     pass
 
     def _activate_page_from_js(self, page: playwright.sync_api.Page):
+        logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
         if not page.context == self.context:
             raise RuntimeError(
                 f"Unexpected: activating a page that belongs to a different browser context ({page})."
@@ -423,7 +434,7 @@ document.addEventListener("visibilitychange", () => {
         # make sure there is always a page open
         # if all pages have been closed, create a new page
         if len(self.context.pages) == 0:
-            logging.warning(f"All pages are closed, opening a new page.")
+            logger.warning(f"All pages are closed, opening a new page.")
             self.page = self.context.new_page()
 
         # if the active page got closed, get the last active page from the history
@@ -464,7 +475,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Frame has been detached" in err_msg
                     or "Cannot mark a child frame without a bid" in err_msg
                 ):
-                    logging.warning(
+                    logger.warning(
                         f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
                     )
                     # post-extract cleanup (aria-roledescription attribute)
