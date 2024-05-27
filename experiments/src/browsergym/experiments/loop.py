@@ -149,7 +149,7 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
-        logger = self.get_logger()
+        logger = self._get_logger()
 
         episode_info = []
         try:
