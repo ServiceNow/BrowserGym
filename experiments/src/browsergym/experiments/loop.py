@@ -649,7 +649,7 @@ action:
 {action}
 """
 
-    logging.getLogger("bgym").info(msg)
+    logging.getLogger("browsergym").info(msg)
     chat.add_message(role="info", msg=msg)
 
 
