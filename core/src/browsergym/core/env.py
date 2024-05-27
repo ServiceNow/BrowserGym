@@ -301,7 +301,7 @@ document.addEventListener("visibilitychange", () => {
 
     def step(self, action: str) -> tuple:
 
-        logger = logging.getLogger("bgym")
+        logger = logging.getLogger("browsergym")
 
         self.last_action = action
 
