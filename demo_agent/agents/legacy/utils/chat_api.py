@@ -22,7 +22,7 @@ from transformers import AutoTokenizer
 from transformers import GPT2TokenizerFast
 
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -166,21 +166,21 @@ class HuggingFaceChatModel(SimpleChatModel):
 
         if max_new_tokens is None:
             max_new_tokens = max_total_tokens - max_input_tokens
-            logging.warning(
+            logger.warning(
                 f"max_new_tokens is not specified. Setting it to {max_new_tokens} (max_total_tokens - max_input_tokens)."
             )
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         if isinstance(self.tokenizer, GPT2TokenizerFast):
             # TODO: make this less hacky once tokenizer.apply_chat_template is more mature
-            logging.warning(
+            logger.warning(
                 f"No chat template is defined for {model_name}. Resolving to the hard-coded templates."
             )
             self.tokenizer = None
             self.prompt_template = get_prompt_template(model_name)
 
         if temperature < 1e-3:
-            logging.warning(
+            logger.warning(
                 "some weird things might happen when temperature is too low for some models."
             )
 
@@ -189,17 +189,17 @@ class HuggingFaceChatModel(SimpleChatModel):
         }
 
         if model_url is not None:
-            logging.info("Loading the LLM from a URL")
+            logger.info("Loading the LLM from a URL")
             client = InferenceClient(model=model_url, token=eai_token)
             self.llm = partial(
                 client.text_generation, temperature=temperature, max_new_tokens=max_new_tokens
             )
         elif hf_hosted:
-            logging.info("Serving the LLM on HuggingFace Hub")
+            logger.info("Serving the LLM on HuggingFace Hub")
             model_kwargs["max_length"] = max_new_tokens
             self.llm = HuggingFaceHub(repo_id=model_name, model_kwargs=model_kwargs)
         else:
-            logging.info("Loading the LLM locally")
+            logger.info("Loading the LLM locally")
             pipe = pipeline(
                 task="text-generation",
                 model=model_name,
@@ -217,7 +217,7 @@ class HuggingFaceChatModel(SimpleChatModel):
         **kwargs: Any,
     ) -> str:
         if stop is not None or run_manager is not None or kwargs:
-            logging.warning(
+            logger.warning(
                 "The `stop`, `run_manager`, and `kwargs` arguments are ignored in this implementation."
             )
 
@@ -236,7 +236,7 @@ class HuggingFaceChatModel(SimpleChatModel):
             except Exception as e:
                 if itr == self.n_retry_server - 1:
                     raise e
-                logging.warning(
+                logger.warning(
                     f"Failed to get a response from the server: \n{e}\n"
                     f"Retrying... ({itr+1}/{self.n_retry_server})"
                 )

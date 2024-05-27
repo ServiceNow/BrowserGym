@@ -14,6 +14,9 @@ from .constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
 MARK_FRAMES_MAX_TRIES = 3
 
 
+logger = logging.getLogger(__name__)
+
+
 class MarkingError(Exception):
     pass
 
@@ -38,7 +41,7 @@ def _pre_extract(page: playwright.sync_api.Page):
         )
         # print warning messages if any
         for msg in warning_msgs:
-            logging.warning(msg)
+            logger.warning(msg)
 
         # recursively mark all descendant frames
         for child_frame in frame.child_frames:
@@ -48,7 +51,7 @@ def _pre_extract(page: playwright.sync_api.Page):
             # deal with weird frames (pdf viewer in <embed>)
             child_frame_elem = child_frame.frame_element()
             if not child_frame_elem.content_frame() == child_frame:
-                logging.warning(
+                logger.warning(
                     f"Skipping frame '{child_frame.name}' for marking, seems problematic."
                 )
                 continue
@@ -76,7 +79,7 @@ def _post_extract(page: playwright.sync_api.Page):
         if not frame == page.main_frame:
             # deal with weird frames (pdf viewer in <embed>)
             if not frame.frame_element().content_frame() == frame:
-                logging.warning(f"Skipping frame '{frame.name}' for unmarking, seems problematic.")
+                logger.warning(f"Skipping frame '{frame.name}' for unmarking, seems problematic.")
                 continue
             # deal with sandboxed frames with blocked script execution
             sandbox_attr = frame.frame_element().get_attribute("sandbox")
@@ -142,7 +145,7 @@ def extract_data_items_from_aria(string):
 
     match = __DATA_REGEXP.fullmatch(string)
     if not match:
-        logging.warning(
+        logger.warning(
             f'Data items could not be extracted from "aria-roledescription" attribute: {string}'
         )
         return [], string
@@ -379,7 +382,7 @@ def extract_dom_extra_properties(dom_snapshot):
             bid = node["bid"]
             if bid:
                 if bid in extra_properties:
-                    logging.warning(f"duplicate {BID_ATTR}={repr(bid)} attribute detected")
+                    logger.warning(f"duplicate {BID_ATTR}={repr(bid)} attribute detected")
                 extra_properties[bid] = {
                     extra_prop: node[extra_prop]
                     for extra_prop in ("visibility", "bbox", "clickable", "set_of_marks")
@@ -490,7 +493,7 @@ def extract_merged_axtree(page: playwright.sync_api.Page):
                     assert frame_root_node["frameId"] == frame_id
                     node["childIds"].append(frame_root_node["nodeId"])
                 else:
-                    logging.warning(f"Extracted AXTree does not contain frameId '{frame_id}'")
+                    logger.warning(f"Extracted AXTree does not contain frameId '{frame_id}'")
 
     cdp.detach()
 

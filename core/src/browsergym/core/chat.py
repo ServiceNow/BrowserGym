@@ -13,6 +13,8 @@ from . import _get_global_playwright, chat_files
 
 CHATBOX_DIR = resources.files(chat_files)
 
+logger = logging.getLogger(__name__)
+
 
 class Chat:
     def __init__(
@@ -61,12 +63,12 @@ class Chat:
         self.page.evaluate(f"addChatMessage({repr(role)}, {repr(timestamp)}, {repr(msg)});")
 
     def wait_for_user_message(self):
-        logging.info("Waiting for message from user...")
+        logger.info("Waiting for message from user...")
         # reset flag
         self.page.evaluate("USER_MESSAGE_RECEIVED = false;")
         # wait for flag to be raised
         self.page.wait_for_function("USER_MESSAGE_RECEIVED", polling=100, timeout=0)
-        logging.info("Message received.")
+        logger.info("Message received.")
 
     def close(self):
         self.context.close()

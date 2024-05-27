@@ -30,6 +30,9 @@ from .action.base import execute_python_code
 from . import _get_global_playwright
 
 
+logger = logging.getLogger(__name__)
+
+
 class BrowserEnv(gym.Env, ABC):
     """The main BrowserGym class, which encapsulates instruction-following Web browsing into a Gymnasium environment."""
 
@@ -169,7 +172,7 @@ class BrowserEnv(gym.Env, ABC):
             if env_value is None:
                 return task_value
             else:
-                logging.warning(
+                logger.warning(
                     f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
                 )
                 return env_value
@@ -301,8 +304,6 @@ document.addEventListener("visibilitychange", () => {
 
     def step(self, action: str) -> tuple:
 
-        logger = logging.getLogger("browsergym")
-
         self.last_action = action
 
         info = {}
@@ -386,7 +387,7 @@ document.addEventListener("visibilitychange", () => {
 
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
-            logging.info(
+            logger.info(
                 "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
             )
             self.page = prev_active_page
@@ -432,7 +433,7 @@ document.addEventListener("visibilitychange", () => {
         # make sure there is always a page open
         # if all pages have been closed, create a new page
         if len(self.context.pages) == 0:
-            logging.warning(f"All pages are closed, opening a new page.")
+            logger.warning(f"All pages are closed, opening a new page.")
             self.page = self.context.new_page()
 
         # if the active page got closed, get the last active page from the history
@@ -473,7 +474,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Frame has been detached" in err_msg
                     or "Cannot mark a child frame without a bid" in err_msg
                 ):
-                    logging.warning(
+                    logger.warning(
                         f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
                     )
                     # post-extract cleanup (aria-roledescription attribute)

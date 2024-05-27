@@ -23,6 +23,8 @@ from browsergym.core.chat import Chat
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class EnvArgs:
@@ -144,12 +146,23 @@ class ExpArgs:
         with open(self.exp_dir / "exp_args.pkl", "wb") as f:
             pickle.dump(self, f)
 
+        # setup root logger
+        logger = logging.getLogger()
+        logger.setLevel(self.logging_level)
+        # output logging traces to a log file
+        file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
+        file_handler.setLevel(self.logging_level)  # same level as console outputs
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        # setup openai logger (do not go below INFO verbosity)
+        logger = logging.getLogger("openai._base_client")
+        logger.setLevel(max(logging.INFO, self.logging_level))
+
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
     def run(self):
         """Run the experiment and save the results"""
-
-        logger = self._get_logger()
 
         episode_info = []
         try:
@@ -210,20 +223,6 @@ class ExpArgs:
                 env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
-
-    def _get_logger(self):
-        logger = logging.getLogger()
-        logger.setLevel(self.logging_level)
-        file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
-        file_handler.setLevel(self.logging_level)
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-        if self.logging_level < logging.INFO:
-            logging.getLogger("openai._base_client").setLevel(logging.INFO)
-
-        return logging.getLogger("browsergym")
 
 
 @dataclass
@@ -649,7 +648,7 @@ action:
 {action}
 """
 
-    logging.getLogger("browsergym").info(msg)
+    logger.info(msg)
     chat.add_message(role="info", msg=msg)
 
 
