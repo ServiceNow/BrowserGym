@@ -207,6 +207,13 @@ class ExpArgs:
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
+                if (
+                    not err_msg
+                    and len(episode_info) > 0
+                    and not (episode_info[-1].terminated or episode_info[-1].truncated)
+                ):
+                    e = KeyboardInterrupt("Early termination??")
+                    err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
                 _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
