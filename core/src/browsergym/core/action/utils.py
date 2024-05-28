@@ -31,7 +31,7 @@ def get_elem_by_bid(
         frame_bid = bid[:i]  # bid of the next frame to select
         frame_elem = current_frame.get_by_test_id(frame_bid)
         if not frame_elem.count():
-            raise ValueError(f'could not find element with bid "{frame_bid}"')
+            raise ValueError(f'Could not find element with bid "{bid}"')
         if scroll_into_view:
             frame_elem.scroll_into_view_if_needed(timeout=500)
         current_frame = frame_elem.frame_locator(":scope")
@@ -39,7 +39,7 @@ def get_elem_by_bid(
     # finally, we should have selected the frame where the target element is
     elem = current_frame.get_by_test_id(bid)
     if not elem.count():
-        raise ValueError(f'Could not find element with bid "{bid}".')
+        raise ValueError(f'Could not find element with bid "{bid}"')
     if scroll_into_view:
         elem.scroll_into_view_if_needed(timeout=500)
     return elem
