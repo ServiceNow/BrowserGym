@@ -1,6 +1,7 @@
 import gzip
 import json
 import logging
+import os
 import pickle
 import sys
 import time
@@ -290,12 +291,15 @@ class StepInfo:
     agent_info: dict = field(default_factory=dict)
     stats: dict = None
     profiling: StepTimestamps = field(default_factory=StepTimestamps)
+    task_info: dict = None
 
     def from_step(self, env: gym.Env, action: str):
         t = self.profiling
         t.env_start = time.time()
         self.obs, self.reward, self.terminated, self.truncated, env_info = env.step(action)
         t.env_stop = time.time()
+
+        self.task_info = env_info.get("task_info", None)
 
         self.raw_reward = env_info.get("RAW_REWARD_GLOBAL", None)
 
@@ -477,7 +481,7 @@ class ExpResult:
         self._logs = None
 
     @property
-    def exp_args(self):
+    def exp_args(self) -> ExpArgs:
         if self._exp_args is None:
             with open(self.exp_dir / "exp_args.pkl", "rb") as f:
                 self._exp_args = pickle.load(f)
@@ -503,6 +507,9 @@ class ExpResult:
     def summary_info(self) -> dict:
         if self._summary_info is None:
             with open(self.exp_dir / "summary_info.json", "r") as f:
+                # if length is zero raise file not found error
+                if os.fstat(f.fileno()).st_size == 0:
+                    raise FileNotFoundError(f"summary_info.json is empty.")
                 self._summary_info = json.load(f)
         return self._summary_info
 
@@ -576,7 +583,7 @@ class ExpResult:
 EXP_RESULT_CACHE = {}
 
 
-def get_exp_result(exp_dir):
+def get_exp_result(exp_dir) -> ExpResult:
     """Keep a cache of pre-loaded exp_results for faster loading"""
     exp_dir = str(exp_dir)  # make sure it's not a Path
     exp_result = EXP_RESULT_CACHE.get(exp_dir, None)
