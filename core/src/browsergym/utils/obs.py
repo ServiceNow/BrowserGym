@@ -1,4 +1,5 @@
 import ast
+import logging
 import numpy as np
 import PIL.Image
 import PIL.ImageDraw
@@ -11,6 +12,8 @@ from bs4 import BeautifulSoup
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from browsergym.core.constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 from browsergym.core.constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
+
+logger = logging.getLogger(__name__)
 
 IGNORED_AXTREE_ROLES = ["LineBreak"]
 
@@ -460,16 +463,22 @@ def overlay_som(
     for bid, properties in extra_properties.items():
         if properties["set_of_marks"] and properties["bbox"]:
             x, y, width, height = properties["bbox"]
+            x0, y0 = x, y
+            x1, y1 = x + width, y + height
+
+            # skip small boxes
+            area = (x1 - x0) * (y1 - y0)
+            if area < 20:
+                logger.warning(
+                    f'som overlay: skipping bid "{bid}" due to bbox too small (area={area})'
+                )
+                continue
 
             # draw bounding box with dashed lines
-            linedashed(draw, x, y, x + width, y, fill=(0, 0, 0, 255), width=linewidth)
-            linedashed(
-                draw, x + width, y, x + width, y + height, fill=(0, 0, 0, 255), width=linewidth
-            )
-            linedashed(
-                draw, x, y + height, x + width, y + height, fill=(0, 0, 0, 255), width=linewidth
-            )
-            linedashed(draw, x, y, x, y + height, fill=(0, 0, 0, 255), width=linewidth)
+            linedashed(draw, x0, y0, x1, y0, fill=(0, 0, 0, 255), width=linewidth)
+            linedashed(draw, x1, y0, x1, y1, fill=(0, 0, 0, 255), width=linewidth)
+            linedashed(draw, x1, y1, x0, y1, fill=(0, 0, 0, 255), width=linewidth)
+            linedashed(draw, x0, y1, x0, y0, fill=(0, 0, 0, 255), width=linewidth)
 
             # get text box size (left, top, right, bottom)
             tag_box = font.getbbox(
