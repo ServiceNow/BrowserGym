@@ -280,7 +280,6 @@
             msgContainer.className = 'message';
 
             const text = document.createElement('div');
-            text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
 
             // const assistant_img = document.createElement('img');
             // assistant_img.src = assistant_image_data;
@@ -290,12 +289,14 @@
             switch (role) {
                 case "user":
                     text.className = 'user-message';
+                    text.innerHTML = addHtmlLineBreaks(msg);
                     text.style.setProperty('--before-content', `"${timeString} - You"`);
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
                     break;
                 case "assistant":
                     text.className = 'assistant-message';
+                    text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
                     text.style.setProperty('--before-content', `"${timeString} - Bot"`);
                     // msgContainer.appendChild(assistant_img); // Add the image to the message container
                     msgContainer.appendChild(text);
@@ -303,12 +304,14 @@
                     break;
                 case "infeasible":
                     text.className = 'assistant-message';
+                    text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
                     text.style.setProperty('--before-content', `"${timeString} - Bot (abort)"`);
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
                     break;
                 case "info":
                     text.className = 'info-message';
+                    text.innerHTML = addHtmlLineBreaks(escapeHtml(msg));
                     msgContainer.appendChild(text);
                     // hide previous debug messages
                     for (const msg of chatDebug.children) {
