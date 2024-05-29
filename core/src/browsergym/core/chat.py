@@ -11,7 +11,7 @@ from importlib import resources
 from . import _get_global_playwright, chat_files
 
 
-CHATBOX_DIR = resources.files(chat_files)
+CHATBOX_HTML_FILE = resources.files(chat_files).joinpath("chat_modern.html")
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +41,9 @@ class Chat:
         )
 
         if modern:
-            self.page.set_content(get_chatbox_modern(CHATBOX_DIR))
+            self.page.set_content(get_chatbox_modern())
         else:
-            self.page.set_content(get_chatbox_classic(CHATBOX_DIR))
+            self.page.set_content(get_chatbox_classic())
 
     def _js_user_message_received_callback(self, msg: str):
         """Callback function for when a user message is received in the chatbox"""
@@ -75,14 +75,16 @@ class Chat:
         self.browser.close()
 
 
-def get_chatbox_modern(chatbox_dir) -> str:
-    with open(chatbox_dir / "chatbox_modern.html", "r") as file:
+def get_chatbox_modern() -> str:
+    with open(CHATBOX_HTML_FILE, "r") as file:
         chatbox_html = file.read()
 
     return chatbox_html
 
 
-def get_chatbox_classic(chatbox_dir) -> str:
+def get_chatbox_classic() -> str:
+    raise NotImplementedError
+
     with open(chatbox_dir / "chatbox.html", "r") as file:
         chatbox_html = file.read()
     with open(chatbox_dir / "assistant.png", "rb") as f:
