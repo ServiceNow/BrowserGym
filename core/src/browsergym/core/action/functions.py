@@ -106,8 +106,8 @@ def select_option(bid: str, options: str | list[str]):
     option value or label to select. Multiple options can be selected.
 
     Examples:
-        select_option('48', "blue")
-        select_option('48', ["red", "green", "blue"])
+        select_option('a48', "blue")
+        select_option('c48', ["red", "green", "blue"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
@@ -124,7 +124,7 @@ def click(
     Click an element.
 
     Examples:
-        click('51')
+        click('a51')
         click('b22', button="right")
         click('48', button="middle", modifiers=["Shift"])
     """
