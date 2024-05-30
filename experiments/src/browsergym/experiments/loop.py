@@ -14,6 +14,7 @@ from pathlib import Path
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from browsergym.experiments.watchdog import WatchdogProcess, Pokable
 import gymnasium as gym
 import numpy as np
 from PIL import Image
@@ -149,7 +150,7 @@ class ExpArgs:
 
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
-    def run(self):
+    def run(self, poke_me: Pokable = None):
         """Run the experiment and save the results"""
 
         # start writing logs to run logfile
@@ -172,6 +173,11 @@ class ExpArgs:
             logger.debug(f"Environment reset.")
 
             while not step_info.is_done:  # set a limit
+
+                if poke_me is not None:
+                    logger.debug(f"Poking the watchdog.")
+                    poke_me.poke()
+
                 logger.debug(f"Starting step {step_info.step}.")
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
@@ -245,6 +251,13 @@ class ExpArgs:
     def _unset_logger(self):
         root_logger = logging.getLogger()
         root_logger.removeHandler(self.logging_file_handler)
+
+    def run_under_watchdog(self, timeout=5 * 60):
+        """If the loop doesn't respond with `timeout` seconds, it will raise an
+        error inside the thread."""
+        watchdog = WatchdogProcess(timeout=timeout, dir_path=self.exp_dir)
+
+        watchdog.run(self.run)
 
 
 @dataclass
