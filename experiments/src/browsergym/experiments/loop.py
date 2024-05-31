@@ -38,7 +38,7 @@ class EnvArgs:
     viewport: dict = None  # use default value from BrowserGym
     slow_mo: int = None  # use default value from BrowserGym
     storage_state: Optional[str | Path | dict] = None
-    task_kwargs: dict = field(default_factory=lambda: {})
+    task_kwargs: dict = None  # use default value from BrowserGym
 
     def make_env(self, action_mapping, exp_dir):
         extra_kwargs = {}
@@ -50,10 +50,11 @@ class EnvArgs:
             extra_kwargs["slow_mo"] = self.slow_mo
         if self.storage_state:
             extra_kwargs["pw_context_kwargs"] = {"storage_state": self.storage_state}
+        if self.task_kwargs is not None:
+            extra_kwargs["task_kwargs"] = self.task_kwargs
 
         return gym.make(
             _get_env_name(self.task_name),
-            task_kwargs=self.task_kwargs,
             disable_env_checker=True,
             max_episode_steps=self.max_steps,
             headless=self.headless,
