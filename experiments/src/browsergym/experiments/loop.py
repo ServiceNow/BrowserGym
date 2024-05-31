@@ -179,7 +179,10 @@ class ExpArgs:
 
                 step_info.save_step_info(self.exp_dir)
                 logger.debug(f"Step info saved.")
+
                 if action is None:
+                    logger.debug(f"Agent returned None action. Ending episode.")
+                    step_info.truncated = True
                     break
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
