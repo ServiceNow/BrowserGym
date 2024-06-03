@@ -280,7 +280,8 @@ One single action to be executed. You can only use one action at a time."""
 
         if self.multiaction:
             description += f"""\
-Multiple actions can be provided at once."""
+Multiple actions can be provided at once, but will be executed sequentially without any feedback from the page.
+More than 2-3 actions usually leads to failure or unexpected behavior."""
         else:
             description += f"""\
 Only a single action can be provided at once."""
@@ -293,11 +294,6 @@ Only a single action can be provided at once."""
         else:
             description += f"""\
 
-"""
-
-        description += f"""\
-Multiple actions are meant to be executed sequentially without any feedback from the page.
-Don't execute multiple actions at once if you need feedback from the page.
 """
 
         return description
