@@ -37,6 +37,7 @@ def flatten_dom_to_str(
     filter_with_bid_only: bool = False,
     filter_som_only: bool = False,
     coord_decimals: int = 0,
+    hide_bid_if_invisible: int = False,
 ) -> str:
     """Formats a DOM snapshot into a string text"""
 
@@ -131,7 +132,13 @@ def flatten_dom_to_str(
                 attributes = extra_attributes_to_print + attributes
 
                 # insert bid as first attribute
-                if bid is not None:
+                if not (
+                    bid is None
+                    or (
+                        hide_bid_if_invisible
+                        and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
+                    )
+                ):
                     attributes.insert(0, f'bid="{bid}"')
 
                 if not skip_node:
@@ -242,7 +249,9 @@ def _process_bid(
             skip_element = True
         if filter_visible_only:
             # element without bid have no visibility mark, they could be visible or non-visible
-            pass  # TODO: we consider them as visible. Is this what we want?
+            # TODO: we consider them as visible. Is this what we want? Now that duplicate bids are handles, should we mark all non-html elements?
+            pass  # keep elements without visible property
+            # skip_element = True  # filter elements without visible property
 
     # parse extra browsergym properties, if node has a bid
     else:
@@ -259,11 +268,11 @@ def _process_bid(
                 skip_element = True
             # print extra attributes if requested (with new names)
             if with_som and node_in_som:
-                attributes_to_print.insert(0, f'som="{int(node_in_som)}"')
-            if with_visible:
-                attributes_to_print.insert(0, f'visible="{int(node_is_visible)}"')
+                attributes_to_print.insert(0, f"som")
+            if with_visible and node_is_visible:
+                attributes_to_print.insert(0, f"visible")
             if with_clickable and node_is_clickable:
-                attributes_to_print.insert(0, f'clickable="{int(node_is_clickable)}"')
+                attributes_to_print.insert(0, f"clickable")
             if with_center_coords and node_bbox is not None:
                 x, y, width, height = node_bbox
                 center = (x + width / 2, y + height / 2)
@@ -291,6 +300,7 @@ def flatten_axtree_to_str(
     ignored_roles=IGNORED_AXTREE_ROLES,
     ignored_properties=IGNORED_AXTREE_PROPERTIES,
     remove_redundant_static_text: bool = True,
+    hide_bid_if_invisible: bool = False,
 ) -> str:
     """Formats the accessibility tree into a string text"""
     node_id_to_idx = {}
@@ -370,7 +380,13 @@ def flatten_axtree_to_str(
             if not skip_node:
                 node_str = f"{node_role} {repr(node_name.strip())}"
 
-                if bid is not None:
+                if not (
+                    bid is None
+                    or (
+                        hide_bid_if_invisible
+                        and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
+                    )
+                ):
                     node_str = f"[{bid}] " + node_str
 
                 if node_value is not None:

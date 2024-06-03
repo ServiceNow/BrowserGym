@@ -11,6 +11,8 @@ from browsergym.core.task import AbstractBrowserTask
 
 from .instance import WebArenaInstance
 
+logger = logging.getLogger(__name__)
+
 
 class GenericWebArenaTask(AbstractBrowserTask):
     """
@@ -176,7 +178,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
             )
         # llm_fuzzy_match() bugfix (assert "correct" in response)
         except AssertionError as e:
-            logging.info(
+            logger.info(
                 "llm_fuzzy_match() bugfix applied: AssertionError in evaluator, using score = 0.0"
             )
             score = 0.0

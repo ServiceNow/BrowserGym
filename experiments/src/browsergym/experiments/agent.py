@@ -1,51 +1,51 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from browsergym.core.action.base import AbstractActionSet
+from browsergym.core.action.highlevel import HighLevelActionSet
+from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
+
+
+def default_obs_preprocessor(obs: dict) -> dict:
+    obs = obs.copy()  # shallow copy to avoid modifying the original dict
+    # augment the observation with text versions of the DOM and AXTree
+    obs["dom_txt"] = flatten_dom_to_str(obs["dom_object"])
+    obs["axtree_txt"] = flatten_axtree_to_str(obs["axtree_object"])
+    obs["pruned_html"] = prune_html(obs["dom_txt"])
+    # remove raw entries that the agent won't use, and we don't want to record
+    del obs["dom_object"]
+    del obs["axtree_object"]
+    return obs
+
+
+DEFAULT_ACTION_SET: AbstractActionSet = HighLevelActionSet()
+DEFAULT_OBS_PREPROCESSOR: callable = default_obs_preprocessor
+
 
 class Agent(ABC):
     """
     A template class that defines the required signature of an agent interacting
-    with a browsergym environment.
+    with a browsergym environment
+
+    Attributes:
+        action_set: AbstractActionSet
+            Defines the set of actions that the agent can take in the environment.
+            This property is meant to be overloaded by your agent (optional).
+            By default, uses BrowserGym's high-level action set.
     """
 
-    def action_mapping(self, action: str) -> str:
+    action_set: AbstractActionSet = DEFAULT_ACTION_SET
+
+    def obs_preprocessor(self, obs: dict) -> Any:
         """
+        Function that pre-processes observations before feeding them to `get_action()`.
         This property is meant to be overloaded by your agent (optional).
+        By default, the base observation is augmented with text versions of the DOM and AXTREE.
 
-        Maps the actions returned by `get_action()` to BrowserGym-compatible Python code.
-        Why this mapping? This mapping will happen within the BrowserGym environment, so that the experiment loop
-        manipulates and records pre-mapping actions and not the resulting Python code (which can be pretty verbose).
-
-        Examples:
-            # no mapping, the agent directly produces Python code
-            return action
-
-            # use a pre-defined action set of high-level function
-            action_space = browsergym.core.action.highlevel.HighLevelActionSet(subsets=["chat", "nav", "bid"])
-            return action_space.to_python_code(action)
-
-            # use a pre-defined Python action set which extracts Markdown code snippets
-            action_space = browsergym.core.action.python.PythonActionSet()
-            return action_space.to_python_code(action)
+        Why this mapping? This mapping will happen within the experiment loop, so that the
+        resulting observation gets recorded in the execution traces, and statistics can be computed from it.
         """
-        return action
-
-    def observation_mapping(self, obs: dict) -> Any:
-        """
-        This method is meant to be overloaded by your agent.
-
-        Returns a function that pre-processes the observations before feeding them to `get_action()`.
-        Why this mapping? This mapping will happen within the experiment loop, so that the resulting observation gets
-        recorded in the execution traces.
-
-        Examples:
-            from browsergym.utils.obs import flatten_axtree_to_str
-            return {
-                "goal": obs["goal"],
-                "axtree": flatten_axtree_to_str(obs["axtree_object"]),
-            }
-        """
-        return obs
+        return DEFAULT_OBS_PREPROCESSOR(obs)
 
     @abstractmethod
     def get_action(self, obs: Any) -> tuple[str, dict]:
@@ -55,7 +55,7 @@ class Agent(ABC):
         Parameters:
         -----------
         obs:
-            The current observation of the environmenti, after it has been processed by `observation_mapping()`.
+            The current observation of the environment, after it has been processed by `obs_preprocessor()`.
             By default, a BrowserGym observation is a dict with the following entries:
             - "chat_messages": list[str], messages between the agent and the user.
             - "goal": str, the current goal.

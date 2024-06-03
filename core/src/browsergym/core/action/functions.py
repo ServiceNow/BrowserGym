@@ -12,6 +12,7 @@ from .utils import (
 
 page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
+report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
 
 """IMPORTANT
@@ -28,6 +29,16 @@ def send_msg_to_user(text: str):
         send_msg_to_user("Based on the results of my search, the city was built in 1751.")
     """
     send_message_to_user(text)
+
+
+def report_infeasible(reason: str):
+    """
+    Notifies the user that their instructions are infeasible.
+
+    Examples:
+        report_infeasible("I cannot follow these instructions because there is no email field in this form.")
+    """
+    report_infeasible_instructions(reason)
 
 
 def noop(wait_ms: float = 1000):
@@ -119,7 +130,7 @@ def click(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.click(button=button, modifiers=modifiers)
+    elem.click(button=button, modifiers=modifiers, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-dblclick

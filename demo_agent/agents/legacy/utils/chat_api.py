@@ -23,9 +23,6 @@ from transformers import AutoTokenizer
 from transformers import GPT2TokenizerFast
 
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-
-
 @dataclass
 class ChatModelArgs:
     """Serializable object for instantiating a generic chat model.

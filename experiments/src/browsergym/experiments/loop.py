@@ -23,6 +23,8 @@ from browsergym.core.chat import Chat
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class EnvArgs:
@@ -37,10 +39,10 @@ class EnvArgs:
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: dict = field(default_factory=lambda: {})
 
-    def make_env(self, action_mapping):
+    def make_env(self, action_mapping, exp_dir):
         extra_kwargs = {}
         if self.record_video:
-            extra_kwargs["record_video_dir"] = self.exp_dir
+            extra_kwargs["record_video_dir"] = exp_dir
         if self.viewport:
             extra_kwargs["viewport"] = self.viewport
         if self.slow_mo is not None:
@@ -112,7 +114,8 @@ class ExpArgs:
     enable_debug: bool = True
     err_msg: str = None
     stack_trace: str = None
-    order: int = None  # use to keep the original order the experiments were meant to be lancuhed.
+    order: int = None  # use to keep the original order the experiments were meant to be launched.
+    logging_level: int = logging.INFO
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -148,28 +151,43 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
+        # start writing logs to run logfile
+        self._set_logger()
+
         episode_info = []
         try:
-            logging.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
+            logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
-            env = self.env_args.make_env(action_mapping=agent.action_mapping)
+            logger.debug(f"Agent created.")
+            env = self.env_args.make_env(
+                action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
+            )
+            logger.debug(f"Environment created.")
 
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
             step_info.from_reset(env, seed=self.env_args.task_seed)
+            logger.debug(f"Environment reset.")
 
             while not step_info.is_done:  # set a limit
+                logger.debug(f"Starting step {step_info.step}.")
                 action = step_info.from_action(agent)
+                logger.debug(f"Agent chose action:\n {action}")
+
                 step_info.save_step_info(self.exp_dir)
+                logger.debug(f"Step info saved.")
                 if action is None:
                     break
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
+                logger.debug(f"Chat info sent.")
 
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
+                logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action)
+                logger.debug(f"Environment stepped.")
 
         except Exception as e:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
@@ -178,17 +196,47 @@ class ExpArgs:
             self.err_msg = err_msg
             self.stack_trace = stack_trace
 
-            logging.warning(err_msg + "\n" + stack_trace)
+            logger.warning(err_msg + "\n" + stack_trace)
             if _is_debugging() and self.enable_debug:
                 raise
 
         finally:
-            # TODO should save at each step
-            _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
+            try:
+                step_info.save_step_info(self.exp_dir)
+            except Exception as e:
+                logger.error(f"Error while saving step info in the finally block: {e}")
+            try:
+                _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
+            except Exception as e:
+                logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
                 env.close()
             except Exception as e:
-                logging.error(f"Error while closing the environment: {e}")
+                logger.error(f"Error while closing the environment in the finally block: {e}")
+            try:
+                self._unset_logger()  # stop writing logs to run logfile
+            except Exception as e:
+                logger.error(f"Error while unsetting the logger in the finally block: {e}")
+
+    def _set_logger(self):
+        # output logging traces to a log file
+        file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
+        file_handler.setLevel(self.logging_level)  # same level as console outputs
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(formatter)
+        # setup root logger
+        root_logger = logging.getLogger()
+        root_logger.setLevel(self.logging_level)
+        root_logger.addHandler(file_handler)
+        # setup openai logger (don't go below INFO verbosity)
+        openai_logger = logging.getLogger("openai._base_client")
+        openai_logger.setLevel(max(logging.INFO, self.logging_level))
+
+        self.logging_file_handler = file_handler
+
+    def _unset_logger(self):
+        root_logger = logging.getLogger()
+        root_logger.removeHandler(self.logging_file_handler)
 
 
 @dataclass
@@ -234,8 +282,8 @@ class StepInfo:
 
     step: int = None
     obs: dict = None
-    reward: float = None
-    raw_reward: float = None
+    reward: float = 0
+    raw_reward: float = 0
     terminated: bool = None
     truncated: bool = None
     action: str = None
@@ -257,8 +305,8 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        if agent.observation_mapping:
-            self.obs = agent.observation_mapping(self.obs)
+        if agent.obs_preprocessor:
+            self.obs = agent.obs_preprocessor(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
@@ -305,7 +353,7 @@ class StepInfo:
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
 
-        if save_jpg:
+        if save_jpg and self.obs is not None:
             for name in ("screenshot", "screenshot_som"):
                 if name in self.obs:
                     img = Image.fromarray(self.obs[name])
@@ -426,6 +474,7 @@ class ExpResult:
         self._summary_info = None
         self._screenshots = {}
         self._flat_exp_args = None
+        self._logs = None
 
     @property
     def exp_args(self):
@@ -515,6 +564,13 @@ class ExpResult:
     @property
     def combined_video_path(self) -> Path:
         return self.exp_dir / "combined_video.mp4"
+
+    @property
+    def logs(self):
+        if self._logs is None:
+            with open(self.exp_dir / "experiment.log", "r") as f:
+                self._logs = f.read()
+        return self._logs
 
 
 EXP_RESULT_CACHE = {}
@@ -606,7 +662,7 @@ action:
 {action}
 """
 
-    logging.info(msg)
+    logger.info(msg)
     chat.add_message(role="info", msg=msg)
 
 

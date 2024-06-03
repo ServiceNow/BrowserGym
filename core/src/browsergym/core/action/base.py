@@ -35,6 +35,7 @@ def execute_python_code(
     code: str,
     page: playwright.sync_api.Page,
     send_message_to_user: callable,
+    report_infeasible_instructions: callable,
 ):
     """
     Executes Python code in a new context, except for a playwright `page` object and a `send_message_to_user` function.
@@ -46,11 +47,13 @@ def execute_python_code(
         code: the Python code to execute, as a string.
         page: the playwright page that will be made accessible to the code.
         send_message_to_user: utility function that will be made accessible to the code. It should take one text argument.
+        report_infeasible_instructions: utility function that will be made accessible to the code. It should take one text argument.
     """
 
     globals = {
         "page": page,
         "send_message_to_user": send_message_to_user,
+        "report_infeasible_instructions": report_infeasible_instructions,
     }
 
     exec(code, globals)

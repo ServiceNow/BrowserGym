@@ -1,2 +1,2 @@
-browsergym-core==0.2.6
+browsergym-core==0.3.4dev
 libwebarena==0.0.3

@@ -13,6 +13,8 @@ from . import _get_global_playwright, chat_files
 
 CHATBOX_DIR = resources.files(chat_files)
 
+logger = logging.getLogger(__name__)
+
 
 class Chat:
     def __init__(
@@ -50,23 +52,23 @@ class Chat:
         # returning a list as JS doesnt like tuples
         return ["user", time.strftime("%H:%M", time.localtime(utc_time)), msg]
 
-    def add_message(self, role: Literal["user", "assistant", "info"], msg: str):
+    def add_message(self, role: Literal["user", "assistant", "info", "infeasible"], msg: str):
         """Add a message to the chatbox and update the page accordingly."""
         utc_time = time.time()
-        if role not in ("user", "assistant", "info"):
+        if role not in ("user", "assistant", "info", "infeasible"):
             raise ValueError(f"Invalid role: {role}")
-        if role in ("user", "assistant"):
+        if role in ("user", "assistant", "infeasible"):
             self.messages.append({"role": role, "timestamp": utc_time, "message": msg})
         timestamp = time.strftime("%H:%M:%S", time.localtime(utc_time))
         self.page.evaluate(f"addChatMessage({repr(role)}, {repr(timestamp)}, {repr(msg)});")
 
     def wait_for_user_message(self):
-        logging.info("Waiting for message from user...")
+        logger.info("Waiting for message from user...")
         # reset flag
         self.page.evaluate("USER_MESSAGE_RECEIVED = false;")
         # wait for flag to be raised
         self.page.wait_for_function("USER_MESSAGE_RECEIVED", polling=100, timeout=0)
-        logging.info("Message received.")
+        logger.info("Message received.")
 
     def close(self):
         self.context.close()
