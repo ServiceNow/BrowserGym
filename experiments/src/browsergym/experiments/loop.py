@@ -531,7 +531,6 @@ class ExpResult:
             self._screenshots[key] = Image.open(self.exp_dir / file_name)
         return self._screenshots[key]
 
-    @property
     def screenshots(self, som=False):
         files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
         for file in files:
