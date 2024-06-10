@@ -1,4 +1,4 @@
-__version__ = "0.3.5dev"
+__version__ = "0.3.5"
 
 import playwright.sync_api
 
