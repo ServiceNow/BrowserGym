@@ -32,6 +32,15 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for webarena, see [webarena/README.md](webarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
 
+### Development setup
+To install browsergym in a development setting, use the following commands:
+```sh
+git clone https://github.com/ServiceNow/BrowserGym.git
+
+cd ~/PATH/TO/REPOSITORY/BrowserGym
+
+make install
+```
 
 ## Usage
 
