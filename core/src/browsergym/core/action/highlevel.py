@@ -107,6 +107,7 @@ class HighLevelActionSet(AbstractActionSet):
         self,
         subsets: Optional[ActionSubset | list[ActionSubset]] = [
             "chat",
+            "infeas",
             "bid",
             "nav",
             "tab",
