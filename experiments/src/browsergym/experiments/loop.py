@@ -169,7 +169,9 @@ class ExpArgs:
             err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
-            step_info.from_reset(env, seed=self.env_args.task_seed)
+            step_info.from_reset(
+                env, seed=self.env_args.task_seed, obs_preprocessor=agent.obs_preprocessor
+            )
             logger.debug(f"Environment reset.")
 
             while not step_info.is_done:  # set a limit
@@ -177,13 +179,13 @@ class ExpArgs:
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
 
-                step_info.save_step_info(self.exp_dir)
-                logger.debug(f"Step info saved.")
-
                 if action is None:
                     logger.debug(f"Agent returned None action. Ending episode.")
                     step_info.truncated = True
                     break
+
+                step_info.save_step_info(self.exp_dir)
+                logger.debug(f"Step info saved.")
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
@@ -191,7 +193,7 @@ class ExpArgs:
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
                 logger.debug(f"Sending action to environment.")
-                step_info.from_step(env, action)
+                step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
 
         except Exception as e:
@@ -304,7 +306,7 @@ class StepInfo:
     profiling: StepTimestamps = field(default_factory=StepTimestamps)
     task_info: dict = None
 
-    def from_step(self, env: gym.Env, action: str):
+    def from_step(self, env: gym.Env, action: str, obs_preprocessor: callable):
         t = self.profiling
         t.env_start = time.time()
         self.obs, self.reward, self.terminated, self.truncated, env_info = env.step(action)
@@ -318,10 +320,11 @@ class StepInfo:
         t.action_exect_after_timeout = env_info["action_exec_stop"]
         t.action_exec_stop = env_info["action_exec_stop"] - env_info["action_exec_timeout"]
 
+        if obs_preprocessor:
+            self.obs = obs_preprocessor(self.obs)
+
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        if agent.obs_preprocessor:
-            self.obs = agent.obs_preprocessor(self.obs)
         self.action, self.agent_info = agent.get_action(self.obs)
         self.profiling.agent_stop = time.time()
 
@@ -329,7 +332,7 @@ class StepInfo:
 
         return self.action
 
-    def from_reset(self, env: gym.Env, seed: int):
+    def from_reset(self, env: gym.Env, seed: int, obs_preprocessor: callable):
         t = self.profiling
         t.env_start = time.time()
         self.obs, env_info = env.reset(seed=seed)
@@ -339,6 +342,9 @@ class StepInfo:
         t.action_exec_start = env_info.get("recording_start_time", t.env_start)
         t.action_exect_after_timeout = t.env_stop
         t.action_exec_stop = t.env_stop
+
+        if obs_preprocessor:
+            self.obs = obs_preprocessor(self.obs)
 
     @property
     def is_done(self):
