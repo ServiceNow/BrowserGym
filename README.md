@@ -33,7 +33,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 ### Development setup
-To install browsergym in a development setting, use the following commands:
+To install browsergym locally for development, use the following commands:
 ```sh
 git clone https://github.com/ServiceNow/BrowserGym.git
 
