@@ -138,3 +138,62 @@ def test_viewport(task_cls):
     assert screenshot.shape[2] == 3  # RGB
 
     env.close()
+
+
+@pytest.mark.parametrize("task_cls", TASKS)
+def test_forbidden_navigation(task_cls):
+    pw = browsergym.core._get_global_playwright()
+
+    browser = pw.chromium.launch(headless=__HEADLESS, slow_mo=__SLOW_MO)
+    context = browser.new_context()
+    page = context.new_page()
+
+    task = task_cls(seed=42)
+    task.setup(page=page)
+
+    reward, done, msg, info = task.validate(page, [])
+
+    assert reward == 0.0 and done == False
+
+    page.goto("http://www.google.com")
+
+    reward, done, msg, info = task.validate(page, [])
+
+    assert reward == 0.0 and done == True
+
+    task.teardown()
+
+    context.close()
+    browser.close()
+
+
+@pytest.mark.parametrize("task_cls", TASKS)
+def test_forbidden_navigation_2(task_cls):
+    pw = browsergym.core._get_global_playwright()
+
+    browser = pw.chromium.launch(headless=__HEADLESS, slow_mo=__SLOW_MO)
+    context = browser.new_context()
+    page = context.new_page()
+
+    task = task_cls(seed=42)
+    task.setup(page=page)
+
+    reward, done, msg, info = task.validate(page, [])
+
+    assert reward == 0.0 and done == False
+
+    page2 = context.new_page()
+    page2.goto("http://www.google.com")
+
+    reward, done, msg, info = task.validate(page, [])
+
+    assert reward == 0.0 and done == False
+
+    reward, done, msg, info = task.validate(page2, [])
+
+    assert reward == 0.0 and done == True
+
+    task.teardown()
+
+    context.close()
+    browser.close()
