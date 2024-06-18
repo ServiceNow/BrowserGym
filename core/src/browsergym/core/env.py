@@ -405,12 +405,12 @@ document.addEventListener("visibilitychange", () => {
         for page in self.context.pages:
             try:
                 page.wait_for_load_state("domcontentloaded", timeout=3000)
-            except playwright.sync_api.TimeoutError:
+            except playwright.sync_api.Error:
                 pass
             for frame in page.frames:
                 try:
                     frame.wait_for_load_state("domcontentloaded", timeout=3000)
-                except playwright.sync_api.TimeoutError:
+                except playwright.sync_api.Error:
                     pass
 
     def _activate_page_from_js(self, page: playwright.sync_api.Page):
