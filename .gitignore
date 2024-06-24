@@ -1,5 +1,6 @@
 .DS_store
 .idea/
+docs/src/generated/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

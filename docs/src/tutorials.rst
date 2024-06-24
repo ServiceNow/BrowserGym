@@ -1,5 +1,7 @@
-Environments
-===
+Tutorials
+=====
+
+This section provides tutorials to help build new environments and tasks.
 
 Creating a custom task
 ----------------------
@@ -67,6 +69,7 @@ Next, we need to compute a reward. For this, we'll implement our validation crit
 We can also implement the code for completing the task, it's an oracle (a.k.a. cheat) version. For this, we'll fill out the `cheat()` function. 
 
 .. code-block:: python
+
     class SampleTask(AbstractBrowserTask):
         # ...
         # Code above

@@ -16,4 +16,4 @@ Contents
 
    usage
    api
-   environments
+   tutorials
