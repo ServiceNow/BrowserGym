@@ -287,7 +287,8 @@ class Observation(Shrinkable):
             if isinstance(prompt, str):
                 prompt = [{"type": "text", "text": prompt}]
             img_url = image_to_jpg_base64_url(self.obs["screenshot"])
-            prompt.append({"type": "image_url", "image_url": img_url})
+            # prompt.append({"type": "image_url", "image_url": img_url})
+            prompt.append({"type": "image_url", "image_url": {"url": img_url}})
 
         return prompt
 
