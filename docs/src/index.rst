@@ -1,5 +1,5 @@
 Welcome to BrowserGym's documentation!
-===================================
+======================================
 
 **BrowserGym** is a Python library that provides a `gym environment <https://gymnasium.farama.org/>`_
 for web task automation in the Chromium browser. It includes the following benchmarks by default:
@@ -13,6 +13,7 @@ Contents
 --------
 
 .. toctree::
+   :maxdepth: 2
 
    usage
    api

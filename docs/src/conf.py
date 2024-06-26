@@ -17,6 +17,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "sphinx_design",
 ]
 
 intersphinx_mapping = {
@@ -26,10 +27,32 @@ intersphinx_mapping = {
 intersphinx_disabled_domains = ["std"]
 
 templates_path = ["_templates"]
+fixed_sidebar = True
 
 # -- Options for HTML output
 
-html_theme = "sphinx_rtd_theme"
+# Automatically extract typehints when specified and place them in
+# descriptions of the relevant function/method.
+# autodoc_typehints = "description"
+
+# Don't show class signature with the class' name.
+# autodoc_class_signature = "separated"
+
+html_theme = "pydata_sphinx_theme"
+
+html_theme_options = {
+    "show_nav_level": 2,
+    "navigation_depth": 2,
+    "show_toc_level": 2,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/ServiceNow/BrowserGym",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        }
+    ]
+}
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"
