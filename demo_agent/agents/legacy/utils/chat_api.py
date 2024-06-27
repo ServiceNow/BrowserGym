@@ -103,7 +103,11 @@ class ChatModelArgs:
 
     def has_vision(self):
         # TODO make sure to upgrade this as we add more models
-        return "vision" in self.model_name
+        name_patterns_with_vision = [
+            "vision",
+            "4o",
+        ]
+        return any(pattern in self.model_name for pattern in name_patterns_with_vision)
 
 
 class HuggingFaceChatModel(SimpleChatModel):

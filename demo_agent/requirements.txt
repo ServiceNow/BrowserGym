@@ -1,8 +1,8 @@
 browsergym-core>=0.3
 browsergym-experiments>=0.3
-openai>=1.7,<1.8
-langchain>=0.1,<0.2
-langchain_openai
+openai>=1.35.4,<1.36
+langchain>=0.2,<0.3
+langchain_openai>=0.1.10,<0.2
 tiktoken
 huggingface_hub
 contexttimer
@@ -11,3 +11,4 @@ pyyaml>=6
 pandas
 joblib
 transformers
+langchain_community>=0.2.6,<0.3
