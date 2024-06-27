@@ -2,3 +2,7 @@ sphinx==7.3.7
 # sphinx-rtd-theme==2.0.0
 pydata-sphinx-theme == 0.15.3
 sphinx_design==0.6.0
+-e core/
+-e miniwob/
+-e webarena/
+-e experiments/
