@@ -539,7 +539,6 @@ class ExpResult:
             self._screenshots[key] = Image.open(self.exp_dir / file_name)
         return self._screenshots[key]
 
-
     def get_screenshots(self, som=False):
         files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
         max_step = 0
@@ -547,7 +546,7 @@ class ExpResult:
             step = int(file.name.split("_")[-1].split(".")[0])
             self.get_screenshot(step, som=som)
             max_step = max(max_step, step)
-        return [self._screenshots.get((i, som), None) for i in range(max_step+1)]
+        return [self._screenshots.get((i, som), None) for i in range(max_step + 1)]
 
     @property
     def screenshots(self):
