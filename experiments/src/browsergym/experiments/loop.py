@@ -502,6 +502,8 @@ class ExpResult:
         if self._exp_args is None:
             with open(self.exp_dir / "exp_args.pkl", "rb") as f:
                 self._exp_args = pickle.load(f)
+                # in case experiments were moved
+                self._exp_args.exp_dir = self.exp_dir
         return self._exp_args
 
     def get_step_info(self, step: int) -> StepInfo:
@@ -537,16 +539,22 @@ class ExpResult:
             self._screenshots[key] = Image.open(self.exp_dir / file_name)
         return self._screenshots[key]
 
-    def screenshots(self, som=False):
+    def get_screenshots(self, som=False):
         files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
+        max_step = 0
         for file in files:
             step = int(file.name.split("_")[-1].split(".")[0])
             self.get_screenshot(step, som=som)
-        return [self._screenshots[(i, som)] for i in range(len(self._screenshots))]
+            max_step = max(max_step, step)
+        return [self._screenshots.get((i, som), None) for i in range(max_step + 1)]
+
+    @property
+    def screenshots(self):
+        return self.get_screenshots(som=False)
 
     @property
     def screenshots_som(self):
-        return self.screenshots(som=True)
+        return self.get_screenshots(som=True)
 
     @property
     def flat_exp_args(self) -> dict:
@@ -618,13 +626,15 @@ def yield_all_exp_results(
     `load_hidden=True` to load them anyway.
     """
 
-    savedir_base = Path(savedir_base)
-    exp_args_paths = savedir_base.glob("**/exp_args.pkl")
+    if not isinstance(savedir_base, list):
+        savedir_base = [savedir_base]
+
+    exp_args_paths = []
+    for exp_dir in savedir_base:
+        exp_args_paths.extend(list(Path(exp_dir).glob("**/exp_args.pkl")))
 
     if progress_fn is not None:
-        exp_args_paths = progress_fn(
-            list(exp_args_paths), desc="Searching experiments directories."
-        )
+        exp_args_paths = progress_fn(exp_args_paths, desc="Searching experiments directories.")
 
     for exp_args_path in exp_args_paths:
         exp_dir = exp_args_path.parent
