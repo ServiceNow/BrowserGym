@@ -502,6 +502,8 @@ class ExpResult:
         if self._exp_args is None:
             with open(self.exp_dir / "exp_args.pkl", "rb") as f:
                 self._exp_args = pickle.load(f)
+                # in case experiments were moved
+                self._exp_args.exp_dir = self.exp_dir
         return self._exp_args
 
     def get_step_info(self, step: int) -> StepInfo:
@@ -618,13 +620,15 @@ def yield_all_exp_results(
     `load_hidden=True` to load them anyway.
     """
 
-    savedir_base = Path(savedir_base)
-    exp_args_paths = savedir_base.glob("**/exp_args.pkl")
+    if not isinstance(savedir_base, list):
+        savedir_base = [savedir_base]
+
+    exp_args_paths = []
+    for exp_dir in savedir_base:
+        exp_args_paths.extend(list(Path(exp_dir).glob("**/exp_args.pkl")))
 
     if progress_fn is not None:
-        exp_args_paths = progress_fn(
-            list(exp_args_paths), desc="Searching experiments directories."
-        )
+        exp_args_paths = progress_fn(exp_args_paths, desc="Searching experiments directories.")
 
     for exp_args_path in exp_args_paths:
         exp_dir = exp_args_path.parent
