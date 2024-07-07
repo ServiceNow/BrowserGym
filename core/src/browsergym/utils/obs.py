@@ -304,6 +304,7 @@ def flatten_axtree_to_str(
     ignored_properties=IGNORED_AXTREE_PROPERTIES,
     remove_redundant_static_text: bool = True,
     hide_bid_if_invisible: bool = False,
+    hide_all_children: bool = False,
 ) -> str:
     """Formats the accessibility tree into a string text"""
     node_id_to_idx = {}
@@ -374,7 +375,7 @@ def flatten_axtree_to_str(
                 )
 
                 # if either is True, skip the node
-                skip_node = skip_node or filter_node
+                skip_node = skip_node or filter_node or (hide_all_children and parent_node_filtered)
 
                 # insert extra attributes before regular attributes
                 attributes = extra_attributes_to_print + attributes
