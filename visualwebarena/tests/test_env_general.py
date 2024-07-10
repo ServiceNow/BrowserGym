@@ -1,0 +1,46 @@
+import gymnasium as gym
+import logging
+import os
+import pytest
+import random
+import ipdb
+
+from tenacity import retry, stop_after_attempt, retry_if_exception_type
+
+# register gym environments
+
+# bugfix: use same playwright instance in browsergym and pytest
+from utils import setup_playwright
+
+
+__SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
+__HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
+
+
+from browsergym.visualwebarena import ALL_VISUALWEBARENA_TASK_IDS
+
+rng = random.Random(1)
+task_ids = rng.sample(ALL_VISUALWEBARENA_TASK_IDS, 25)
+print(task_ids)
+
+
+@retry(
+    stop=stop_after_attempt(5),
+    retry=retry_if_exception_type(TimeoutError),
+    reraise=True,
+    before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),
+)
+@pytest.mark.parametrize("task_id", task_ids)
+@pytest.mark.slow
+def test_env_generic(task_id):
+    env = gym.make(
+        f"browsergym/{task_id}",
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+    )
+    obs, info = env.reset()
+    ipdb.set_trace()
+    env.close()
+
+
+test_env_generic('visualwebarena.137')
