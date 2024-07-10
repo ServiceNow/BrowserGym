@@ -41,6 +41,3 @@ def test_env_generic(task_id):
     obs, info = env.reset()
     ipdb.set_trace()
     env.close()
-
-
-test_env_generic("visualwebarena.137")
