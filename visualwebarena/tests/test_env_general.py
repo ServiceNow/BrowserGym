@@ -43,4 +43,4 @@ def test_env_generic(task_id):
     env.close()
 
 
-test_env_generic('visualwebarena.137')
+test_env_generic("visualwebarena.137")

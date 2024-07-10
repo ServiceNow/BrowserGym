@@ -49,7 +49,9 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         # read the list of all webarena task configs
         import visualwebarena
 
-        all_configs_str = importlib.resources.files(visualwebarena).joinpath("test_raw.json").read_text()
+        all_configs_str = (
+            importlib.resources.files(visualwebarena).joinpath("test_raw.json").read_text()
+        )
 
         # substitute URLs
         for pattern, url_key in {
@@ -57,7 +59,6 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
             "__SHOPPING__": "shopping",
             "__WIKIPEDIA__": "wikipedia",
             "__CLASSIFIEDS__": "classifieds",
-
         }.items():
             all_configs_str = all_configs_str.replace(pattern, self.webarena_instance.urls[url_key])
 

@@ -18,14 +18,14 @@ class VisualWebArenaInstance:
             SHOPPING,
             WIKIPEDIA,
             HOMEPAGE,
-            CLASSIFIEDS
+            CLASSIFIEDS,
         )
 
         self.urls = {
             "reddit": REDDIT,
             "shopping": SHOPPING,
             "wikipedia": WIKIPEDIA,
-            "classifieds": CLASSIFIEDS
+            "classifieds": CLASSIFIEDS,
         }
         self.home_url = HOMEPAGE
 
@@ -79,7 +79,7 @@ class VisualWebArenaInstance:
             case "wikipedia":
                 page.goto(url)
 
-            case 'classifieds':
+            case "classifieds":
                 username = self.credentials[site]["username"]
                 password = self.credentials[site]["password"]
                 page.goto(f"{url}/index.php?page=login")
