@@ -3,7 +3,6 @@ import logging
 import os
 import pytest
 import random
-import ipdb
 
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
@@ -39,5 +38,4 @@ def test_env_generic(task_id):
         slow_mo=__SLOW_MO,
     )
     obs, info = env.reset()
-    ipdb.set_trace()
     env.close()
