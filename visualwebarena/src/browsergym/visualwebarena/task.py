@@ -51,11 +51,6 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
 
         all_configs_str = importlib.resources.files(visualwebarena).joinpath("test_raw.json").read_text()
 
-        #with open('/Users/lawrencejang/Desktop/BrowserGym/visualwebarena/src/browsergym/webarena/test_raw.json', 'r') as file:
-        #    all_configs_str = file.read()
-
-        #print(all_configs_str)
-
         # substitute URLs
         for pattern, url_key in {
             "__REDDIT__": "reddit",
