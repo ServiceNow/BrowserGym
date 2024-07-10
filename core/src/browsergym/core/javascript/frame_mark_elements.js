@@ -6,7 +6,7 @@ async ([parent_bid, bid_attr_name]) => {
 
     // standard html tags
     // https://www.w3schools.com/tags/
-    const html_tags = [
+    const html_tags = new Set([
         "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio",
         "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button",
         "canvas", "caption", "center", "cite", "code", "col", "colgroup", "data", "datalist",
@@ -20,10 +20,10 @@ async ([parent_bid, bid_attr_name]) => {
         "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup",
         "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead",
         "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"
-    ];
-    const set_of_marks_tags = [
+    ]);
+    const set_of_marks_tags = new Set([
         "input", "textarea", "select", "button", "a", "iframe", "video", "li", "td", "option"
-    ];
+    ]);
 
     let browsergym_first_visit = false;
     // if no yet set, set the frame (local) element counter to 0
@@ -70,7 +70,7 @@ async ([parent_bid, bid_attr_name]) => {
         }
         i++;
         // we will mark only standard HTML tags
-        if (!elem.tagName || !html_tags.includes(elem.tagName.toLowerCase())) {
+        if (!elem.tagName || !html_tags.has(elem.tagName.toLowerCase())) {
             // Skipping element
             continue;  // stop and move on to the next element
         }
@@ -148,7 +148,7 @@ async ([parent_bid, bid_attr_name]) => {
         // click at center activates self or a child
         if (["self", "child"].includes(whoCapturesCenterClick(elem))) {
             // has valid tag name, or has click event, or triggers a pointer cursor
-            if (set_of_marks_tags.includes(elem.tagName.toLowerCase()) || (elem.onclick != null) || (window.getComputedStyle(elem).cursor == "pointer")) {
+            if (set_of_marks_tags.has(elem.tagName.toLowerCase()) || (elem.onclick != null) || (window.getComputedStyle(elem).cursor == "pointer")) {
                 let rect = elem.getBoundingClientRect();
                 let area = (rect.right - rect.left) * (rect.bottom - rect.top);
                 // area is large enough
