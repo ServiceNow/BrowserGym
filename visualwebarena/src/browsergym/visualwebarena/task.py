@@ -1,15 +1,15 @@
 import json
 import logging
-import numpy as np
 import playwright.sync_api
 import importlib.resources
 import tempfile
+import requests
 
 from typing import Optional, Tuple
 
 from browsergym.core.task import AbstractBrowserTask
 
-from instance import VisualWebArenaInstance
+from .instance import VisualWebArenaInstance
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,6 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         task_id: Optional[int] = None,
         intent_template_id: Optional[int] = None,
         with_na_hint: bool = False,
-        with_homepage_hint: bool = False,
     ) -> None:
         super().__init__(seed)
 
@@ -38,7 +37,6 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         self.webarena_instance = VisualWebArenaInstance()
         self.config_file: str = None
         self.with_na_hint = with_na_hint
-        self.with_homepage_hint = with_homepage_hint
 
         # one and only one of task id and template id must be provided
         if (task_id is None) == (intent_template_id is None):
@@ -100,36 +98,24 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         # build the evaluator
         self.evaluator = evaluator_router(self.config_file)
 
-        # authenticate
-        for site in self.config["sites"]:
-            self.webarena_instance.ui_login(site=site, page=page)
-
-
+        # reset instance if needed (classifieds domain only)
         if self.config.get("require_reset", False):
             if "classifieds" in self.config["sites"]:
                 # Send POST request to __CLASSIFIEDS__/index.php?page=reset with token=CLASSIFIEDS_TOKEN
-                import requests
-                from visualwebarena.browser_env.env_config import (
-                CLASSIFIEDS,
-                CLASSIFIEDS_RESET_TOKEN)
                 response = requests.post(
-                    f"{CLASSIFIEDS}/index.php?page=reset",
-                    data={"token": CLASSIFIEDS_RESET_TOKEN},
+                    f'{self.webarena_instance.urls["classifieds"]}/index.php?page=reset',
+                    data={"token": self.webarena_instance.classifieds_reset_token},
                 )
 
                 # Check if the request was successful
                 if response.status_code == 200:
-                    print("Reset Classifieds site.")
+                    logger.info("Reset Classifieds site successful.")
                 else:
-                    print(
-                        "Failed to reset Classifieds site:",
-                        response.status_code,
-                    )
-            else:
-                print(
-                    "WARNING: Reset is not supported for this site. Please manually reset the site."
-                )
+                    raise Exception(f"Failed to reset Classifieds site: {response.status_code}")
 
+        # authenticate
+        for site in self.config["sites"]:
+            self.webarena_instance.ui_login(site=site, page=page)
 
         # set geolocation
         page.context.set_geolocation(self.config["geolocation"])
@@ -145,14 +131,6 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
 
         # recover goal
         goal = self.config["intent"]
-
-        # This note is present in all webarena's agent prompts
-        # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/agent/prompts/raw/p_cot_id_actree_2s.py#L34
-        if self.with_homepage_hint:
-            goal += f"""
-
-(Note: if you want to visit other websites, check out the homepage at {self.webarena_instance.home_url}. It has a list of websites you can visit. {self.webarena_instance.home_url}/password.html lists all the account name and password for the websites. You can use them to log in to the websites.)
-"""
 
         # This note is present in some of webarena's agent prompts
         if self.with_na_hint:
@@ -202,7 +180,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
             score = self.evaluator(
                 trajectory=trajectory,
                 config_file=self.config_file,
-                page=page  # none of webarena's evaluators requires a cdp session
+                page=page,  # none of webarena's evaluators requires a cdp session
             )
         # llm_fuzzy_match() bugfix (assert "correct" in response)
         except AssertionError as e:
