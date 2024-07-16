@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 
 from browsergym.core.task import AbstractBrowserTask
 
-from .instance import VisualWebArenaInstance
+from instance import VisualWebArenaInstance
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +103,33 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         for site in self.config["sites"]:
             self.webarena_instance.ui_login(site=site, page=page)
 
+
+        if self.config.get("require_reset", False):
+            if "classifieds" in self.config["sites"]:
+                # Send POST request to __CLASSIFIEDS__/index.php?page=reset with token=CLASSIFIEDS_TOKEN
+                import requests
+                from visualwebarena.browser_env.env_config import (
+                CLASSIFIEDS,
+                CLASSIFIEDS_RESET_TOKEN)
+                response = requests.post(
+                    f"{CLASSIFIEDS}/index.php?page=reset",
+                    data={"token": CLASSIFIEDS_RESET_TOKEN},
+                )
+
+                # Check if the request was successful
+                if response.status_code == 200:
+                    print("Reset Classifieds site.")
+                else:
+                    print(
+                        "Failed to reset Classifieds site:",
+                        response.status_code,
+                    )
+            else:
+                print(
+                    "WARNING: Reset is not supported for this site. Please manually reset the site."
+                )
+
+
         # set geolocation
         page.context.set_geolocation(self.config["geolocation"])
 
@@ -159,7 +186,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
         # if any, use the last assistant message as the stop answer for webarena
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             last_action = {"action_type": ActionTypes.STOP, "answer": chat_messages[-1]["message"]}
-        if chat_messages and chat_messages[-1]["role"] == "infeasible":
+        elif chat_messages and chat_messages[-1]["role"] == "infeasible":
             last_action = {"action_type": ActionTypes.STOP, "answer": "N/A"}
         else:
             last_action = {"action_type": ActionTypes.NONE, "answer": ""}
@@ -174,8 +201,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
             score = self.evaluator(
                 trajectory=trajectory,
                 config_file=self.config_file,
-                page=page,
-                client=None,  # none of webarena's evaluators requires a cdp session
+                page=page  # none of webarena's evaluators requires a cdp session
             )
         # llm_fuzzy_match() bugfix (assert "correct" in response)
         except AssertionError as e:
