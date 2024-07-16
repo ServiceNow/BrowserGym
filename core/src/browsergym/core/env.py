@@ -491,13 +491,13 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
-        if 'image' in self.task.config:
-            image_value = self.task.config['image']
+        if "image" in self.task.config:
+            image_value = self.task.config["image"]
             # Now you can use image_value or perform operations with it
-            #print("input_image found")
+            # print("input_image found")
         else:
             image_value = []
-            #print("input image does not exist.")
+            # print("input image does not exist.")
 
         # use first user message as goal, if any
         if len(self.chat.messages) > 1:
@@ -521,7 +521,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
-            "input_images": image_value
+            "input_images": image_value,
         }
 
         return obs

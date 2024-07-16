@@ -12,6 +12,7 @@ from browsergym.visualwebarena import ALL_VISUALWEBARENA_TASK_IDS
 from visualwebarena.browser_env.env_config import URL_MAPPINGS
 from browsergym.utils.obs import overlay_som
 
+
 class VWAAgent(Agent):
     """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
 
@@ -28,12 +29,12 @@ class VWAAgent(Agent):
     def obs_preprocessor(self, obs: dict) -> dict:
         return {
             "goal": obs["goal"],
-            "input_images": obs['input_images'],
-            "last_action": obs['last_action'],
+            "input_images": obs["input_images"],
+            "last_action": obs["last_action"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
             "url": obs["url"],
             "screenshot": obs["screenshot"],
-            "extra_properties": obs['extra_element_properties']
+            "extra_properties": obs["extra_element_properties"],
         }
 
     def __init__(self, model_name) -> None:
@@ -50,13 +51,12 @@ class VWAAgent(Agent):
                 url = url.replace(i, j)
         return url
 
-
     def get_action(self, obs: dict) -> tuple[str, dict]:
         input_images = []
-        if obs['input_images'] is not None:
-            if isinstance(obs['input_images'], str):
-                obs['input_images'] = [obs['input_images']]
-            for image_path in obs['input_images']:
+        if obs["input_images"] is not None:
+            if isinstance(obs["input_images"], str):
+                obs["input_images"] = [obs["input_images"]]
+            for image_path in obs["input_images"]:
                 # Load image either from the web or from a local path.
                 if image_path.startswith("http"):
                     input_image = Image.open(requests.get(image_path, stream=True).raw)
@@ -64,28 +64,32 @@ class VWAAgent(Agent):
                     input_image = Image.open(image_path)
                 input_images.append(input_image)
         temp_input = [
-    {
-        "type": "text",
-        "text": "IMAGES: (1) current page screenshot",
-    },
-    {
-        "type": "image_url",
-        "image_url": {"url": pil_to_b64(Image.fromarray(overlay_som(obs['screenshot'], obs['extra_properties'])))},
-    },
-]     
+            {
+                "type": "text",
+                "text": "IMAGES: (1) current page screenshot",
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": pil_to_b64(
+                        Image.fromarray(overlay_som(obs["screenshot"], obs["extra_properties"]))
+                    )
+                },
+            },
+        ]
         for image_i, image in enumerate(input_images):
             temp_input.extend(
-                    [
-                        {
-                            "type": "text",
-                            "text": f"({image_i+2}) input image {image_i+1}",
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": pil_to_b64(image)},
-                        },
-                    ]
-                )
+                [
+                    {
+                        "type": "text",
+                        "text": f"({image_i+2}) input image {image_i+1}",
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": pil_to_b64(image)},
+                    },
+                ]
+            )
         system_msg = f"""\
 # Instructions
 Review the current state of the page and all other information to find the best
@@ -116,12 +120,13 @@ def send_msg_to_user(text: str). For example, if you are asked what is the color
             model=self.model_name,
             messages=[
                 {"role": "system", "content": system_msg},
-                {"role": "system", "content":temp_input},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": temp_input},
+                {"role": "user", "content": prompt},
             ],
         )
         action = response.choices[0].message.content
         return action, {}
+
 
 @dataclasses.dataclass
 class VWAAgentArgs(AbstractAgentArgs):
@@ -141,6 +146,7 @@ class VWAAgentArgs(AbstractAgentArgs):
 def main():
     from browsergym.experiments import EnvArgs, ExpArgs, get_exp_result
     from pathlib import Path
+
     exp_root = Path().home() / "agent_experiments"
     exp_root.mkdir(exist_ok=True)
     exp_args = ExpArgs(
