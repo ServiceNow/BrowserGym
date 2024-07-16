@@ -134,6 +134,9 @@ class BrowserEnv(gym.Env, ABC):
                 "last_action": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "last_action_error": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
+                "input_images": gym.spaces.Sequence(
+                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+                ),
             }
         )
 
@@ -381,7 +384,6 @@ document.addEventListener("visibilitychange", () => {
         # back-up these in case validate() navigates pages and messes the history
         prev_active_page = self.page
         prev_page_history = self.page_history.copy()
-
         # call validate
         reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
 
@@ -489,6 +491,14 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
+        if 'image' in self.task.config:
+            image_value = self.task.config['image']
+            # Now you can use image_value or perform operations with it
+            #print("input_image found")
+        else:
+            image_value = []
+            #print("input image does not exist.")
+
         # use first user message as goal, if any
         if len(self.chat.messages) > 1:
             assert self.chat.messages[1]["role"] == "user"
@@ -511,6 +521,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
+            "input_images": image_value
         }
 
         return obs
