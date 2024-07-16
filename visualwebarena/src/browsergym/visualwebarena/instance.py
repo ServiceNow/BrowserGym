@@ -19,6 +19,7 @@ class VisualWebArenaInstance:
             WIKIPEDIA,
             HOMEPAGE,
             CLASSIFIEDS,
+            CLASSIFIEDS_RESET_TOKEN,
         )
 
         self.urls = {
@@ -28,6 +29,7 @@ class VisualWebArenaInstance:
             "classifieds": CLASSIFIEDS,
         }
         self.home_url = HOMEPAGE
+        self.classifieds_reset_token = CLASSIFIEDS_RESET_TOKEN
 
         self.credentials = ACCOUNTS
 
