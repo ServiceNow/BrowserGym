@@ -7,19 +7,18 @@ import sys
 import time
 import traceback
 import uuid
+from abc import ABC, abstractmethod
 from collections import defaultdict
-from dataclasses import dataclass, field, asdict, is_dataclass
+from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime
 from pathlib import Path
-from abc import ABC, abstractmethod
 from typing import Optional
 
 import gymnasium as gym
 import numpy as np
+from browsergym.core.chat import Chat
 from PIL import Image
 from tqdm import tqdm
-
-from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -325,7 +324,7 @@ class StepInfo:
 
     def from_action(self, agent: Agent):
         self.profiling.agent_start = time.time()
-        self.action, self.agent_info = agent.get_action(self.obs)
+        self.action, self.agent_info = agent.get_action(self.obs.copy())
         self.profiling.agent_stop = time.time()
 
         self.make_stats()
