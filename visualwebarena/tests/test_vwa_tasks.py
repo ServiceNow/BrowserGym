@@ -7,6 +7,7 @@ import random
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
 # register gym environments
+import browsergym.visualwebarena
 
 # bugfix: use same playwright instance in browsergym and pytest
 from utils import setup_playwright
