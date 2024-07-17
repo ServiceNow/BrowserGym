@@ -1,5 +1,9 @@
 import playwright.sync_api
+import os
 import requests
+
+
+ENV_VARS = ("SHOPPING", "REDDIT", "WIKIPEDIA", "HOMEPAGE", "CLASSIFIEDS", "CLASSIFIEDS_RESET_TOKEN")
 
 
 class VisualWebArenaInstance:
@@ -11,6 +15,18 @@ class VisualWebArenaInstance:
     def __init__(
         self,
     ) -> None:
+
+        # setup visualwebarena environment variables (visualwebarena will read those on import)
+        os.environ["DATASET"] = "visualwebarena"
+        append_vwa = lambda x: f"VWA_{x}"
+        for key in ENV_VARS:
+            assert append_vwa(key) in os.environ, (
+                f"Environment variable {append_vwa(key)} missing.\n"
+                + "Please set the following environment variables to use VisualWebArena through BrowserGym:\n"
+                + "\n".join([append_vwa(x) for x in ENV_VARS])
+            )
+            os.environ[key] = os.environ[append_vwa(key)]
+
         # import webarena on instantiation
         from visualwebarena.browser_env.env_config import (
             ACCOUNTS,

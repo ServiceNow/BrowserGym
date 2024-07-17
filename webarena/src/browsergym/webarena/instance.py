@@ -1,5 +1,9 @@
 import playwright.sync_api
+import os
 import requests
+
+
+ENV_VARS = ("SHOPPING", "SHOPPING_ADMIN", "REDDIT", "GITLAB", "WIKIPEDIA", "MAP", "HOMEPAGE")
 
 
 class WebArenaInstance:
@@ -11,6 +15,17 @@ class WebArenaInstance:
     def __init__(
         self,
     ) -> None:
+
+        # setup webarena environment variables (webarena will read those on import)
+        append_wa = lambda x: f"WA_{x}"
+        for key in ENV_VARS:
+            assert append_wa(key) in os.environ, (
+                f"Environment variable {append_wa(key)} missing.\n"
+                + "Please set the following environment variables to use WebArena through BrowserGym:\n"
+                + "\n".join([append_wa(x) for x in ENV_VARS])
+            )
+            os.environ[key] = os.environ[append_wa(key)]
+
         # import webarena on instanciation
         from webarena.browser_env.env_config import (
             ACCOUNTS,
