@@ -1,2 +1,2 @@
-browsergym-core==0.3.6.dev0
+browsergym-core==0.4.0
 tiktoken>=0.4
