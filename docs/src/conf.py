@@ -7,7 +7,7 @@ copyright = "2024, ServiceNow Research"
 author = "ServiceNow Research"
 
 release = "0.3"
-version = "0.4.0"
+version = "0.4.1.dev0"
 
 # -- General configuration
 
