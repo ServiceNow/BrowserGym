@@ -29,7 +29,7 @@ class VWAAgent(Agent):
     def obs_preprocessor(self, obs: dict) -> dict:
         return {
             "goal": obs["goal"],
-            "input_images": obs["input_images"],
+            "goal_image_urls": obs["goal_image_urls"],
             "last_action": obs["last_action"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
             "url": obs["url"],
@@ -53,16 +53,13 @@ class VWAAgent(Agent):
 
     def get_action(self, obs: dict) -> tuple[str, dict]:
         input_images = []
-        if obs["input_images"] is not None:
-            if isinstance(obs["input_images"], str):
-                obs["input_images"] = [obs["input_images"]]
-            for image_path in obs["input_images"]:
-                # Load image either from the web or from a local path.
-                if image_path.startswith("http"):
-                    input_image = Image.open(requests.get(image_path, stream=True).raw)
-                else:
-                    input_image = Image.open(image_path)
-                input_images.append(input_image)
+        for image_path in obs["goal_image_urls"]:
+            # Load image either from the web or from a local path.
+            if image_path.startswith("http"):
+                input_image = Image.open(requests.get(image_path, stream=True).raw)
+            else:
+                input_image = Image.open(image_path)
+            input_images.append(input_image)
         temp_input = [
             {
                 "type": "text",

@@ -130,11 +130,21 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
                     page = page.context.new_page()
 
         # recover goal
-        goal = self.config["intent"]
+        goal = {
+            "message": self.config["intent"],
+            "image_urls": self.config.get("image", []),
+        }
+        # fix goal if needed
+        if goal["image_urls"] is None:
+            goal["image_urls"] = []
+        elif isinstance(goal["image_urls"], str):
+            goal["image_urls"] = [goal["image_urls"]]
 
         # This note is present in some of webarena's agent prompts
         if self.with_na_hint:
-            goal += """\
+            goal[
+                "message"
+            ] += """\
 
 If you believe the task is impossible to complete, provide the answer "N/A".
 """

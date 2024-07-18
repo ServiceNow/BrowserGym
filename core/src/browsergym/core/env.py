@@ -116,6 +116,9 @@ class BrowserEnv(gym.Env, ABC):
                 ),
                 # TODO: this is redundant with chat messages, to be removed
                 "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "goal_image_urls": gym.spaces.Sequence(
+                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+                ),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
@@ -134,9 +137,6 @@ class BrowserEnv(gym.Env, ABC):
                 "last_action": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "last_action_error": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
-                "input_images": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
             }
         )
 
@@ -269,7 +269,18 @@ document.addEventListener("visibilitychange", () => {
         )
         # if any, add the task's goal to the chat
         if goal:
-            self.chat.add_message(role="user", msg=goal)
+
+            # goal is text-only
+            if isinstance(goal, str):
+                goal_msg = goal
+
+            # goal is text + images
+            elif isinstance(goal, dict):
+                goal_msg = goal["message"]
+                for image_url in goal["image_urls"]:
+                    self.chat.add_message(role="user_image", msg=image_url)
+
+            self.chat.add_message(role="user", msg=goal_msg)
 
         self._wait_dom_loaded()
 
@@ -500,16 +511,25 @@ document.addEventListener("visibilitychange", () => {
             # print("input image does not exist.")
 
         # use first user message as goal, if any
-        if len(self.chat.messages) > 1:
-            assert self.chat.messages[1]["role"] == "user"
-            goal = self.chat.messages[1]["message"]
-        else:
-            goal = "Do whatever."
+        # use all user images before first user message as goal images, if any
+        goal_msg = "There is no goal."
+        goal_image_urls = []
+        _prev_image_urls = []
+        for msg in self.chat.messages:
+            if msg["role"] == "user_image":
+                _prev_image_urls.append(msg["message"])
+            elif msg["role"] == "user":
+                goal_msg = msg["message"]
+                goal_image_urls = _prev_image_urls
+                break
+            else:
+                pass
 
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": goal,  # TODO: redundant with chat messages, to be removed?
+            "goal": goal_msg,  # TODO: redundant with chat messages, to be removed?
+            "goal_image_urls": goal_image_urls,  # TODO: redundant with chat messages, to be removed?
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
@@ -521,7 +541,6 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
-            "input_images": image_value,
         }
 
         return obs
