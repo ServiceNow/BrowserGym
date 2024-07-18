@@ -272,6 +272,9 @@
         function addHtmlLineBreaks(text) {
             return text.replace(/\n/g, "<br>");
         }
+        function toHtmlImage(url) {
+            return `<img src="${url}">`
+        }
 
         function addChatMessage(role, timeString, msg) {
             const chatBody = document.getElementById('chatBody');
@@ -290,6 +293,13 @@
                 case "user":
                     text.className = 'user-message';
                     text.innerHTML = addHtmlLineBreaks(msg);
+                    text.style.setProperty('--before-content', `"${timeString} - You"`);
+                    msgContainer.appendChild(text);
+                    chatBody.appendChild(msgContainer);
+                    break;
+                case "user_image":
+                    text.className = 'user-message';
+                    text.innerHTML = toHtmlImage(msg);
                     text.style.setProperty('--before-content', `"${timeString} - You"`);
                     msgContainer.appendChild(text);
                     chatBody.appendChild(msgContainer);
