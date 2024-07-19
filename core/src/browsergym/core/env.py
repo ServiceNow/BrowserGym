@@ -502,14 +502,6 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
-        if "image" in self.task.config:
-            image_value = self.task.config["image"]
-            # Now you can use image_value or perform operations with it
-            # print("input_image found")
-        else:
-            image_value = []
-            # print("input image does not exist.")
-
         # use first user message as goal, if any
         # use all user images before first user message as goal images, if any
         goal_msg = "There is no goal."
