@@ -1,30 +1,44 @@
+import base64
 import dataclasses
+import io
+import requests
+import tempfile
 
 from browsergym.experiments import Agent, AbstractAgentArgs
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.python import PythonActionSet
 from browsergym.utils.obs import flatten_axtree_to_str
-from PIL import Image
-from visualwebarena.browser_env.env_config import URL_MAPPINGS
-from visualwebarena.browser_env.utils import pil_to_b64
-import requests
-from browsergym.visualwebarena import ALL_VISUALWEBARENA_TASK_IDS
-from visualwebarena.browser_env.env_config import URL_MAPPINGS
 from browsergym.utils.obs import overlay_som
+from PIL import Image
+from io import BytesIO
+
+
+def pil_to_b64(img: Image.Image) -> str:
+    with BytesIO() as image_buffer:
+        img.save(image_buffer, format="PNG")
+        byte_data = image_buffer.getvalue()
+        img_b64 = base64.b64encode(byte_data).decode("utf-8")
+        img_b64 = "data:image/png;base64," + img_b64
+    return img_b64
+
+
+def b64_to_pil(img_b64: str) -> str:
+    if not img_b64.startswith("data:image/png;base64,"):
+        raise ValueError(f"Unexpected base64 encoding: {img_b64}")
+    img_b64 = img_b64.removeprefix("data:image/png;base64,")
+    img_data = base64.b64decode(img_b64)
+    img = Image.open(io.BytesIO(img_data))
+    return img
 
 
 class VWAAgent(Agent):
     """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
 
     action_set = HighLevelActionSet(
-        subsets=["chat", "bid"],  # define a subset of the action space
-        # subsets=["chat", "bid", "coord"] # allow the agent to also use x,y coordinates
-        strict=False,  # less strict on the parsing of the actions
-        multiaction=True,  # enable to agent to take multiple actions at once
-        demo_mode="default",  # add visual effects
+        subsets=["chat", "bid", "infeas", "nav", "tab"],
+        strict=False,
+        multiaction=False,
+        demo_mode="off",
     )
-    # use this instead to allow the agent to directly use Python code
-    # action_set = PythonActionSet())
 
     def obs_preprocessor(self, obs: dict) -> dict:
         return {
@@ -44,23 +58,41 @@ class VWAAgent(Agent):
         from openai import OpenAI
 
         self.openai_client = OpenAI()
-
-    def map_url_to_real(self, url: str) -> str:
-        for i, j in URL_MAPPINGS.items():
-            if i in url:
-                url = url.replace(i, j)
-        return url
+        self.goal_images = None
 
     def get_action(self, obs: dict) -> tuple[str, dict]:
-        input_images = []
-        for image_path in obs["goal_image_urls"]:
-            # Load image either from the web or from a local path.
-            if image_path.startswith("http"):
-                input_image = Image.open(requests.get(image_path, stream=True).raw)
-            else:
-                input_image = Image.open(image_path)
-            input_images.append(input_image)
-        temp_input = [
+        # process goal images only once
+        if self.goal_images is None:
+            self.goal_images = []
+            for image_i, image_url in enumerate(obs["goal_image_urls"]):
+                # load the image as PIL object + PNG base64 string
+                if image_url.startswith("http"):
+                    image = Image.open(requests.get(image_url, stream=True).raw)
+                    image_base64 = pil_to_b64(image)
+                elif image_url.startswith("data:image/png;base64,"):
+                    image_base64 = image_url
+                    image = b64_to_pil(image_base64)
+                else:
+                    raise ValueError(f"Unexpected image_url: {image_url}")
+
+                # save the image to a temporary (but persistent) PNG file
+                with tempfile.NamedTemporaryFile(suffix="png", delete=False) as f:
+                    image_path = f.name
+                image.save(image_path)
+
+                # add the image to the list
+                self.goal_images.append({"base64": image_base64, "path": image_path})
+
+        system_msg = f"""\
+# Instructions
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal:
+{obs["goal"]}"""
+
+        system_msg_2 = [
             {
                 "type": "text",
                 "text": "IMAGES: (1) current page screenshot",
@@ -74,27 +106,21 @@ class VWAAgent(Agent):
                 },
             },
         ]
-        for image_i, image in enumerate(input_images):
-            temp_input.extend(
+        for image_i, image in enumerate(self.goal_images):
+            system_msg_2.extend(
                 [
-                    {
-                        "type": "text",
-                        "text": f"({image_i+2}) input image {image_i+1}",
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": pil_to_b64(image)},
-                    },
+                    [
+                        {
+                            "type": "text",
+                            "text": f"({image_i+2}) input image {image_i+1} (local path: {repr(image['path'])})",
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": image["base64"]},
+                        },
+                    ]
                 ]
             )
-        system_msg = f"""\
-# Instructions
-Review the current state of the page and all other information to find the best
-possible next action to accomplish your goal. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions.
-
-# Goal:
-{obs["goal"]}"""
 
         prompt = f"""\
 # Current Accessibility Tree:
@@ -106,10 +132,12 @@ and executed by a program, make sure to follow the formatting instructions.
 Here is an example with chain of thought of a valid action when clicking on a button:
 "
 In order to accomplish my goal I need to click on the button with bid 12
-```click("12")```.
+```click("12")```
+"
 
-If you have completed the task, use the chat option, not the bid, and return the answer. You can return the following function, with the answer as the input.
-def send_msg_to_user(text: str). For example, if you are asked what is the color of the sky, return ```send_msg_to_user(blue)```
+If you have completed the task, use the chat to return an answer. For example, if you are asked what is the color of the sky, return
+"
+```send_msg_to_user("blue")```
 "
 """
         # query OpenAI model
@@ -117,7 +145,7 @@ def send_msg_to_user(text: str). For example, if you are asked what is the color
             model=self.model_name,
             messages=[
                 {"role": "system", "content": system_msg},
-                {"role": "system", "content": temp_input},
+                {"role": "system", "content": system_msg_2},
                 {"role": "user", "content": prompt},
             ],
         )
