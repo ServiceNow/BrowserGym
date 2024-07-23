@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any
 
 from browsergym.core.action.base import AbstractActionSet
@@ -20,6 +21,27 @@ def default_obs_preprocessor(obs: dict) -> dict:
 
 DEFAULT_ACTION_SET: AbstractActionSet = HighLevelActionSet()
 DEFAULT_OBS_PREPROCESSOR: callable = default_obs_preprocessor
+
+
+@dataclass
+class AgentInfo:
+    think: str = None
+    chat_messages: list = None
+    stats: dict = None
+    markup_page: str = ""
+    extra_info: dict = None
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __contains__(self, key):
+        return hasattr(self, key)
+
+    def pop(self, key, default=None):
+        return getattr(self, key, default)
+
+    def get(self, key, default=None):
+        return getattr(self, key, default)
 
 
 class Agent(ABC):
@@ -48,7 +70,7 @@ class Agent(ABC):
         return DEFAULT_OBS_PREPROCESSOR(obs)
 
     @abstractmethod
-    def get_action(self, obs: Any) -> tuple[str, dict]:
+    def get_action(self, obs: Any) -> tuple[str, AgentInfo]:
         """
         Updates the agent with the current observation, and returns its next action (plus an info dict, optional).
 
@@ -76,11 +98,14 @@ class Agent(ABC):
         --------
         action: str
             The action to be processed by `action_mapping()` (if any), and executed in the environment.
-        info: dict
+        info: AgentInfo
             Additional information about the action. with the following entries
             being handled by BrowserGym:
                 - "think": optional chain of thought
                 - "messages": list of messages with the LLM
                 - "stats": dict of extra statistics that will be saved and
                   aggregated.
+                - "markup_page": str, string that will be displayed by agentlab's xray tool.
+                - "extra_info": dict, additional information that will be saved
+                  and aggregated.
         """
