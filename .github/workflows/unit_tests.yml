@@ -58,7 +58,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-core Unit Tests
         run: pytest -n 5 --durations=10 -m 'not pricy' -v core/tests
@@ -89,7 +89,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -135,7 +135,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -180,7 +180,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-webarena not slow Unit Tests
         env:
@@ -218,7 +218,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-webarena slow Unit Tests
         env:
@@ -256,7 +256,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena not slow Unit Tests
         env:
@@ -293,7 +293,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena slow Unit Tests
         env:
