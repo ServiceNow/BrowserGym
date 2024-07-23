@@ -191,6 +191,7 @@ jobs:
           WA_WIKIPEDIA: "${{ vars.WA_WIKIPEDIA }}"
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v webarena/tests
 
   browsergym-webarena-slow:
@@ -229,6 +230,7 @@ jobs:
           WA_WIKIPEDIA: "${{ vars.WA_WIKIPEDIA }}"
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v webarena/tests
 
   browsergym-visualwebarena-fast:
@@ -266,6 +268,7 @@ jobs:
           VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
           VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v visualwebarena/tests
 
   browsergym-visualwebarena-slow:
@@ -303,4 +306,5 @@ jobs:
           VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
           VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v visualwebarena/tests
