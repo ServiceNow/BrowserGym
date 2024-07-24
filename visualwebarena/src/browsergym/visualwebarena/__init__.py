@@ -5,6 +5,7 @@ from . import config, task
 
 ALL_VISUALWEBARENA_TASK_IDS = []
 VISUALWEBARENA_TASK_IDS_WITH_RESET = []
+VISUALWEBARENA_TASK_IDS_WITHOUT_RESET = []
 
 # register the WebArena benchmark
 for task_id in config.TASK_IDS:
@@ -17,3 +18,5 @@ for task_id in config.TASK_IDS:
     ALL_VISUALWEBARENA_TASK_IDS.append(gym_id)
     if task_id in config.TASK_IDS_WITH_RESET:
         VISUALWEBARENA_TASK_IDS_WITH_RESET.append(gym_id)
+    else:
+        VISUALWEBARENA_TASK_IDS_WITHOUT_RESET.append(gym_id)

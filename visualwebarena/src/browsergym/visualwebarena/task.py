@@ -108,10 +108,10 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
                 )
 
                 # Check if the request was successful
-                if response.status_code == 200:
-                    logger.info("Reset Classifieds site successful.")
-                else:
+                if not response.status_code == 200:
                     raise Exception(f"Failed to reset Classifieds site: {response.status_code}")
+
+                logger.info("Reset Classifieds site successful.")
 
         # authenticate
         for site in self.config["sites"]:

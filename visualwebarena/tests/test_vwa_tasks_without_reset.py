@@ -18,10 +18,11 @@ __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
 
 
-from browsergym.visualwebarena import ALL_VISUALWEBARENA_TASK_IDS
+from browsergym.visualwebarena import VISUALWEBARENA_TASK_IDS_WITHOUT_RESET
+
 
 rng = random.Random(1)
-task_ids = rng.sample(ALL_VISUALWEBARENA_TASK_IDS, 25)
+task_ids = rng.sample(VISUALWEBARENA_TASK_IDS_WITHOUT_RESET, 25)
 print(task_ids)
 
 

@@ -34,6 +34,7 @@ print(task_ids)
 )
 @pytest.mark.parametrize("task_id", task_ids)
 @pytest.mark.slow
+@pytest.mark.serial
 def test_env_generic(task_id):
     env = gym.make(
         f"browsergym/{task_id}",

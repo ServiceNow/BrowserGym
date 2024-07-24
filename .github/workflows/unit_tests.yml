@@ -269,7 +269,9 @@ jobs:
           VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v visualwebarena/tests
+        run: |
+          pytest -n 5 --durations=10 -m 'not slow and not pricy and not serial' --slowmo 1000 -v visualwebarena/tests
+          pytest --durations=10 -m 'not slow and not pricy and serial' --slowmo 1000 -v visualwebarena/tests
 
   browsergym-visualwebarena-slow:
     runs-on: ubuntu-latest
@@ -307,4 +309,6 @@ jobs:
           VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v visualwebarena/tests
+        run: |
+          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v visualwebarena/tests
+          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v visualwebarena/tests
