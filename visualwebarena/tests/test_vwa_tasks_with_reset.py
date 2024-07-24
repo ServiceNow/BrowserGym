@@ -4,7 +4,7 @@ import os
 import pytest
 import random
 
-from tenacity import retry, stop_after_attempt, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_fixed
 
 # register gym environments
 import browsergym.visualwebarena
@@ -27,6 +27,7 @@ print(task_ids)
 @retry(
     stop=stop_after_attempt(5),
     retry=retry_if_exception_type(TimeoutError),
+    wait=wait_fixed(2),
     reraise=True,
     before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),
 )

@@ -5,6 +5,7 @@ import pytest
 import random
 
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
+from playwright.sync_api import TimeoutError
 
 # register gym environments
 import browsergym.webarena
