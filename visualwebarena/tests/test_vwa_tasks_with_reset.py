@@ -1,6 +1,7 @@
 import gymnasium as gym
 import logging
 import os
+import playwright.sync_api
 import pytest
 import random
 
@@ -26,7 +27,7 @@ print(task_ids)
 
 @retry(
     stop=stop_after_attempt(5),
-    retry=retry_if_exception_type(TimeoutError),
+    retry=retry_if_exception_type(playwright.sync_api.TimeoutError),
     wait=wait_fixed(2),
     reraise=True,
     before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),

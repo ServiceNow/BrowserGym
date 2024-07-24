@@ -1,11 +1,10 @@
 import gymnasium as gym
 import logging
 import os
+import playwright.sync_api
 import pytest
-import random
 
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
-from playwright.sync_api import TimeoutError
 
 # register gym environments
 import browsergym.webarena
@@ -23,7 +22,7 @@ FEAS_TASK_IDS = [165, 187, 199]
 
 @retry(
     stop=stop_after_attempt(5),
-    retry=retry_if_exception_type(TimeoutError),
+    retry=retry_if_exception_type(playwright.sync_api.TimeoutError),
     reraise=True,
     before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),
 )
