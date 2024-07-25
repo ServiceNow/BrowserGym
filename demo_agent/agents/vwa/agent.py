@@ -76,53 +76,22 @@ class VWAAgent(Agent):
                     raise ValueError(f"Unexpected image_url: {image_url}")
 
                 # save the image to a temporary (but persistent) PNG file
-                with tempfile.NamedTemporaryFile(suffix="png", delete=False) as f:
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
                     image_path = f.name
                 image.save(image_path)
 
                 # add the image to the list
                 self.goal_images.append({"base64": image_base64, "path": image_path})
 
-        system_msg = f"""\
-# Instructions
+        system_prompt = f"""\
 Review the current state of the page and all other information to find the best
 possible next action to accomplish your goal. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions.
+and executed by a program, make sure to follow the formatting instructions."""
 
+        user_prompt = f"""\
 # Goal:
-{obs["goal"]}"""
+{obs["goal"]}
 
-        system_msg_2 = [
-            {
-                "type": "text",
-                "text": "IMAGES: (1) current page screenshot",
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": pil_to_b64(
-                        Image.fromarray(overlay_som(obs["screenshot"], obs["extra_properties"]))
-                    )
-                },
-            },
-        ]
-        for image_i, image in enumerate(self.goal_images):
-            system_msg_2.extend(
-                [
-                    [
-                        {
-                            "type": "text",
-                            "text": f"({image_i+2}) input image {image_i+1} (local path: {repr(image['path'])})",
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": image["base64"]},
-                        },
-                    ]
-                ]
-            )
-
-        prompt = f"""\
 # Current Accessibility Tree:
 {obs["axtree_txt"]}
 
@@ -140,13 +109,45 @@ If you have completed the task, use the chat to return an answer. For example, i
 ```send_msg_to_user("blue")```
 "
 """
+
+        # screenshot
+        user_msgs = [
+            {
+                "type": "text",
+                "text": "IMAGES: (1) current page screenshot",
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": pil_to_b64(
+                        Image.fromarray(overlay_som(obs["screenshot"], obs["extra_properties"]))
+                    )
+                },
+            },
+        ]
+        # aditional images
+        for image_i, image in enumerate(self.goal_images):
+            user_msgs.extend(
+                [
+                    {
+                        "type": "text",
+                        "text": f"({image_i+2}) input image {image_i+1} (local path: {repr(image['path'])})",
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": image["base64"]},
+                    },
+                ]
+            )
+        # prompt
+        user_msgs.append({"type": "text", "text": user_prompt})
+
         # query OpenAI model
         response = self.openai_client.chat.completions.create(
             model=self.model_name,
             messages=[
-                {"role": "system", "content": system_msg},
-                {"role": "system", "content": system_msg_2},
-                {"role": "user", "content": prompt},
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_msgs},
             ],
         )
         action = response.choices[0].message.content
@@ -162,7 +163,7 @@ class VWAAgentArgs(AbstractAgentArgs):
     internal states of the agent.
     """
 
-    model_name: str = "gpt-4-turbo"
+    model_name: str = "gpt-4o"
 
     def make_agent(self):
         return VWAAgent(model_name=self.model_name)
@@ -172,20 +173,22 @@ def main():
     from browsergym.experiments import EnvArgs, ExpArgs, get_exp_result
     from pathlib import Path
 
-    exp_root = Path().home() / "agent_experiments"
-    exp_root.mkdir(exist_ok=True)
     exp_args = ExpArgs(
         agent_args=VWAAgentArgs(model_name="gpt-4-turbo"),
         env_args=EnvArgs(
-            task_name="visualwebarena.137",
+            task_name="visualwebarena.423",
             task_seed=42,
             headless=False,  # shows the browser
         ),
     )
-    exp_args.prepare(exp_root=exp_root)
+    exp_args.prepare(exp_root=Path("./results"))
     exp_args.run()
     exp_result = get_exp_result(exp_args.exp_dir)
     exp_record = exp_result.get_exp_record()
 
     for key, val in exp_record.items():
         print(f"{key}: {val}")
+
+
+if __name__ == "__main__":
+    main()
