@@ -72,6 +72,14 @@ class AbstractAgentArgs(ABC):
         """The name of the agent. Used for naming experiments."""
         return self.__class__.__name__
 
+    def prepare(self):
+        """Prepare the agent's LLM models before running the experiment."""
+        pass
+
+    def close(self):
+        """Close the agent's LLM models after running the experiment."""
+        pass
+
     @abstractmethod
     def make_agent(self) -> Agent:
         """Comply the experiments.loop API for instantiating the agent."""
