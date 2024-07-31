@@ -31,3 +31,11 @@ export WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_
 export MAP="$BASE_URL:3000"
 export HOMEPAGE="$BASE_URL:4399"
 ```
+
+5. Setup an OpenAI API key
+
+```sh
+export OPENAI_API_KEY=...
+```
+
+> **_NOTE:_**  be mindful of costs, as WebArena will call GPT4 for certain evaluations ([llm_fuzzy_match](https://github.com/web-arena-x/webarena/blob/1469b7c9d8eaec3177855b3131569751f43a40d6/evaluation_harness/helper_functions.py#L146C5-L146C20)).

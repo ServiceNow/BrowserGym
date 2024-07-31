@@ -19,3 +19,11 @@ python -c "import nltk; nltk.download('punkt')"
 3. Setup the web servers (follow the [visualwebarena README](https://github.com/web-arena-x/visualwebarena?tab=readme-ov-file)).
 
 4. Setup the URLs as environment variables
+
+5. Setup an OpenAI API key
+
+```sh
+export OPENAI_API_KEY=...
+```
+
+> **_NOTE:_**  be mindful of costs, as VisualWebArena will call GPT4 for certain evaluations ([llm_fuzzy_match](https://github.com/web-arena-x/webarena/blob/1469b7c9d8eaec3177855b3131569751f43a40d6/evaluation_harness/helper_functions.py#L146C5-L146C20)).
