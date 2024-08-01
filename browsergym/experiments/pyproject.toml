@@ -34,4 +34,4 @@ path = "../core/src/browsergym/core/__init__.py"
 files = ["requirements.txt"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/browsergym"]
+packages = ["src/browsergym", "src/bgym"]

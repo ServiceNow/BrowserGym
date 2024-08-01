@@ -21,19 +21,19 @@ jobs:
         run: python3 -m pip install build --user
 
       - name: Build a binary wheel and a source tarball (browsergym-core)
-        run: python3 -m build core/ --outdir dist/
+        run: python3 -m build browsergym/core/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym-miniwob)
-        run: python3 -m build miniwob/ --outdir dist/
+        run: python3 -m build browsergym/miniwob/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym-webarena)
-        run: python3 -m build webarena/ --outdir dist/
+        run: python3 -m build browsergym/webarena/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym-webarena)
-        run: python3 -m build visualwebarena/ --outdir dist/
+        run: python3 -m build browsergym/visualwebarena/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym-experiments)
-        run: python3 -m build experiments/ --outdir dist/
+        run: python3 -m build browsergym/experiments/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym)
         run: python3 -m build . --outdir dist/

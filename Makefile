@@ -1,6 +1,6 @@
 install:
 	@echo "--- 🚀 Installing project dependencies ---"
-	pip install -e ./core -e ./miniwob -e ./webarena -e visualwebarena/ -e ./experiments -e .
+	pip install -e ./browsergym/core -e ./browsergym/miniwob -e ./browsergym/webarena -e ./browsergym/visualwebarena/ -e ./browsergym/experiments -e ./browsergym/
 
 install-demo:
 	@echo "--- 🚀 Installing demo dependencies ---"
@@ -12,4 +12,4 @@ demo:
 
 test-core:
 	@echo "--- 🧪 Running tests ---"
-	pytest -n auto ./core
+	pytest -n auto ./tests/core

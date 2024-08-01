@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -61,10 +61,12 @@ jobs:
         run: playwright install chromium --with-deps
 
       - name: Run browsergym-core Unit Tests
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v core/tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
 
   browsergym-miniwob:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -78,7 +80,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -107,10 +109,12 @@ jobs:
       - name: Run browsergym-miniwob Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v miniwob/tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
 
   browsergym-experiments:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -124,7 +128,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -157,6 +161,8 @@ jobs:
 
   browsergym-webarena-fast:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -169,7 +175,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -192,10 +198,12 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v webarena/tests
+        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-webarena-slow:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -208,7 +216,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -231,10 +239,12 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v webarena/tests
+        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-visualwebarena-fast:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -247,7 +257,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -270,10 +280,12 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v visualwebarena/tests
+          pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-visualwebarena-slow:
     runs-on: ubuntu-latest
+    needs:
+      - browsergym-core
 
     defaults:
       run:
@@ -286,7 +298,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '>=3.10'
           cache: 'pip' # caching pip dependencies
 
       - name: Pip install
@@ -309,5 +321,5 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v visualwebarena/tests
-          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v visualwebarena/tests
+          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
+          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
