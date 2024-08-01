@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument(
         "--model_name",
         type=str,
-        default="openai/gpt-4-vision-preview",
+        default="openai/gpt-4o",
         help="Model name for the chat model.",
     )
     parser.add_argument(
@@ -140,6 +140,7 @@ WARNING this demo agent will soon be moved elsewhere. Expect it to be removed at
                 use_past_error_logs=True,  # "Prompt the agent with the past error logs."
                 use_action_history=True,  # "Prompt the agent with the action history."
                 multi_actions=args.multi_actions,
+                action_space="bid+nav",
                 use_abstract_example=True,  # "Prompt the agent with an abstract example."
                 use_concrete_example=True,  # "Prompt the agent with a concrete example."
                 use_screenshot=args.use_screenshot,
