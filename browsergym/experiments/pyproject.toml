@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "browsergym-experiments"
+description = "Experimentation tools for BrowserGym"
+authors = [
+    {name = "Alex Lacoste"},
+    {name = "Massimo Caccia"},
+    {name = "Maxime Gasse"},
+    {name = "Thibault Le Sellier De Chezelles"},
+]
+readme = "README.md"
+requires-python = ">3.7"
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: Apache Software License",
+]
+dynamic = ["dependencies", "version"]
+
+[project.urls]
+homepage = "https://github.com/ServiceNow/BrowserGym"
+
+[tool.hatch.version]
+path = "../core/src/browsergym/core/__init__.py"
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/browsergym", "src/bgym"]
