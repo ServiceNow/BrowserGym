@@ -36,7 +36,7 @@ jobs:
         run: python3 -m build browsergym/experiments/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym)
-        run: python3 -m build . --outdir dist/
+        run: python3 -m build browsergym/ --outdir dist/
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
