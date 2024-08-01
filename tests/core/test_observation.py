@@ -16,9 +16,6 @@ from browsergym.utils.obs import (
     flatten_dom_to_str,
 )
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 from browsergym.core.observation import (
     _pre_extract,
     _post_extract,

@@ -13,9 +13,6 @@ from time import time, sleep
 # register openended gym environments
 import browsergym.core
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
 __TIMEOUT = 500

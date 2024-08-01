@@ -10,9 +10,6 @@ from tenacity import retry, stop_after_attempt, retry_if_exception_type
 # register gym environments
 import browsergym.webarena
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True

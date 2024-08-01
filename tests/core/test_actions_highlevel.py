@@ -12,9 +12,6 @@ from pyparsing.exceptions import ParseException
 # register openended gym environments
 import browsergym.core
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 from browsergym.utils.obs import flatten_dom_to_str
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.parsers import highlevel_action_parser, NamedArgument

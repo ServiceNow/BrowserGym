@@ -1,9 +1,6 @@
 import pytest
 import playwright.sync_api
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 from browsergym.webarena.instance import WebArenaInstance
 
 

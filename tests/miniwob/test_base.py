@@ -6,9 +6,6 @@ import gymnasium as gym
 # register gym environments
 import browsergym.miniwob
 
-# bugfix: use same playwright instance in browsergym and pytest
-from utils import setup_playwright
-
 from browsergym.miniwob.all import (
     ClickButtonTask,
     ClickOptionTask,
