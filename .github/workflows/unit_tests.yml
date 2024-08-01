@@ -157,7 +157,7 @@ jobs:
       - name: Run browsergym-miniwob Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v experiments/tests
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:
     runs-on: ubuntu-latest
