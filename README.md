@@ -1,6 +1,9 @@
 # BrowserGym: a Gym Environment for Web Task Automation
 
-[[Setup]](#setup) ♦ [[Usage]](#usage) ♦ [[Demo]](#demo)
+[[Setup](#setup)] 
+[[Usage](#usage)] 
+[[Demo](#demo)] 
+[[Citation](#citing-this-work)]
 
 This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
 
@@ -11,34 +14,34 @@ _Example of a GPT4-V agent executing openended tasks (top row, chat interactive)
 BrowserGym includes the following benchmarks by default:
  - [MiniWob++](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
+ - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
 ## Setup
 
-To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena` and `browsergym-workarena` packages, or you can simply install `browsergym` which includes all of these by default.
+To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena`, `browsergym-visualwebarena` and `browsergym-workarena` packages, or you can simply install `browsergym` which includes all of these by default.
 ```sh
 pip install browsergym
 ```
 
 Then, a required step is to setup playwright by running
 ```sh
-playwright install
+playwright install chromium
 ```
 
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
  - for miniwob, see [miniwob/README.md](miniwob/README.md)
  - for webarena, see [webarena/README.md](webarena/README.md)
+ - for visualwebarena, see [visualwebarena/README.md](visualwebarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 ### Development setup
 To install browsergym locally for development, use the following commands:
 ```sh
 git clone https://github.com/ServiceNow/BrowserGym.git
-
-cd ~/PATH/TO/REPOSITORY/BrowserGym
-
+cd BrowserGym
 make install
 ```
 
@@ -52,13 +55,16 @@ import gymnasium as gym
 import browsergym.core  # register the openended task as a gym environment
 
 env = gym.make(
-    "browsergym/openended", task_kwargs={"start_url": "https://www.google.com/"}, wait_for_user_message=True
+    "browsergym/openended",
+    task_kwargs={"start_url": "https://www.google.com/"},  # starting URL
+    wait_for_user_message=True,  # wait for a user message after each agent message sent to the chat
 )
 obs, info = env.reset()
 done = False
 while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
 ```
 
 ### MiniWoB++ task example
@@ -74,9 +80,10 @@ done = False
 while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
 ```
 
-List of all the available MiniWoB++ environments
+To list all the available MiniWoB++ environments run
 ```python
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/miniwob")]
 print("\n".join(env_ids))
@@ -95,11 +102,34 @@ done = False
 while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
 ```
 
-List of all the available WebArena environments
+To list all the available WebArena environments run
 ```python
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webarena")]
+print("\n".join(env_ids))
+```
+
+### VisualWebArena task example
+
+Boilerplate code to run an agent on a VisualWebArena task:
+```python
+import gymnasium as gym
+import browsergym.webarena  # register webarena tasks as gym environments
+
+env = gym.make("browsergym/webarena.721")
+obs, info = env.reset()
+done = False
+while not done:
+    action = ...  # implement your agent here
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
+```
+
+To list all the available VisualWebArena environments run
+```python
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/visualwebarena")]
 print("\n".join(env_ids))
 ```
 
@@ -116,9 +146,10 @@ done = False
 while not done:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
 ```
 
-List of all the available WorkArena environments
+To list all the available WorkArena environments run
 ```python
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
@@ -133,10 +164,10 @@ If you want to experiment with an agent in BrowserGym, follow these steps:
 cd demo-agent
 conda env create -f environment.yml; conda activate demo-agent
 # or simply use `pip install -r requirements.txt`
-playwright install
+playwright install chromium
 ```
 
-Optional: Set your `OPENAI_API_KEY` if you want to use a GPT agent.
+Optional: Set your `OPENAI_API_KEY` to use a GPT agent.
 
 Launch the demo on the open web:
 
@@ -150,13 +181,19 @@ You can customize your experience by changing the `model_name` to your preferred
 ## Citing This Work
 
 Please use the following BibTeX to cite our work:
-```
-@misc{workarena2024,
-      title={WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks?}, 
-      author={Alexandre Drouin and Maxime Gasse and Massimo Caccia and Issam H. Laradji and Manuel Del Verme and Tom Marty and Léo Boisvert and Megh Thakkar and Quentin Cappart and David Vazquez and Nicolas Chapados and Alexandre Lacoste},
-      year={2024},
-      eprint={2403.07718},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+```tex
+@inproceedings{workarena2024,
+    title = {{W}ork{A}rena: How Capable are Web Agents at Solving Common Knowledge Work Tasks?},
+    author = {Drouin, Alexandre and Gasse, Maxime and Caccia, Massimo and Laradji, Issam H. and Del Verme, Manuel and Marty, Tom and Vazquez, David and Chapados, Nicolas and Lacoste, Alexandre},
+    booktitle = {Proceedings of the 41st International Conference on Machine Learning},
+    pages = {11642--11662},
+    year = {2024},
+    editor = {Salakhutdinov, Ruslan and Kolter, Zico and Heller, Katherine and Weller, Adrian and Oliver, Nuria and Scarlett, Jonathan and Berkenkamp, Felix},
+    volume = {235},
+    series = {Proceedings of Machine Learning Research},
+    month = {21--27 Jul},
+    publisher = {PMLR},
+    url = {https://proceedings.mlr.press/v235/drouin24a.html},
 }
+
 ```

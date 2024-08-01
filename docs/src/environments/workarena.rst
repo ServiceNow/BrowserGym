@@ -4,7 +4,7 @@ WorkArena
 `BrowserGym` integrates `WebArena` enviroment. For more information about this enviroment, please refer to the `WorkArena <https://github.com/ServiceNow/WorkArena>`_ official documentation.
 
 
-BrowserGym API 
+BrowserGym API
 """"""""""""""
 
 .. currentmodule:: browsergym
@@ -17,7 +17,7 @@ BrowserGym API
    workarena
 
 
-Usage 
+Usage
 """""
 
 **Create a ServiceNow Developer Instance**
@@ -43,23 +43,23 @@ Usage
 
 Run the following command to install WorkArena in the BrowswerGym environment:
 
-.. code:: bash 
-   
+.. code:: bash
+
    pip install browsergym-workarena
 
 
 Then, run this command in a terminal to upload the benchmark data to your ServiceNow instance:
 
-.. code:: bash 
-   
+.. code:: bash
+
    workarena-install
 
 
 Finally, install Playwright:
 
-.. code:: bash 
-   
-   playwright install
+.. code:: bash
+
+   playwright install chromium
 
 
 Your installation is now complete! 🎉
@@ -71,7 +71,7 @@ Your installation is now complete! 🎉
     import gym
     import browsergym.workarena
 
-    env = gym.make('browsergym/workarena.servicenow.filter-asset-list')
+    env = gym.make("browsergym/workarena.servicenow.filter-asset-list")
     obs, info = env.reset()
     done = False
 
@@ -79,5 +79,5 @@ Your installation is now complete! 🎉
         action = "noop()"
         obs, reward, terminated, truncated, info = env.step(action)
         print(f"Reward: {reward}, Done: {done}, Info: {info}")
-    
+
     env.close()

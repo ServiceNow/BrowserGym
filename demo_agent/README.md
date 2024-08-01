@@ -1,9 +1,5 @@
-## Install ui-assist
+## Install demo-agent
 
 conda env create -f environment.yml
-conda activate ui-assist
-playwright install
-
-
-
-
+conda activate demo-agent
+playwright install chromium

@@ -10,14 +10,14 @@ To use BrowserGym, first install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install browsergym
+   pip install browsergym
 
 Then, a required step is to setup playwright by running
 
 .. code-block:: console
 
-   (.venv) $ playwright install
-  
+   playwright install chromium
+
 Example code
 ------------
 
@@ -29,7 +29,9 @@ Boilerplate code to run an agent on an interactive, open-ended task:
    import browsergym.core  # register the openended task as a gym environment
 
    env = gym.make(
-       "browsergym/openended", task_kwargs={"start_url": "https://www.google.com/"}, wait_for_user_message=True
+       "browsergym/openended",
+       task_kwargs={"start_url": "https://www.google.com/"},  # starting URL
+       wait_for_user_message=True,  # wait for a user message after each agent message sent to the chat
    )
 
    obs, info = env.reset()
