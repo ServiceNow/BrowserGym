@@ -3,10 +3,10 @@ import os
 import requests
 
 
-ENV_VARS = ("SHOPPING", "SHOPPING_ADMIN", "REDDIT", "GITLAB", "WIKIPEDIA", "MAP", "HOMEPAGE")
+ENV_VARS = ("SHOPPING", "REDDIT", "WIKIPEDIA", "HOMEPAGE", "CLASSIFIEDS", "CLASSIFIEDS_RESET_TOKEN")
 
 
-class WebArenaInstance:
+class VisualWebArenaInstance:
     """
     Utility class to access a WebArena instance.
 
@@ -16,37 +16,36 @@ class WebArenaInstance:
         self,
     ) -> None:
 
-        # setup webarena environment variables (webarena will read those on import)
-        append_wa = lambda x: f"WA_{x}"
+        # setup visualwebarena environment variables (visualwebarena will read those on import)
+        os.environ["DATASET"] = "visualwebarena"
+        append_vwa = lambda x: f"VWA_{x}"
         for key in ENV_VARS:
-            assert append_wa(key) in os.environ, (
-                f"Environment variable {append_wa(key)} missing.\n"
-                + "Please set the following environment variables to use WebArena through BrowserGym:\n"
-                + "\n".join([append_wa(x) for x in ENV_VARS])
+            assert append_vwa(key) in os.environ, (
+                f"Environment variable {append_vwa(key)} missing.\n"
+                + "Please set the following environment variables to use VisualWebArena through BrowserGym:\n"
+                + "\n".join([append_vwa(x) for x in ENV_VARS])
             )
-            os.environ[key] = os.environ[append_wa(key)]
+            os.environ[key] = os.environ[append_vwa(key)]
 
-        # import webarena on instanciation
-        from webarena.browser_env.env_config import (
+        # import webarena on instantiation
+        from visualwebarena.browser_env.env_config import (
             ACCOUNTS,
             REDDIT,
             SHOPPING,
-            SHOPPING_ADMIN,
-            GITLAB,
             WIKIPEDIA,
-            MAP,
             HOMEPAGE,
+            CLASSIFIEDS,
+            CLASSIFIEDS_RESET_TOKEN,
         )
 
         self.urls = {
             "reddit": REDDIT,
-            "gitlab": GITLAB,
             "shopping": SHOPPING,
-            "shopping_admin": SHOPPING_ADMIN,
             "wikipedia": WIKIPEDIA,
-            "map": MAP,
+            "classifieds": CLASSIFIEDS,
         }
         self.home_url = HOMEPAGE
+        self.classifieds_reset_token = CLASSIFIEDS_RESET_TOKEN
 
         self.credentials = ACCOUNTS
 
@@ -67,7 +66,7 @@ class WebArenaInstance:
                 requests.get(url, timeout=5000)  # 5 secs
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
                 raise RuntimeError(
-                    f'WebArena site "{site}" ({url}) is not reacheable. Please check the URL.'
+                    f'VisualWebArena site "{site}" ({url}) is not reacheable. Please check the URL.'
                 )
 
     def ui_login(self, site: str, page: playwright.sync_api.Page):
@@ -81,22 +80,11 @@ class WebArenaInstance:
             case "reddit":
                 username = self.credentials[site]["username"]
                 password = self.credentials[site]["password"]
-
                 page.goto(f"{url}")
                 page.get_by_role("link", name="Log in").click()
                 page.get_by_label("Username").fill(username)
                 page.get_by_label("Password").fill(password)
                 page.get_by_role("button", name="Log in").click()
-
-            case "gitlab":
-                username = self.credentials[site]["username"]
-                password = self.credentials[site]["password"]
-
-                page.goto(f"{url}/users/sign_in")
-                page.get_by_label("Username or email").fill(username)
-                page.get_by_label("Password").fill(password)
-                page.get_by_role("button", name="Sign in").click()
-
             case "shopping":
                 username = self.credentials[site]["username"]
                 password = self.credentials[site]["password"]
@@ -106,20 +94,16 @@ class WebArenaInstance:
                 page.get_by_label("Password", exact=True).fill(password)
                 page.get_by_role("button", name="Sign In").click()
 
-            case "shopping_admin":
-                username = self.credentials[site]["username"]
-                password = self.credentials[site]["password"]
-
-                page.goto(url)
-                page.get_by_label("Username").fill(username)
-                page.get_by_label("Password").fill(password)
-                page.get_by_role("button", name="Sign in").click()
-
             case "wikipedia":
                 page.goto(url)
 
-            case "map":
-                page.goto(url)
+            case "classifieds":
+                username = self.credentials[site]["username"]
+                password = self.credentials[site]["password"]
+                page.goto(f"{url}/index.php?page=login")
+                page.locator("#email").fill(username)
+                page.locator("#password").fill(password)
+                page.get_by_role("button", name="Log in").click()
 
             case _:
                 raise ValueError

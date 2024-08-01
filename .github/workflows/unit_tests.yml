@@ -58,7 +58,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-core Unit Tests
         run: pytest -n 5 --durations=10 -m 'not pricy' -v core/tests
@@ -89,7 +89,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -135,7 +135,7 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -180,18 +180,18 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-webarena not slow Unit Tests
         env:
-          SHOPPING: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770/"
-          SHOPPING_ADMIN: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin"
-          REDDIT: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999"
-          GITLAB: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023"
-          WIKIPEDIA: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-          MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
-          HOMEPAGE: "PASS:4399"
-          WEBARENA_PATH: "${{ github.workspace }}/webarena/"
+          WA_SHOPPING: "${{ vars.WA_SHOPPING }}"
+          WA_SHOPPING_ADMIN: "${{ vars.WA_SHOPPING_ADMIN }}"
+          WA_REDDIT: "${{ vars.WA_REDDIT }}"
+          WA_GITLAB: "${{ vars.WA_GITLAB }}"
+          WA_WIKIPEDIA: "${{ vars.WA_WIKIPEDIA }}"
+          WA_MAP: "${{ vars.WA_MAP }}"
+          WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v webarena/tests
 
   browsergym-webarena-slow:
@@ -219,16 +219,95 @@ jobs:
         run: pip list
 
       - name: Install Playwright
-        run: playwright install --with-deps
+        run: playwright install chromium --with-deps
 
       - name: Run browsergym-webarena slow Unit Tests
         env:
-          SHOPPING: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770/"
-          SHOPPING_ADMIN: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin"
-          REDDIT: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999"
-          GITLAB: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023"
-          WIKIPEDIA: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-          MAP: "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000"
-          HOMEPAGE: "PASS:4399"
-          WEBARENA_PATH: "${{ github.workspace }}/webarena/"
+          WA_SHOPPING: "${{ vars.WA_SHOPPING }}"
+          WA_SHOPPING_ADMIN: "${{ vars.WA_SHOPPING_ADMIN }}"
+          WA_REDDIT: "${{ vars.WA_REDDIT }}"
+          WA_GITLAB: "${{ vars.WA_GITLAB }}"
+          WA_WIKIPEDIA: "${{ vars.WA_WIKIPEDIA }}"
+          WA_MAP: "${{ vars.WA_MAP }}"
+          WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v webarena/tests
+
+  browsergym-visualwebarena-fast:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Run browsergym-visualwebarena not slow Unit Tests
+        env:
+          VWA_CLASSIFIEDS: "${{ vars.VWA_CLASSIFIEDS }}"
+          VWA_CLASSIFIEDS_RESET_TOKEN: "${{ vars.VWA_CLASSIFIEDS_RESET_TOKEN }}"
+          VWA_SHOPPING: "${{ vars.VWA_SHOPPING }}"
+          VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
+          VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
+          VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
+        run: |
+          pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v visualwebarena/tests
+
+  browsergym-visualwebarena-slow:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Run browsergym-visualwebarena slow Unit Tests
+        env:
+          VWA_CLASSIFIEDS: "${{ vars.VWA_CLASSIFIEDS }}"
+          VWA_CLASSIFIEDS_RESET_TOKEN: "${{ vars.VWA_CLASSIFIEDS_RESET_TOKEN }}"
+          VWA_SHOPPING: "${{ vars.VWA_SHOPPING }}"
+          VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
+          VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
+          VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
+        run: |
+          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v visualwebarena/tests
+          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v visualwebarena/tests

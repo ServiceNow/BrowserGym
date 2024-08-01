@@ -21,15 +21,15 @@ python -c "import nltk; nltk.download('punkt')"
 BASE_URL=<YOUR_SERVER_URL_HERE>
 ```
 
-4. Setup the URLs as environment variables
+4. Setup the URLs as environment variables (note the `WA_` prefix)
 ```sh
-export SHOPPING="$BASE_URL:7770/"
-export SHOPPING_ADMIN="$BASE_URL:7780/admin"
-export REDDIT="$BASE_URL:9999"
-export GITLAB="$BASE_URL:8023"
-export WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-export MAP="$BASE_URL:3000"
-export HOMEPAGE="$BASE_URL:4399"
+export WA_SHOPPING="$BASE_URL:7770/"
+export WA_SHOPPING_ADMIN="$BASE_URL:7780/admin"
+export WA_REDDIT="$BASE_URL:9999"
+export WA_GITLAB="$BASE_URL:8023"
+export WA_WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
+export WA_MAP="$BASE_URL:3000"
+export WA_HOMEPAGE="$BASE_URL:4399"
 ```
 
 5. Setup an OpenAI API key
