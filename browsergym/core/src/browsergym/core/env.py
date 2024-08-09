@@ -5,7 +5,12 @@ import numpy as np
 import playwright.sync_api
 import time
 import re
-
+from PIL import Image
+from io import BytesIO
+import requests
+import tempfile
+import base64
+import io
 from abc import ABC
 from pathlib import Path
 from typing import Optional, Literal
@@ -31,6 +36,23 @@ from . import _get_global_playwright
 
 
 logger = logging.getLogger(__name__)
+
+
+def pil_to_b64(img: Image.Image) -> str:
+    with BytesIO() as image_buffer:
+        img.save(image_buffer, format="PNG")
+        byte_data = image_buffer.getvalue()
+        img_b64 = base64.b64encode(byte_data).decode("utf-8")
+        img_b64 = "data:image/png;base64," + img_b64
+    return img_b64
+
+def b64_to_pil(img_b64: str) -> str:
+    if not img_b64.startswith("data:image/png;base64,"):
+        raise ValueError(f"Unexpected base64 encoding: {img_b64}")
+    img_b64 = img_b64.removeprefix("data:image/png;base64,")
+    img_data = base64.b64decode(img_b64)
+    img = Image.open(io.BytesIO(img_data))
+    return img
 
 
 class BrowserEnv(gym.Env, ABC):
@@ -285,7 +307,18 @@ document.addEventListener("visibilitychange", () => {
                 goal_msg = goal["message"]
                 for image_url in goal["image_urls"]:
                     self.chat.add_message(role="user_image", msg=image_url)
-
+                    if image_url.startswith("http"):
+                        image = Image.open(requests.get(image_url, stream=True).raw)
+                        image_base64 = pil_to_b64(image)
+                    elif image_url.startswith("data:image/png;base64,"):
+                        image_base64 = image_url
+                        image = b64_to_pil(image_base64)
+                    else:
+                        raise ValueError(f"Unexpected image_url: {image_url}")
+                    # save the image to a temporary (but persistent) PNG file
+                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+                        image_path = f.name
+                    image.save(image_path)
             self.chat.add_message(role="user", msg=goal_msg)
 
         self._wait_dom_loaded()
