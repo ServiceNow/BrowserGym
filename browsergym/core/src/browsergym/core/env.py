@@ -11,6 +11,7 @@ import requests
 import tempfile
 import base64
 import io
+import os
 from abc import ABC
 from pathlib import Path
 from typing import Optional, Literal
@@ -305,7 +306,7 @@ document.addEventListener("visibilitychange", () => {
             # goal is text + images
             elif isinstance(goal, dict):
                 goal_msg = goal["message"]
-                for image_url in goal["image_urls"]:
+                for image_i, image_url in enumerate(goal["image_urls"]):
                     self.chat.add_message(role="user_image", msg=image_url)
                     if image_url.startswith("http"):
                         image = Image.open(requests.get(image_url, stream=True).raw)
@@ -316,8 +317,10 @@ document.addEventListener("visibilitychange", () => {
                     else:
                         raise ValueError(f"Unexpected image_url: {image_url}")
                     # save the image to a temporary (but persistent) PNG file
-                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-                        image_path = f.name
+                    if not os.path.exists("tmp"):
+                        os.makedirs("tmp")
+                    image_path = os.path.join("tmp", f"image_{image_i}.png")
+                    # Save the image to the specified path
                     image.save(image_path)
             self.chat.add_message(role="user", msg=goal_msg)
 
