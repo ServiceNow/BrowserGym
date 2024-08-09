@@ -319,7 +319,7 @@ document.addEventListener("visibilitychange", () => {
                     # save the image to a temporary (but persistent) PNG file
                     if not os.path.exists("tmp"):
                         os.makedirs("tmp")
-                    image_path = os.path.join("tmp", f"image_{image_i}.png")
+                    image_path = os.path.join("tmp", f"inputImage_{image_i}.png")
                     # Save the image to the specified path
                     image.save(image_path)
             self.chat.add_message(role="user", msg=goal_msg)
