@@ -32,9 +32,9 @@ playwright install chromium
 ```
 
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
- - for miniwob, see [miniwob/README.md](miniwob/README.md)
- - for webarena, see [webarena/README.md](webarena/README.md)
- - for visualwebarena, see [visualwebarena/README.md](visualwebarena/README.md)
+ - for miniwob, see [miniwob/README.md](browsergym/miniwob/README.md)
+ - for webarena, see [webarena/README.md](browsergym/webarena/README.md)
+ - for visualwebarena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 ### Development setup
