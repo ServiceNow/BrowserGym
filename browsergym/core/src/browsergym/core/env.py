@@ -1,40 +1,39 @@
-import copy
-import gymnasium as gym
-import logging
-import numpy as np
-import playwright.sync_api
-import time
-import re
-from PIL import Image
-from io import BytesIO
-import requests
-import tempfile
 import base64
+import copy
 import io
+import logging
 import os
+import re
+import tempfile
+import time
 from abc import ABC
+from io import BytesIO
 from pathlib import Path
 from typing import Optional, Literal
 
-from .chat import Chat
-from .task import AbstractBrowserTask
-from .spaces import Unicode, AnyDict, AnyBox
-from .constants import TEXT_MAX_LENGTH, BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
-from .observation import (
-    _pre_extract,
-    _post_extract,
-    extract_screenshot,
-    extract_dom_snapshot,
-    extract_dom_extra_properties,
-    extract_merged_axtree,
-    extract_focused_element_bid,
-    MarkingError,
-)
+import gymnasium as gym
+import numpy as np
+import playwright.sync_api
+import requests
+from PIL import Image
+
+from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
-from .action.base import execute_python_code
-from . import _get_global_playwright
-
+from .chat import Chat
+from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES, TEXT_MAX_LENGTH
+from .observation import (
+    MarkingError,
+    _post_extract,
+    _pre_extract,
+    extract_dom_extra_properties,
+    extract_dom_snapshot,
+    extract_focused_element_bid,
+    extract_merged_axtree,
+    extract_screenshot,
+)
+from .spaces import AnyBox, AnyDict, Unicode
+from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +45,7 @@ def pil_to_b64(img: Image.Image) -> str:
         img_b64 = base64.b64encode(byte_data).decode("utf-8")
         img_b64 = "data:image/png;base64," + img_b64
     return img_b64
+
 
 def b64_to_pil(img_b64: str) -> str:
     if not img_b64.startswith("data:image/png;base64,"):
@@ -297,6 +297,7 @@ document.addEventListener("visibilitychange", () => {
             msg="Hi! I am your UI assistant, I can perform web tasks for you. What can I help you with?",
         )
         # if any, add the task's goal to the chat
+        self.goal_images = []
         if goal:
 
             # goal is text-only
@@ -322,6 +323,7 @@ document.addEventListener("visibilitychange", () => {
                     image_path = os.path.join("tmp", f"inputImage_{image_i}.png")
                     # Save the image to the specified path
                     image.save(image_path)
+                    self.goal_images.append({"base64": image_base64, "path": image_path})
             self.chat.add_message(role="user", msg=goal_msg)
 
         self._wait_dom_loaded()
@@ -564,6 +566,7 @@ document.addEventListener("visibilitychange", () => {
             "chat_messages": copy.deepcopy(self.chat.messages),
             "goal": goal_msg,  # TODO: redundant with chat messages, to be removed?
             "goal_image_urls": goal_image_urls,  # TODO: redundant with chat messages, to be removed?
+            "goal_images": self.goal_images,
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
