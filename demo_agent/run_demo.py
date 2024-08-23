@@ -29,13 +29,13 @@ def parse_args():
     parser.add_argument(
         "--task_name",
         type=str,
-        default="openended",
+        default="webcanvas.1",
         help="Name of the Browsergym task to run. If 'openended', you need to specify a 'start_url'",
     )
     parser.add_argument(
         "--start_url",
         type=str,
-        default="https://www.google.com",
+        default="https://www.google.com/",
         help="Starting URL (only for the openended task).",
     )
     parser.add_argument(

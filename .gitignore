@@ -150,3 +150,8 @@ tests/assistantbench/assistantbench-predictions-test.jsonl
 
 # weblinx
 bg_wl_data/
+
+# webcanvas
+test_gpt.py
+temp_test.py
+results/
