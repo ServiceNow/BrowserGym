@@ -11,7 +11,6 @@ import regex as re
 import browsergym.core
 
 from browsergym.utils.obs import (
-    _remove_redundant_static_text,
     flatten_axtree_to_str,
     flatten_dom_to_str,
 )

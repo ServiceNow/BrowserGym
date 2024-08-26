@@ -181,19 +181,6 @@ def flatten_dom_to_str(
     return html
 
 
-def _remove_redundant_static_text(ax_tree: str) -> str:
-    """Removes redundant `StaticText` from the accessibility tree"""
-    new_lines = []
-    lines = ax_tree.split("\n")
-    for line in lines:
-        if line.strip().startswith("StaticText"):
-            content = line.split("StaticText")[1].strip().strip("'")
-            if content in "\n".join(new_lines[-3:]):
-                continue
-        new_lines.append(line)
-    return "\n".join(new_lines)
-
-
 def _get_coord_str(coord, decimals):
     if isinstance(coord, str):
         coord = list(map(float, ast.literal_eval(coord)))
@@ -311,13 +298,14 @@ def flatten_axtree_to_str(
     for idx, node in enumerate(AX_tree["nodes"]):
         node_id_to_idx[node["nodeId"]] = idx
 
-    def dfs(node_idx: int, depth: int, parent_node_filtered: bool) -> str:
+    def dfs(node_idx: int, depth: int, parent_node_filtered: bool, parent_node_name: str) -> str:
         tree_str = ""
         node = AX_tree["nodes"][node_idx]
         indent = "\t" * depth
         skip_node = False
         filter_node = False
         node_role = node["role"]["value"]
+        node_name = ""
 
         if node_role in ignored_roles:
             skip_node = True
@@ -358,6 +346,8 @@ def flatten_axtree_to_str(
 
             if node_role == "StaticText":
                 if parent_node_filtered:
+                    skip_node = True
+                elif remove_redundant_static_text and node_name in parent_node_name:
                     skip_node = True
             else:
                 filter_node, extra_attributes_to_print = _process_bid(
@@ -407,7 +397,10 @@ def flatten_axtree_to_str(
             # mark this to save some tokens
             child_depth = depth if skip_node else (depth + 1)
             child_str = dfs(
-                node_id_to_idx[child_node_id], child_depth, parent_node_filtered=filter_node
+                node_id_to_idx[child_node_id],
+                child_depth,
+                parent_node_filtered=filter_node,
+                parent_node_name=node_name,
             )
             if child_str:
                 if tree_str:
@@ -416,9 +409,7 @@ def flatten_axtree_to_str(
 
         return tree_str
 
-    tree_str = dfs(0, 0, False)
-    if remove_redundant_static_text:
-        tree_str = _remove_redundant_static_text(tree_str)
+    tree_str = dfs(0, 0, False, "")
     return tree_str
 
 
