@@ -1,6 +1,6 @@
 /**
  * Go through all DOM elements in the frame (including shadowDOMs),
- * and cleanup previously stored data in the aria-roledescription attribute.
+ * and cleanup previously stored data in ARIA attributes.
  */
 () => {
     // get all DOM elements in the current frame (does not include elements in shadowDOMs)
@@ -18,23 +18,23 @@
             );
         }
         i++;
-        // Hack: remove custom data stored inside the aria-roledescription tag
+        // Hack: remove custom data stored in ARIA attributes
         //  - elem_global_id: global browsergym identifier
-        if (elem.hasAttribute("aria-roledescription")) {
-            let content = elem.getAttribute("aria-roledescription");
-            // TODO: handle more data if needed
-            let n_data_items = 1;  // bid
-            let post_data_index = 0;
-            for (let j = 0 ; j < n_data_items ; j++) {
-                post_data_index = content.indexOf("_", post_data_index) + 1;
-            }
-            original_content = content.substring(post_data_index);
-            if (original_content) {
-                elem.setAttribute("aria-roledescription", original_content);
-            }
-            else {
-                elem.removeAttribute("aria-roledescription");
-            }
+        pop_bid_from_attribute(elem, "aria-description");
+        pop_bid_from_attribute(elem, "aria-roledescription");  // fallback for generic nodes
+    }
+}
+
+function pop_bid_from_attribute(elem, attr) {
+    let bid_regex = /^browsergym_id[^\s]*\s/;
+    if (elem.hasAttribute(attr)) {
+        let content = elem.getAttribute(attr);
+        let original_content = content.replace(bid_regex, '');
+        if (original_content) {
+            elem.setAttribute(attr, original_content);
+        }
+        else {
+            elem.removeAttribute(attr);
         }
     }
 }

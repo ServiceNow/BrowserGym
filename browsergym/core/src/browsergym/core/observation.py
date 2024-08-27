@@ -130,24 +130,20 @@ def extract_screenshot(page: playwright.sync_api.Page):
     return img
 
 
-# TODO: handle more data items if needed
+# we could handle more data items here if needed
 __BID_EXPR = r"([a-z0-9]+)"
-__FLOAT_EXPR = r"([+-]?(?:[0-9]*[.])?[0-9]+)"
-__BOOL_EXPR = r"([01])"
-# bid, bbox_left, bbox_top, center_x, center_y, bbox_right, bbox_bottom, is_in_viewport
-__DATA_REGEXP = re.compile(__BID_EXPR + r"_" + r"(.*)")
+__DATA_REGEXP = re.compile(r"^browsergym_id_" + __BID_EXPR + r"\s?" + r"(.*)")
 
 
-def extract_data_items_from_aria(string):
+def extract_data_items_from_aria(string: str, with_warning: bool = True):
     """
-    Utility function to extract temporary data stored in the "aria-roledescription" attribute of a node
+    Utility function to extract temporary data stored in the ARIA attributes of a node
     """
 
     match = __DATA_REGEXP.fullmatch(string)
     if not match:
-        logger.warning(
-            f'Data items could not be extracted from "aria-roledescription" attribute: {string}'
-        )
+        if with_warning:
+            logger.warning(f"Failed to extract BrowserGym data from ARIA string: {repr(string)}")
         return [], string
 
     groups = match.groups()
@@ -171,7 +167,7 @@ def extract_dom_snapshot(
         computed_styles: whitelist of computed styles to return.
         include_dom_rects: whether to include DOM rectangles (offsetRects, clientRects, scrollRects) in the snapshot.
         include_paint_order: whether to include paint orders in the snapshot.
-        temp_data_cleanup: whether to clean up the temporary data stored in the "aria-roledescription" attribute.
+        temp_data_cleanup: whether to clean up the temporary data stored in the ARIA attributes.
 
     Returns:
         A document snapshot, including the full DOM tree of the root node (including iframes,
@@ -191,41 +187,48 @@ def extract_dom_snapshot(
     )
     cdp.detach()
 
-    # if requested, remove temporary data stored in the "aria-roledescription" attribute of each node
+    # if requested, remove temporary data stored in the ARIA attributes of each node
     if temp_data_cleanup:
-        try:
-            target_attr_name_id = dom_snapshot["strings"].index("aria-roledescription")
-        except ValueError:
-            target_attr_name_id = -1
-        # run the cleanup only if the "aria-roledescription" string is present
-        if target_attr_name_id > -1:
-            processed_string_ids = set()
-            for document in dom_snapshot["documents"]:
-                for node_attributes in document["nodes"]["attributes"]:
-                    i = 0
-                    # find the "aria-roledescription" attribute, if any
-                    for i in range(0, len(node_attributes), 2):
-                        attr_name_id = node_attributes[i]
-                        attr_value_id = node_attributes[i + 1]
-                        if attr_name_id == target_attr_name_id:
-                            attr_value = dom_snapshot["strings"][attr_value_id]
-                            # remove any data stored in the "aria-roledescription" attribute
-                            if attr_value_id not in processed_string_ids:
-                                _, new_attr_value = extract_data_items_from_aria(attr_value)
-                                dom_snapshot["strings"][
-                                    attr_value_id
-                                ] = new_attr_value  # update the string in the metadata
-                                processed_string_ids.add(
-                                    attr_value_id
-                                )  # mark string as processed (in case several "aria-roledescription" attributes share the same value string)
-                                attr_value = new_attr_value
-                            # remove "aria-roledescription" attribute (name and value) if empty
-                            if attr_value == "":
-                                del node_attributes[i : i + 2]
-                            # once "aria-roledescription" is found, exit the search
-                            break
+        pop_bids_from_attribute(dom_snapshot, "aria-roledescription")
+        pop_bids_from_attribute(dom_snapshot, "aria-description")
 
     return dom_snapshot
+
+
+def pop_bids_from_attribute(dom_snapshot, attr: str):
+    try:
+        target_attr_name_id = dom_snapshot["strings"].index(attr)
+    except ValueError:
+        target_attr_name_id = -1
+    # run the cleanup only if the target attribute string is present
+    if target_attr_name_id > -1:
+        processed_string_ids = set()
+        for document in dom_snapshot["documents"]:
+            for node_attributes in document["nodes"]["attributes"]:
+                i = 0
+                # find the target attribute, if any
+                for i in range(0, len(node_attributes), 2):
+                    attr_name_id = node_attributes[i]
+                    attr_value_id = node_attributes[i + 1]
+                    if attr_name_id == target_attr_name_id:
+                        attr_value = dom_snapshot["strings"][attr_value_id]
+                        # remove any data stored in the target attribute
+                        if attr_value_id not in processed_string_ids:
+                            _, new_attr_value = extract_data_items_from_aria(
+                                attr_value, with_warning=False
+                            )
+                            dom_snapshot["strings"][
+                                attr_value_id
+                            ] = new_attr_value  # update the string in the metadata
+                            processed_string_ids.add(
+                                attr_value_id
+                            )  # mark string as processed (in case several nodes share the same target attribute string value)
+                            attr_value = new_attr_value
+                        # remove target attribute (name and value) if empty
+                        if attr_value == "":
+                            del node_attributes[i : i + 2]
+                        # once target attribute is found, exit the search
+                        break
 
 
 def extract_dom_extra_properties(dom_snapshot):
@@ -433,30 +436,34 @@ def extract_all_frame_axtrees(page: playwright.sync_api.Page):
 
     cdp.detach()
 
-    # extract browsergym properties (bids, coordinates, etc.) from the "roledescription" property ("aria-roledescription" attribute)
+    # extract browsergym data from ARIA attributes
     for ax_tree in frame_axtrees.values():
         for node in ax_tree["nodes"]:
-            # look for the "roledescription" property
+            data_items = []
+            # look for data in the node's "roledescription" property
             if "properties" in node:
                 for i, prop in enumerate(node["properties"]):
                     if prop["name"] == "roledescription":
                         data_items, new_value = extract_data_items_from_aria(prop["value"]["value"])
                         prop["value"]["value"] = new_value
-                        # remove the "roledescription" property if empty
+                        # remove the "description" property if empty
                         if new_value == "":
                             del node["properties"][i]
-                        # add all extracted "browsergym" properties to the AXTree
-                        if data_items:
-                            (browsergym_id,) = data_items
-                            node["properties"].append(
-                                {
-                                    "name": "browsergym_id",
-                                    "value": {
-                                        "type": "string",
-                                        "value": browsergym_id,
-                                    },
-                                }
-                            )
+                        break
+            # look for data in the node's "description" (fallback plan)
+            if "description" in node:
+                data_items_bis, new_value = extract_data_items_from_aria(
+                    node["description"]["value"]
+                )
+                node["description"]["value"] = new_value
+                if new_value == "":
+                    del node["description"]
+                if not data_items:
+                    data_items = data_items_bis
+            # add the extracted "browsergym" data to the AXTree
+            if data_items:
+                (browsergym_id,) = data_items
+                node["browsergym_id"] = browsergym_id
     return frame_axtrees
 
 
