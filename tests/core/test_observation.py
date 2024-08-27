@@ -185,6 +185,10 @@ def test_simple_shadowdom():
     elem_id = elem.get_attribute(BID_ATTR)
     assert elem_id is not None
 
+    # elem should not have an aria-description (it should have been cleaned)
+    aria_description = elem.get_attribute("aria-description")
+    assert aria_description is None
+
     # elem should not have an aria-roledescription (it should have been cleaned)
     aria_roledescription = elem.get_attribute("aria-roledescription")
     assert aria_roledescription is None
@@ -218,6 +222,10 @@ def test_nested_shadowdom():
     # elem should have a browsergym_id in its BID_ATTR attribute
     elem_id = elem.get_attribute(BID_ATTR)
     assert elem_id is not None
+
+    # elem should not have an aria-description (it should have been cleaned)
+    aria_description = elem.get_attribute("aria-description")
+    assert aria_description is None
 
     # elem should not have an aria-roledescription (it should have been cleaned)
     aria_roledescription = elem.get_attribute("aria-roledescription")
@@ -261,7 +269,7 @@ def test_dom_has_bids_no_aria(url):
     dom_node_names_without_bid = ["html", "#text", "#document", "#comment"]
     axtree_roles_without_bid = ["RootWebArea", "none", "generic", "StaticText"]
 
-    # 1. test the DOM snapshot for BID_ATTR and "aria-roledescription"
+    # 1. test the DOM snapshot for BID_ATTR, "aria-description" and "aria-roledescription"
 
     # check all HTML elements in the DOM for unique browsergym id
     dom = obs["dom_object"]
@@ -281,40 +289,46 @@ def test_dom_has_bids_no_aria(url):
                 # check that the "aria-roledescription" attribute is absent (this is specific to this test page)
                 assert attr_name != "aria-roledescription"
 
+                # check that the "aria-description" attribute is absent (this is specific to this test page)
+                assert attr_name != "aria-description"
+
                 # extract the browsergym id from the BID_ATTR attribute
                 if attr_name == BID_ATTR:
                     bid = attr_value
-                    bids.append(bid)
                 j += 2
-
-            # print(f"{dom['strings'][node_name_id]}: {bid}")
 
             # check that all elements (with exceptions) have a browsergym id
             if node_name not in dom_node_names_without_bid:
                 assert bid is not None
 
+            if bid is not None:
+                bids.append(bid)
+
     # check that all browsergym ids are unique
     assert len(bids) == len(set(bids))
 
-    # 2. test the AXTree for "browsergym_id" and "roledescription" properties
+    # 2. test the AXTree for "browsergym_id" and "description" properties
     axtree = obs["axtree_object"]
     bids = []
     for node in axtree["nodes"]:
-        bid = None
+        bid = node.get("browsergym_id", None)
+
+        # check that the "aria-roledescription" attribute is absent (this is specific to this test page)
         for property in node.get("properties", []):
-            # check that the "aria-roledescription" attribute is absent (this is specific to this test page)
             assert property["name"] != "roledescription"
 
-            # extract the browsergym id from the "browsergym_id" property
-            if property["name"] == "browsergym_id":
-                bid = property["value"]["value"]
-                bids.append(bid)
+        # check that the "aria-description" attribute is absent (this is specific to this test page)
+        assert "description" not in node
 
-        # print(f"{node['role']['value']}: {bid}")
-
-        # check that all elements (with excepttions) have a browsergym id
+        # check that all elements (with exceptions) have a browsergym id
         if node["role"]["value"] not in axtree_roles_without_bid:
             assert bid is not None
+
+            if bid is not None:
+                bids.append(bid)
+
+    # check that all browsergym ids are unique
+    assert len(bids) == len(set(bids))
 
     env.close()
 
@@ -365,7 +379,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     assert 'clickable="" som="" type="submit" value="Submit" visible=""' in dom
     assert 'head bid="1">' in dom
     assert 'clickable="" for="email" visible=""' in dom
-    assert "Text within in non-html tag" in dom
+    assert "Text within a non-html tag" in dom
     assert "Text that should not be visible" in dom
 
     dom = flatten_dom_to_str(
@@ -373,7 +387,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     )
     assert 'for="email"' not in dom
     assert 'type="submit" value="Submit"' in dom
-    assert "Text within in non-html tag" not in dom
+    assert "Text within a non-html tag" not in dom
     assert "Text that should not be visible" not in dom
 
     dom = flatten_dom_to_str(
@@ -383,7 +397,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     )
     assert "<title bid=" not in dom
     assert 'type="submit" value="Submit"' in dom
-    assert "Text within in non-html tag" in dom
+    assert "Text within a non-html tag" in dom
     assert "Text that should not be visible" not in dom
 
     dom = flatten_dom_to_str(
@@ -394,7 +408,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     assert "<title" in dom
     assert "<title bid=" not in dom
     assert 'type="submit" value="Submit"' in dom
-    assert "Text within in non-html tag" in dom
+    assert "Text within a non-html tag" in dom
     assert "Text that should not be visible" in dom
 
     dom = flatten_dom_to_str(
@@ -404,7 +418,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     )
     assert "<title bid=" in dom
     assert 'type="submit" value="Submit"' in dom
-    assert "Text within in non-html tag" not in dom
+    assert "Text within a non-html tag" in dom
     assert "Text that should not be visible" in dom
 
     env.close()
@@ -458,7 +472,7 @@ page.get_by_label("Subscribe to newsletter").click()
     assert ", clickable, visible, som" in axtree
     assert "] heading 'Simple Form', box=\"(" in axtree
     assert "] textbox 'Email:' value='janice@mail.com'" in axtree
-    assert "Text within in non-html tag" in axtree
+    assert "Text within a non-html tag" in axtree
     assert "Text that should not be visible" in axtree
     assert "] paragraph" in axtree
 
@@ -467,7 +481,7 @@ page.get_by_label("Subscribe to newsletter").click()
     )
     assert "LabelText" not in axtree
     assert "] button 'Submit'" in axtree
-    assert "Text within in non-html tag" not in axtree
+    assert "Text within a non-html tag" not in axtree
     assert "Text that should not be visible" not in axtree
 
     axtree = flatten_axtree_to_str(
@@ -477,7 +491,7 @@ page.get_by_label("Subscribe to newsletter").click()
     )
     assert "RootWebArea" in axtree
     assert "] button 'Submit'" in axtree
-    assert "Text within in non-html tag" in axtree
+    assert "Text within a non-html tag" in axtree
     assert "Text that should not be visible" not in axtree
     assert "] paragraph" not in axtree
 
@@ -488,7 +502,7 @@ page.get_by_label("Subscribe to newsletter").click()
     )
     assert "RootWebArea" in axtree
     assert "] button 'Submit'" in axtree
-    assert "Text within in non-html tag" in axtree
+    assert "Text within a non-html tag" in axtree
     assert "Text that should not be visible" in axtree
     assert "] paragraph '" not in axtree
     assert "paragraph '" in axtree
@@ -499,46 +513,30 @@ page.get_by_label("Subscribe to newsletter").click()
         filter_with_bid_only=True,
     )
     assert "button 'Submit'" in axtree
-    assert "Text within in non-html tag" not in axtree
+    assert "Text within a non-html tag" in axtree
     assert "Text that should not be visible" in axtree
 
     env.close()
 
 
-def test_remove_redundant():
-    test_ax_tree = """\
-[150] main 'Screen content'
-[151] Section ''
-    [155] Section ''
-        [171] Section ''
-            [173] Section ''
-                [175] heading 'Manage your instance'
-                    StaticText 'Manage your instance'
-                [179] heading 'Apps ready to update'
-                    StaticText 'Apps ready to update'
-                [180] button 'Refresh Apps ready to update'
-                [183] image 'Loading'
-                StaticText 'Loading visualization data'
-                [198] heading 'Apps ready to install'
-                    StaticText 'Apps ready to install'
-"""
+def test_axtree_to_text_remove_redundant():
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEST_PAGE_2},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=None,
+    )
+    obs, info = env.reset()
 
-    target = """\
-[150] main 'Screen content'
-[151] Section ''
-    [155] Section ''
-        [171] Section ''
-            [173] Section ''
-                [175] heading 'Manage your instance'
-                [179] heading 'Apps ready to update'
-                [180] button 'Refresh Apps ready to update'
-                [183] image 'Loading'
-                StaticText 'Loading visualization data'
-                [198] heading 'Apps ready to install'
-"""
+    axtree = flatten_axtree_to_str(obs["axtree_object"], remove_redundant_static_text=True)
+    assert "heading 'Simple Form'" in axtree
+    assert "StaticText 'Simple Form'" not in axtree
 
-    cleaned_ax_tree = _remove_redundant_static_text(test_ax_tree)
-    assert cleaned_ax_tree == target
+    axtree = flatten_axtree_to_str(obs["axtree_object"], remove_redundant_static_text=False)
+    assert "heading 'Simple Form'" in axtree
+    assert "StaticText 'Simple Form'" in axtree
 
 
 def test_simple_webpage():
