@@ -1429,11 +1429,13 @@ def test_forced_actions(force_actions):
     """
 
     obs, reward, terminated, truncated, info = env.step(action)
+    attributes = checkbox.attrs
+    checkbox_checked = attributes.get("checked", False)
     if force_actions:
         assert not obs["last_action_error"]
-        # assert checkbox.has_attr("checked")
+        assert not checkbox_checked
     else:
         assert obs["last_action_error"]
-        # assert not checkbox.has_attr("checked")
+        assert checkbox.has_attr("checked")
     
     env.close()
