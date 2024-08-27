@@ -6,9 +6,6 @@ import openai
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
-openai.api_key = openai_api_key
-
-
 class GPTGenerator:
     def __init__(self, model=None):
         self.model = model

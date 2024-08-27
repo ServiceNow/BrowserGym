@@ -46,7 +46,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         # read the list of all WebCanvas task configs
         import browsergym.webcanvas as wcs
         all_configs_str = importlib.resources.files(wcs).joinpath(
-            "data/example_130.json").read_text()
+            "data/mind2web-test_104tasks_20240528.json").read_text()
         all_task_configs = json.loads(all_configs_str)
         all_task = WebCanvasInstance.read_task_configs(all_task_configs)
         if task_id is not None and task_id < len(all_task):
