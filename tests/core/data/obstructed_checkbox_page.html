@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbox with Label Interception</title>
+    <style>
+        .form-wrapper {
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .col-md-3, .col-md-9, .col-sm-12 {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .custom-control {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-checkbox-inline {
+            margin-right: 20px;
+        }
+
+        .custom-control-input {
+            margin-right: 10px;
+        }
+
+        .custom-control-label {
+            font-weight: bold;
+            position: absolute; /* Position the label over the checkbox */
+            top: 0;
+            left: 0;
+            width: 100%; /* Make the label cover the checkbox completely */
+            height: 100%;
+            z-index: 2; /* Ensure the label is above the checkbox */
+            background-color: rgba(255, 255, 255, 0.5); /* Optional: make the label semi-transparent */
+        }
+    </style>
+</head>
+<body>
+
+    <form novalidate id="userForm" class="form-wrapper">
+        <div id="userName-wrapper" class="row">
+            <!-- User Name Input -->
+        </div>
+        <div id="userEmail-wrapper" class="row">
+            <!-- User Email Input -->
+        </div>
+        <!-- Additional Form Groups -->
+        <div id="hobbiesWrapper" class="row">
+            <div class="col-md-3 col-sm-12">
+                <!-- Empty Column for Alignment -->
+            </div>
+            <div class="col-md-9 col-sm-12">
+                <div class="custom-control custom-checkbox custom-control-inline">
+                    <input type="checkbox" id="hobbies-checkbox-1" class="custom-control-input" value="1">
+                    <label for="hobbies-checkbox-1" class="custom-control-label">Hobby 1</label>
+                </div>
+                <div class="custom-control custom-checkbox custom-control-inline">
+                    <input type="checkbox" id="hobbies-checkbox-2" class="custom-control-input" value="2">
+                    <label for="hobbies-checkbox-2" class="custom-control-label">Hobby 2</label>
+                </div>
+                <div class="custom-control custom-checkbox custom-control-inline">
+                    <input type="checkbox" id="hobbies-checkbox-3" class="custom-control-input" value="3">
+                    <label for="hobbies-checkbox-3" class="custom-control-label">Hobby 3</label>
+                </div>
+            </div>
+        </div>
+        <div id="currentAddress-wrapper" class="row">
+            <!-- Current Address Input -->
+        </div>
+        <div id="stateCity-wrapper" class="row">
+            <!-- State City Input -->
+        </div>
+        <div class="mt-4 justify-content-end row">
+            <!-- Submit Button -->
+        </div>
+    </form>
+
+</body>
+</html>

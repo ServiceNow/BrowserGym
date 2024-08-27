@@ -14,6 +14,7 @@ page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
 report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
+force_actions: bool = False
 
 """IMPORTANT
 The following primitives are meant to be included in the browsergym action using
@@ -69,9 +70,14 @@ def fill(bid: str, value: str):
         elem.clear()
         delay = max(2000 / len(value), 10)
         elem.type(value, delay=delay)
+    if force_actions:
+        try:
+            elem.fill(value, timeout=500)
+        except Exception as e:
+            elem.click(force=True)
+            elem.type(value)
     else:
         elem.fill(value, timeout=500)
-
 
 # https://playwright.dev/python/docs/api/class-locator#locator-check
 def check(bid: str):
@@ -82,8 +88,15 @@ def check(bid: str):
         check('55')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.check(timeout=500)
+    if demo_mode != "off":
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    if force_actions:
+        try:
+            elem.check(timeout=500)
+        except Exception as e:
+            elem.click(force=True, timeout=500)
+    else:
+        elem.check(timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-uncheck
@@ -95,8 +108,15 @@ def uncheck(bid: str):
         uncheck('a5289')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.uncheck(timeout=500)
+    if demo_mode != "off":
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    if force_actions:
+        try:
+            elem.uncheck(timeout=500)
+        except Exception as e:
+            elem.click(force=True, timeout=500)
+    else:
+        elem.uncheck(timeout=500)
 
 
 # https://playwright.dev/docs/input#select-options
@@ -110,8 +130,15 @@ def select_option(bid: str, options: str | list[str]):
         select_option('c48', ["red", "green", "blue"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    elem.select_option(options, timeout=500)
+    if demo_mode != "off":
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    if force_actions:
+        try:
+            elem.select_option(options, timeout=500)
+        except Exception as e:
+            elem.select_option(options, force=True, timeout=500)
+    else:
+        elem.select_option(options, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-click
@@ -129,8 +156,15 @@ def click(
         click('48', button="middle", modifiers=["Shift"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.click(button=button, modifiers=modifiers, timeout=500)
+    if demo_mode != "off":
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    if force_actions:
+        try:
+            elem.click(button=button, modifiers=modifiers, timeout=500)
+        except Exception as e:
+            elem.click(button=button, modifiers=modifiers, force=True, timeout=500)
+    else:
+        elem.click(button=button, modifiers=modifiers, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-dblclick
@@ -148,8 +182,15 @@ def dblclick(
         dblclick('178', button="middle", modifiers=["Shift"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    elem.dblclick(button=button, modifiers=modifiers, timeout=500)
+    if demo_mode != "off":
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    if force_actions:
+        try:
+            elem.dblclick(button=button, modifiers=modifiers, timeout=500)
+        except Exception as e:
+            elem.dblclick(button=button, modifiers=modifiers, force=True, timeout=500)
+    else:
+        elem.dblclick(button=button, modifiers=modifiers, timeout=500)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-hover
@@ -166,7 +207,13 @@ def hover(bid: str):
         if box:
             center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
             smooth_move_visual_cursor_to(page, center_x, center_y)
-    elem.hover(timeout=500)
+    if force_actions:
+        try:
+            elem.hover(timeout=500)
+        except Exception as e:
+            elem.hover(force=True, timeout=500)
+    else:
+        elem.hover(timeout=500)
 
 
 # https://playwright.dev/python/docs/input#keys-and-shortcuts

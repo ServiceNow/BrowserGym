@@ -116,10 +116,12 @@ class HighLevelActionSet(AbstractActionSet):
         multiaction: bool = True,
         demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off",
         strict: bool = False,
+        force_actions: bool = False,
     ):
         super().__init__(strict)
         self.multiaction = multiaction
         self.demo_mode = demo_mode
+        self.force_actions = force_actions
 
         if not subsets:
             raise ValueError(f"'action_subsets' is empty.")
@@ -169,11 +171,10 @@ from typing import Literal
 
 
 """
-        # include demo_mode flag
+        # include demo_mode and force_actions flags
         self.python_includes += f"""\
 demo_mode={repr(demo_mode)}
-
-
+force_actions={repr(force_actions)}
 """
 
         # include utility functions
