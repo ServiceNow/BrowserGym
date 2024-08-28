@@ -164,6 +164,7 @@ class ExpArgs:
         self._set_logger()
 
         episode_info = []
+        env, step_info, err_msg, stack_trace = None, None, None, None
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
@@ -173,7 +174,6 @@ class ExpArgs:
             )
             logger.debug(f"Environment created.")
 
-            err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
             step_info.from_reset(
@@ -216,7 +216,8 @@ class ExpArgs:
 
         finally:
             try:
-                step_info.save_step_info(self.exp_dir)
+                if step_info is not None:
+                    step_info.save_step_info(self.exp_dir)
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
@@ -231,7 +232,8 @@ class ExpArgs:
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
-                env.close()
+                if env is not None:
+                    env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
             try:
