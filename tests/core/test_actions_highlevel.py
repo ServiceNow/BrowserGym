@@ -1403,9 +1403,9 @@ mouse_up({repr(x)}, {repr(y)})
 
 
 # test that forced action can click an obstructed element
-@pytest.mark.parametrize("force_actions", [True, False])
-def test_forced_actions(force_actions):
-    action_set = HighLevelActionSet(subsets=["bid"], force_actions=force_actions)
+@pytest.mark.parametrize("retry_with_force", [True, False])
+def test_forced_actions(retry_with_force):
+    action_set = HighLevelActionSet(subsets=["bid"], retry_with_force=retry_with_force)
     env = gym.make(
         "browsergym/openended",
         task_kwargs={"start_url": OBSTRUCTED_CHECKBOX_URL},
@@ -1431,7 +1431,7 @@ def test_forced_actions(force_actions):
     obs, reward, terminated, truncated, info = env.step(action)
     attributes = checkbox.attrs
     checkbox_checked = attributes.get("checked", False)
-    if force_actions:
+    if retry_with_force:
         assert not obs["last_action_error"]
         assert not checkbox_checked
     else:

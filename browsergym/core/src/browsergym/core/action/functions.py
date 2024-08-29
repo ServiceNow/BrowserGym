@@ -14,7 +14,7 @@ page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
 report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
-force_actions: bool = False
+retry_with_force: bool = False
 
 """IMPORTANT
 The following primitives are meant to be included in the browsergym action using
@@ -70,7 +70,7 @@ def fill(bid: str, value: str):
         elem.clear()
         delay = max(2000 / len(value), 10)
         elem.type(value, delay=delay)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.fill(value, timeout=500)
         except Exception as e:
@@ -90,7 +90,7 @@ def check(bid: str):
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.check(timeout=500)
         except Exception as e:
@@ -110,7 +110,7 @@ def uncheck(bid: str):
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.uncheck(timeout=500)
         except Exception as e:
@@ -132,7 +132,7 @@ def select_option(bid: str, options: str | list[str]):
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.select_option(options, timeout=500)
         except Exception as e:
@@ -158,7 +158,7 @@ def click(
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.click(button=button, modifiers=modifiers, timeout=500)
         except Exception as e:
@@ -184,7 +184,7 @@ def dblclick(
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     if demo_mode != "off":
         add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.dblclick(button=button, modifiers=modifiers, timeout=500)
         except Exception as e:
@@ -207,7 +207,7 @@ def hover(bid: str):
         if box:
             center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
             smooth_move_visual_cursor_to(page, center_x, center_y)
-    if force_actions:
+    if retry_with_force:
         try:
             elem.hover(timeout=500)
         except Exception as e:

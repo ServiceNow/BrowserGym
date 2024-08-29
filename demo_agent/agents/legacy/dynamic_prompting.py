@@ -53,7 +53,7 @@ class Flags:
     extract_coords: Literal["False", "center", "box"] = "False"
     extract_visible_elements_only: bool = False
     demo_mode: Literal["off", "default", "only_visible_elements"] = "off"
-    force_actions: bool = False
+    retry_with_force: bool = False
 
     def copy(self):
         return deepcopy(self)
@@ -500,7 +500,7 @@ def _get_action_space(flags: Flags) -> AbstractActionSet:
         multiaction=flags.multi_actions,
         strict=flags.is_strict,
         demo_mode=flags.demo_mode,
-        force_actions=flags.force_actions,
+        retry_with_force=flags.retry_with_force,
     )
 
     return action_space
