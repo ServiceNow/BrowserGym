@@ -1409,7 +1409,7 @@ def test_forced_actions(retry_with_force):
     env = gym.make(
         "browsergym/openended",
         task_kwargs={"start_url": OBSTRUCTED_CHECKBOX_URL},
-        headless=False,
+        headless=__HEADLESS,
         slow_mo=__SLOW_MO,
         timeout=__TIMEOUT,
         action_mapping=action_set.to_python_code,
