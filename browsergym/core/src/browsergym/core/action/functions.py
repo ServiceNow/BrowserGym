@@ -74,8 +74,7 @@ def fill(bid: str, value: str):
         try:
             elem.fill(value, timeout=500)
         except Exception as e:
-            elem.click(force=True)
-            elem.type(value)
+            elem.fill(value, force=True, timeout=500)
     else:
         elem.fill(value, timeout=500)
 
@@ -88,13 +87,12 @@ def check(bid: str):
         check('55')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
     if retry_with_force:
         try:
             elem.check(timeout=500)
         except Exception as e:
-            elem.click(force=True, timeout=500)
+            elem.check(force=True, timeout=500)
     else:
         elem.check(timeout=500)
 
@@ -108,13 +106,12 @@ def uncheck(bid: str):
         uncheck('a5289')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
     if retry_with_force:
         try:
             elem.uncheck(timeout=500)
         except Exception as e:
-            elem.click(force=True, timeout=500)
+            elem.uncheck(force=True, timeout=500)
     else:
         elem.uncheck(timeout=500)
 
@@ -130,8 +127,7 @@ def select_option(bid: str, options: str | list[str]):
         select_option('c48', ["red", "green", "blue"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
     if retry_with_force:
         try:
             elem.select_option(options, timeout=500)
@@ -156,8 +152,7 @@ def click(
         click('48', button="middle", modifiers=["Shift"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
     if retry_with_force:
         try:
             elem.click(button=button, modifiers=modifiers, timeout=500)
@@ -182,8 +177,7 @@ def dblclick(
         dblclick('178', button="middle", modifiers=["Shift"])
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
     if retry_with_force:
         try:
             elem.dblclick(button=button, modifiers=modifiers, timeout=500)
