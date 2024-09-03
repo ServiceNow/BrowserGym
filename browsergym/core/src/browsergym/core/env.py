@@ -148,6 +148,14 @@ class BrowserEnv(gym.Env, ABC):
                 "goal_image_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
+                "goal_images": gym.spaces.Sequence(
+                    gym.spaces.Dict(
+                        {
+                            "base64": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                            "path": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                        }
+                    )
+                ),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
@@ -566,7 +574,7 @@ document.addEventListener("visibilitychange", () => {
             "chat_messages": copy.deepcopy(self.chat.messages),
             "goal": goal_msg,  # TODO: redundant with chat messages, to be removed?
             "goal_image_urls": goal_image_urls,  # TODO: redundant with chat messages, to be removed?
-            "goal_images": self.goal_images,
+            "goal_images": self.goal_images,  # TODO: this should be moved bc it's super redundant
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
