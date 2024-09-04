@@ -315,6 +315,9 @@ document.addEventListener("visibilitychange", () => {
             # goal is text + images
             elif isinstance(goal, dict):
                 goal_msg = goal["message"]
+
+                temp_dir = Path(tempfile.mkdtemp())
+
                 for image_i, image_url in enumerate(goal["image_urls"]):
                     self.chat.add_message(role="user_image", msg=image_url)
                     if image_url.startswith("http"):
@@ -325,10 +328,7 @@ document.addEventListener("visibilitychange", () => {
                         image = b64_to_pil(image_base64)
                     else:
                         raise ValueError(f"Unexpected image_url: {image_url}")
-                    # save the image to a temporary (but persistent) PNG file
-                    if not os.path.exists("tmp"):
-                        os.makedirs("tmp")
-                    image_path = os.path.join("tmp", f"inputImage_{image_i}.png")
+                    image_path = temp_dir / f"inputImage_{image_i}.png"
                     # Save the image to the specified path
                     image.save(image_path)
                     self.goal_images.append({"base64": image_base64, "path": image_path})
