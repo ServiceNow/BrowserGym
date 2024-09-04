@@ -17,9 +17,10 @@ from typing import Optional
 
 import gymnasium as gym
 import numpy as np
-from browsergym.core.chat import Chat
 from PIL import Image
 from tqdm import tqdm
+
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -414,8 +415,19 @@ class StepInfo:
 
     def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
 
+        if "goal_images" in self.obs:
+            goal_images = self.obs.pop("goal_images")
+        else:
+            goal_images = None
+
+        if goal_images and not os.path.exists(exp_dir / "goal_images.pkl.gz"):
+            with gzip.open(exp_dir / "goal_images.pkl.gz", "wb") as f:
+                pickle.dump(goal_images, f)
+
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
-            pickle.dump(self, f)
+            pickle.dump(
+                self, f
+            )  # should we not pop the screenshots before this to avoid duplicates ?
 
         if save_jpg and self.obs is not None:
             for name in ("screenshot", "screenshot_som"):
@@ -552,6 +564,13 @@ class ExpResult:
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
+
+        if os.path.exists(self.exp_dir / f"goal_images.pkl.gz"):
+            if "goal_images" not in self._steps_info[step].obs:
+                with gzip.open(self.exp_dir / "goal_images.pkl.gz", "rb") as f:
+                    goal_images = pickle.load(f)
+                    self._steps_info[step].obs["goal_images"] = goal_images
+
         return self._steps_info[step]
 
     @property
