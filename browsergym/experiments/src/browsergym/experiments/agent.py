@@ -29,6 +29,7 @@ class AgentInfo:
     chat_messages: list = None
     stats: dict = None
     markup_page: str = ""
+    html_page: str = ""
     extra_info: dict = None
 
     def __getitem__(self, key):
