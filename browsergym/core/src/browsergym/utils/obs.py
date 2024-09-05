@@ -181,19 +181,6 @@ def flatten_dom_to_str(
     return html
 
 
-def _remove_redundant_static_text(ax_tree: str) -> str:
-    """Removes redundant `StaticText` from the accessibility tree"""
-    new_lines = []
-    lines = ax_tree.split("\n")
-    for line in lines:
-        if line.strip().startswith("StaticText"):
-            content = line.split("StaticText")[1].strip().strip("'")
-            if content in "\n".join(new_lines[-3:]):
-                continue
-        new_lines.append(line)
-    return "\n".join(new_lines)
-
-
 def _get_coord_str(coord, decimals):
     if isinstance(coord, str):
         coord = list(map(float, ast.literal_eval(coord)))
@@ -252,7 +239,7 @@ def _process_bid(
             skip_element = True
         if filter_visible_only:
             # element without bid have no visibility mark, they could be visible or non-visible
-            # TODO: we consider them as visible. Is this what we want? Now that duplicate bids are handles, should we mark all non-html elements?
+            # TODO we consider them as visible. Is this what we want? Now that duplicate bids are handled, should we mark all non-html elements?
             pass  # keep elements without visible property
             # skip_element = True  # filter elements without visible property
 
@@ -296,6 +283,7 @@ def flatten_axtree_to_str(
     with_center_coords: bool = False,
     with_bounding_box_coords: bool = False,
     with_som: bool = False,
+    skip_generic: bool = True,
     filter_visible_only: bool = False,
     filter_with_bid_only: bool = False,
     filter_som_only: bool = False,
@@ -311,13 +299,14 @@ def flatten_axtree_to_str(
     for idx, node in enumerate(AX_tree["nodes"]):
         node_id_to_idx[node["nodeId"]] = idx
 
-    def dfs(node_idx: int, depth: int, parent_node_filtered: bool) -> str:
+    def dfs(node_idx: int, depth: int, parent_node_filtered: bool, parent_node_name: str) -> str:
         tree_str = ""
         node = AX_tree["nodes"][node_idx]
         indent = "\t" * depth
-        skip_node = False
-        filter_node = False
+        skip_node = False  # node will not be printed, with no effect on children nodes
+        filter_node = False  # node will not be printed, possibly along with its children nodes
         node_role = node["role"]["value"]
+        node_name = ""
 
         if node_role in ignored_roles:
             skip_node = True
@@ -332,8 +321,11 @@ def flatten_axtree_to_str(
             else:
                 node_value = None
 
+            # extract bid
+            bid = node.get("browsergym_id", None)
+
+            # extract node attributes
             attributes = []
-            bid = None
             for property in node.get("properties", []):
                 if not "value" in property:
                     continue
@@ -343,9 +335,7 @@ def flatten_axtree_to_str(
                 prop_name = property["name"]
                 prop_value = property["value"]["value"]
 
-                if prop_name == "browsergym_id":
-                    bid = prop_value
-                elif prop_name in ignored_properties:
+                if prop_name in ignored_properties:
                     continue
                 elif prop_name in ("required", "focused", "atomic"):
                     if prop_value:
@@ -353,11 +343,16 @@ def flatten_axtree_to_str(
                 else:
                     attributes.append(f"{prop_name}={repr(prop_value)}")
 
-            if node_role == "generic" and not attributes:
+            if skip_generic and node_role == "generic" and not attributes:
+                skip_node = True
+
+            if hide_all_children and parent_node_filtered:
                 skip_node = True
 
             if node_role == "StaticText":
                 if parent_node_filtered:
+                    skip_node = True
+                elif remove_redundant_static_text and node_name in parent_node_name:
                     skip_node = True
             else:
                 filter_node, extra_attributes_to_print = _process_bid(
@@ -375,14 +370,17 @@ def flatten_axtree_to_str(
                 )
 
                 # if either is True, skip the node
-                skip_node = skip_node or filter_node or (hide_all_children and parent_node_filtered)
+                skip_node = skip_node or filter_node
 
                 # insert extra attributes before regular attributes
                 attributes = extra_attributes_to_print + attributes
 
             # actually print the node string
             if not skip_node:
-                node_str = f"{node_role} {repr(node_name.strip())}"
+                if node_role == "generic" and not node_name:
+                    node_str = f"{node_role}"
+                else:
+                    node_str = f"{node_role} {repr(node_name.strip())}"
 
                 if not (
                     bid is None
@@ -407,7 +405,10 @@ def flatten_axtree_to_str(
             # mark this to save some tokens
             child_depth = depth if skip_node else (depth + 1)
             child_str = dfs(
-                node_id_to_idx[child_node_id], child_depth, parent_node_filtered=filter_node
+                node_id_to_idx[child_node_id],
+                child_depth,
+                parent_node_filtered=filter_node,
+                parent_node_name=node_name,
             )
             if child_str:
                 if tree_str:
@@ -416,9 +417,7 @@ def flatten_axtree_to_str(
 
         return tree_str
 
-    tree_str = dfs(0, 0, False)
-    if remove_redundant_static_text:
-        tree_str = _remove_redundant_static_text(tree_str)
+    tree_str = dfs(0, 0, False, "")
     return tree_str
 
 

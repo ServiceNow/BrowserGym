@@ -1,26 +1,8 @@
 /**
  * Go through all DOM elements in the frame (including shadowDOMs), give them unique browsergym
- * identifiers (bid), and store custom data in the aria-roledescription attribute.
+ * identifiers (bid), and store custom data in ARIA attributes.
  */
 async ([parent_bid, bid_attr_name]) => {
-
-    // standard html tags
-    // https://www.w3schools.com/tags/
-    const html_tags = new Set([
-        "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio",
-        "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button",
-        "canvas", "caption", "center", "cite", "code", "col", "colgroup", "data", "datalist",
-        "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed",
-        "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset",
-        "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i",
-        "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "main",
-        "map", "mark", "menu", "meta", "meter", "nav", "noframes", "noscript", "object",
-        "ol", "optgroup", "option", "output", "p", "param", "picture", "pre", "progress",
-        "q", "rp", "rt", "ruby", "s", "samp", "script", "search", "section", "select",
-        "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup",
-        "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead",
-        "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"
-    ]);
     const set_of_marks_tags = new Set([
         "input", "textarea", "select", "button", "a", "iframe", "video", "li", "td", "option"
     ]);
@@ -69,11 +51,6 @@ async ([parent_bid, bid_attr_name]) => {
             );
         }
         i++;
-        // we will mark only standard HTML tags
-        if (!elem.tagName || !html_tags.has(elem.tagName.toLowerCase())) {
-            // Skipping element
-            continue;  // stop and move on to the next element
-        }
         // Processing element
         // register intersection callback on element, and keep track of element for waiting later
         elem.setAttribute('browsergym_visibility_ratio', 0);
@@ -132,15 +109,11 @@ async ([parent_bid, bid_attr_name]) => {
         }
         all_bids.add(elem_global_bid);
 
-        // Hack: store custom data inside the aria-roledescription attribute (will be available in DOM and AXTree)
+        // Hack: store custom data inside ARIA attributes (will be available in DOM and AXTree)
         //  - elem_global_bid: global element identifier (unique over multiple frames)
         // TODO: add more data if needed (x, y coordinates, bounding box, is_visible, is_clickable etc.)
-        let original_content = "";
-        if (elem.hasAttribute("aria-roledescription")) {
-            original_content = elem.getAttribute("aria-roledescription");
-        }
-        let new_content = `${elem_global_bid}_${original_content}`
-        elem.setAttribute("aria-roledescription", new_content);
+        push_bid_to_attribute(elem_global_bid, elem, "aria-roledescription");
+        push_bid_to_attribute(elem_global_bid, elem, "aria-description");  // fallback for generic nodes
 
         // set-of-marks flag (He et al. 2024)
         // https://github.com/MinorJerry/WebVoyager/blob/main/utils.py
@@ -227,6 +200,15 @@ function whoCapturesCenterClick(element){
     } else {
         return "non-descendant";
     }
+}
+
+function push_bid_to_attribute(bid, elem, attr){
+    let original_content = "";
+    if (elem.hasAttribute(attr)) {
+        original_content = elem.getAttribute(attr);
+    }
+    let new_content = `browsergym_id_${bid} ${original_content}`
+    elem.setAttribute(attr, new_content);
 }
 
 function elementFromPoint(x, y) {
