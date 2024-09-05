@@ -125,6 +125,8 @@ class ExpArgs:
     stack_trace: str = None
     order: int = None  # use to keep the original order the experiments were meant to be launched.
     logging_level: int = logging.INFO
+    exp_id: str = None
+    depends_on: tuple[str] = field(default_factory=tuple)
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -138,22 +140,32 @@ class ExpArgs:
             task_name = self.env_args.task_name
             self.exp_name = f"{self.agent_args.agent_name}_on_{task_name}_{self.env_args.task_seed}"
 
+        if self.exp_id is None:  # reuse the same task_id if it's a relaunch
+            self.exp_id = str(uuid.uuid4().hex)
+
         # if exp_dir exists, it means it's a re-run, move the old one
         if self.exp_dir is not None:
             _move_old_exp(self.exp_dir)
 
         self.exp_date = datetime.now()
-        date_str = self.exp_date.strftime("%Y-%m-%d_%H-%M-%S")
-
-        while True:  # create a short unique id, but if it exists, try again
-            id = str(uuid.uuid4().hex)[:6]
-            self.exp_dir = Path(exp_root) / f"{date_str}_{self.exp_name}_{id}"
-            if not self.exp_dir.exists():
-                break
+        self._make_dir(exp_root)
 
         self.exp_dir.mkdir(parents=True, exist_ok=True)
         with open(self.exp_dir / "exp_args.pkl", "wb") as f:
             pickle.dump(self, f)
+
+    def _make_dir(self, exp_root):
+        """Create a unique directory for the experiment."""
+        date_str = self.exp_date.strftime("%Y-%m-%d_%H-%M-%S")
+
+        for i in range(1000):
+            if i >= 999:  # make sure we don't loop forever
+                raise ValueError("Could not find a unique name for the experiment directory.")
+
+            tag = f"_{i}" if i > 0 else ""
+            self.exp_dir = Path(exp_root) / f"{date_str}_{self.exp_name}{tag}"
+            if not self.exp_dir.exists():
+                break
 
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
@@ -164,6 +176,7 @@ class ExpArgs:
         self._set_logger()
 
         episode_info = []
+        env, step_info, err_msg, stack_trace = None, None, None, None
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
@@ -173,7 +186,6 @@ class ExpArgs:
             )
             logger.debug(f"Environment created.")
 
-            err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
             step_info.from_reset(
@@ -216,7 +228,8 @@ class ExpArgs:
 
         finally:
             try:
-                step_info.save_step_info(self.exp_dir)
+                if step_info is not None:
+                    step_info.save_step_info(self.exp_dir)
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
@@ -231,7 +244,8 @@ class ExpArgs:
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
-                env.close()
+                if env is not None:
+                    env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
             try:
