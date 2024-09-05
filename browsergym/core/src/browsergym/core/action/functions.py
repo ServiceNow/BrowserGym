@@ -78,6 +78,7 @@ def fill(bid: str, value: str):
     else:
         elem.fill(value, timeout=500)
 
+
 # https://playwright.dev/python/docs/api/class-locator#locator-check
 def check(bid: str):
     """

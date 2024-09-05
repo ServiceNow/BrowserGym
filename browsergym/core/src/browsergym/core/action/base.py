@@ -11,7 +11,6 @@ class AbstractActionSet(ABC):
         """
         Returns a textual description of this action space.
         """
-        
 
     @abstractmethod
     def example_action(self, abstract: bool) -> str:
@@ -58,5 +57,3 @@ def execute_python_code(
     }
 
     exec(code, globals)
-
-

@@ -1437,5 +1437,5 @@ def test_forced_actions(retry_with_force):
     else:
         assert obs["last_action_error"]
         assert checkbox.has_attr("checked")
-    
+
     env.close()
