@@ -35,6 +35,7 @@ TEXT_INPUT_URL = f"file://{__DATA_DIR}/input_type/text_input.html"
 URL_INPUT_URL = f"file://{__DATA_DIR}/input_type/url_input.html"
 CHECKBOX_URL = f"file://{__DATA_DIR}/input_type/checkbox_input.html"
 MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
+OBSTRUCTED_CHECKBOX_URL = f"file://{__DATA_DIR}/obstructed_checkbox_page.html"
 
 
 def test_action_parser():
@@ -1399,3 +1400,42 @@ mouse_up({repr(x)}, {repr(y)})
     # box not checked
     assert not obs["last_action_error"]
     assert not checkbox.has_attr("checked")
+
+
+# test that forced action can click an obstructed element
+@pytest.mark.parametrize("retry_with_force", [True, False])
+def test_forced_actions(retry_with_force):
+    action_set = HighLevelActionSet(subsets=["bid"], retry_with_force=retry_with_force)
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": OBSTRUCTED_CHECKBOX_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    obs, info = env.reset()
+
+    def get_checkbox(obs):
+        soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
+        checkbox = soup.find("input", attrs={"id": "hobbies-checkbox-1"})
+        return checkbox
+
+    checkbox = get_checkbox(obs)
+
+    action = f"""
+    click({repr(checkbox.get(BID_ATTR))})
+    """
+
+    obs, reward, terminated, truncated, info = env.step(action)
+    attributes = checkbox.attrs
+    checkbox_checked = attributes.get("checked", False)
+    if retry_with_force:
+        assert not obs["last_action_error"]
+        assert not checkbox_checked
+    else:
+        assert obs["last_action_error"]
+        assert checkbox.has_attr("checked")
+
+    env.close()
