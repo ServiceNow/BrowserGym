@@ -172,6 +172,9 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
+        # save pip info
+        _save_pip_info(self.exp_dir)
+
         # start writing logs to run logfile
         self._set_logger()
 
@@ -450,6 +453,22 @@ def _aggregate_episode_stats(episode_info: list[StepInfo]):
     return aggregated_stats
 
 
+def _save_pip_info(
+    exp_dir,
+):
+    # from https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
+    import subprocess
+    import sys
+
+    pip_freeze = subprocess.check_output([sys.executable, "-m", "pip", "freeze"], encoding="utf-8")
+    pip_list = subprocess.check_output([sys.executable, "-m", "pip", "list"], encoding="utf-8")
+
+    with open(exp_dir / "pip_freeze.txt", "w") as f:
+        f.write(pip_freeze)
+    with open(exp_dir / "pip_list.txt", "w") as f:
+        f.write(pip_list)
+
+
 def _save_summary_info(
     episode_info: list[StepInfo],
     exp_dir,
@@ -507,6 +526,8 @@ class ExpResult:
         task_video_path: Path, the path to the task video. (if record_video=True)
         combined_video_path: Path, the path to the combined video. (if video was
             combined)
+        pip_freeze: str, a `pip freeze` of the python environment
+        pip_list: str, a `pip list` of the python environment
     """
 
     def __init__(self, exp_dir) -> None:
@@ -517,6 +538,8 @@ class ExpResult:
         self._screenshots = {}
         self._flat_exp_args = None
         self._logs = None
+        self._pip_freeze = None
+        self._pip_list = None
 
     @property
     def exp_args(self) -> ExpArgs:
@@ -623,6 +646,20 @@ class ExpResult:
             with open(self.exp_dir / "experiment.log", "r") as f:
                 self._logs = f.read()
         return self._logs
+
+    @property
+    def pip_freeze(self):
+        if self._pip_freeze is None:
+            with open(self.exp_dir / "pip_freeze.txt", "r") as f:
+                self._pip_freeze = f.read()
+        return self._pip_freeze
+
+    @property
+    def pip_list(self):
+        if self._pip_list is None:
+            with open(self.exp_dir / "pip_list.txt", "r") as f:
+                self._pip_list = f.read()
+        return self._pip_list
 
 
 EXP_RESULT_CACHE = {}
