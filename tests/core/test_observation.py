@@ -418,7 +418,7 @@ page.get_by_label("Age:", exact=True).press("Tab")
     )
     assert "<title bid=" in dom
     assert 'type="submit" value="Submit"' in dom
-    assert "Text within a non-html tag" in dom
+    assert "Text within a non-html tag" not in dom
     assert "Text that should not be visible" in dom
 
     env.close()
@@ -747,3 +747,77 @@ def test_extract_focused_element_bid_through_shadowdom():
     assert obs["focused_element_bid"] == input_elem.get(BID_ATTR)
 
     env.close()
+
+
+def test_tags_to_mark():
+
+    # default value
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEST_PAGE_2},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=None,
+    )
+    obs, info = env.reset()
+
+    dom = flatten_dom_to_str(obs["dom_object"])
+    assert isinstance(dom, str)
+    assert "<nonhtmltag" in dom
+    assert '<nonhtmltag bid="' not in dom
+    assert '<p bid="' in dom
+
+    env.close()
+
+    # standard_html
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEST_PAGE_2},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        tags_to_mark="standard_html",
+        action_mapping=None,
+    )
+    obs, info = env.reset()
+
+    dom = flatten_dom_to_str(obs["dom_object"])
+    assert isinstance(dom, str)
+    assert "<nonhtmltag" in dom
+    assert '<nonhtmltag bid="' not in dom
+    assert '<p bid="' in dom
+
+    env.close()
+
+    # all
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEST_PAGE_2},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        tags_to_mark="all",
+        action_mapping=None,
+    )
+    obs, info = env.reset()
+
+    dom = flatten_dom_to_str(obs["dom_object"])
+    assert isinstance(dom, str)
+    assert "<nonhtmltag" in dom
+    assert '<nonhtmltag bid="' in dom
+    assert '<p bid="' in dom
+
+    env.close()
+
+    # incorrect value
+    with pytest.raises(Exception):
+        env = gym.make(
+            "browsergym/openended",
+            task_kwargs={"start_url": TEST_PAGE_2},
+            headless=__HEADLESS,
+            slow_mo=__SLOW_MO,
+            timeout=__TIMEOUT,
+            tags_to_mark="fdsjkhjk",
+            action_mapping=None,
+        )
