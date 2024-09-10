@@ -3,10 +3,12 @@ import json
 import logging
 import os
 import pickle
+import subprocess
 import sys
 import time
 import traceback
 import uuid
+
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field, is_dataclass
@@ -457,9 +459,6 @@ def _save_pip_info(
     exp_dir,
 ):
     # from https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
-    import subprocess
-    import sys
-
     pip_freeze = subprocess.check_output([sys.executable, "-m", "pip", "freeze"], encoding="utf-8")
     pip_list = subprocess.check_output([sys.executable, "-m", "pip", "list"], encoding="utf-8")
 
@@ -643,22 +642,19 @@ class ExpResult:
     @property
     def logs(self):
         if self._logs is None:
-            with open(self.exp_dir / "experiment.log", "r") as f:
-                self._logs = f.read()
+            self._logs = (self.exp_dir / "experiment.log").read_text()
         return self._logs
 
     @property
     def pip_freeze(self):
         if self._pip_freeze is None:
-            with open(self.exp_dir / "pip_freeze.txt", "r") as f:
-                self._pip_freeze = f.read()
+            self._pip_freeze = (self.exp_dir / "pip_freeze.txt").read_text()
         return self._pip_freeze
 
     @property
     def pip_list(self):
         if self._pip_list is None:
-            with open(self.exp_dir / "pip_list.txt", "r") as f:
-                self._pip_list = f.read()
+            self._pip_list = (self.exp_dir / "pip_list.txt").read_text()
         return self._pip_list
 
 
