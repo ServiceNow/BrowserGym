@@ -8,7 +8,7 @@ import re
 
 from abc import ABC
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Literal
 
 from .chat import Chat
 from .task import AbstractBrowserTask
@@ -47,6 +47,7 @@ class BrowserEnv(gym.Env, ABC):
         viewport: Optional[dict] = None,  # will override the task's viewport
         slow_mo: Optional[int] = None,  # will override the task's slow_mo
         timeout: Optional[int] = None,  # will override the task's timeout
+        tags_to_mark: Literal["all", "standard_html"] = "standard_html",
         # interactive / debugging arguments
         headless: bool = True,
         wait_for_user_message: bool = False,
@@ -67,6 +68,7 @@ class BrowserEnv(gym.Env, ABC):
             viewport: desired viewport size. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             slow_mo: desired slow_mo value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             timeout: desired timeout value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            tags_to_mark: which HTML tags should be marked by BrowserGym and receive a bid. Value "all" will mark every element in the page, while "standard_html" (default) will only mark standard html tags.
             headless: whether the browser should run in headless mode or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Headless mode should only be disabled for debugging/testing.
             wait_for_user_message: whether the environment should pause and wait for a user message in the chat after a new message is sent by the agent. Useful for running agents in interactive mode.
             resizeable_window: whether the browser window should be resizeable or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Should only be set for debugging/testing.
@@ -82,6 +84,7 @@ class BrowserEnv(gym.Env, ABC):
         self.viewport = viewport
         self.slow_mo = slow_mo
         self.timeout = timeout
+        self.tags_to_mark = tags_to_mark
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
         self.terminate_on_infeasible = terminate_on_infeasible
@@ -90,6 +93,9 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_chromium_kwargs = pw_chromium_kwargs
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
+
+        # check argument values
+        assert tags_to_mark in ("all", "standard_html")
 
         # task
         self.task = None
@@ -472,7 +478,7 @@ document.addEventListener("visibilitychange", () => {
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
-                _pre_extract(self.page)
+                _pre_extract(self.page, self.tags_to_mark)
 
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)

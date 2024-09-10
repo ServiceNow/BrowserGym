@@ -7,6 +7,8 @@ import PIL.Image
 import pkgutil
 import re
 
+from typing import Literal
+
 from .constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from .constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 from .constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
@@ -21,7 +23,9 @@ class MarkingError(Exception):
     pass
 
 
-def _pre_extract(page: playwright.sync_api.Page):
+def _pre_extract(
+    page: playwright.sync_api.Page, tags_to_mark: Literal["all", "standard_html"] = "standard_html"
+):
     """
     pre-extraction routine, marks dom elements (set bid and dynamic attributes like value and checked)
     """
@@ -37,7 +41,7 @@ def _pre_extract(page: playwright.sync_api.Page):
         # mark all DOM elements in the frame (it will use the parent frame element's bid as a prefix)
         warning_msgs = frame.evaluate(
             js_frame_mark_elements,
-            [frame_bid, BID_ATTR],
+            [frame_bid, BID_ATTR, tags_to_mark],
         )
         # print warning messages if any
         for msg in warning_msgs:

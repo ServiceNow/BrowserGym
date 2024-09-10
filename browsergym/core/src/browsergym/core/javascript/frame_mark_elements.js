@@ -2,7 +2,25 @@
  * Go through all DOM elements in the frame (including shadowDOMs), give them unique browsergym
  * identifiers (bid), and store custom data in ARIA attributes.
  */
-async ([parent_bid, bid_attr_name]) => {
+async ([parent_bid, bid_attr_name, tags_to_mark]) => {
+
+    // standard html tags
+    // https://www.w3schools.com/tags/
+    const html_tags = new Set([
+        "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio",
+        "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button",
+        "canvas", "caption", "center", "cite", "code", "col", "colgroup", "data", "datalist",
+        "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em", "embed",
+        "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset",
+        "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i",
+        "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "main",
+        "map", "mark", "menu", "meta", "meter", "nav", "noframes", "noscript", "object",
+        "ol", "optgroup", "option", "output", "p", "param", "picture", "pre", "progress",
+        "q", "rp", "rt", "ruby", "s", "samp", "script", "search", "section", "select",
+        "small", "source", "span", "strike", "strong", "style", "sub", "summary", "sup",
+        "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead",
+        "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr"
+    ]);
     const set_of_marks_tags = new Set([
         "input", "textarea", "select", "button", "a", "iframe", "video", "li", "td", "option"
     ]);
@@ -51,6 +69,22 @@ async ([parent_bid, bid_attr_name]) => {
             );
         }
         i++;
+        // decide if the current element should be marked or not
+        switch (tags_to_mark) {
+            // mark all elements
+            case "all":
+                break;
+            // mark only standard HTML tags
+            case "standard_html":
+                if (!elem.tagName || !html_tags.has(elem.tagName.toLowerCase())) {
+                    // continue the loop, i.e., move on to the next element
+                    continue;
+                }
+                break;
+            // non-recognized argument
+            default:
+                throw new Error(`Invalid value for parameter \"tags_to_mark\": ${JSON.stringify(tags_to_mark)}`);
+        }
         // Processing element
         // register intersection callback on element, and keep track of element for waiting later
         elem.setAttribute('browsergym_visibility_ratio', 0);
