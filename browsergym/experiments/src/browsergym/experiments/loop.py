@@ -526,8 +526,6 @@ class ExpResult:
         task_video_path: Path, the path to the task video. (if record_video=True)
         combined_video_path: Path, the path to the combined video. (if video was
             combined)
-        pip_freeze: str, a `pip freeze` of the python environment
-        pip_list: str, a `pip list` of the python environment
     """
 
     def __init__(self, exp_dir) -> None:
@@ -538,8 +536,6 @@ class ExpResult:
         self._screenshots = {}
         self._flat_exp_args = None
         self._logs = None
-        self._pip_freeze = None
-        self._pip_list = None
 
     @property
     def exp_args(self) -> ExpArgs:
