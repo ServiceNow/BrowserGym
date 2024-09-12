@@ -6,7 +6,7 @@ project = "BrowserGym"
 copyright = "2024, ServiceNow Research"
 author = "ServiceNow Research"
 
-version = "0.5.2.dev0"
+version = "0.6.0"
 release = version
 
 # -- General configuration
