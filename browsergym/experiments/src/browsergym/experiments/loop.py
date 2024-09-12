@@ -69,10 +69,11 @@ class EnvArgs:
 class AbstractAgentArgs(ABC):
     """A template class that defines the required signature of an agent's arguments."""
 
-    @property
-    def agent_name(self) -> str:
-        """The name of the agent. Used for naming experiments."""
-        return self.__class__.__name__
+    agent_name: str = None
+
+    def __post_init__(self):
+        if self.agent_name is None:
+            self.agent_name = self.__class__.__name__
 
     def prepare(self):
         """Prepare the agent's LLM models before running the experiment."""
