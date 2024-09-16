@@ -36,6 +36,7 @@ URL_INPUT_URL = f"file://{__DATA_DIR}/input_type/url_input.html"
 CHECKBOX_URL = f"file://{__DATA_DIR}/input_type/checkbox_input.html"
 MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
 OBSTRUCTED_CHECKBOX_URL = f"file://{__DATA_DIR}/obstructed_checkbox_page.html"
+LOTS_OF_IFRAMES_URL = f"file://{__DATA_DIR}/lots_of_iframes.html"
 
 
 def test_action_parser():
@@ -1436,6 +1437,56 @@ def test_forced_actions(retry_with_force):
         assert not checkbox_checked
     else:
         assert obs["last_action_error"]
+        assert checkbox.has_attr("checked")
+
+    env.close()
+
+
+# TODO investigate why it takes ~1sec to mark each frame, although they are very small, and if we can do something about it
+@pytest.mark.slow
+def test_iframe_bid():
+    action_set = HighLevelActionSet(subsets=["bid"])
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": LOTS_OF_IFRAMES_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    obs, info = env.reset()
+
+    def get_checkbox(obs, i):
+        soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
+        checkbox = soup.find("input", attrs={"id": f"checkbox{i}"})
+        return checkbox
+
+    # try to click on checkboxes
+    checkboxes = [
+        (0, "a"),
+        # (5, "f"),
+        # (26, "aA"),
+        (29, "aD"),
+    ]
+    for id, iframe_bid in checkboxes:
+
+        # try to click on checkbox
+        checkbox = get_checkbox(obs, id)
+        bid = checkbox.get(BID_ATTR)
+
+        # iframe bid should match
+        assert re.match(f"^{iframe_bid}[0-9]+$", bid)
+
+        action = f"""
+        click({repr(bid)})
+        """
+
+        obs, reward, terminated, truncated, info = env.step(action)
+        assert not obs["last_action_error"]
+
+        # checkbox should get checked
+        checkbox = get_checkbox(obs, id)
         assert checkbox.has_attr("checked")
 
     env.close()

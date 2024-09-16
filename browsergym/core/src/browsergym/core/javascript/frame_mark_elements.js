@@ -121,13 +121,9 @@ async ([parent_bid, bid_attr_name, tags_to_mark]) => {
         }
         if (elem_global_bid === null) {
             let elem_local_id = null;
-            // iFrames get alphabetical ids: 'a', 'b', ..., 'z'.
-            // if more than 26 iFrames are present, raise an Error
+            // iFrames get alphabetical ids: 'a', 'b', ..., 'z', 'aA', 'aB' etc.
             if (['iframe', 'frame'].includes(elem.tagName.toLowerCase())) {
                 elem_local_id = `${window.browsergym_frame_id_generator.next()}`;
-                if (elem_local_id.length > 1) {
-                    throw new Error(`More than 26? Such iFrames. BrowserGym not like.`);
-                }
             }
             // other elements get numerical ids: '0', '1', '2', ...
             else {
@@ -268,8 +264,13 @@ class IFrameIdGenerator {
 
     next() {
       const r = [];
-      for (const char of this._nextId) {
-        r.unshift(this._chars[char]);
+      for (let i = 0; i < this._nextId.length; i++) {
+        let char = this._chars[this._nextId[i]];
+        // all but first character must be upper-cased (a, aA, bCD)
+        if (i < this._nextId.length - 1) {
+            char = char.toUpperCase();
+        }
+        r.unshift(char);
       }
       this._increment();
       return r.join('');

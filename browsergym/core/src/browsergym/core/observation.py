@@ -36,7 +36,8 @@ def _pre_extract(
     # we can't run this loop in JS due to Same-Origin Policy
     # (can't access the content of an iframe from a another one)
     def mark_frames_recursive(frame, frame_bid: str):
-        assert frame_bid == "" or (frame_bid.islower() and frame_bid.isalpha())
+        assert frame_bid == "" or re.match(r"^[a-z][A-Z]*$", frame_bid)
+        logger.debug(f"Marking frame {repr(frame_bid)}")
 
         # mark all DOM elements in the frame (it will use the parent frame element's bid as a prefix)
         warning_msgs = frame.evaluate(
@@ -137,7 +138,7 @@ def extract_screenshot(page: playwright.sync_api.Page):
 
 
 # we could handle more data items here if needed
-__BID_EXPR = r"([a-z0-9]+)"
+__BID_EXPR = r"([a-zA-Z0-9]+)"
 __DATA_REGEXP = re.compile(r"^browsergym_id_" + __BID_EXPR + r"\s?" + r"(.*)")
 
 

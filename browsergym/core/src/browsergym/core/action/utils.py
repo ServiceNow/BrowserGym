@@ -7,9 +7,9 @@ def get_elem_by_bid(
 ) -> playwright.sync_api.Locator:
     """
     Parse the given bid to sequentially locate every nested frame leading to the bid, then
-    locate the bid element. Bids are expected to take the form "abb123", which means
-    the element abb123 is located inside frame abb, which is located inside frame ab, which is
-    located inside frame a, which is located inside the page's main frame.
+    locate the bid element. Bids are expected to take the form "abDb123", which means
+    the element abDb123 is located inside frame abDAb, which is located inside frame abD,
+    which is located inside frame a, which is located inside the page's main frame.
 
     Args:
         bid: the browsergym id (playwright testid) of the page element.
@@ -28,6 +28,9 @@ def get_elem_by_bid(
     i = 0
     while bid[i:] and not bid[i:].isnumeric():
         i += 1
+        # allow multi-character frame ids such as aA, bCD etc.
+        while bid[i:] and bid[i].isalpha() and bid[i].isupper():
+            i += 1
         frame_bid = bid[:i]  # bid of the next frame to select
         frame_elem = current_frame.get_by_test_id(frame_bid)
         if not frame_elem.count():
