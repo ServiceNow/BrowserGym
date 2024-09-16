@@ -80,17 +80,19 @@ def _post_extract(page: playwright.sync_api.Page):
     # we can't run this loop in JS due to Same-Origin Policy
     # (can't access the content of an iframe from a another one)
     for frame in page.frames:
-        if not frame == page.main_frame:
-            # deal with weird frames (pdf viewer in <embed>)
-            if not frame.frame_element().content_frame() == frame:
-                logger.warning(f"Skipping frame '{frame.name}' for unmarking, seems problematic.")
-                continue
-            # deal with sandboxed frames with blocked script execution
-            sandbox_attr = frame.frame_element().get_attribute("sandbox")
-            if sandbox_attr is not None and "allow-scripts" not in sandbox_attr.split():
-                continue
-
         try:
+            if not frame == page.main_frame:
+                # deal with weird frames (pdf viewer in <embed>)
+                if not frame.frame_element().content_frame() == frame:
+                    logger.warning(
+                        f"Skipping frame '{frame.name}' for unmarking, seems problematic."
+                    )
+                    continue
+                # deal with sandboxed frames with blocked script execution
+                sandbox_attr = frame.frame_element().get_attribute("sandbox")
+                if sandbox_attr is not None and "allow-scripts" not in sandbox_attr.split():
+                    continue
+
             frame.evaluate(js_frame_unmark_elements)
         except playwright.sync_api.Error as e:
             if "Frame was detached" in str(e):
