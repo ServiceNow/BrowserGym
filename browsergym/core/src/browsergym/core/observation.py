@@ -36,7 +36,7 @@ def _pre_extract(
     # we can't run this loop in JS due to Same-Origin Policy
     # (can't access the content of an iframe from a another one)
     def mark_frames_recursive(frame, frame_bid: str):
-        assert frame_bid == "" or re.match(r"^[a-z][A-Z]*$", frame_bid)
+        assert frame_bid == "" or re.match(r"^[a-z][a-zA-Z]*$", frame_bid)
         logger.debug(f"Marking frame {repr(frame_bid)}")
 
         # mark all DOM elements in the frame (it will use the parent frame element's bid as a prefix)
