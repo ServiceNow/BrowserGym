@@ -1429,11 +1429,10 @@ def test_forced_actions(retry_with_force):
     """
 
     obs, reward, terminated, truncated, info = env.step(action)
-    attributes = checkbox.attrs
-    checkbox_checked = attributes.get("checked", False)
+    checkbox = get_checkbox(obs)
     if retry_with_force:
         assert not obs["last_action_error"]
-        assert not checkbox_checked
+        assert checkbox.get("checked", False) == False
     else:
         assert obs["last_action_error"]
         assert checkbox.has_attr("checked")
