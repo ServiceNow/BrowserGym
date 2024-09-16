@@ -7,24 +7,12 @@
 
 <body>
     <script>
-
-        function escapeHtml(unsafe) {
-            return unsafe;
-            //.replace(/&/g, "&amp;amp;")
-            // .replace(/</g, "&lt;")
-            // .replace(/>/g, "&gt;")
-            // .replace(/'/g, "&#039;"
-            //.replace(/"/g, "&quot;");
-        }
-
         for (let i = 0; i < 30; i++) {
             const iframe = document.createElement('iframe');
-            html = `
+            iframe.srcdoc = `
 This is IFrame ${i}.
 <input type='checkbox' id='checkbox${i}'>
 `
-            // Escape characters
-            iframe.srcdoc = escapeHtml(html);
             document.body.appendChild(iframe);
         }
     </script>
