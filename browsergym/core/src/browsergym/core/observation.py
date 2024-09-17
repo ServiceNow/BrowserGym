@@ -36,7 +36,8 @@ def _pre_extract(
     # we can't run this loop in JS due to Same-Origin Policy
     # (can't access the content of an iframe from a another one)
     def mark_frames_recursive(frame, frame_bid: str):
-        assert frame_bid == "" or (frame_bid.islower() and frame_bid.isalpha())
+        assert frame_bid == "" or re.match(r"^[a-z][a-zA-Z]*$", frame_bid)
+        logger.debug(f"Marking frame {repr(frame_bid)}")
 
         # mark all DOM elements in the frame (it will use the parent frame element's bid as a prefix)
         warning_msgs = frame.evaluate(
@@ -80,17 +81,19 @@ def _post_extract(page: playwright.sync_api.Page):
     # we can't run this loop in JS due to Same-Origin Policy
     # (can't access the content of an iframe from a another one)
     for frame in page.frames:
-        if not frame == page.main_frame:
-            # deal with weird frames (pdf viewer in <embed>)
-            if not frame.frame_element().content_frame() == frame:
-                logger.warning(f"Skipping frame '{frame.name}' for unmarking, seems problematic.")
-                continue
-            # deal with sandboxed frames with blocked script execution
-            sandbox_attr = frame.frame_element().get_attribute("sandbox")
-            if sandbox_attr is not None and "allow-scripts" not in sandbox_attr.split():
-                continue
-
         try:
+            if not frame == page.main_frame:
+                # deal with weird frames (pdf viewer in <embed>)
+                if not frame.frame_element().content_frame() == frame:
+                    logger.warning(
+                        f"Skipping frame '{frame.name}' for unmarking, seems problematic."
+                    )
+                    continue
+                # deal with sandboxed frames with blocked script execution
+                sandbox_attr = frame.frame_element().get_attribute("sandbox")
+                if sandbox_attr is not None and "allow-scripts" not in sandbox_attr.split():
+                    continue
+
             frame.evaluate(js_frame_unmark_elements)
         except playwright.sync_api.Error as e:
             if "Frame was detached" in str(e):
@@ -135,7 +138,7 @@ def extract_screenshot(page: playwright.sync_api.Page):
 
 
 # we could handle more data items here if needed
-__BID_EXPR = r"([a-z0-9]+)"
+__BID_EXPR = r"([a-zA-Z0-9]+)"
 __DATA_REGEXP = re.compile(r"^browsergym_id_" + __BID_EXPR + r"\s?" + r"(.*)")
 
 

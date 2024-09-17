@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lots of Iframes</title>
+</head>
+
+<body>
+    <script>
+        for (let i = 0; i < 30; i++) {
+            const iframe = document.createElement('iframe');
+            iframe.srcdoc = `
+This is IFrame ${i}.
+<input type='checkbox' id='checkbox${i}'>
+`
+            document.body.appendChild(iframe);
+        }
+    </script>
+</body>
+
+</html>
