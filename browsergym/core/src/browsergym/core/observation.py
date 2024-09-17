@@ -96,7 +96,7 @@ def _post_extract(page: playwright.sync_api.Page):
 
             frame.evaluate(js_frame_unmark_elements)
         except playwright.sync_api.Error as e:
-            if "Frame was detached" in str(e):
+            if ("Frame was detached", "Frame has been detached") in str(e):
                 pass
             else:
                 raise e
@@ -496,18 +496,26 @@ def extract_merged_axtree(page: playwright.sync_api.Page):
         # connect each iframe node to the corresponding AXTree root node
         for node in ax_tree["nodes"]:
             if node["role"]["value"] == "Iframe":
-                frame_id = cdp.send(
-                    "DOM.describeNode", {"backendNodeId": node["backendDOMNodeId"]}
-                )["node"]["frameId"]
+                frame_id = (
+                    cdp.send("DOM.describeNode", {"backendNodeId": node["backendDOMNodeId"]})
+                    .get("node", {})
+                    .get("frameId", None)
+                )
+                if not frame_id:
+                    logger.warning(
+                        f"AXTree merging: unable to recover frameId of node with backendDOMNodeId {repr(node['backendDOMNodeId'])}, skipping"
+                    )
                 # it seems Page.getFrameTree() from CDP omits certain Frames (empty frames?)
                 # if a frame is not found in the extracted AXTrees, we just ignore it
-                if frame_id in frame_axtrees:
+                elif frame_id in frame_axtrees:
                     # root node should always be the first node in the AXTree
                     frame_root_node = frame_axtrees[frame_id]["nodes"][0]
                     assert frame_root_node["frameId"] == frame_id
                     node["childIds"].append(frame_root_node["nodeId"])
                 else:
-                    logger.warning(f"Extracted AXTree does not contain frameId '{frame_id}'")
+                    logger.warning(
+                        f"AXTree merging: extracted AXTree does not contain frameId '{frame_id}', skipping"
+                    )
 
     cdp.detach()
 
