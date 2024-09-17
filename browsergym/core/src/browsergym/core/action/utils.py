@@ -8,7 +8,7 @@ def get_elem_by_bid(
     """
     Parse the given bid to sequentially locate every nested frame leading to the bid, then
     locate the bid element. Bids are expected to take the form "abDb123", which means
-    the element abDb123 is located inside frame abDAb, which is located inside frame abD,
+    the element abDb123 is located inside frame abDAb, which is located inside frame abDA,
     which is located inside frame a, which is located inside the page's main frame.
 
     Args:
