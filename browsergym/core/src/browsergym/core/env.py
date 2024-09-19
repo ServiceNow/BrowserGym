@@ -122,17 +122,8 @@ class BrowserEnv(gym.Env, ABC):
                         }
                     )
                 ),
-                "goal": gym.spaces.Dict(
-                    {
-                        "text": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                        "image_urls": gym.spaces.Sequence(
-                            Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                        ),
-                        "image_paths": gym.spaces.Sequence(
-                            Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                        ),
-                    }
-                ),
+                "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "goal_data": AnyDict(),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
@@ -283,7 +274,7 @@ document.addEventListener("visibilitychange", () => {
         )
 
         # process the task goal
-        self.goal = self._process_task_goal(task_goal, send_to_chat=True)
+        self.goal, self.goal_data = self._process_task_goal(task_goal, send_to_chat=True)
 
         self._wait_dom_loaded()
 
@@ -506,13 +497,14 @@ document.addEventListener("visibilitychange", () => {
         _post_extract(self.page)
 
         # if no goal has been set yet, try to extract it from the chat
-        if self.goal is None:
-            self.goal = self._try_and_extract_goal_from_chat()
+        if not self.goal:
+            self.goal, self.goal_data = self._try_and_extract_goal_from_chat()
 
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
             "goal": self.goal,
+            "goal_data": self.goal_data,
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
@@ -531,19 +523,21 @@ document.addEventListener("visibilitychange", () => {
     def _process_task_goal(self, task_goal, send_to_chat: bool = False):
         # no goal specified
         if task_goal is None:
-            goal = None
+            goal = ""
+            goal_data = {}
 
         # text-only goal
         elif isinstance(task_goal, str):
             goal = task_goal
+            goal_data = {}
 
             if send_to_chat:
                 self.chat.add_message(role="user", msg=task_goal)
 
         # goal with text and images
         elif isinstance(task_goal, dict):
-            goal = {
-                "text": task_goal["text"],
+            goal = task_goal["text"]
+            goal_data = {
                 "image_urls": task_goal["image_urls"],
                 "image_paths": [],
             }
@@ -563,7 +557,7 @@ document.addEventListener("visibilitychange", () => {
                 image_path = temp_dir / f"input_image_{image_i}.{format}"
                 image.save(image_path)
                 # add image path to the goal
-                goal["image_paths"].append(image_path)
+                goal_data["image_paths"].append(image_path)
 
             if send_to_chat:
                 for image_url in task_goal["image_urls"]:
@@ -574,7 +568,7 @@ document.addEventListener("visibilitychange", () => {
         else:
             raise ValueError(f"task_goal should be of type str or dict, got {task_goal.__class__}")
 
-        return goal
+        return goal, goal_data
 
     def _try_and_extract_goal_from_chat(self):
         # as a fallback, when a task does not specify a goal, we try to convert the first chat message into a goal
@@ -585,7 +579,7 @@ document.addEventListener("visibilitychange", () => {
             if msg["role"] == "user":
                 first_user_message = msg["message"]
                 break
-            # extract all user_image messages before as goal images, if any
+            # extract any user_image message present before as a goal image
             elif msg["role"] == "user_image":
                 first_user_images.append(msg["message"])
             else:
@@ -603,6 +597,6 @@ document.addEventListener("visibilitychange", () => {
             }
 
         # process the task_goal into a proper goal, if any
-        goal = self._process_task_goal(task_goal=task_goal, send_to_chat=False)
+        goal, goal_data = self._process_task_goal(task_goal=task_goal, send_to_chat=False)
 
-        return goal
+        return goal, goal_data

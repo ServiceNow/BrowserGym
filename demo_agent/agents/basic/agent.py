@@ -21,19 +21,9 @@ class DemoAgent(Agent):
 
     def obs_preprocessor(self, obs: dict) -> dict:
 
-        # convert legacy text-only goals to structured goals
-        if isinstance(obs["goal"], str):
-            goal = {
-                "text": obs["goal"],
-                "image_urls": [],
-                "image_paths": [],
-            }
-        else:
-            goal = obs["goal"]
-
         return {
             "chat": obs["chat"],
-            "goal": goal,
+            "goal": obs["goal"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
         }
 
@@ -69,6 +59,7 @@ and executed by a program, make sure to follow the formatting instructions.
 """
 
         else:
+            assert obs["goal"], "The goal is missing."
             system_msg = f"""\
 # Instructions
 
@@ -78,7 +69,7 @@ and executed by a program, make sure to follow the formatting instructions.
 
 # Goal
 
-{obs["goal"]["text"] if obs["goal"] else "The goal is missing."}"""
+{obs["goal"]}"""
 
         prompt = f"""\
 # Current Accessibility Tree

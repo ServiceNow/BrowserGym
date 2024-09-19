@@ -415,14 +415,15 @@ class StepInfo:
 
     def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
 
-        # save structured goals (which might contain images) to a separate file to save space
-        if isinstance(self.obs["goal"], dict):
-            # save the goal only once (goal should never change)
-            if not os.path.exists(exp_dir / "goal.pkl.gz"):
-                with gzip.open(exp_dir / "goal.pkl.gz", "wb") as f:
-                    pickle.dump(self.obs["goal"], f)
-            # set goal to a special placeholder value, it indicate it should be read from "goal.pkl.gz"
-            self.obs["goal"] = -1
+        # save goal data (which might contain images) to a separate file to save space
+        if self.obs is not None and self.obs.get("goal_data", None) is not None:
+            # save the goal data only once (goal should never change)
+            goal_data_file = exp_dir / "goal_data.pkl.gz"
+            if not os.path.exists(goal_data_file):
+                with gzip.open(goal_data_file, "wb") as f:
+                    pickle.dump(self.obs["goal_data"], f)
+            # set goal_data to a special placeholder value, it indicate it should be read from a separate file
+            self.obs["goal_data"] = None
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             # should we pop the screenshots before this to avoid duplicates ?
@@ -564,11 +565,11 @@ class ExpResult:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
 
-        # if goal is set to -1, it indicates it has been saved into a separate file
-        if self._steps_info[step].obs.get("goal", None) == -1:
-            with gzip.open(self.exp_dir / "goal.pkl.gz", "rb") as f:
-                goal = pickle.load(f)
-                self._steps_info[step].obs["goal"] = goal
+        # if goal_data is set to None, it indicates it has been saved into a separate file
+        if self._steps_info[step].obs and self._steps_info[step].obs["goal_data"] is None:
+            with gzip.open(self.exp_dir / "goal_data.pkl.gz", "rb") as f:
+                goal_data = pickle.load(f)
+                self._steps_info[step].obs["goal_data"] = goal_data
 
         return self._steps_info[step]
 
