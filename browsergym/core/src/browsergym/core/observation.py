@@ -96,7 +96,7 @@ def _post_extract(page: playwright.sync_api.Page):
 
             frame.evaluate(js_frame_unmark_elements)
         except playwright.sync_api.Error as e:
-            if ("Frame was detached", "Frame has been detached") in str(e):
+            if any(msg in str(e) for msg in ("Frame was detached", "Frame has been detached")):
                 pass
             else:
                 raise e
