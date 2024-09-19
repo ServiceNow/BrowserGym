@@ -88,6 +88,19 @@ class AbstractAgentArgs(ABC):
         """Comply the experiments.loop API for instantiating the agent."""
 
 
+def save_package_versions(exp_dir: Path):
+    """Save the versions of the installed packages in the experiment directory."""
+    python_dists = "\n".join(
+        sorted(
+            [
+                f'{dist.metadata["Name"]}=={dist.metadata["Version"]}'
+                for dist in importlib.metadata.distributions()
+            ]
+        )
+    )
+    (exp_dir / "package_versions.txt").write_text(python_dists)
+
+
 @dataclass
 class ExpArgs:
     """Arguments to run an experiment, i.e. run agent in an environment until done.
@@ -129,7 +142,7 @@ class ExpArgs:
     order: int = None  # use to keep the original order the experiments were meant to be launched.
     logging_level: int = logging.INFO
     exp_id: str = None
-    depends_on: tuple[str] = field(default_factory=tuple)
+    depends_on: tuple[str] = ()
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -179,22 +192,8 @@ class ExpArgs:
         self._set_logger()
 
         # log python environment info
-        # from https://stackoverflow.com/a/78160009/1264211
-        python_dists = "\n".join(
-            sorted(
-                [
-                    f'{dist.metadata["Name"]}=={dist.metadata["Version"]}'
-                    for dist in importlib.metadata.distributions()
-                ]
-            )
-        )
-        logger.info(
-            f"""\
-Python version: {sys.version}
-Python installed distributions:
-{python_dists}
-"""
-        )
+        save_package_versions(self.exp_dir)
+
         episode_info = []
         env, step_info, err_msg, stack_trace = None, None, None, None
         try:
