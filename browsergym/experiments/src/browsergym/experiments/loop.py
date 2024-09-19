@@ -142,7 +142,7 @@ class ExpArgs:
     order: int = None  # use to keep the original order the experiments were meant to be launched.
     logging_level: int = logging.INFO
     exp_id: str = None
-    depends_on: tuple[str] = field(default_factory=tuple)
+    depends_on: tuple[str] = ()
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
