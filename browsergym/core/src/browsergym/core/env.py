@@ -1,13 +1,9 @@
-import base64
 import copy
-import io
 import logging
-import os
 import re
 import tempfile
 import time
 from abc import ABC
-from io import BytesIO
 from pathlib import Path
 from typing import Optional, Literal
 
@@ -34,26 +30,9 @@ from .observation import (
 )
 from .spaces import AnyBox, AnyDict, Unicode
 from .task import AbstractBrowserTask
+from ..utils.obs import b64_to_pil, pil_to_b64
 
 logger = logging.getLogger(__name__)
-
-
-def pil_to_b64(img: Image.Image) -> str:
-    with BytesIO() as image_buffer:
-        img.save(image_buffer, format="PNG")
-        byte_data = image_buffer.getvalue()
-        img_b64 = base64.b64encode(byte_data).decode("utf-8")
-        img_b64 = "data:image/png;base64," + img_b64
-    return img_b64
-
-
-def b64_to_pil(img_b64: str) -> str:
-    if not img_b64.startswith("data:image/png;base64,"):
-        raise ValueError(f"Unexpected base64 encoding: {img_b64}")
-    img_b64 = img_b64.removeprefix("data:image/png;base64,")
-    img_data = base64.b64decode(img_b64)
-    img = Image.open(io.BytesIO(img_data))
-    return img
 
 
 class BrowserEnv(gym.Env, ABC):
@@ -143,18 +122,16 @@ class BrowserEnv(gym.Env, ABC):
                         }
                     )
                 ),
-                # TODO: this is redundant with chat messages, to be removed
-                "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "goal_image_urls": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
-                "goal_images": gym.spaces.Sequence(
-                    gym.spaces.Dict(
-                        {
-                            "base64": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                            "path": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                        }
-                    )
+                "goal": gym.spaces.Dict(
+                    {
+                        "text": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                        "image_urls": gym.spaces.Sequence(
+                            Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+                        ),
+                        "image_paths": gym.spaces.Sequence(
+                            Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+                        ),
+                    }
                 ),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
@@ -297,42 +274,16 @@ document.addEventListener("visibilitychange", () => {
         recording_start_time = time.time()
 
         # setup the task
-        goal, task_info = self.task.setup(page=self.page)
+        task_goal, task_info = self.task.setup(page=self.page)
 
         # initialize the chat
         self.chat.add_message(
             role="assistant",
             msg="Hi! I am your UI assistant, I can perform web tasks for you. What can I help you with?",
         )
-        # if any, add the task's goal to the chat
-        self.goal_images = []
-        if goal:
 
-            # goal is text-only
-            if isinstance(goal, str):
-                goal_msg = goal
-
-            # goal is text + images
-            elif isinstance(goal, dict):
-                goal_msg = goal["message"]
-
-                temp_dir = Path(tempfile.mkdtemp())
-
-                for image_i, image_url in enumerate(goal["image_urls"]):
-                    self.chat.add_message(role="user_image", msg=image_url)
-                    if image_url.startswith("http"):
-                        image = Image.open(requests.get(image_url, stream=True).raw)
-                        image_base64 = pil_to_b64(image)
-                    elif image_url.startswith("data:image/png;base64,"):
-                        image_base64 = image_url
-                        image = b64_to_pil(image_base64)
-                    else:
-                        raise ValueError(f"Unexpected image_url: {image_url}")
-                    image_path = temp_dir / f"inputImage_{image_i}.png"
-                    # Save the image to the specified path
-                    image.save(image_path)
-                    self.goal_images.append({"base64": image_base64, "path": image_path})
-            self.chat.add_message(role="user", msg=goal_msg)
+        # process the task goal
+        self.goal = self._process_task_goal(task_goal, send_to_chat=True)
 
         self._wait_dom_loaded()
 
@@ -554,27 +505,14 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
-        # use first user message as goal, if any
-        # use all user images before first user message as goal images, if any
-        goal_msg = "There is no goal."
-        goal_image_urls = []
-        _prev_image_urls = []
-        for msg in self.chat.messages:
-            if msg["role"] == "user_image":
-                _prev_image_urls.append(msg["message"])
-            elif msg["role"] == "user":
-                goal_msg = msg["message"]
-                goal_image_urls = _prev_image_urls
-                break
-            else:
-                pass
+        # if no goal has been set yet, try to extract it from the chat
+        if self.goal is None:
+            self.goal = self._try_and_extract_goal_from_chat()
 
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": goal_msg,  # TODO: redundant with chat messages, to be removed?
-            "goal_image_urls": goal_image_urls,  # TODO: redundant with chat messages, to be removed?
-            "goal_images": self.goal_images,  # TODO: this should be moved bc it's super redundant
+            "goal": self.goal,
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
@@ -589,3 +527,82 @@ document.addEventListener("visibilitychange", () => {
         }
 
         return obs
+
+    def _process_task_goal(self, task_goal, send_to_chat: bool = False):
+        # no goal specified
+        if task_goal is None:
+            goal = None
+
+        # text-only goal
+        elif isinstance(task_goal, str):
+            goal = task_goal
+
+            if send_to_chat:
+                self.chat.add_message(role="user", msg=task_goal)
+
+        # goal with text and images
+        elif isinstance(task_goal, dict):
+            goal = {
+                "text": task_goal["text"],
+                "image_urls": task_goal["image_urls"],
+                "image_paths": [],
+            }
+            # save images from the goal to files in a local directory
+            temp_dir = Path(tempfile.mkdtemp())
+            for image_i, image_url in enumerate(task_goal["image_urls"]):
+                # download remotely hosted images
+                if image_url.startswith("http"):
+                    image = Image.open(requests.get(image_url, stream=True).raw)
+                # decode base64-encoded images
+                elif image_url.startswith("data:image"):
+                    image = b64_to_pil(image_url)
+                else:
+                    raise ValueError(f"Unexpected image_url: {image_url}")
+                # write images to local files
+                format = image.format.lower()
+                image_path = temp_dir / f"input_image_{image_i}.{format}"
+                image.save(image_path)
+                # add image path to the goal
+                goal["image_paths"].append(image_path)
+
+            if send_to_chat:
+                for image_url in task_goal["image_urls"]:
+                    # send goal images to the chat
+                    self.chat.add_message(role="user_image", msg=image_url)
+                # send goal text to the chat, after the images
+                self.chat.add_message(role="user", msg=task_goal["text"])
+        else:
+            raise ValueError(f"task_goal should be of type str or dict, got {task_goal.__class__}")
+
+        return goal
+
+    def _try_and_extract_goal_from_chat(self):
+        # as a fallback, when a task does not specify a goal, we try to convert the first chat message into a goal
+        first_user_message = None
+        first_user_images = []
+        for msg in self.chat.messages:
+            # extract first user message as goal, if any
+            if msg["role"] == "user":
+                first_user_message = msg["message"]
+                break
+            # extract all user_image messages before as goal images, if any
+            elif msg["role"] == "user_image":
+                first_user_images.append(msg["message"])
+            else:
+                pass
+
+        # convert chat messages to a task_goal, if any
+        if first_user_message is None:
+            task_goal = None
+        elif not first_user_images:
+            task_goal = first_user_message
+        else:
+            task_goal = {
+                "text": first_user_message,
+                "image_urls": first_user_images,
+            }
+
+        # process the task_goal into a proper goal, if any
+        goal = self._process_task_goal(task_goal=task_goal, send_to_chat=False)
+
+        return goal

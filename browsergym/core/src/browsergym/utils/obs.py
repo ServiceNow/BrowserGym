@@ -1,4 +1,6 @@
 import ast
+import base64
+import io
 import logging
 import numpy as np
 import PIL.Image
@@ -8,6 +10,7 @@ import re
 
 from collections import defaultdict
 from bs4 import BeautifulSoup
+from typing import Literal
 
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from browsergym.core.constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
@@ -545,3 +548,25 @@ def prune_html(html):
     html = soup.prettify()
 
     return html
+
+
+def pil_to_b64(img: PIL.Image.Image, format: Literal["png", "jpeg"] = "png") -> str:
+    assert format in ("png", "jpeg")
+    with io.BytesIO() as image_buffer:
+        img.save(image_buffer, format=format.upper())
+        byte_data = image_buffer.getvalue()
+    img_b64 = base64.b64encode(byte_data).decode("utf-8")
+    img_b64 = f"data:image/{format};base64," + img_b64
+    return img_b64
+
+
+def b64_to_pil(img_b64: str) -> str:
+    if img_b64.startswith("data:image/png;base64,"):
+        img_b64 = img_b64.removeprefix("data:image/png;base64,")
+    elif img_b64.startswith("data:image/jpeg;base64,"):
+        img_b64 = img_b64.removeprefix("data:image/jpeg;base64,")
+    else:
+        raise ValueError(f"Unexpected base64 encoding: {img_b64}")
+    img_data = base64.b64decode(img_b64)
+    img = PIL.Image.open(io.BytesIO(img_data))
+    return img

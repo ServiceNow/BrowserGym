@@ -131,7 +131,7 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
 
         # recover goal
         goal = {
-            "message": self.config["intent"],
+            "text": self.config["intent"],
             "image_urls": self.config.get("image", []),
         }
         # fix goal if needed
@@ -143,7 +143,7 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         # This note is present in some of webarena's agent prompts
         if self.with_na_hint:
             goal[
-                "message"
+                "text"
             ] += """\
 
 If you believe the task is impossible to complete, provide the answer "N/A".
