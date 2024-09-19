@@ -30,7 +30,7 @@ from .observation import (
 )
 from .spaces import AnyBox, AnyDict, Unicode
 from .task import AbstractBrowserTask
-from ..utils.obs import b64_to_pil, pil_to_b64
+from ..utils.obs import b64_to_pil
 
 logger = logging.getLogger(__name__)
 
