@@ -217,6 +217,9 @@ class ExpArgs:
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
 
+                if action is None:
+                    step_info.truncated = True
+
                 step_info.save_step_info(self.exp_dir)
                 logger.debug(f"Step info saved.")
 
