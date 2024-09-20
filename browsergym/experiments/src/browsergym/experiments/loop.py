@@ -217,11 +217,6 @@ class ExpArgs:
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
 
-                if action is None:
-                    logger.debug(f"Agent returned None action. Ending episode.")
-                    step_info.truncated = True
-                    break
-
                 step_info.save_step_info(self.exp_dir)
                 logger.debug(f"Step info saved.")
 
@@ -230,6 +225,12 @@ class ExpArgs:
 
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
+
+                if action is None:
+                    logger.debug(f"Agent returned None action. Ending episode.")
+                    step_info.truncated = True
+                    break
+
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
