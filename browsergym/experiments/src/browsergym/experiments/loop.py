@@ -228,7 +228,6 @@ class ExpArgs:
 
                 if action is None:
                     logger.debug(f"Agent returned None action. Ending episode.")
-                    step_info.truncated = True
                     break
 
                 logger.debug(f"Sending action to environment.")
