@@ -30,7 +30,6 @@ from .observation import (
 )
 from .spaces import AnyBox, AnyDict, Unicode
 from .task import AbstractBrowserTask
-from ..utils.obs import b64_to_pil
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +122,7 @@ class BrowserEnv(gym.Env, ABC):
                     )
                 ),
                 "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "goal_data": AnyDict(),
+                "goal_object": gym.spaces.Sequence(AnyDict()),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
@@ -267,14 +266,37 @@ document.addEventListener("visibilitychange", () => {
         # setup the task
         task_goal, task_info = self.task.setup(page=self.page)
 
+        # process the task goal
+
+        # no goal specified
+        if task_goal is None:
+            goal = []
+        # convert text-only goal (legacy) to new format
+        elif isinstance(task_goal, str):
+            goal = [{"type": "text", "text": task_goal}]
+        # new format goal with multiple texts and images (OpenAI style)
+        elif isinstance(task_goal, list):
+            goal = task_goal
+        else:
+            raise ValueError(f"task_goal should be of type str or list, got {task_goal.__class__}")
+
         # initialize the chat
         self.chat.add_message(
             role="assistant",
             msg="Hi! I am your UI assistant, I can perform web tasks for you. What can I help you with?",
         )
 
-        # process the task goal
-        self.goal, self.goal_data = self._process_task_goal(task_goal, send_to_chat=True)
+        # send task goal (if any) to the chat
+        for message in goal:
+            match message["type"]:
+                case "text":
+                    self.chat.add_message(role="user", msg=message["text"])
+                case "image_url":
+                    self.chat.add_message(role="user_image", msg=message["image_url"])
+                case _:
+                    raise ValueError(
+                        f"Unknown message type {repr(message['type'])} in the task goal."
+                    )
 
         self._wait_dom_loaded()
 
@@ -498,13 +520,14 @@ document.addEventListener("visibilitychange", () => {
 
         # if no goal has been set yet, try to extract it from the chat
         if not self.goal:
-            self.goal, self.goal_data = self._try_and_extract_goal_from_chat()
+            logger.warning(f"Empty goal, trying to extract goal from chat as a fallback.")
+            self.goal = self._try_and_extract_goal_from_chat()
 
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": self.goal,
-            "goal_data": self.goal_data,
+            "goal": self._goal_to_text(self.goal),  # legacy goal, deprecated
+            "goal_object": self.goal,  # new goal format, liust of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
@@ -520,83 +543,34 @@ document.addEventListener("visibilitychange", () => {
 
         return obs
 
-    def _process_task_goal(self, task_goal, send_to_chat: bool = False):
-        # no goal specified
-        if task_goal is None:
-            goal = ""
-            goal_data = {}
-
-        # text-only goal
-        elif isinstance(task_goal, str):
-            goal = task_goal
-            goal_data = {}
-
-            if send_to_chat:
-                self.chat.add_message(role="user", msg=task_goal)
-
-        # goal with text and images
-        elif isinstance(task_goal, dict):
-            goal = task_goal["text"]
-            goal_data = {
-                "image_urls": task_goal["image_urls"],
-                "image_paths": [],
-            }
-            # save images from the goal to files in a local directory
-            temp_dir = Path(tempfile.mkdtemp())
-            for image_i, image_url in enumerate(task_goal["image_urls"]):
-                # download remotely hosted images
-                if image_url.startswith("http"):
-                    image = Image.open(requests.get(image_url, stream=True).raw)
-                # decode base64-encoded images
-                elif image_url.startswith("data:image"):
-                    image = b64_to_pil(image_url)
-                else:
-                    raise ValueError(f"Unexpected image_url: {image_url}")
-                # write images to local files
-                format = image.format.lower()
-                image_path = temp_dir / f"input_image_{image_i}.{format}"
-                image.save(image_path)
-                # add image path to the goal
-                goal_data["image_paths"].append(image_path)
-
-            if send_to_chat:
-                for image_url in task_goal["image_urls"]:
-                    # send goal images to the chat
-                    self.chat.add_message(role="user_image", msg=image_url)
-                # send goal text to the chat, after the images
-                self.chat.add_message(role="user", msg=task_goal["text"])
-        else:
-            raise ValueError(f"task_goal should be of type str or dict, got {task_goal.__class__}")
-
-        return goal, goal_data
-
     def _try_and_extract_goal_from_chat(self):
         # as a fallback, when a task does not specify a goal, we try to convert the first chat message into a goal
-        first_user_message = None
-        first_user_images = []
+        goal = []
         for msg in self.chat.messages:
             # extract first user message as goal, if any
             if msg["role"] == "user":
-                first_user_message = msg["message"]
+                goal = [{"type": "text", "text": msg["message"]}]
                 break
-            # extract any user_image message present before as a goal image
-            elif msg["role"] == "user_image":
-                first_user_images.append(msg["message"])
-            else:
-                pass
 
-        # convert chat messages to a task_goal, if any
-        if first_user_message is None:
-            task_goal = None
-        elif not first_user_images:
-            task_goal = first_user_message
-        else:
-            task_goal = {
-                "text": first_user_message,
-                "image_urls": first_user_images,
-            }
+        return goal
 
-        # process the task_goal into a proper goal, if any
-        goal, goal_data = self._process_task_goal(task_goal=task_goal, send_to_chat=False)
+    def _goal_to_text(self, goal: list):
+        goal_text_strings = []
+        for message in goal:
+            match message["type"]:
+                case "text":
+                    goal_text_strings.append(message["text"])
+                case "image_url":
+                    if message["image_url"].startswith("data:image"):
+                        goal_text_strings.append(
+                            "image_url: " + message["image_url"][:30] + "... (truncated)"
+                        )
+                    else:
+                        goal_text_strings.append("image_url: " + message["image_url"])
+                case _:
+                    raise ValueError(
+                        f"Unknown message type {repr(message['type'])} in the task goal."
+                    )
+        goal_text = "\n".join(goal_text_strings)
 
-        return goal, goal_data
+        return goal_text

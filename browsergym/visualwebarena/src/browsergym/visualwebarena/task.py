@@ -2,6 +2,7 @@ import json
 import logging
 import playwright.sync_api
 import importlib.resources
+import pathlib
 import tempfile
 import requests
 
@@ -10,6 +11,7 @@ from typing import Optional, Tuple
 from browsergym.core.task import AbstractBrowserTask
 
 from .instance import VisualWebArenaInstance
+from .utils import image_url_to_pil_image
 
 logger = logging.getLogger(__name__)
 
@@ -129,25 +131,59 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
                 if i < len(start_urls) - 1:
                     page = page.context.new_page()
 
-        # recover goal
-        goal = {
-            "text": self.config["intent"],
-            "image_urls": self.config.get("image", []),
-        }
-        # fix goal if needed
-        if goal["image_urls"] is None:
-            goal["image_urls"] = []
-        elif isinstance(goal["image_urls"], str):
-            goal["image_urls"] = [goal["image_urls"]]
+        # recover goal text
+        goal_text = self.config["intent"]
 
         # This note is present in some of webarena's agent prompts
         if self.with_na_hint:
-            goal[
-                "text"
-            ] += """\
+            goal_text += """\
 
 If you believe the task is impossible to complete, provide the answer "N/A".
 """
+
+        # recover goal image urls
+        image_urls = self.config.get("image", [])
+
+        # fix image list if needed
+        if image_urls is None:
+            image_urls = []
+        elif isinstance(image_urls, str):
+            image_urls = [image_urls]
+
+        # save goal images to local files in a temporary directory
+        image_paths = []
+        temp_dir = pathlib.Path(tempfile.mkdtemp())
+        for i, image_url in enumerate(image_urls):
+            # extract image content from url
+            image = image_url_to_pil_image(image_url)
+            # write image to local file
+            format = image.format.lower()
+            image_path = temp_dir / f"input_image_{i}.{format}"
+            image.save(image_path)
+            # add image path to the goal
+            image_paths.append(image_path)
+
+        # build an OpenAI-style structured goal
+        # textual goal first
+        goal = [{"type": "text", "text": goal_text}]
+        # then goal images
+        for i, (image_url, image_path) in enumerate(zip(image_urls, image_paths)):
+            goal.extend(
+                [
+                    # image description (id and filepath)
+                    {
+                        "type": "text",
+                        "text": f"Input image {i}/{len(image_urls)} below (local path: {repr(image_path)})",
+                    },
+                    # actual image (image_url)
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_url,
+                        },
+                    },
+                ]
+            )
 
         return goal, {}
 
