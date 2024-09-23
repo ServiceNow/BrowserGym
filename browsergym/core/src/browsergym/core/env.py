@@ -270,13 +270,13 @@ document.addEventListener("visibilitychange", () => {
 
         # no goal specified
         if task_goal is None:
-            goal = []
+            self.goal = []
         # convert text-only goal (legacy) to new format
         elif isinstance(task_goal, str):
-            goal = [{"type": "text", "text": task_goal}]
+            self.goal = [{"type": "text", "text": task_goal}]
         # new format goal with multiple texts and images (OpenAI style)
         elif isinstance(task_goal, list):
-            goal = task_goal
+            self.goal = task_goal
         else:
             raise ValueError(f"task_goal should be of type str or list, got {task_goal.__class__}")
 
@@ -287,7 +287,7 @@ document.addEventListener("visibilitychange", () => {
         )
 
         # send task goal (if any) to the chat
-        for message in goal:
+        for message in self.goal:
             match message["type"]:
                 case "text":
                     self.chat.add_message(role="user", msg=message["text"])
