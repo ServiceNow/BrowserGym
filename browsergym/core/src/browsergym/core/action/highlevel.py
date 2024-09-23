@@ -316,11 +316,12 @@ Only a single action can be provided at once."""
         # the corresponding python function call
         if self.strict:
             function_calls = highlevel_action_parser.parse_string(highlevel_code, parse_all=True)
+            function_calls = function_calls.as_list()
         else:
             function_calls = highlevel_action_parser.search_string(
                 highlevel_code
             )  # allow for multiple matches, skip anything in-between
-            function_calls = sum(function_calls, [])  # unpack multiple matches
+            function_calls = sum(function_calls.as_list(), [])  # unpack multiple matches
 
         if not function_calls:
             raise ValueError("Received an empty action.")
