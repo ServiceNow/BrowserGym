@@ -135,6 +135,20 @@ def test_valid_action():
     assert not obs["last_action_error"]
     assert not checkbox.has_attr("checked")
 
+    # typo in action (unescaped double quotes)
+    action = f"""\
+click({repr(checkbox.get(BID_ATTR))}, "17" screen")  # typo here
+"""
+    with pytest.raises(ValueError):
+        python_action = action_set.to_python_code(action)
+
+    obs, reward, term, trunc, info = env.step(action)
+    checkbox = get_checkbox_elem(obs)
+
+    # error and box not checked
+    assert "Received an empty action." in obs["last_action_error"]
+    assert not checkbox.has_attr("checked")
+
     # click box 1 time
     action = f"""\
 click({repr(checkbox.get(BID_ATTR))})

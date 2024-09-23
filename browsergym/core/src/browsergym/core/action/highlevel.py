@@ -320,7 +320,7 @@ Only a single action can be provided at once."""
             function_calls = highlevel_action_parser.search_string(
                 highlevel_code
             )  # allow for multiple matches, skip anything in-between
-            function_calls = sum(function_calls)  # unpack multiple matches
+            function_calls = sum(function_calls, [])  # unpack multiple matches
 
         if not function_calls:
             raise ValueError("Received an empty action.")
