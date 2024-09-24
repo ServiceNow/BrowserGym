@@ -156,13 +156,24 @@ def main():
     exp_root.mkdir(exist_ok=True)
 
     exp_args = ExpArgs(
-        agent_args=DemoAgentArgs(model_name="gpt-4o-mini", chat_mode=True),
+        agent_args=DemoAgentArgs(model_name="gpt-4o-mini", chat_mode=False),
         env_args=EnvArgs(
             task_name="miniwob.click-test",
             task_seed=42,
             headless=False,  # shows the browser
         ),
     )
+
+    # exp_args = ExpArgs(
+    #     agent_args=DemoAgentArgs(model_name="gpt-4o-mini", chat_mode=True),
+    #     env_args=EnvArgs(
+    #         task_name="openended",
+    #         task_seed=42,
+    #         headless=False,  # shows the browser
+    #         wait_for_user_message=True,
+    #         task_kwargs={"start_url": "http://www.google.com"},
+    #     ),
+    # )
 
     exp_args.prepare(exp_root=exp_root)
     exp_args.run()
