@@ -22,8 +22,8 @@ class DemoAgent(Agent):
     def obs_preprocessor(self, obs: dict) -> dict:
 
         return {
-            "chat": obs["chat"],
-            "goal": obs["goal"],
+            "chat_messages": obs["chat_messages"],
+            "goal_object": obs["goal_object"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
         }
 
@@ -37,12 +37,18 @@ class DemoAgent(Agent):
         self.openai_client = OpenAI()
 
     def get_action(self, obs: dict) -> tuple[str, dict]:
+        system_msgs = []
+        user_msgs = []
+
         if self.chat_mode:
-            system_msg = f"""\
+            system_msgs.append(
+                {
+                    "type": "text",
+                    "text": f"""\
 # Instructions
 
 You are a UI Assistant, your goal is to help the user perform tasks using a web browser. You can
-communicate with the user via a chat, in which the user gives you instructions and in which you
+communicate with the user via a chat, to which the user gives you instructions and to which you
 can send back messages. You have access to a web browser that both you and the user can see,
 and with which only you can interact via specific commands.
 
@@ -52,15 +58,31 @@ and executed by a program, make sure to follow the formatting instructions.
 
 # Chat Messages
 
-"""
-        for msg in obs["chat"]:
-            system_msg += f"""\
- - [{msg['role']}] {msg['message']}
-"""
+""",
+                }
+            )
+            # append chat messages
+            for msg in obs["chat_messages"]:
+                if msg["role"] in ("user", "assistant", "infeasible"):
+                    system_msgs.append(
+                        {
+                            "type": "text",
+                            "text": f"""\
+- [{msg['role']}] {msg['message']}
+""",
+                        }
+                    )
+                elif msg["role"] == "user_image":
+                    system_msgs.append({"type": "image_url", "image_url": msg["message"]})
+                else:
+                    raise ValueError(f"Unexpected chat message role {repr(msg['role'])}")
 
         else:
-            assert obs["goal"], "The goal is missing."
-            system_msg = f"""\
+            assert obs["goal_object"], "The goal is missing."
+            system_msgs.append(
+                {
+                    "type": "text",
+                    "text": f"""\
 # Instructions
 
 Review the current state of the page and all other information to find the best
@@ -69,9 +91,17 @@ and executed by a program, make sure to follow the formatting instructions.
 
 # Goal
 
-{obs["goal"]}"""
+""",
+                }
+            )
+            # append goal messages
+            system_msgs.extend(obs["goal_object"])
 
-        prompt = f"""\
+        # append page observation and action space description
+        user_msgs.append(
+            {
+                "type": "text",
+                "text": f"""\
 # Current Accessibility Tree
 
 {obs["axtree_txt"]}
@@ -85,14 +115,16 @@ Here is an example with chain of thought of a valid action when clicking on a bu
 In order to accomplish my goal I need to click on the button with bid 12
 ```click("12")```
 "
-"""
+""",
+            }
+        )
 
         # query OpenAI model
         response = self.openai_client.chat.completions.create(
             model=self.model_name,
             messages=[
-                {"role": "system", "content": system_msg},
-                {"role": "user", "content": prompt},
+                {"role": "system", "content": system_msgs},
+                {"role": "user", "content": user_msgs},
             ],
         )
         action = response.choices[0].message.content
@@ -124,7 +156,7 @@ def main():
     exp_root.mkdir(exist_ok=True)
 
     exp_args = ExpArgs(
-        agent_args=DemoAgentArgs(model_name="gpt-4o-mini"),
+        agent_args=DemoAgentArgs(model_name="gpt-4o-mini", chat_mode=True),
         env_args=EnvArgs(
             task_name="miniwob.click-test",
             task_seed=42,
