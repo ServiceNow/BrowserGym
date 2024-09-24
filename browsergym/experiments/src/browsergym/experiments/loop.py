@@ -364,6 +364,9 @@ class StepInfo:
         t.action_exect_after_timeout = env_info["action_exec_stop"]
         t.action_exec_stop = env_info["action_exec_stop"] - env_info["action_exec_timeout"]
 
+        print(self.obs["last_action"])
+        print(self.obs["last_action_error"])
+
         if obs_preprocessor:
             self.obs = obs_preprocessor(self.obs)
 
@@ -566,7 +569,11 @@ class ExpResult:
                 self._steps_info[step] = pickle.load(f)
 
         # if goal_object is set to None, it indicates it has been saved into a separate file
-        if self._steps_info[step].obs and self._steps_info[step].obs["goal_object"] is None:
+        if (
+            self._steps_info[step].obs
+            and "goal_object" in self._steps_info[step].obs
+            and self._steps_info[step].obs["goal_object"] is None
+        ):
             with gzip.open(self.exp_dir / "goal_object.pkl.gz", "rb") as f:
                 goal_object = pickle.load(f)
                 self._steps_info[step].obs["goal_object"] = goal_object
