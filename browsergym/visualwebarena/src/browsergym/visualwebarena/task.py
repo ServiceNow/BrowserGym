@@ -173,7 +173,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
                     # image description (id and filepath)
                     {
                         "type": "text",
-                        "text": f"Input image {i}/{len(image_urls)} below (local path: {repr(image_path)})",
+                        "text": f"Input image {i+1}/{len(image_urls)} below (local path: {repr(image_path)})",
                     },
                     # actual image (image_url)
                     {
