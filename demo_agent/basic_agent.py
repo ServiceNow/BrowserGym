@@ -96,16 +96,21 @@ and with which only you can interact via specific commands.
 Review the instructions from the user, the current state of the page and all other information
 to find the best possible next action to accomplish your goal. Your answer will be interpreted
 and executed by a program, make sure to follow the formatting instructions.
-
-# Chat Messages
-
 """,
                 }
             )
             # append chat messages
+            user_msgs.append(
+                {
+                    "type": "text",
+                    "text": f"""\
+# Chat Messages
+""",
+                }
+            )
             for msg in obs["chat_messages"]:
                 if msg["role"] in ("user", "assistant", "infeasible"):
-                    system_msgs.append(
+                    user_msgs.append(
                         {
                             "type": "text",
                             "text": f"""\
@@ -129,14 +134,20 @@ and executed by a program, make sure to follow the formatting instructions.
 Review the current state of the page and all other information to find the best
 possible next action to accomplish your goal. Your answer will be interpreted
 and executed by a program, make sure to follow the formatting instructions.
-
-# Goal
-
 """,
                 }
             )
-            # append goal messages
-            system_msgs.extend(obs["goal_object"])
+            # append goal
+            user_msgs.append(
+                {
+                    "type": "text",
+                    "text": f"""\
+# Goal
+""",
+                }
+            )
+            # goal_object is directly presented as a list of openai-style messages
+            user_msgs.extend(obs["goal_object"])
 
         # append page AXTree (if asked)
         if self.use_axtree:
