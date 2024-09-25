@@ -364,9 +364,6 @@ class StepInfo:
         t.action_exect_after_timeout = env_info["action_exec_stop"]
         t.action_exec_stop = env_info["action_exec_stop"] - env_info["action_exec_timeout"]
 
-        print(self.obs["last_action"])
-        print(self.obs["last_action_error"])
-
         if obs_preprocessor:
             self.obs = obs_preprocessor(self.obs)
 
