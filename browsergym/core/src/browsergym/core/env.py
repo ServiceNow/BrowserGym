@@ -527,7 +527,7 @@ document.addEventListener("visibilitychange", () => {
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
             "goal": self._goal_to_text(self.goal),  # legacy goal, deprecated
-            "goal_object": self.goal,  # new goal format, liust of messages openai style
+            "goal_object": self.goal,  # new goal format, list of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
