@@ -426,7 +426,7 @@ class StepInfo:
             self.obs["goal_object"] = None
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
-            # TODO should we pop the screenshots too before this save space ?
+            # TODO should we pop the screenshots too before this to save space ?
             pickle.dump(self, f)
 
         if save_jpg and self.obs is not None:
