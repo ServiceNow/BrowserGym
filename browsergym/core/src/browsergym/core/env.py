@@ -270,13 +270,13 @@ document.addEventListener("visibilitychange", () => {
 
         # no goal specified
         if task_goal is None:
-            self.goal = []
+            self.goal_object = []
         # convert text-only goal (legacy) to new format
         elif isinstance(task_goal, str):
-            self.goal = [{"type": "text", "text": task_goal}]
+            self.goal_object = [{"type": "text", "text": task_goal}]
         # new format goal with multiple texts and images (OpenAI style)
         elif isinstance(task_goal, list):
-            self.goal = task_goal
+            self.goal_object = task_goal
         else:
             raise ValueError(f"task_goal should be of type str or list, got {task_goal.__class__}")
 
@@ -287,7 +287,7 @@ document.addEventListener("visibilitychange", () => {
         )
 
         # send task goal (if any) to the chat
-        for message in self.goal:
+        for message in self.goal_object:
             match message["type"]:
                 case "text":
                     self.chat.add_message(role="user", msg=message["text"])
@@ -518,16 +518,11 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
-        # if no goal has been set yet, try to extract it from the chat
-        if not self.goal:
-            logger.warning(f"Empty goal, trying to extract goal from chat as a fallback.")
-            self.goal = self._try_and_extract_goal_from_chat()
-
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": self._goal_to_text(self.goal),  # legacy goal, deprecated
-            "goal_object": self.goal,  # new goal format, list of messages openai style
+            "goal": self._try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
+            "goal_object": self.goal_object,  # new goal format, list of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,
@@ -543,34 +538,19 @@ document.addEventListener("visibilitychange", () => {
 
         return obs
 
-    def _try_and_extract_goal_from_chat(self):
-        # as a fallback, when a task does not specify a goal, we try to convert the first chat message into a goal
-        goal = []
-        for msg in self.chat.messages:
-            # extract first user message as goal, if any
-            if msg["role"] == "user":
-                goal = [{"type": "text", "text": msg["message"]}]
-                break
-
-        return goal
-
-    def _goal_to_text(self, goal: list):
-        goal_text_strings = []
+    def _try_to_extract_legacy_goal(self, goal: list):
+        legacy_goal_strings = []
         for message in goal:
-            match message["type"]:
-                case "text":
-                    goal_text_strings.append(message["text"])
-                case "image_url":
-                    if message["image_url"].startswith("data:image"):
-                        goal_text_strings.append(
-                            "image_url: " + message["image_url"][:30] + "... (truncated)"
-                        )
-                    else:
-                        goal_text_strings.append("image_url: " + message["image_url"])
-                case _:
-                    raise ValueError(
-                        f"Unknown message type {repr(message['type'])} in the task goal."
-                    )
-        goal_text = "\n".join(goal_text_strings)
+            if message["type"] == "text":
+                legacy_goal_strings.append(message["text"])
+            else:
+                logger.debug(
+                    f"Message type {repr(message['type'])} present in the goal, cannot be converted to legacy text-only format."
+                )
+                legacy_goal_strings[
+                    'WARNING: This goal cannot be converted to a text-only goal format. Use the new goal format instead ("goal_object" field). Any agent reading this should abort immediately.'
+                ]
+                break
+        legacy_goal = "\n".join(legacy_goal_strings)
 
-        return goal_text
+        return legacy_goal
