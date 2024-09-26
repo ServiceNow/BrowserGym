@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from browsergym.core.action.base import AbstractActionSet
@@ -27,7 +27,7 @@ DEFAULT_OBS_PREPROCESSOR: callable = default_obs_preprocessor
 class AgentInfo:
     think: str = None
     chat_messages: list = None
-    stats: dict = None
+    stats: dict = field(default_factory=dict)
     markup_page: str = ""
     html_page: str = ""
     extra_info: dict = None
