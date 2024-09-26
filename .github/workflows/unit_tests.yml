@@ -413,7 +413,7 @@ jobs:
   
   workarena-fast-tests:
     if: github.event_name == 'pull_request'
-    uses: ServiceNow/WorkArena/.github/workflows/unit-tests.yml@main
+    uses: ServiceNow/WorkArena/.github/workflows/unit-tests.yml@workarena-plus-plus
     with:
       run_fast_tests_only: true
     secrets: inherit
