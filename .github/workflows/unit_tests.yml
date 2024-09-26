@@ -446,3 +446,4 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: ServiceNow/WorkArena
           event-type: dependency-update
+    
