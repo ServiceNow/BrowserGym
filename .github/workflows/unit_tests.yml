@@ -413,11 +413,39 @@ jobs:
   
   workarena-fast-tests:
     if: github.event_name == 'pull_request'
-    uses: ServiceNow/WorkArena/.github/workflows/unit-tests.yml@workarena-plus-plus
-    with:
-      run_fast_tests_only: true
-    secrets: inherit
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Dependency Repo
+        uses: actions/checkout@v4
 
+      - name: Checkout WorkArena
+        uses: actions/checkout@v4
+        with:
+          repository: ServiceNow/WorkArena
+          ref: workarena-plus-plus
+          path: WorkArena
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: WorkArena/dev
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright
+        run: playwright install --with-deps
+
+      - name: Run fast tests
+        working-directory: WorkArena
+        env:
+          SNOW_INSTANCE_URL: ${{ secrets.SNOW_INSTANCE_URL }}
+          SNOW_INSTANCE_UNAME: ${{ secrets.SNOW_INSTANCE_UNAME }}
+          SNOW_INSTANCE_PWD: ${{ secrets.SNOW_INSTANCE_PWD }}
+        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests
+    
   scheduled-workarena-slow-tests:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-22.04
