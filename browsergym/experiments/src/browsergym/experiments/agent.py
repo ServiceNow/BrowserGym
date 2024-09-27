@@ -27,7 +27,7 @@ DEFAULT_OBS_PREPROCESSOR: callable = default_obs_preprocessor
 class AgentInfo:
     think: str = None
     chat_messages: list = None
-    stats: dict = {}
+    stats: dict = field(default_factory=dict)
     markdown_page: str = ""
     html_page: str = ""
     extra_info: dict = None
