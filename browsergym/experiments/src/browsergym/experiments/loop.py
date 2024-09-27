@@ -217,6 +217,7 @@ class ExpArgs:
                 logger.debug(f"Agent chose action:\n {action}")
 
                 if action is None:
+                    # will end the episode after saving the step info.
                     step_info.truncated = True
 
                 step_info.save_step_info(self.exp_dir)
@@ -225,12 +226,12 @@ class ExpArgs:
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
 
-                step_info = StepInfo(step=step_info.step + 1)
-                episode_info.append(step_info)
-
                 if action is None:
                     logger.debug(f"Agent returned None action. Ending episode.")
                     break
+
+                step_info = StepInfo(step=step_info.step + 1)
+                episode_info.append(step_info)
 
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
@@ -447,8 +448,6 @@ def _aggregate_episode_stats(episode_info: list[StepInfo]):
     These two summaries should cover many use cases. If more are needed, the
     user can compute other stats by reloading individual StepInfo.
     """
-    # discard the last step since it was not seen by the agent
-    episode_info = episode_info[:-1]
 
     stats = defaultdict(list)
     for step_info in episode_info:
