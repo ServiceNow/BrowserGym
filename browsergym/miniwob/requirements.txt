@@ -1,1 +1,1 @@
-browsergym-core==0.7.0
+browsergym-core==0.7.1
