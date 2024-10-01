@@ -418,8 +418,8 @@ class StepInfo:
         # save goal object (which might contain images) to a separate file to save space
         if self.obs is not None and self.obs.get("goal_object", False):
             # save the goal object only once (goal should never change once setup)
-            goal_object_file = exp_dir / "goal_object.pkl.gz"
-            if not os.path.exists(goal_object_file):
+            goal_object_file = Path(exp_dir) / "goal_object.pkl.gz"
+            if not goal_object_file.exists():
                 with gzip.open(goal_object_file, "wb") as f:
                     pickle.dump(self.obs["goal_object"], f)
             # set goal_object to a special placeholder value, which indicates it should be loaded from a separate file
