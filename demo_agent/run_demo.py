@@ -77,12 +77,10 @@ https://github.com/ServiceNow/AgentLab"""
 
     args = parse_args()
 
-    is_openended = args.task_name == "openended"
-
     # setting up agent config
     agent_args = DemoAgentArgs(
         model_name=args.model_name,
-        chat_mode=is_openended,
+        chat_mode=False,
         demo_mode="default" if args.visual_effects else "off",
         use_html=args.use_html,
         use_axtree=args.use_axtree,
@@ -96,9 +94,13 @@ https://github.com/ServiceNow/AgentLab"""
         max_steps=100,
         headless=False,  # keep the browser open
         # viewport={"width": 1500, "height": 1280},  # can be played with if needed
-        wait_for_user_message=is_openended,
-        task_kwargs={"start_url": args.start_url} if is_openended else {},
     )
+
+    # for openended task, set environment and agent to interactive chat mode on a start url
+    if args.task_name == "openended":
+        agent_args.chat_mode = True
+        env_args.wait_for_user_message = True
+        env_args.task_kwargs = {"start_url": args.start_url}
 
     # setting up the experiment
     exp_args = ExpArgs(
