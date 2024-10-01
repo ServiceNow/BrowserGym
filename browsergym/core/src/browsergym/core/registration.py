@@ -6,7 +6,12 @@ from .task import AbstractBrowserTask
 
 
 def register_task(
-    id: str, task_class: Type[AbstractBrowserTask], nondeterministic: bool = True, *args, **kwargs
+    id: str,
+    task_class: Type[AbstractBrowserTask],
+    task_kwargs: dict = None,
+    nondeterministic: bool = True,
+    *args,
+    **kwargs,
 ):
     """
     Registers a browser task as a gym environment with its unique id.
@@ -19,9 +24,16 @@ def register_task(
         *kwargs: additional arguments for the browsergym environment.
     """
 
+    # these environment arguments will be fixed, and error will be raised if they are set when calling gym.make()
+    fixed_env_kwargs = {}
+    if task_kwargs is not None:
+        fixed_env_kwargs["task_kwargs"] = task_kwargs
+
     gym.register(
         id=f"browsergym/{id}",
-        entry_point=lambda *env_args, **env_kwargs: BrowserEnv(task_class, *env_args, **env_kwargs),
+        entry_point=lambda *env_args, **env_kwargs: BrowserEnv(
+            task_class, *env_args, **fixed_env_kwargs, **env_kwargs
+        ),
         nondeterministic=nondeterministic,
         *args,
         **kwargs,
