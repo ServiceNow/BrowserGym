@@ -1,7 +1,6 @@
 import copy
 import logging
 import re
-import tempfile
 import time
 from abc import ABC
 from pathlib import Path
@@ -10,8 +9,6 @@ from typing import Optional, Literal
 import gymnasium as gym
 import numpy as np
 import playwright.sync_api
-import requests
-from PIL import Image
 
 from . import _get_global_playwright
 from .action.base import execute_python_code
@@ -32,6 +29,24 @@ from .spaces import AnyBox, AnyDict, Unicode
 from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
+
+
+def _try_to_extract_legacy_goal(goal: list):
+    legacy_goal_strings = []
+    for message in goal:
+        if message["type"] == "text":
+            legacy_goal_strings.append(message["text"])
+        else:
+            logger.debug(
+                f"Message type {repr(message['type'])} present in the goal, cannot be converted to legacy text-only format."
+            )
+            legacy_goal_strings[
+                'WARNING: This goal cannot be converted to a text-only goal format. Use the new goal format instead ("goal_object" field). Any agent reading this should abort immediately.'
+            ]
+            break
+    legacy_goal = "\n".join(legacy_goal_strings)
+
+    return legacy_goal
 
 
 class BrowserEnv(gym.Env, ABC):
@@ -521,7 +536,7 @@ document.addEventListener("visibilitychange", () => {
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": self._try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
+            "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
             "goal_object": self.goal_object,  # new goal format, list of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
@@ -537,20 +552,3 @@ document.addEventListener("visibilitychange", () => {
         }
 
         return obs
-
-    def _try_to_extract_legacy_goal(self, goal: list):
-        legacy_goal_strings = []
-        for message in goal:
-            if message["type"] == "text":
-                legacy_goal_strings.append(message["text"])
-            else:
-                logger.debug(
-                    f"Message type {repr(message['type'])} present in the goal, cannot be converted to legacy text-only format."
-                )
-                legacy_goal_strings[
-                    'WARNING: This goal cannot be converted to a text-only goal format. Use the new goal format instead ("goal_object" field). Any agent reading this should abort immediately.'
-                ]
-                break
-        legacy_goal = "\n".join(legacy_goal_strings)
-
-        return legacy_goal
