@@ -77,6 +77,8 @@ class DemoAgent(Agent):
         # use this instead to allow the agent to directly use Python code
         # self.action_set = PythonActionSet())
 
+        self.action_history = []
+
     def get_action(self, obs: dict) -> tuple[str, dict]:
         system_msgs = []
         user_msgs = []
@@ -211,25 +213,34 @@ I now need to click on the Submit button to send the form. I will use the click 
 ```click("12")```
 
 I found the information requested by the user, I will send it to the chat.
-```send_msg_to_user("The price for a 15\" laptop is 1499 USD.")```
+```send_msg_to_user("The price for a 15\\" laptop is 1499 USD.")```
 
 """,
             }
         )
 
-        # append last action (and error message) if any
-        if obs["last_action"]:
+        # append past actions (and last error message) if any
+        if self.action_history:
             user_msgs.append(
                 {
                     "type": "text",
                     "text": f"""\
-# Last executed action
-
-{obs["last_action"]}
-
+# History of past actions
 """,
                 }
             )
+            user_msgs.extend(
+                [
+                    {
+                        "type": "text",
+                        "text": f"""\
+{action}
+""",
+                    }
+                    for action in self.action_history
+                ]
+            )
+
             if obs["last_action_error"]:
                 user_msgs.append(
                     {
@@ -250,7 +261,7 @@ I found the information requested by the user, I will send it to the chat.
                 "text": f"""\
 # Next action
 
-You will now think step by step and then produce your next best action.
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, the current state of the page before deciding on your next action.
 """,
             }
         )
@@ -286,6 +297,8 @@ You will now think step by step and then produce your next best action.
             ],
         )
         action = response.choices[0].message.content
+
+        self.action_history.append(action)
 
         return action, {}
 
