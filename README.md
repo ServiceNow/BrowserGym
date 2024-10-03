@@ -180,6 +180,21 @@ Or use it to solve a simple MiniWoB task:
 python run_demo.py --task_name miniwob.click-test
 ```
 
+A VisualWebArena task:
+```sh
+python run_demo.py --task_name visualwebarena.398
+```
+
+A WebArena task:
+```sh
+python run_demo.py --task_name webarena.4
+```
+
+A WorkArena task:
+```sh
+python run_demo.py --task_name workarena.servicenow.order-standard-laptop
+```
+
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
 
 
