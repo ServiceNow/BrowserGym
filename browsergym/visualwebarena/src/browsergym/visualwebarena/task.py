@@ -73,7 +73,7 @@ If you believe the task is impossible to complete, provide the answer "N/A".
                 # image description (id, filepath, url)
                 {
                     "type": "text",
-                    "text": f"Input image {i+1}/{len(image_urls)} below (local path: {repr(image_path)}, url: {repr(image_url)})",
+                    "text": f"Input image {i+1}/{len(image_urls)} below (local path: {repr(str(image_path))})",
                 },
                 # actual image (base64 image data URI)
                 {
