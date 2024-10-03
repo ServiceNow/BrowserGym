@@ -16,6 +16,78 @@ from .utils import image_url_to_pil_image, pil_image_to_data_uri
 logger = logging.getLogger(__name__)
 
 
+def _build_goal(config, with_na_hint: bool):
+    """
+    Build an openai-style goal (list of messages)
+     - recovers the goal text from config
+     - download goal images if any
+     - save goal images to local files
+     - expose goal images as image_url messages using base64 encoding
+     - expose goal images as local file paths (if task requires to upload them)
+    """
+
+    # recover goal text
+    goal_text = config["intent"]
+
+    # This note is present in some of webarena's agent prompts
+    if with_na_hint:
+        goal_text += """\
+
+If you believe the task is impossible to complete, provide the answer "N/A".
+"""
+
+    # recover goal image urls
+    image_urls = config.get("image", [])
+    image_data_uris = []
+    image_paths = []
+
+    # fix image list if needed
+    if image_urls is None:
+        image_urls = []
+    elif isinstance(image_urls, str):
+        image_urls = [image_urls]
+
+    # save images to local files in a temporary directory
+    temp_dir = pathlib.Path(tempfile.mkdtemp())
+    for i, image_url in enumerate(image_urls):
+        # extract image content from url
+        image = image_url_to_pil_image(image_url)
+        format = image.format.lower()
+        # write image to local file
+        image_path = temp_dir / f"input_image_{i+1}.{format}"
+        image.save(image_path)
+        # save image path for the goal
+        image_paths.append(image_path)
+        # save image data as base64 for the goal
+        image_data_uris.append(pil_image_to_data_uri(image))
+
+    # build an OpenAI-style structured goal
+    # textual goal first
+    goal = [{"type": "text", "text": goal_text}]
+    # then goal images
+    for i, (image_url, image_data_uri, image_path) in enumerate(
+        zip(image_urls, image_data_uris, image_paths)
+    ):
+        goal.extend(
+            [
+                # image description (id, filepath, url)
+                {
+                    "type": "text",
+                    "text": f"Input image {i+1}/{len(image_urls)} below (local path: {repr(image_path)}, url: {repr(image_url)})",
+                },
+                # actual image (base64 image data URI)
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": image_data_uri,  # send data URI instead of URL (local urls might be inaccessible from the outside)
+                    },
+                },
+            ]
+        )
+
+    return goal
+
+
 class GenericVisualWebArenaTask(AbstractBrowserTask):
     """
     Base class for all WebArena tasks.
@@ -132,64 +204,7 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
                 if i < len(start_urls) - 1:
                     page = page.context.new_page()
 
-        # recover goal text
-        goal_text = self.config["intent"]
-
-        # This note is present in some of webarena's agent prompts
-        if self.with_na_hint:
-            goal_text += """\
-
-If you believe the task is impossible to complete, provide the answer "N/A".
-"""
-
-        # recover goal image urls
-        image_urls = self.config.get("image", [])
-        image_data_uris = []
-        image_paths = []
-
-        # fix image list if needed
-        if image_urls is None:
-            image_urls = []
-        elif isinstance(image_urls, str):
-            image_urls = [image_urls]
-
-        # save images to local files in a temporary directory
-        temp_dir = pathlib.Path(tempfile.mkdtemp())
-        for i, image_url in enumerate(image_urls):
-            # extract image content from url
-            image = image_url_to_pil_image(image_url)
-            format = image.format.lower()
-            # write image to local file
-            image_path = temp_dir / f"input_image_{i+1}.{format}"
-            image.save(image_path)
-            # save image path for the goal
-            image_paths.append(image_path)
-            # save image data as base64 for the goal
-            image_data_uris.append(pil_image_to_data_uri(image))
-
-        # build an OpenAI-style structured goal
-        # textual goal first
-        goal = [{"type": "text", "text": goal_text}]
-        # then goal images
-        for i, (image_url, image_data_uri, image_path) in enumerate(
-            zip(image_urls, image_data_uris, image_paths)
-        ):
-            goal.extend(
-                [
-                    # image description (id, filepath, url)
-                    {
-                        "type": "text",
-                        "text": f"Input image {i+1}/{len(image_urls)} below (local path: {repr(image_path)}, url: {repr(image_url)})",
-                    },
-                    # actual image (base64 image data URI)
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": image_data_uri,  # send data URI instead of URL (local urls might be inaccessible from the outside)
-                        },
-                    },
-                ]
-            )
+        goal = _build_goal(self.config, with_na_hint=self.with_na_hint)
 
         return goal, {}
 
