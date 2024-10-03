@@ -9,8 +9,12 @@ from typing import Literal
 def image_url_to_pil_image(image_url: str) -> PIL.Image:
     if not image_url.startswith("http"):
         raise ValueError(f"Unexpected image URL: {image_url}")
-    image_data = requests.get(image_url, stream=True).raw
-    img = PIL.Image.open(io.BytesIO(image_data))
+    response = requests.get(image_url, stream=True)
+    if response.status_code != 200:
+        raise ValueError(
+            f"Could not download image from url {image_url} (status code {response.status_code})"
+        )
+    img = PIL.Image.open(io.BytesIO(response.content))
     return img
 
 

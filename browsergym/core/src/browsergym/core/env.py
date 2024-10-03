@@ -40,9 +40,9 @@ def _try_to_extract_legacy_goal(goal: list):
             logger.debug(
                 f"Message type {repr(message['type'])} present in the goal, cannot be converted to legacy text-only format."
             )
-            legacy_goal_strings[
+            legacy_goal_strings.append(
                 'WARNING: This goal cannot be converted to a text-only goal format. Use the new goal format instead ("goal_object" field). Any agent reading this should abort immediately.'
-            ]
+            )
             break
     legacy_goal = "\n".join(legacy_goal_strings)
 

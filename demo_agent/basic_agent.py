@@ -121,7 +121,7 @@ and executed by a program, make sure to follow the formatting instructions.
                         }
                     )
                 elif msg["role"] == "user_image":
-                    system_msgs.append({"type": "image_url", "image_url": msg["message"]})
+                    user_msgs.append({"type": "image_url", "image_url": msg["message"]})
                 else:
                     raise ValueError(f"Unexpected chat message role {repr(msg['role'])}")
 
