@@ -54,13 +54,14 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         )
 
         # substitute URLs
-        for pattern, url_key in {
-            "__REDDIT__": "reddit",
-            "__SHOPPING__": "shopping",
-            "__WIKIPEDIA__": "wikipedia",
-            "__CLASSIFIEDS__": "classifieds",
+        for pattern, url in {
+            "__REDDIT__": self.webarena_instance.urls["reddit"],
+            "__SHOPPING__": self.webarena_instance.urls["shopping"],
+            "__WIKIPEDIA__": self.webarena_instance.urls["wikipedia"],
+            "__CLASSIFIEDS__": self.webarena_instance.urls["classifieds"],
+            "__HOMEPAGE__": self.webarena_instance.home_url,
         }.items():
-            all_configs_str = all_configs_str.replace(pattern, self.webarena_instance.urls[url_key])
+            all_configs_str = all_configs_str.replace(pattern, url)
 
         # load all task configs to JSON
         all_configs = json.loads(all_configs_str)
