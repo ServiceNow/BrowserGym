@@ -307,7 +307,10 @@ document.addEventListener("visibilitychange", () => {
                 case "text":
                     self.chat.add_message(role="user", msg=message["text"])
                 case "image_url":
-                    self.chat.add_message(role="user_image", msg=message["image_url"])
+                    image_src = message["image_url"]
+                    if isinstance(image_src, dict):
+                        image_src = image_src["url"]
+                    self.chat.add_message(role="user_image", msg=image_src)
                 case _:
                     raise ValueError(
                         f"Unknown message type {repr(message['type'])} in the task goal."
