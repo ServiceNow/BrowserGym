@@ -572,15 +572,13 @@ class ExpResult:
                 self._steps_info[step] = pickle.load(f)
             if "screenshot" not in self._steps_info[step].obs:
                 try:
-                    self._steps_info[step].obs["screenshot"] = np.array(
-                        Image.open(self.exp_dir / f"screenshot_step_{step}.png"), dtype=np.uint8
-                    )
+                    self._steps_info[step].obs["screenshot"] = self.get_screenshot(step)
                 except FileNotFoundError:
                     pass
             if "screenshot_som" not in self._steps_info[step].obs:
                 try:
-                    self._steps_info[step].obs["screenshot_som"] = np.array(
-                        Image.open(self.exp_dir / f"screenshot_som_step_{step}.png"), dtype=np.uint8
+                    self._steps_info[step].obs["screenshot_som"] = self.get_screenshot(
+                        step, som=True
                     )
                 except FileNotFoundError:
                     pass
@@ -608,8 +606,11 @@ class ExpResult:
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
         if self._screenshots.get(key, None) is None:
-            file_name = f"screenshot_{'som_' if som else ''}step_{step}.png"
-            self._screenshots[key] = Image.open(self.exp_dir / file_name)
+            file_name = f"screenshot_{'som_' if som else ''}step_{step}"
+            try:
+                self._screenshots[key] = Image.open(self.exp_dir / (file_name + ".png"))
+            except FileNotFoundError:
+                self._screenshots[key] = Image.open(self.exp_dir / (file_name + ".jpg"))
         return self._screenshots[key]
 
     def get_screenshots(self, som=False):
