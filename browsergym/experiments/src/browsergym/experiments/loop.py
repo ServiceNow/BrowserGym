@@ -143,6 +143,8 @@ class ExpArgs:
     logging_level: int = logging.INFO
     exp_id: str = None
     depends_on: tuple[str] = ()
+    save_jpg: bool = True
+    save_som: bool = False
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -221,7 +223,9 @@ class ExpArgs:
                     # will end the episode after saving the step info.
                     step_info.truncated = True
 
-                step_info.save_step_info(self.exp_dir)
+                step_info.save_step_info(
+                    self.exp_dir, save_jpg=self.save_jpg, save_som=self.save_som
+                )
                 logger.debug(f"Step info saved.")
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
@@ -252,7 +256,9 @@ class ExpArgs:
         finally:
             try:
                 if step_info is not None:
-                    step_info.save_step_info(self.exp_dir)
+                    step_info.save_step_info(
+                        self.exp_dir, save_jpg=self.save_jpg, save_som=self.save_som
+                    )
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
