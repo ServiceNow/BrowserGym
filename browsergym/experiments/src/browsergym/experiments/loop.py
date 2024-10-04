@@ -143,7 +143,7 @@ class ExpArgs:
     logging_level: int = logging.INFO
     exp_id: str = None
     depends_on: tuple[str] = ()
-    save_jpg: bool = True
+    save_screenshot: bool = True
     save_som: bool = False
 
     def prepare(self, exp_root):
@@ -224,7 +224,7 @@ class ExpArgs:
                     step_info.truncated = True
 
                 step_info.save_step_info(
-                    self.exp_dir, save_jpg=self.save_jpg, save_som=self.save_som
+                    self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
                 )
                 logger.debug(f"Step info saved.")
 
@@ -257,7 +257,7 @@ class ExpArgs:
             try:
                 if step_info is not None:
                     step_info.save_step_info(
-                        self.exp_dir, save_jpg=self.save_jpg, save_som=self.save_som
+                        self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
                     )
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
@@ -419,18 +419,18 @@ class StepInfo:
 
         self.stats = stats
 
-    def save_step_info(self, exp_dir, save_json=False, save_jpg=True, save_som=False):
+    def save_step_info(self, exp_dir, save_json=False, save_screenshot=True, save_som=False):
 
         screenshot = self.obs.pop("screenshot", None)
         screenshot_som = self.obs.pop("screenshot_som", None)
 
-        if save_jpg and screenshot is not None:
+        if save_screenshot and screenshot is not None:
             img = Image.fromarray(screenshot)
-            img.save(exp_dir / f"screenshot_step_{self.step}.jpg")
+            img.save(exp_dir / f"screenshot_step_{self.step}.png")
 
         if save_som and screenshot_som is not None:
             img = Image.fromarray(screenshot_som)
-            img.save(exp_dir / f"screenshot_som_step_{self.step}.jpg")
+            img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
@@ -438,6 +438,12 @@ class StepInfo:
         if save_json:
             with open(exp_dir / "steps_info.json", "w") as f:
                 json.dump(self, f, indent=4, cls=DataclassJSONEncoder)
+
+        # add the screenshots back to the obs
+        if screenshot is not None:
+            self.obs["screenshot"] = screenshot
+        if screenshot_som is not None:
+            self.obs["screenshot_som"] = screenshot_som
 
 
 def _extract_err_msg(episode_info: list[StepInfo]):
@@ -567,14 +573,14 @@ class ExpResult:
             if "screenshot" not in self._steps_info[step].obs:
                 try:
                     self._steps_info[step].obs["screenshot"] = np.array(
-                        Image.open(self.exp_dir / f"screenshot_step_{step}.jpg"), dtype=np.uint8
+                        Image.open(self.exp_dir / f"screenshot_step_{step}.png"), dtype=np.uint8
                     )
                 except FileNotFoundError:
                     pass
             if "screenshot_som" not in self._steps_info[step].obs:
                 try:
                     self._steps_info[step].obs["screenshot_som"] = np.array(
-                        Image.open(self.exp_dir / f"screenshot_som_step_{step}.jpg"), dtype=np.uint8
+                        Image.open(self.exp_dir / f"screenshot_som_step_{step}.png"), dtype=np.uint8
                     )
                 except FileNotFoundError:
                     pass
@@ -602,12 +608,12 @@ class ExpResult:
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
         if self._screenshots.get(key, None) is None:
-            file_name = f"screenshot_{'som_' if som else ''}step_{step}.jpg"
+            file_name = f"screenshot_{'som_' if som else ''}step_{step}.png"
             self._screenshots[key] = Image.open(self.exp_dir / file_name)
         return self._screenshots[key]
 
     def get_screenshots(self, som=False):
-        files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
+        files = list(self.exp_dir.glob("screenshot_step_*.png"))
         max_step = 0
         for file in files:
             step = int(file.name.split("_")[-1].split(".")[0])
