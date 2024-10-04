@@ -614,7 +614,7 @@ class ExpResult:
         return self._screenshots[key]
 
     def get_screenshots(self, som=False):
-        files = list(self.exp_dir.glob("screenshot_step_*.png"))
+        files = list(self.exp_dir.glob("screenshot_step_*"))
         max_step = 0
         for file in files:
             step = int(file.name.split("_")[-1].split(".")[0])
