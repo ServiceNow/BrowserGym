@@ -17,9 +17,10 @@ from typing import Optional
 
 import gymnasium as gym
 import numpy as np
-from browsergym.core.chat import Chat
 from PIL import Image
 from tqdm import tqdm
+
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -412,16 +413,21 @@ class StepInfo:
 
         self.stats = stats
 
-    def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
+    def save_step_info(self, exp_dir, save_json=False, save_jpg=True, save_som=False):
+
+        screenshot = self.obs.pop("screenshot", None)
+        screenshot_som = self.obs.pop("screenshot_som", None)
+
+        if save_jpg and screenshot is not None:
+            img = Image.fromarray(screenshot)
+            img.save(exp_dir / f"screenshot_step_{self.step}.jpg")
+
+        if save_som and screenshot_som is not None:
+            img = Image.fromarray(screenshot_som)
+            img.save(exp_dir / f"screenshot_som_step_{self.step}.jpg")
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
-
-        if save_jpg and self.obs is not None:
-            for name in ("screenshot", "screenshot_som"):
-                if name in self.obs:
-                    img = Image.fromarray(self.obs[name])
-                    img.save(exp_dir / f"{name}_step_{self.step}.jpg")
 
         if save_json:
             with open(exp_dir / "steps_info.json", "w") as f:
@@ -552,6 +558,20 @@ class ExpResult:
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
+            if "screenshot" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot"] = np.array(
+                        Image.open(self.exp_dir / f"screenshot_step_{step}.jpg"), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
+            if "screenshot_som" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot_som"] = np.array(
+                        Image.open(self.exp_dir / f"screenshot_som_step_{step}.jpg"), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
         return self._steps_info[step]
 
     @property
