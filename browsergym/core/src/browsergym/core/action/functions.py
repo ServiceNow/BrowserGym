@@ -1,7 +1,8 @@
 # these are placeholders
 # all these symbols will be available in browsergym actions
-import playwright.sync_api
 from typing import Literal
+
+import playwright.sync_api
 
 from .utils import (
     add_demo_mode_effects,
@@ -142,7 +143,7 @@ def select_option(bid: str, options: str | list[str]):
 def click(
     bid: str,
     button: Literal["left", "middle", "right"] = "left",
-    modifiers: list[Literal["Alt", "Control", "Meta", "Shift"]] = [],
+    modifiers: list[Literal["Alt", "Control", "ControlOrMeta", "Meta", "Shift"]] = [],
 ):
     """
     Click an element.
@@ -167,7 +168,7 @@ def click(
 def dblclick(
     bid: str,
     button: Literal["left", "middle", "right"] = "left",
-    modifiers: list[Literal["Alt", "Control", "Meta", "Shift"]] = [],
+    modifiers: list[Literal["Alt", "Control", "ControlOrMeta", "Meta", "Shift"]] = [],
 ):
     """
     Double click an element.
@@ -221,11 +222,12 @@ def press(bid: str, key_comb: str):
     ArrowRight, ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc. You can
     alternatively specify a single character you'd like to produce such as "a"
     or "#". Following modification shortcuts are also supported: Shift, Control,
-    Alt, Meta.
+    Alt, Meta, ShiftLeft, ControlOrMeta. ControlOrMeta resolves to Control on
+    Windows and Linux and to Meta on macOS.
 
     Examples:
         press('88', 'Backspace')
-        press('a26', 'Control+a')
+        press('a26', 'ControlOrMeta+a')
         press('a61', 'Meta+Shift+t')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
@@ -405,11 +407,12 @@ def keyboard_press(key: str):
     ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc. You can
     alternatively specify a single character you'd like to produce such
     as "a" or "#". Following modification shortcuts are also supported:
-    Shift, Control, Alt, Meta.
+    Shift, Control, Alt, Meta, ShiftLeft, ControlOrMeta. ControlOrMeta
+    resolves to Control on Windows and Linux and to Meta on macOS.
 
     Examples:
         keyboard_press('Backspace')
-        keyboard_press('Control+a')
+        keyboard_press('ControlOrMeta+a')
         keyboard_press('Meta+Shift+t')
         page.keyboard.press("PageDown")
     """
