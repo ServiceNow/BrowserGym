@@ -17,9 +17,10 @@ from typing import Optional
 
 import gymnasium as gym
 import numpy as np
-from browsergym.core.chat import Chat
 from PIL import Image
 from tqdm import tqdm
+
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -142,6 +143,8 @@ class ExpArgs:
     logging_level: int = logging.INFO
     exp_id: str = None
     depends_on: tuple[str] = ()
+    save_screenshot: bool = True
+    save_som: bool = False
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -220,7 +223,9 @@ class ExpArgs:
                     # will end the episode after saving the step info.
                     step_info.truncated = True
 
-                step_info.save_step_info(self.exp_dir)
+                step_info.save_step_info(
+                    self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
+                )
                 logger.debug(f"Step info saved.")
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
@@ -251,7 +256,9 @@ class ExpArgs:
         finally:
             try:
                 if step_info is not None:
-                    step_info.save_step_info(self.exp_dir)
+                    step_info.save_step_info(
+                        self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
+                    )
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
@@ -412,20 +419,31 @@ class StepInfo:
 
         self.stats = stats
 
-    def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
+    def save_step_info(self, exp_dir, save_json=False, save_screenshot=True, save_som=False):
+
+        screenshot = self.obs.pop("screenshot", None)
+        screenshot_som = self.obs.pop("screenshot_som", None)
+
+        if save_screenshot and screenshot is not None:
+            img = Image.fromarray(screenshot)
+            img.save(exp_dir / f"screenshot_step_{self.step}.png")
+
+        if save_som and screenshot_som is not None:
+            img = Image.fromarray(screenshot_som)
+            img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
             pickle.dump(self, f)
 
-        if save_jpg and self.obs is not None:
-            for name in ("screenshot", "screenshot_som"):
-                if name in self.obs:
-                    img = Image.fromarray(self.obs[name])
-                    img.save(exp_dir / f"{name}_step_{self.step}.jpg")
-
         if save_json:
             with open(exp_dir / "steps_info.json", "w") as f:
                 json.dump(self, f, indent=4, cls=DataclassJSONEncoder)
+
+        # add the screenshots back to the obs
+        if screenshot is not None:
+            self.obs["screenshot"] = screenshot
+        if screenshot_som is not None:
+            self.obs["screenshot_som"] = screenshot_som
 
 
 def _extract_err_msg(episode_info: list[StepInfo]):
@@ -552,6 +570,20 @@ class ExpResult:
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
+            if "screenshot" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot"] = np.array(
+                        self.get_screenshot(step), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
+            if "screenshot_som" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot_som"] = np.array(
+                        self.get_screenshot(step, som=True), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
         return self._steps_info[step]
 
     @property
@@ -576,12 +608,17 @@ class ExpResult:
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
         if self._screenshots.get(key, None) is None:
-            file_name = f"screenshot_{'som_' if som else ''}step_{step}.jpg"
-            self._screenshots[key] = Image.open(self.exp_dir / file_name)
+            file_name = f"screenshot_{'som_' if som else ''}step_{step}"
+            try:
+                with Image.open(self.exp_dir / (file_name + ".png")) as img:
+                    self._screenshots[key] = img.copy()
+            except FileNotFoundError:
+                with Image.open(self.exp_dir / (file_name + ".jpg")) as img:
+                    self._screenshots[key] = img.copy()
         return self._screenshots[key]
 
     def get_screenshots(self, som=False):
-        files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
+        files = list(self.exp_dir.glob("screenshot_step_*"))
         max_step = 0
         for file in files:
             step = int(file.name.split("_")[-1].split(".")[0])
