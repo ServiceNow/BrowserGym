@@ -227,29 +227,6 @@ BENCHMARKS = {
     ),
 }
 
-# @staticmethod
-# def from_file(path: str | pathlib.Path):
-#     pass
-
-# def to_file(self, path: str | pathlib.Path):
-#     pass
-
-# def get_task_list(self):
-#     # make env_args_list from task_df, taking into account seed_category
-#     pass
-
-# def make_task_subset_from_split(self, split_name):
-#     df_subset = my_filter(self.task_df, split_name)
-#     return Benchmark(name=f"{self.name}.{split_name}", task_df=df_subset)
-
-# def make_task_subset_from_glob(self, glob_pattern):
-#     df_subset = my_filter(self.task_df, glob_pattern)
-#     return Benchmark(name=f"{self.name}.{glob_pattern}", task_df=df_subset)
-
-# def make_task_subset_from_category(self, category):
-#     df_subset = my_filter(self.task_df, category)
-#     return Benchmark(name=f"{self.name}.{category}", task_df=df_subset)
-
 
 def _make_env_args_list_from_workarena_curriculum(
     level: Literal["l2", "l3"],
