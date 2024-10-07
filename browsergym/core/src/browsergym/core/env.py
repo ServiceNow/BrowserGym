@@ -4,7 +4,7 @@ import re
 import time
 from abc import ABC
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Literal, Optional
 
 import gymnasium as gym
 import numpy as np
