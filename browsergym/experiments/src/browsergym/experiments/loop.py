@@ -17,6 +17,7 @@ from typing import Optional
 
 import gymnasium as gym
 import numpy as np
+from dataclasses_json import DataClassJsonMixin
 from PIL import Image
 from tqdm import tqdm
 
@@ -27,9 +28,11 @@ from .utils import count_messages_token, count_tokens
 
 logger = logging.getLogger(__name__)
 
+SEED_MAX = 2 ^ 32  # arbitrary max value (exclusive), seems large enough
+
 
 @dataclass
-class EnvArgs:
+class EnvArgs(DataClassJsonMixin):
     task_name: str
     task_seed: int = None
     max_steps: int = None
@@ -152,7 +155,7 @@ class ExpArgs:
         This enables inspecting experiments that are not run yet.
         """
         if self.env_args.task_seed is None:
-            self.env_args.task_seed = np.random.randint(0, 1000)
+            self.env_args.task_seed = np.random.randint(0, SEED_MAX)
 
         if self.exp_name is None:
             task_name = self.env_args.task_name
