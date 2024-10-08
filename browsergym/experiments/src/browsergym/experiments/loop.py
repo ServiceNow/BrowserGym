@@ -432,7 +432,18 @@ class StepInfo:
             img = Image.fromarray(screenshot_som)
             img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
 
+        # save goal object (which might contain images) to a separate file to save space
+        if self.obs is not None and self.obs.get("goal_object", False):
+            # save the goal object only once (goal should never change once setup)
+            goal_object_file = Path(exp_dir) / "goal_object.pkl.gz"
+            if not goal_object_file.exists():
+                with gzip.open(goal_object_file, "wb") as f:
+                    pickle.dump(self.obs["goal_object"], f)
+            # set goal_object to a special placeholder value, which indicates it should be loaded from a separate file
+            self.obs["goal_object"] = None
+
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
+            # TODO should we pop the screenshots too before this to save space ?
             pickle.dump(self, f)
 
         if save_json:
@@ -584,6 +595,16 @@ class ExpResult:
                     )
                 except FileNotFoundError:
                     pass
+        # if goal_object is set to None, it indicates it has been saved into a separate file
+        if (
+            self._steps_info[step].obs
+            and "goal_object" in self._steps_info[step].obs
+            and self._steps_info[step].obs["goal_object"] is None
+        ):
+            with gzip.open(self.exp_dir / "goal_object.pkl.gz", "rb") as f:
+                goal_object = pickle.load(f)
+                self._steps_info[step].obs["goal_object"] = goal_object
+
         return self._steps_info[step]
 
     @property

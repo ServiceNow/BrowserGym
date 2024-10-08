@@ -11,6 +11,6 @@ for task_id in config.TASK_IDS:
     register_task(
         gym_id,
         task.GenericWebArenaTask,
-        kwargs={"task_kwargs": {"task_id": task_id}},
+        task_kwargs={"task_id": task_id},
     )
     ALL_WEBARENA_TASK_IDS.append(gym_id)

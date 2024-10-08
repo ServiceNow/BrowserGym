@@ -79,6 +79,19 @@ class AnyDict(Space):
         return isinstance(other, AnyDict)
 
 
+class Anything(Space):
+    """A space representing an arbitrary dictionary object."""
+
+    def contains(self, x: Any) -> bool:
+        return True
+
+    def __repr__(self) -> str:
+        return f"Anything()"
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, Anything)
+
+
 class AnyBox(Space[NDArray[Any]]):
     """A space representing an arbitrary dictionary object."""
 
