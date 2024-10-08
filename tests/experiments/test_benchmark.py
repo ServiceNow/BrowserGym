@@ -60,8 +60,8 @@ def test_build_benchmarks():
         "visualwebarena": 910,
         "workarena_l1": 33 * 10,
         "workarena_l1_sort": 6 * 10,
-        "workarena_l2_agent_curriculum": 235,
-        "workarena_l3_agent_curriculum": 235,
+        "workarena_l2_agent_curriculum_eval": 235,
+        "workarena_l3_agent_curriculum_eval": 235,
     }
     for name, benchmark_builder in BENCHMARKS.items():
         benchmark = benchmark_builder()

@@ -212,24 +212,24 @@ BENCHMARKS = {
             seeds_rng=np.random.RandomState(42),
         ),
     ),
-    "workarena_l2_agent_curriculum": lambda: Benchmark(
-        name="workarena_l2_agent_curriculum",
+    "workarena_l2_agent_curriculum_eval": lambda: Benchmark(
+        name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l2",
             task_category_filter=None,
-            meta_seed=42,
+            meta_seed=42,  # meta seed for evaluation curriculum
             max_steps=50,
             curriculum_type="agent",
         ),
     ),
-    "workarena_l3_agent_curriculum": lambda: Benchmark(
-        name="workarena_l3_agent_curriculum",
+    "workarena_l3_agent_curriculum_eval": lambda: Benchmark(
+        name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l3",
             task_category_filter=None,
-            meta_seed=42,
+            meta_seed=42,  # meta seed for evaluation curriculum
             max_steps=50,
             curriculum_type="agent",
         ),
