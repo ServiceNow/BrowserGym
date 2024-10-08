@@ -44,9 +44,7 @@ class Benchmark(DataClassJsonMixin):
 
 def task_list_from_metadata(benchmark: str, *args, **kwargs):
     return task_list_from_csv(
-        io.StringIO(
-            pkgutil.get_data(__name__, f"benchmark_metadata/{benchmark}.csv").decode("utf-8")
-        ),
+        io.StringIO(pkgutil.get_data(__name__, f"task_metadata/{benchmark}.csv").decode("utf-8")),
         *args,
         **kwargs,
     )
