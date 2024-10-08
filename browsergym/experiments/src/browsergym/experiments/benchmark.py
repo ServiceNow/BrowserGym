@@ -38,7 +38,7 @@ class HighLevelActionSetArgs(DataClassJsonMixin):
 @dataclass
 class Benchmark(DataClassJsonMixin):
     name: str
-    high_level_action_set: HighLevelActionSetArgs
+    high_level_action_set_args: HighLevelActionSetArgs
     env_args_list: list[EnvArgs]
 
 
@@ -66,7 +66,7 @@ def task_list_from_csv(
 
 # These are mean as the default highlevel action set to fairly evaluate agents on each benchmark.
 # They are mostly arbitrary, the important thing is to evaluate different agents using the same action set for fairness.
-DEFAULT_HIGHLEVEL_ACTION_SETS = {
+DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
     "miniwob": HighLevelActionSetArgs(
         subsets=["bid", "coord"],
         multiaction=False,
@@ -111,10 +111,11 @@ DEFAULT_HIGHLEVEL_ACTION_SETS = {
     ),
 }
 
+# all benchmarks are callables designed for lazy loading, i.e. `bench = BENCHMARKS["miniwob_all"]()`
 BENCHMARKS = {
     "miniwob_all": lambda: Benchmark(
         name="miniwob_all",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(benchmark="miniwob"),
             max_steps=10,
@@ -124,7 +125,7 @@ BENCHMARKS = {
     ),
     "miniwob_webgum": lambda: Benchmark(
         name="miniwob_webgum",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 benchmark="miniwob", filters={"webgum_subset": "True"}
@@ -136,7 +137,7 @@ BENCHMARKS = {
     ),
     "miniwob_tiny_test": lambda: Benchmark(
         name="miniwob_tiny_test",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
@@ -146,7 +147,7 @@ BENCHMARKS = {
     ),
     "miniwob_train": lambda: Benchmark(
         name="miniwob_train",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 benchmark="miniwob",
@@ -159,7 +160,7 @@ BENCHMARKS = {
     ),
     "miniwob_test": lambda: Benchmark(
         name="miniwob_test",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 benchmark="miniwob", filters={"miniwob_category": "hidden test"}
@@ -171,7 +172,7 @@ BENCHMARKS = {
     ),
     "webarena": lambda: Benchmark(
         name="webarena",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["webarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(benchmark="webarena"),
             max_steps=15,
@@ -181,7 +182,7 @@ BENCHMARKS = {
     ),
     "visualwebarena": lambda: Benchmark(
         name="visualwebarena",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["visualwebarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(benchmark="visualwebarena"),
             max_steps=15,
@@ -191,7 +192,7 @@ BENCHMARKS = {
     ),
     "workarena_l1": lambda: Benchmark(
         name="workarena_l1",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena_l1"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(benchmark="workarena", filters={"level": "l1"}),
             max_steps=15,
@@ -201,7 +202,7 @@ BENCHMARKS = {
     ),
     "workarena_l1_sort": lambda: Benchmark(
         name="workarena_l1_sort",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena_l1"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 benchmark="workarena", filters={"level": "l1", "category": "list-sort"}
@@ -213,7 +214,7 @@ BENCHMARKS = {
     ),
     "workarena_l2_agent_curriculum": lambda: Benchmark(
         name="workarena_l2_agent_curriculum",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l2",
             task_category_filter=None,
@@ -224,7 +225,7 @@ BENCHMARKS = {
     ),
     "workarena_l3_agent_curriculum": lambda: Benchmark(
         name="workarena_l3_agent_curriculum",
-        high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l3",
             task_category_filter=None,

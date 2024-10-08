@@ -75,7 +75,7 @@ def test_build_benchmarks():
 def test_run_mock_benchmark():
     benchmark = Benchmark(
         name="miniwob_click_test",
-        high_level_action_set=HighLevelActionSetArgs(
+        high_level_action_set_args=HighLevelActionSetArgs(
             subsets=["bid"],
             multiaction=False,
             strict=False,
@@ -91,7 +91,9 @@ def test_run_mock_benchmark():
     )
 
     for env_args in benchmark.env_args_list:
-        agent_args = MiniwobTestAgentArgs(high_level_action_set=benchmark.high_level_action_set)
+        agent_args = MiniwobTestAgentArgs(
+            high_level_action_set=benchmark.high_level_action_set_args
+        )
         exp_args = ExpArgs(
             agent_args=agent_args,
             env_args=env_args,
