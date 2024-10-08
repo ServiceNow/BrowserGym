@@ -24,6 +24,16 @@ class HighLevelActionSetArgs(DataClassJsonMixin):
     retry_with_force: bool
     demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"]
 
+    def make_action_set(self):
+        return HighLevelActionSet(
+            subsets=self.subsets,
+            custom_actions=None,
+            multiaction=self.multiaction,
+            strict=self.strict,
+            retry_with_force=self.retry_with_force,
+            demo_mode=self.demo_mode,
+        )
+
 
 @dataclass
 class Benchmark(DataClassJsonMixin):
@@ -50,7 +60,7 @@ def task_list_from_csv(
     df: pd.DataFrame = pd.read_csv(filepath_or_bytes)
     # filter the desired columns (AND filter)
     for col_name, regex in filters.items():
-        filter = df[col_name].str.contains(regex, regexp=True)
+        filter = df[col_name].astype(str).str.contains(regex, regex=True)
         df = df[filter]
     # return only the task names
     return df["task_name"]
@@ -196,15 +206,15 @@ BENCHMARKS = {
         high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena_l1"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
-                benchmark="workarena", filters={"level": "l1", "category": "sort_list"}
+                benchmark="workarena", filters={"level": "l1", "category": "list-sort"}
             ),
             max_steps=15,
             n_repeats=10,
             seeds_rng=np.random.RandomState(42),
         ),
     ),
-    "workarena_l2": lambda: Benchmark(
-        name="workarena_l2",
+    "workarena_l2_agent_curriculum": lambda: Benchmark(
+        name="workarena_l2_agent_curriculum",
         high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l2",
@@ -214,8 +224,8 @@ BENCHMARKS = {
             curriculum_type="agent",
         ),
     ),
-    "workarena_l3": lambda: Benchmark(
-        name="workarena_l3",
+    "workarena_l3_agent_curriculum": lambda: Benchmark(
+        name="workarena_l3_agent_curriculum",
         high_level_action_set=DEFAULT_HIGHLEVEL_ACTION_SETS["workarena"],
         env_args_list=_make_env_args_list_from_workarena_curriculum(
             level="l3",
@@ -241,6 +251,8 @@ def _make_env_args_list_from_workarena_curriculum(
     assert level in ("l2", "l3")
     assert curriculum_type in ("human", "agent")
 
+    env_args_list = []
+
     from browsergym.workarena import get_all_tasks_agents
 
     all_task_tuples = get_all_tasks_agents(
@@ -249,7 +261,6 @@ def _make_env_args_list_from_workarena_curriculum(
         is_agent_curriculum=(curriculum_type == "agent"),
     )
 
-    env_args_list = []
     for task, seed in all_task_tuples:
         task_name = task.get_task_id()
         env_args_list.append(EnvArgs(task_name=task_name, task_seed=seed, max_steps=max_steps))
