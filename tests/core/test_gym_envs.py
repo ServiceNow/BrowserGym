@@ -1,17 +1,17 @@
-import bs4
-import gymnasium as gym
 import os
 import pathlib
-import pytest
+from time import time
 
-from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.python import PythonActionSet
-from browsergym.utils.obs import flatten_dom_to_str
-from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
-from time import time, sleep
+import bs4
+import gymnasium as gym
+import pytest
 
 # register openended gym environments
 import browsergym.core
+from browsergym.core.action.highlevel import HighLevelActionSet
+from browsergym.core.action.python import PythonActionSet
+from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
+from browsergym.utils.obs import flatten_dom_to_str
 
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
@@ -219,9 +219,15 @@ click({repr(inner_checkbox.get(BID_ATTR))})
     env.close()
 
 
+@pytest.mark.parametrize("as_global_context", [True, False])
 @pytest.mark.parametrize("demo_mode", DEMO_MODES)
-def test_demo_mode(demo_mode):
-    action_set = HighLevelActionSet(demo_mode=demo_mode)
+def test_demo_mode(as_global_context: bool, demo_mode: str):
+    if as_global_context:
+        action_set = HighLevelActionSet()
+        HighLevelActionSet.default_demo_mode = demo_mode
+    else:
+        action_set = HighLevelActionSet(demo_mode=demo_mode)
+
     env = gym.make(
         "browsergym/openended",
         task_kwargs={"start_url": TEST_PAGE},
@@ -250,16 +256,16 @@ fill({repr(email_field.get(BID_ATTR))}, "test@test")
     # typing should be slow in demo mode
     assert typing_end - typing_start > 1
 
-    sleep(1)
-
-    # email field has been filled correctly
-    assert env.page.input_value("#email") == "test@test"
-    # wait for the typing to complete
-
     soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
     checkbox = soup.find("input", attrs={"id": "subscribe"})
     # box is not checked
     assert not checkbox.has_attr("checked")
+
+    # email field has been filled correctly
+    email_field = soup.find("input", attrs={"id": "email"})
+
+    # check that the email field is empty
+    assert email_field.get("value") == "test@test"
 
     # click box
     action = f"""\
