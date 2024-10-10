@@ -32,7 +32,7 @@ dependencies = [
     "browsergym-webarena==0.8.0",
     "browsergym-visualwebarena==0.8.0",
     "browsergym-experiments==0.8.0",
-    "browsergym-workarena",
+    "browsergym-workarena>=0.4.1",
 ]
 
 [tool.setuptools]
