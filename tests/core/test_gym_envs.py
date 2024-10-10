@@ -219,9 +219,15 @@ click({repr(inner_checkbox.get(BID_ATTR))})
     env.close()
 
 
+@pytest.mark.parametrize("as_global_context", [True, False])
 @pytest.mark.parametrize("demo_mode", DEMO_MODES)
-def test_demo_mode(demo_mode):
-    action_set = HighLevelActionSet(demo_mode=demo_mode)
+def test_demo_mode(as_global_context: bool, demo_mode: str):
+    if as_global_context:
+        action_set = HighLevelActionSet()
+        HighLevelActionSet.default_demo_mode = demo_mode
+    else:
+        action_set = HighLevelActionSet(demo_mode=demo_mode)
+
     env = gym.make(
         "browsergym/openended",
         task_kwargs={"start_url": TEST_PAGE},

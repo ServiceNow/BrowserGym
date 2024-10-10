@@ -1,49 +1,45 @@
 import inspect
 import random
-
 from dataclasses import dataclass
 from typing import Literal, Optional
 
 from . import utils
 from .base import AbstractActionSet
-from .functions import (
-    noop,
-    send_msg_to_user,
-    report_infeasible,
-    fill,
-    # check,
-    # uncheck,
-    select_option,
+from .functions import (  # check,; uncheck,
+    clear,
     click,
     dblclick,
-    hover,
-    press,
-    focus,
-    clear,
     drag_and_drop,
-    upload_file,
-    scroll,
-    mouse_move,
-    mouse_up,
-    mouse_down,
-    mouse_click,
-    mouse_dblclick,
-    mouse_drag_and_drop,
-    mouse_upload_file,
-    keyboard_down,
-    keyboard_up,
-    keyboard_press,
-    keyboard_type,
-    keyboard_insert_text,
-    tab_close,
-    tab_focus,
-    new_tab,
+    fill,
+    focus,
     go_back,
     go_forward,
     goto,
+    hover,
+    keyboard_down,
+    keyboard_insert_text,
+    keyboard_press,
+    keyboard_type,
+    keyboard_up,
+    mouse_click,
+    mouse_dblclick,
+    mouse_down,
+    mouse_drag_and_drop,
+    mouse_move,
+    mouse_up,
+    mouse_upload_file,
+    new_tab,
+    noop,
+    press,
+    report_infeasible,
+    scroll,
+    select_option,
+    send_msg_to_user,
+    tab_close,
+    tab_focus,
+    upload_file,
 )
-from .parsers import highlevel_action_parser, action_docstring_parser
-
+from .parsers import action_docstring_parser, highlevel_action_parser
 
 CHAT_ACTIONS = [send_msg_to_user]
 
@@ -101,7 +97,9 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
+    # static class variables
     ActionSubset = Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
+    default_demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off"
 
     def __init__(
         self,
@@ -114,7 +112,7 @@ class HighLevelActionSet(AbstractActionSet):
         ],
         custom_actions: Optional[list[callable]] = None,
         multiaction: bool = True,
-        demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off",
+        demo_mode: Optional[Literal["off", "default", "all_blue", "only_visible_elements"]] = None,
         strict: bool = False,
         retry_with_force: bool = False,
     ):
@@ -173,7 +171,7 @@ from typing import Literal
 """
         # include demo_mode and retry_with_force flags
         self.python_includes += f"""\
-demo_mode={repr(demo_mode)}
+demo_mode={repr(demo_mode if demo_mode else self.default_demo_mode)}
 retry_with_force={repr(retry_with_force)}
 """
 
