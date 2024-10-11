@@ -9,7 +9,7 @@ on:
 jobs:
 
   code-format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -33,7 +33,7 @@ jobs:
         run: black . --check
 
   agentlab:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -86,7 +86,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
 
   browsergym-core:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -117,7 +117,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
 
   browsergym-miniwob:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -163,7 +163,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
 
   browsergym-experiments:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -209,7 +209,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -248,7 +248,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-webarena-slow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - browsergym-webarena-fast
 
@@ -289,7 +289,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-visualwebarena-fast:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -328,7 +328,7 @@ jobs:
           pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-visualwebarena-slow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - browsergym-visualwebarena-fast
 
