@@ -1,10 +1,12 @@
 # these are placeholders
 # all these symbols will be available in browsergym actions
-import playwright.sync_api
 from typing import Literal
+
+import playwright.sync_api
 
 from .utils import (
     add_demo_mode_effects,
+    call_fun,
     get_elem_by_bid,
     highlight_by_box,
     smooth_move_visual_cursor_to,
@@ -66,17 +68,18 @@ def fill(bid: str, value: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    if demo_mode != "off":
-        elem.clear()
-        delay = max(2000 / len(value), 10)
-        elem.type(value, delay=delay)
-    if retry_with_force:
-        try:
-            elem.fill(value, timeout=500)
-        except Exception as e:
-            elem.fill(value, force=True, timeout=500)
-    else:
-        elem.fill(value, timeout=500)
+
+    print(f"demo_mode={repr(demo_mode)}")
+
+    def do(force: bool):
+        if demo_mode != "off":
+            delay = max(2000 / len(value), 10)
+            elem.clear(force=force, timeout=500)
+            elem.type(value, delay=delay, timeout=0)  # no timeout
+        else:
+            elem.fill(value, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-check
@@ -89,13 +92,11 @@ def check(bid: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.check(timeout=500)
-        except Exception as e:
-            elem.check(force=True, timeout=500)
-    else:
-        elem.check(timeout=500)
+
+    def do(force: bool):
+        elem.check(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-uncheck
@@ -108,13 +109,11 @@ def uncheck(bid: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.uncheck(timeout=500)
-        except Exception as e:
-            elem.uncheck(force=True, timeout=500)
-    else:
-        elem.uncheck(timeout=500)
+
+    def do(force: bool):
+        elem.uncheck(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/docs/input#select-options
@@ -129,13 +128,11 @@ def select_option(bid: str, options: str | list[str]):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    if retry_with_force:
-        try:
-            elem.select_option(options, timeout=500)
-        except Exception as e:
-            elem.select_option(options, force=True, timeout=500)
-    else:
-        elem.select_option(options, timeout=500)
+
+    def do(force: bool):
+        elem.select_option(options, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-click
@@ -154,13 +151,11 @@ def click(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.click(button=button, modifiers=modifiers, timeout=500)
-        except Exception as e:
-            elem.click(button=button, modifiers=modifiers, force=True, timeout=500)
-    else:
-        elem.click(button=button, modifiers=modifiers, timeout=500)
+
+    def do(force: bool):
+        elem.click(button=button, modifiers=modifiers, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-dblclick
@@ -179,13 +174,11 @@ def dblclick(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.dblclick(button=button, modifiers=modifiers, timeout=500)
-        except Exception as e:
-            elem.dblclick(button=button, modifiers=modifiers, force=True, timeout=500)
-    else:
-        elem.dblclick(button=button, modifiers=modifiers, timeout=500)
+
+    def do(force: bool):
+        elem.click(button=button, modifiers=modifiers, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-hover
@@ -197,18 +190,14 @@ def hover(bid: str):
         hover('b8')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        box = elem.bounding_box()
-        if box:
-            center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-            smooth_move_visual_cursor_to(page, center_x, center_y)
-    if retry_with_force:
-        try:
-            elem.hover(timeout=500)
-        except Exception as e:
-            elem.hover(force=True, timeout=500)
-    else:
-        elem.hover(timeout=500)
+    add_demo_mode_effects(
+        page, elem, bid, demo_mode=demo_mode, move_cursor=True, highlight_box=False
+    )
+
+    def do(force: bool):
+        elem.hover(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/input#keys-and-shortcuts
@@ -461,11 +450,13 @@ def keyboard_type(text: str):
     Examples:
         keyboard_type('Hello world!')
     """
-    if demo_mode:
+    if demo_mode != "off":
         delay = max(2000 / len(text), 10)
+        timeout = 0  # no timeout
     else:
         delay = None
-    page.keyboard.type(text, delay=delay)
+        timeout = 500
+    page.keyboard.type(text, delay=delay, timeout=timeout)
 
 
 # https://playwright.dev/python/docs/api/class-keyboard#keyboard-insert-text

@@ -99,7 +99,6 @@ class HighLevelActionSet(AbstractActionSet):
 
     # static class variables
     ActionSubset = Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
-    default_demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off"
 
     def __init__(
         self,
@@ -171,8 +170,12 @@ from typing import Literal
 """
         # include demo_mode and retry_with_force flags
         self.python_includes += f"""\
-demo_mode={repr(demo_mode if demo_mode else self.default_demo_mode)}
+demo_mode={repr(demo_mode)}
 retry_with_force={repr(retry_with_force)}
+
+if demo_mode is None:
+    demo_mode = "default" if DEMO_MODE else "off"
+
 """
 
         # include utility functions

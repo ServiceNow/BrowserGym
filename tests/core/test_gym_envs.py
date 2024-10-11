@@ -8,6 +8,7 @@ import pytest
 
 # register openended gym environments
 import browsergym.core
+import browsergym.core.action
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
@@ -20,7 +21,6 @@ __TIMEOUT = 500
 __DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 TEST_PAGE = f"file://{__DATA_DIR}/test_page.html"
 BASIC_IFRAME_PAGE = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
-DEMO_MODES = ["default", "only_visible_elements", "all_blue"]
 
 
 def test_gym_env():
@@ -219,14 +219,15 @@ click({repr(inner_checkbox.get(BID_ATTR))})
     env.close()
 
 
-@pytest.mark.parametrize("as_global_context", [True, False])
-@pytest.mark.parametrize("demo_mode", DEMO_MODES)
-def test_demo_mode(as_global_context: bool, demo_mode: str):
-    if as_global_context:
-        action_set = HighLevelActionSet()
-        HighLevelActionSet.default_demo_mode = demo_mode
-    else:
-        action_set = HighLevelActionSet(demo_mode=demo_mode)
+@pytest.mark.parametrize("global_demo_mode", [True, False])
+@pytest.mark.parametrize("demo_mode", [None, "off", "default", "only_visible_elements", "all_blue"])
+def test_demo_mode(global_demo_mode: bool, demo_mode: str):
+    action_set = HighLevelActionSet(demo_mode=demo_mode)
+    browsergym.core.action.set_global_demo_mode(global_demo_mode)
+
+    demo_mode_active = (global_demo_mode and demo_mode is None) or (
+        demo_mode is not None and demo_mode != "off"
+    )
 
     env = gym.make(
         "browsergym/openended",
@@ -239,48 +240,56 @@ def test_demo_mode(as_global_context: bool, demo_mode: str):
     obs, info = env.reset()
     assert not obs["last_action_error"]
 
-    # Check that the box can be checked when action is not forced
     soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
     email_field = soup.find("input", attrs={"id": "email"})
+    checkbox = soup.find("input", attrs={"id": "subscribe"})
 
     # check that the email field is empty
     assert email_field.get("value") == ""
 
-    # click box
-    action = f"""\
-fill({repr(email_field.get(BID_ATTR))}, "test@test")
-"""
-    typing_start = time()
-    obs, _, _, _, _ = env.step(action)
-    typing_end = time()
-    # typing should be slow in demo mode
-    assert typing_end - typing_start > 1
-
-    soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
-    checkbox = soup.find("input", attrs={"id": "subscribe"})
-    # box is not checked
+    # check that the box is not checked
     assert not checkbox.has_attr("checked")
-
-    # email field has been filled correctly
-    email_field = soup.find("input", attrs={"id": "email"})
-
-    # check that the email field is empty
-    assert email_field.get("value") == "test@test"
 
     # click box
     action = f"""\
 click({repr(checkbox.get(BID_ATTR))})
 """
-    checkbox_start = time()
-    obs, _, _, _, _ = env.step(action)
-    checkbox_end = time()
-    # clicking should be slow in demo mode
-    assert checkbox_end - checkbox_start > 1
+    obs, reward, terminated, truncated, info = env.step(action)
+    assert not obs["last_action_error"]
 
     soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
     checkbox = soup.find("input", attrs={"type": "checkbox", "id": "subscribe"})
-    # box is checked
+
+    # check that the box is checked
     assert checkbox.has_attr("checked")
+
+    # clicking should be slow (only in demo mode)
+    action_time = info["action_exec_stop"] - info["action_exec_start"]
+    if demo_mode_active:
+        assert action_time > 2
+    else:
+        assert action_time <= 1.5
+
+    # fill box
+    action = f"""\
+fill({repr(email_field.get(BID_ATTR))}, "test@test")
+"""
+    obs, reward, terminated, truncated, info = env.step(action)
+    assert not obs["last_action_error"]
+
+    soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
+
+    # email field has been filled correctly
+    email_field = soup.find("input", attrs={"id": "email"})
+    assert email_field.get("value") == "test@test"
+
+    # typing should be slow (only in demo mode)
+    action_time = info["action_exec_stop"] - info["action_exec_start"]
+    print(f"typing time: {action_time}")
+    if demo_mode_active:
+        assert action_time > 2
+    else:
+        assert action_time <= 1.5
 
     env.close()
 
