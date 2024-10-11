@@ -1,5 +1,8 @@
-import playwright.sync_api
 from abc import ABC, abstractmethod
+
+import playwright.sync_api
+
+DEMO_MODE = False
 
 
 class AbstractActionSet(ABC):
@@ -54,6 +57,7 @@ def execute_python_code(
         "page": page,
         "send_message_to_user": send_message_to_user,
         "report_infeasible_instructions": report_infeasible_instructions,
+        "DEMO_MODE": DEMO_MODE,
     }
 
     exec(code, globals)
