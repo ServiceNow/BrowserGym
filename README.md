@@ -41,6 +41,7 @@ BrowserGym includes the following benchmarks by default:
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - [WebCanvas](https://github.com/iMeanAI/WebCanvas)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
 
@@ -71,6 +72,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for WebArena, see [webarena/README.md](browsergym/webarena/README.md)
  - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - for WebCanvas, see [WebCanvas](https://github.com/iMeanAI/WebCanvas)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
 
 ### 🏗️ Development setup

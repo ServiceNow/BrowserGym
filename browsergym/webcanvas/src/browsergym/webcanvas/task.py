@@ -39,8 +39,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
 
         if task_id is None:
             raise ValueError(
-                f"One and only one of 'task_id' must be provided (task_id={
-                    task_id})."
+                f"One and only one of 'task_id' must be provided (task_id={task_id})."
             )
 
         # read the list of all WebCanvas task configs

@@ -2,8 +2,8 @@ import re
 from urllib.parse import parse_qs, urlparse, unquote
 from lxml import html
 
-from .sematic_match.prompt_constructor import SemanticMatchPromptConstructor
-from .sematic_match.openai import GPTGenerator35
+from .semantic_match.prompt_constructor import SemanticMatchPromptConstructor
+from .semantic_match.openai import GPTGenerator35
 
 
 MapTagNameList = [

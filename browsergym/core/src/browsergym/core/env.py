@@ -398,8 +398,7 @@ document.addEventListener("visibilitychange", () => {
             # extract reward, done, user_message, info (task-specific)
             reward, done, user_message, task_info = self.task.validate(
                 self.page, self.chat.messages, action)
-            logger.info(f"WebCanvas task validation result:\n{
-                        self.task.evaluate_result}")
+            logger.info(f"WebCanvas task validation result:\n{self.task.evaluate_result}")
             info["task_info"] = task_info
             info["webcanvas_result"] = self.task.evaluate_result
 
@@ -506,8 +505,7 @@ document.addEventListener("visibilitychange", () => {
         logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
         if not page.context == self.context:
             raise RuntimeError(
-                f"Unexpected: activating a page that belongs to a different browser context ({
-                    page})."
+                f"Unexpected: activating a page that belongs to a different browser context ({page})."
             )
 
         # add the activated page to the page history (or move it to last which is the most recent)
@@ -538,8 +536,7 @@ document.addEventListener("visibilitychange", () => {
         # active page should share the same browser context with the environment
         if self.page not in self.context.pages:
             raise RuntimeError(
-                f"Unexpected: active page is not part of the browser context's open pages ({
-                    self.page})."
+                f"Unexpected: active page is not part of the browser context's open pages ({self.page})."
             )
 
         # active page should not be closed
