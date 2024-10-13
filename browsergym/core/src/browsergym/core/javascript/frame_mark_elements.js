@@ -1,8 +1,8 @@
 /**
  * Go through all DOM elements in the frame (including shadowDOMs), give them unique browsergym
- * identifiers (bid), and store custom data in the aria-roledescription attribute.
+ * identifiers (bid), and store custom data in ARIA attributes.
  */
-async ([parent_bid, bid_attr_name]) => {
+async ([parent_bid, bid_attr_name, tags_to_mark]) => {
 
     // standard html tags
     // https://www.w3schools.com/tags/
@@ -69,10 +69,21 @@ async ([parent_bid, bid_attr_name]) => {
             );
         }
         i++;
-        // we will mark only standard HTML tags
-        if (!elem.tagName || !html_tags.has(elem.tagName.toLowerCase())) {
-            // Skipping element
-            continue;  // stop and move on to the next element
+        // decide if the current element should be marked or not
+        switch (tags_to_mark) {
+            // mark all elements
+            case "all":
+                break;
+            // mark only standard HTML tags
+            case "standard_html":
+                if (!elem.tagName || !html_tags.has(elem.tagName.toLowerCase())) {
+                    // continue the loop, i.e., move on to the next element
+                    continue;
+                }
+                break;
+            // non-recognized argument
+            default:
+                throw new Error(`Invalid value for parameter \"tags_to_mark\": ${JSON.stringify(tags_to_mark)}`);
         }
         // Processing element
         // register intersection callback on element, and keep track of element for waiting later
@@ -110,13 +121,9 @@ async ([parent_bid, bid_attr_name]) => {
         }
         if (elem_global_bid === null) {
             let elem_local_id = null;
-            // iFrames get alphabetical ids: 'a', 'b', ..., 'z'.
-            // if more than 26 iFrames are present, raise an Error
+            // iFrames get alphabetical ids: 'a', 'b', ..., 'z', 'aA', 'aB' etc.
             if (['iframe', 'frame'].includes(elem.tagName.toLowerCase())) {
                 elem_local_id = `${window.browsergym_frame_id_generator.next()}`;
-                if (elem_local_id.length > 1) {
-                    throw new Error(`More than 26? Such iFrames. BrowserGym not like.`);
-                }
             }
             // other elements get numerical ids: '0', '1', '2', ...
             else {
@@ -132,15 +139,11 @@ async ([parent_bid, bid_attr_name]) => {
         }
         all_bids.add(elem_global_bid);
 
-        // Hack: store custom data inside the aria-roledescription attribute (will be available in DOM and AXTree)
+        // Hack: store custom data inside ARIA attributes (will be available in DOM and AXTree)
         //  - elem_global_bid: global element identifier (unique over multiple frames)
         // TODO: add more data if needed (x, y coordinates, bounding box, is_visible, is_clickable etc.)
-        let original_content = "";
-        if (elem.hasAttribute("aria-roledescription")) {
-            original_content = elem.getAttribute("aria-roledescription");
-        }
-        let new_content = `${elem_global_bid}_${original_content}`
-        elem.setAttribute("aria-roledescription", new_content);
+        push_bid_to_attribute(elem_global_bid, elem, "aria-roledescription");
+        push_bid_to_attribute(elem_global_bid, elem, "aria-description");  // fallback for generic nodes
 
         // set-of-marks flag (He et al. 2024)
         // https://github.com/MinorJerry/WebVoyager/blob/main/utils.py
@@ -229,6 +232,15 @@ function whoCapturesCenterClick(element){
     }
 }
 
+function push_bid_to_attribute(bid, elem, attr){
+    let original_content = "";
+    if (elem.hasAttribute(attr)) {
+        original_content = elem.getAttribute(attr);
+    }
+    let new_content = `browsergym_id_${bid} ${original_content}`
+    elem.setAttribute(attr, new_content);
+}
+
 function elementFromPoint(x, y) {
     let dom = document;
     let last_elem = null;
@@ -252,8 +264,13 @@ class IFrameIdGenerator {
 
     next() {
       const r = [];
-      for (const char of this._nextId) {
-        r.unshift(this._chars[char]);
+      for (let i = 0; i < this._nextId.length; i++) {
+        let char = this._chars[this._nextId[i]];
+        // all but first character must be upper-cased (a, aA, bCD)
+        if (i < this._nextId.length - 1) {
+            char = char.toUpperCase();
+        }
+        r.unshift(char);
       }
       this._increment();
       return r.join('');

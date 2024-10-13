@@ -13,7 +13,7 @@ for task_id in config.TASK_IDS:
     register_task(
         gym_id,
         task.GenericVisualWebArenaTask,
-        kwargs={"task_kwargs": {"task_id": task_id}},
+        task_kwargs={"task_id": task_id},
     )
     ALL_VISUALWEBARENA_TASK_IDS.append(gym_id)
     if task_id in config.TASK_IDS_WITH_RESET:

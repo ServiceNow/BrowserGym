@@ -32,6 +32,59 @@ jobs:
       - name: Code Formatting
         run: black . --check
 
+  agentlab:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout AgentLab
+        uses: actions/checkout@v4
+        with:
+          repository: 'ServiceNow/AgentLab'
+          ref: 'main'
+          path: 'agentlab'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install AgentLab
+        working-directory: ./agentlab
+        run: pip install -e .
+
+      - name: Install BrowserGym
+        run: make install
+
+      - name: Pip list
+        run: pip list
+
+      - name: Fetch MiniWob
+        uses: actions/checkout@v4
+        with:
+          repository: "Farama-Foundation/miniwob-plusplus"
+          ref: "7fd85d71a4b60325c6585396ec4f48377d049838"
+          path: "miniwob-plusplus"
+
+      - name: Serve MiniWob
+        uses: Eun/http-server-action@v1
+        with:
+          directory: "${{ github.workspace }}/miniwob-plusplus/miniwob/html"
+          port: 8080
+
+      - name: Run AgentLab Unit Tests
+        env:
+          MINIWOB_URL: "http://localhost:8080/miniwob/"
+        run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
+
   browsergym-core:
     runs-on: ubuntu-latest
 

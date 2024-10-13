@@ -1,2 +1,2 @@
-from .agent import Agent
-from .loop import EnvArgs, AbstractAgentArgs, ExpArgs, get_exp_result
+from .agent import Agent, AgentInfo
+from .loop import AbstractAgentArgs, EnvArgs, ExpArgs, get_exp_result

@@ -1,8 +1,8 @@
-import numpy as np
-import playwright.sync_api
-
 from abc import ABC, abstractmethod
 from typing import Tuple
+
+import numpy as np
+import playwright.sync_api
 
 
 class AbstractBrowserTask(ABC):

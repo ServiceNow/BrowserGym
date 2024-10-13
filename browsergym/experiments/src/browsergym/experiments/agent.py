@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from browsergym.core.action.base import AbstractActionSet
@@ -27,8 +27,9 @@ DEFAULT_OBS_PREPROCESSOR: callable = default_obs_preprocessor
 class AgentInfo:
     think: str = None
     chat_messages: list = None
-    stats: dict = None
-    markup_page: str = ""
+    stats: dict = field(default_factory=dict)
+    markdown_page: str = ""
+    html_page: str = ""
     extra_info: dict = None
 
     def __getitem__(self, key):
@@ -105,7 +106,7 @@ class Agent(ABC):
                 - "messages": list of messages with the LLM
                 - "stats": dict of extra statistics that will be saved and
                   aggregated.
-                - "markup_page": str, string that will be displayed by agentlab's xray tool.
+                - "markdown_page": str, string that will be displayed by agentlab's xray tool.
                 - "extra_info": dict, additional information that will be saved
                   and aggregated.
         """

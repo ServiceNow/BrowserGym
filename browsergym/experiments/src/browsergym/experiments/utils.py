@@ -22,6 +22,8 @@ def count_messages_token(messages, model="gpt-4"):
     for message in messages:
         if hasattr(message, "content"):
             message = message.content
+        elif isinstance(message, dict) and "content" in message:
+            message = message["content"]
 
         if isinstance(message, str):
             token_count += count_tokens(message, model)

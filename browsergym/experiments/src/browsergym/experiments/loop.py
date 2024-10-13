@@ -1,4 +1,5 @@
 import gzip
+import importlib.metadata
 import json
 import logging
 import os
@@ -16,9 +17,10 @@ from typing import Optional
 
 import gymnasium as gym
 import numpy as np
-from browsergym.core.chat import Chat
 from PIL import Image
 from tqdm import tqdm
+
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -67,10 +69,11 @@ class EnvArgs:
 class AbstractAgentArgs(ABC):
     """A template class that defines the required signature of an agent's arguments."""
 
-    @property
-    def agent_name(self) -> str:
-        """The name of the agent. Used for naming experiments."""
-        return self.__class__.__name__
+    agent_name: str = None
+
+    def __post_init__(self):
+        if self.agent_name is None:
+            self.agent_name = self.__class__.__name__
 
     def prepare(self):
         """Prepare the agent's LLM models before running the experiment."""
@@ -83,6 +86,19 @@ class AbstractAgentArgs(ABC):
     @abstractmethod
     def make_agent(self) -> Agent:
         """Comply the experiments.loop API for instantiating the agent."""
+
+
+def save_package_versions(exp_dir: Path):
+    """Save the versions of the installed packages in the experiment directory."""
+    python_dists = "\n".join(
+        sorted(
+            [
+                f'{dist.metadata["Name"]}=={dist.metadata["Version"]}'
+                for dist in importlib.metadata.distributions()
+            ]
+        )
+    )
+    (exp_dir / "package_versions.txt").write_text(python_dists)
 
 
 @dataclass
@@ -125,6 +141,10 @@ class ExpArgs:
     stack_trace: str = None
     order: int = None  # use to keep the original order the experiments were meant to be launched.
     logging_level: int = logging.INFO
+    exp_id: str = None
+    depends_on: tuple[str] = ()
+    save_screenshot: bool = True
+    save_som: bool = False
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -138,22 +158,32 @@ class ExpArgs:
             task_name = self.env_args.task_name
             self.exp_name = f"{self.agent_args.agent_name}_on_{task_name}_{self.env_args.task_seed}"
 
+        if self.exp_id is None:  # reuse the same task_id if it's a relaunch
+            self.exp_id = str(uuid.uuid4().hex)
+
         # if exp_dir exists, it means it's a re-run, move the old one
         if self.exp_dir is not None:
             _move_old_exp(self.exp_dir)
 
         self.exp_date = datetime.now()
-        date_str = self.exp_date.strftime("%Y-%m-%d_%H-%M-%S")
-
-        while True:  # create a short unique id, but if it exists, try again
-            id = str(uuid.uuid4().hex)[:6]
-            self.exp_dir = Path(exp_root) / f"{date_str}_{self.exp_name}_{id}"
-            if not self.exp_dir.exists():
-                break
+        self._make_dir(exp_root)
 
         self.exp_dir.mkdir(parents=True, exist_ok=True)
         with open(self.exp_dir / "exp_args.pkl", "wb") as f:
             pickle.dump(self, f)
+
+    def _make_dir(self, exp_root):
+        """Create a unique directory for the experiment."""
+        date_str = self.exp_date.strftime("%Y-%m-%d_%H-%M-%S")
+
+        for i in range(1000):
+            if i >= 999:  # make sure we don't loop forever
+                raise ValueError("Could not find a unique name for the experiment directory.")
+
+            tag = f"_{i}" if i > 0 else ""
+            self.exp_dir = Path(exp_root) / f"{date_str}_{self.exp_name}{tag}"
+            if not self.exp_dir.exists():
+                break
 
     # TODO distinguish between agent error and environment or system error. e.g.
     # the parsing error of an action should not be re-run.
@@ -163,7 +193,11 @@ class ExpArgs:
         # start writing logs to run logfile
         self._set_logger()
 
+        # log python environment info
+        save_package_versions(self.exp_dir)
+
         episode_info = []
+        env, step_info, err_msg, stack_trace = None, None, None, None
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
@@ -173,7 +207,6 @@ class ExpArgs:
             )
             logger.debug(f"Environment created.")
 
-            err_msg, stack_trace = None, None
             step_info = StepInfo(step=0)
             episode_info = [step_info]
             step_info.from_reset(
@@ -187,18 +220,24 @@ class ExpArgs:
                 logger.debug(f"Agent chose action:\n {action}")
 
                 if action is None:
-                    logger.debug(f"Agent returned None action. Ending episode.")
+                    # will end the episode after saving the step info.
                     step_info.truncated = True
-                    break
 
-                step_info.save_step_info(self.exp_dir)
+                step_info.save_step_info(
+                    self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
+                )
                 logger.debug(f"Step info saved.")
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
 
+                if action is None:
+                    logger.debug(f"Agent returned None action. Ending episode.")
+                    break
+
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
+
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
@@ -216,7 +255,10 @@ class ExpArgs:
 
         finally:
             try:
-                step_info.save_step_info(self.exp_dir)
+                if step_info is not None:
+                    step_info.save_step_info(
+                        self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
+                    )
             except Exception as e:
                 logger.error(f"Error while saving step info in the finally block: {e}")
             try:
@@ -231,7 +273,8 @@ class ExpArgs:
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
-                env.close()
+                if env is not None:
+                    env.close()
             except Exception as e:
                 logger.error(f"Error while closing the environment in the finally block: {e}")
             try:
@@ -376,20 +419,42 @@ class StepInfo:
 
         self.stats = stats
 
-    def save_step_info(self, exp_dir, save_json=False, save_jpg=True):
+    def save_step_info(self, exp_dir, save_json=False, save_screenshot=True, save_som=False):
+
+        screenshot = self.obs.pop("screenshot", None)
+        screenshot_som = self.obs.pop("screenshot_som", None)
+
+        if save_screenshot and screenshot is not None:
+            img = Image.fromarray(screenshot)
+            img.save(exp_dir / f"screenshot_step_{self.step}.png")
+
+        if save_som and screenshot_som is not None:
+            img = Image.fromarray(screenshot_som)
+            img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
+
+        # save goal object (which might contain images) to a separate file to save space
+        if self.obs is not None and self.obs.get("goal_object", False):
+            # save the goal object only once (goal should never change once setup)
+            goal_object_file = Path(exp_dir) / "goal_object.pkl.gz"
+            if not goal_object_file.exists():
+                with gzip.open(goal_object_file, "wb") as f:
+                    pickle.dump(self.obs["goal_object"], f)
+            # set goal_object to a special placeholder value, which indicates it should be loaded from a separate file
+            self.obs["goal_object"] = None
 
         with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
+            # TODO should we pop the screenshots too before this to save space ?
             pickle.dump(self, f)
-
-        if save_jpg and self.obs is not None:
-            for name in ("screenshot", "screenshot_som"):
-                if name in self.obs:
-                    img = Image.fromarray(self.obs[name])
-                    img.save(exp_dir / f"{name}_step_{self.step}.jpg")
 
         if save_json:
             with open(exp_dir / "steps_info.json", "w") as f:
                 json.dump(self, f, indent=4, cls=DataclassJSONEncoder)
+
+        # add the screenshots back to the obs
+        if screenshot is not None:
+            self.obs["screenshot"] = screenshot
+        if screenshot_som is not None:
+            self.obs["screenshot_som"] = screenshot_som
 
 
 def _extract_err_msg(episode_info: list[StepInfo]):
@@ -412,8 +477,6 @@ def _aggregate_episode_stats(episode_info: list[StepInfo]):
     These two summaries should cover many use cases. If more are needed, the
     user can compute other stats by reloading individual StepInfo.
     """
-    # discard the last step since it was not seen by the agent
-    episode_info = episode_info[:-1]
 
     stats = defaultdict(list)
     for step_info in episode_info:
@@ -518,6 +581,30 @@ class ExpResult:
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
+            if "screenshot" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot"] = np.array(
+                        self.get_screenshot(step), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
+            if "screenshot_som" not in self._steps_info[step].obs:
+                try:
+                    self._steps_info[step].obs["screenshot_som"] = np.array(
+                        self.get_screenshot(step, som=True), dtype=np.uint8
+                    )
+                except FileNotFoundError:
+                    pass
+        # if goal_object is set to None, it indicates it has been saved into a separate file
+        if (
+            self._steps_info[step].obs
+            and "goal_object" in self._steps_info[step].obs
+            and self._steps_info[step].obs["goal_object"] is None
+        ):
+            with gzip.open(self.exp_dir / "goal_object.pkl.gz", "rb") as f:
+                goal_object = pickle.load(f)
+                self._steps_info[step].obs["goal_object"] = goal_object
+
         return self._steps_info[step]
 
     @property
@@ -542,12 +629,17 @@ class ExpResult:
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
         if self._screenshots.get(key, None) is None:
-            file_name = f"screenshot_{'som_' if som else ''}step_{step}.jpg"
-            self._screenshots[key] = Image.open(self.exp_dir / file_name)
+            file_name = f"screenshot_{'som_' if som else ''}step_{step}"
+            try:
+                with Image.open(self.exp_dir / (file_name + ".png")) as img:
+                    self._screenshots[key] = img.copy()
+            except FileNotFoundError:
+                with Image.open(self.exp_dir / (file_name + ".jpg")) as img:
+                    self._screenshots[key] = img.copy()
         return self._screenshots[key]
 
     def get_screenshots(self, som=False):
-        files = list(self.exp_dir.glob("screenshot_step_*.jpg"))
+        files = list(self.exp_dir.glob("screenshot_step_*"))
         max_step = 0
         for file in files:
             step = int(file.name.split("_")[-1].split(".")[0])
@@ -606,8 +698,7 @@ class ExpResult:
     @property
     def logs(self):
         if self._logs is None:
-            with open(self.exp_dir / "experiment.log", "r") as f:
-                self._logs = f.read()
+            self._logs = (self.exp_dir / "experiment.log").read_text()
         return self._logs
 
 

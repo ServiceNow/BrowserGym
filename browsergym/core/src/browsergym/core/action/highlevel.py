@@ -116,10 +116,12 @@ class HighLevelActionSet(AbstractActionSet):
         multiaction: bool = True,
         demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off",
         strict: bool = False,
+        retry_with_force: bool = False,
     ):
         super().__init__(strict)
         self.multiaction = multiaction
         self.demo_mode = demo_mode
+        self.retry_with_force = retry_with_force
 
         if not subsets:
             raise ValueError(f"'action_subsets' is empty.")
@@ -169,11 +171,10 @@ from typing import Literal
 
 
 """
-        # include demo_mode flag
+        # include demo_mode and retry_with_force flags
         self.python_includes += f"""\
 demo_mode={repr(demo_mode)}
-
-
+retry_with_force={repr(retry_with_force)}
 """
 
         # include utility functions
@@ -315,11 +316,12 @@ Only a single action can be provided at once."""
         # the corresponding python function call
         if self.strict:
             function_calls = highlevel_action_parser.parse_string(highlevel_code, parse_all=True)
+            function_calls = function_calls.as_list()
         else:
             function_calls = highlevel_action_parser.search_string(
                 highlevel_code
             )  # allow for multiple matches, skip anything in-between
-            function_calls = sum(function_calls)  # unpack multiple matches
+            function_calls = sum(function_calls.as_list(), [])  # unpack multiple matches
 
         if not function_calls:
             raise ValueError("Received an empty action.")

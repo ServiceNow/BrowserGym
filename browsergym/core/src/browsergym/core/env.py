@@ -1,36 +1,52 @@
 import copy
-import gymnasium as gym
 import logging
-import numpy as np
-import playwright.sync_api
-import time
 import re
-
+import time
 from abc import ABC
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
-from .chat import Chat
-from .task import AbstractBrowserTask
-from .spaces import Unicode, AnyDict, AnyBox
-from .constants import TEXT_MAX_LENGTH, BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
-from .observation import (
-    _pre_extract,
-    _post_extract,
-    extract_screenshot,
-    extract_dom_snapshot,
-    extract_dom_extra_properties,
-    extract_merged_axtree,
-    extract_focused_element_bid,
-    MarkingError,
-)
+import gymnasium as gym
+import numpy as np
+import playwright.sync_api
+
+from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
-from .action.base import execute_python_code
-from . import _get_global_playwright
-
+from .chat import Chat
+from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES, TEXT_MAX_LENGTH
+from .observation import (
+    MarkingError,
+    _post_extract,
+    _pre_extract,
+    extract_dom_extra_properties,
+    extract_dom_snapshot,
+    extract_focused_element_bid,
+    extract_merged_axtree,
+    extract_screenshot,
+)
+from .spaces import AnyBox, AnyDict, Unicode
+from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
+
+
+def _try_to_extract_legacy_goal(goal: list):
+    legacy_goal_strings = []
+    for message in goal:
+        if message["type"] == "text":
+            legacy_goal_strings.append(message["text"])
+        else:
+            logger.debug(
+                f"Message type {repr(message['type'])} present in the goal, cannot be converted to legacy text-only format."
+            )
+            legacy_goal_strings.append(
+                'WARNING: This goal cannot be converted to a text-only goal format. Use the new goal format instead ("goal_object" field). Any agent reading this should abort immediately.'
+            )
+            break
+    legacy_goal = "\n".join(legacy_goal_strings)
+
+    return legacy_goal
 
 
 class BrowserEnv(gym.Env, ABC):
@@ -47,6 +63,7 @@ class BrowserEnv(gym.Env, ABC):
         viewport: Optional[dict] = None,  # will override the task's viewport
         slow_mo: Optional[int] = None,  # will override the task's slow_mo
         timeout: Optional[int] = None,  # will override the task's timeout
+        tags_to_mark: Literal["all", "standard_html"] = "standard_html",
         # interactive / debugging arguments
         headless: bool = True,
         wait_for_user_message: bool = False,
@@ -68,6 +85,7 @@ class BrowserEnv(gym.Env, ABC):
             viewport: desired viewport size. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             slow_mo: desired slow_mo value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             timeout: desired timeout value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            tags_to_mark: which HTML tags should be marked by BrowserGym and receive a bid. Value "all" will mark every element in the page, while "standard_html" (default) will only mark standard html tags.
             headless: whether the browser should run in headless mode or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Headless mode should only be disabled for debugging/testing.
             wait_for_user_message: whether the environment should pause and wait for a user message in the chat after a new message is sent by the agent. Useful for running agents in interactive mode.
             resizeable_window: whether the browser window should be resizeable or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Should only be set for debugging/testing.
@@ -83,6 +101,7 @@ class BrowserEnv(gym.Env, ABC):
         self.viewport = viewport
         self.slow_mo = slow_mo
         self.timeout = timeout
+        self.tags_to_mark = tags_to_mark
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
         self.terminate_on_infeasible = terminate_on_infeasible
@@ -91,6 +110,9 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_chromium_kwargs = pw_chromium_kwargs
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
+
+        # check argument values
+        assert tags_to_mark in ("all", "standard_html")
 
         # task
         self.task = None
@@ -115,11 +137,8 @@ class BrowserEnv(gym.Env, ABC):
                         }
                     )
                 ),
-                # TODO: this is redundant with chat messages, to be removed
                 "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "goal_image_urls": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
+                "goal_object": gym.spaces.Sequence(AnyDict()),
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
@@ -264,27 +283,42 @@ document.addEventListener("visibilitychange", () => {
         recording_start_time = time.time()
 
         # setup the task
-        goal, task_info = self.task.setup(page=self.page)
+        task_goal, task_info = self.task.setup(page=self.page)
+
+        # process the task goal
+
+        # no goal specified
+        if task_goal is None:
+            self.goal_object = []
+        # convert text-only goal (legacy) to new format
+        elif isinstance(task_goal, str):
+            self.goal_object = [{"type": "text", "text": task_goal}]
+        # new format goal with multiple texts and images (OpenAI style)
+        elif isinstance(task_goal, list):
+            self.goal_object = task_goal
+        else:
+            raise ValueError(f"task_goal should be of type str or list, got {task_goal.__class__}")
 
         # initialize the chat
         self.chat.add_message(
             role="assistant",
             msg="Hi! I am your UI assistant, I can perform web tasks for you. What can I help you with?",
         )
-        # if any, add the task's goal to the chat
-        if goal:
 
-            # goal is text-only
-            if isinstance(goal, str):
-                goal_msg = goal
-
-            # goal is text + images
-            elif isinstance(goal, dict):
-                goal_msg = goal["message"]
-                for image_url in goal["image_urls"]:
-                    self.chat.add_message(role="user_image", msg=image_url)
-
-            self.chat.add_message(role="user", msg=goal_msg)
+        # send task goal (if any) to the chat
+        for message in self.goal_object:
+            match message["type"]:
+                case "text":
+                    self.chat.add_message(role="user", msg=message["text"])
+                case "image_url":
+                    image_src = message["image_url"]
+                    if isinstance(image_src, dict):
+                        image_src = image_src["url"]
+                    self.chat.add_message(role="user_image", msg=image_src)
+                case _:
+                    raise ValueError(
+                        f"Unknown message type {repr(message['type'])} in the task goal."
+                    )
 
         self._wait_dom_loaded()
 
@@ -494,7 +528,7 @@ document.addEventListener("visibilitychange", () => {
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
-                _pre_extract(self.page)
+                _pre_extract(self.page, self.tags_to_mark)
 
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
@@ -514,7 +548,7 @@ document.addEventListener("visibilitychange", () => {
                         f"An error occured while extracting the dom and axtree. Retrying ({
                             retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
                     )
-                    # post-extract cleanup (aria-roledescription attribute)
+                    # post-extract cleanup (ARIA attributes)
                     _post_extract(self.page)
                     time.sleep(0.5)
                     continue
@@ -525,27 +559,11 @@ document.addEventListener("visibilitychange", () => {
         # post-extraction cleanup of temporary info in dom
         _post_extract(self.page)
 
-        # use first user message as goal, if any
-        # use all user images before first user message as goal images, if any
-        goal_msg = "There is no goal."
-        goal_image_urls = []
-        _prev_image_urls = []
-        for msg in self.chat.messages:
-            if msg["role"] == "user_image":
-                _prev_image_urls.append(msg["message"])
-            elif msg["role"] == "user":
-                goal_msg = msg["message"]
-                goal_image_urls = _prev_image_urls
-                break
-            else:
-                pass
-
         # obs is generic to all tasks
         obs = {
             "chat_messages": copy.deepcopy(self.chat.messages),
-            "goal": goal_msg,  # TODO: redundant with chat messages, to be removed?
-            # TODO: redundant with chat messages, to be removed?
-            "goal_image_urls": goal_image_urls,
+            "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
+            "goal_object": self.goal_object,  # new goal format, list of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,

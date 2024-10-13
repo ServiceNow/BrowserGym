@@ -17,7 +17,7 @@ BrowserGym includes the following benchmarks by default:
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
 
-Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/task.py#L7C7-L7C26) class.
+Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
 ## Setup
 
@@ -32,9 +32,9 @@ playwright install chromium
 ```
 
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
- - for miniwob, see [miniwob/README.md](miniwob/README.md)
- - for webarena, see [webarena/README.md](webarena/README.md)
- - for visualwebarena, see [visualwebarena/README.md](visualwebarena/README.md)
+ - for miniwob, see [miniwob/README.md](browsergym/miniwob/README.md)
+ - for webarena, see [webarena/README.md](browsergym/webarena/README.md)
+ - for visualwebarena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
 
 ### Development setup
@@ -158,24 +158,44 @@ print("\n".join(env_ids))
 
 ## Demo
 
-If you want to experiment with an agent in BrowserGym, follow these steps:
+If you want to experiment with a demo agent in BrowserGym, follow these steps:
 
 ```sh
 cd demo-agent
-conda env create -f environment.yml; conda activate demo-agent
+conda env create -f environment.yml
+conda activate demo-agent
 # or simply use `pip install -r requirements.txt`
 playwright install chromium
 ```
 
-Optional: Set your `OPENAI_API_KEY` to use a GPT agent.
+Our demo agent uses `openai` as a backend, be sure to set your `OPENAI_API_KEY`.
 
-Launch the demo on the open web:
-
+Launch the demo agent on the open web:
 ```sh
 python run_demo.py --task_name openended --start_url https://www.google.com
 ```
 
-You can customize your experience by changing the `model_name` to your preferred LLM, toggling Chain-of-thought with `use_thinking`, adding screenshots for your VLMs with `use_screenshot`, and much more!
+Or use it to solve a simple MiniWoB task:
+```sh
+python run_demo.py --task_name miniwob.click-test
+```
+
+A VisualWebArena task:
+```sh
+python run_demo.py --task_name visualwebarena.398
+```
+
+A WebArena task:
+```sh
+python run_demo.py --task_name webarena.4
+```
+
+A WorkArena task:
+```sh
+python run_demo.py --task_name workarena.servicenow.order-standard-laptop
+```
+
+You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
 
 
 ## Citing This Work
