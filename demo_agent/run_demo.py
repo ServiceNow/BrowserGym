@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument(
         "--task_name",
         type=str,
-        default="webcanvas.1",
+        default="webcanvas.0",
         help="Name of the Browsergym task to run. If 'openended', you need to specify a 'start_url'",
     )
     parser.add_argument(
@@ -101,6 +101,8 @@ https://github.com/ServiceNow/AgentLab"""
         agent_args.chat_mode = True
         env_args.wait_for_user_message = True
         env_args.task_kwargs = {"start_url": args.start_url}
+
+    print(args.task_name)
 
     # setting up the experiment
     exp_args = ExpArgs(

@@ -196,8 +196,7 @@ class BrowserEnv(gym.Env, ABC):
                 return task_value
             else:
                 logger.warning(
-                    f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(
-                        env_value)}). This might change the task's behaviour and difficulty."
+                    f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
                 )
                 return env_value
 
@@ -374,8 +373,7 @@ document.addEventListener("visibilitychange", () => {
             # extract reward, done, user_message, info (task-specific)
             reward, done, user_message, task_info = self.task.validate(
                 self.page, self.chat.messages, action)
-            logger.info(f"WebCanvas task validation result:\n{
-                        self.task.evaluate_result}")
+            logger.info(f"WebCanvas task validation result:\n{self.task.evaluate_result}")
             info["task_info"] = task_info
             info["webcanvas_result"] = self.task.evaluate_result
 
@@ -482,8 +480,7 @@ document.addEventListener("visibilitychange", () => {
         logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
         if not page.context == self.context:
             raise RuntimeError(
-                f"Unexpected: activating a page that belongs to a different browser context ({
-                    page})."
+                f"Unexpected: activating a page that belongs to a different browser context ({page})."
             )
 
         # add the activated page to the page history (or move it to last which is the most recent)
@@ -514,8 +511,7 @@ document.addEventListener("visibilitychange", () => {
         # active page should share the same browser context with the environment
         if self.page not in self.context.pages:
             raise RuntimeError(
-                f"Unexpected: active page is not part of the browser context's open pages ({
-                    self.page})."
+                f"Unexpected: active page is not part of the browser context's open pages ({self.page})."
             )
 
         # active page should not be closed
@@ -545,8 +541,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Cannot mark a child frame without a bid" in err_msg
                 ):
                     logger.warning(
-                        f"An error occured while extracting the dom and axtree. Retrying ({
-                            retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
+                        f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
                     )
                     # post-extract cleanup (ARIA attributes)
                     _post_extract(self.page)
