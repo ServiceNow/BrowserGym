@@ -143,6 +143,3 @@ tmp.py
 # demo and results
 demo_agent/
 results/
-
-# predictions
-browsergym/assistantbench/predictions/
