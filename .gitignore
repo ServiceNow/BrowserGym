@@ -140,4 +140,9 @@ tests/results
 tmp.py
 .vscode/**
 
+# demo and results
+demo_agent/
 results/
+
+# predictions
+browsergym/assistantbench/predictions/
