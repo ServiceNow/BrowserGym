@@ -8,8 +8,10 @@ gym_id = f"ab.imp.0"
 register_task(
     gym_id,
     task.AssistantBenchTask,
-    task_kwargs={"task_id": f"imp.0",
-                 "output_file_path": "browsergym/assistantbench/predictions/imp.jsonl"},
+    task_kwargs={
+        "task_id": f"imp.0",
+        "output_file_path": "browsergym/assistantbench/predictions/imp.jsonl",
+    },
 )
 ALL_AB_TASK_IDS.append(gym_id)
 
@@ -29,8 +31,9 @@ for task_id in range(181):
     register_task(
         gym_id,
         task.AssistantBenchTask,
-        task_kwargs={"task_id": f'test.{task_id}',
-                     "output_file_path": "browsergym/assistantbench/predictions/test.jsonl"},
+        task_kwargs={
+            "task_id": f"test.{task_id}",
+            "output_file_path": "browsergym/assistantbench/predictions/test.jsonl",
+        },
     )
     ALL_AB_TASK_IDS.append(gym_id)
-

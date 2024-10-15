@@ -45,9 +45,7 @@ def _normalize_answer(text: str) -> str:
     """Lower text and remove punctuation, articles and extra whitespace."""
 
     parts = [
-        _white_space_fix(
-            _remove_articles(_normalize_number(_remove_punc(_lower(token))))
-        )
+        _white_space_fix(_remove_articles(_normalize_number(_remove_punc(_lower(token)))))
         for token in _tokenize(text)
     ]
     parts = [part for part in parts if part.strip()]
@@ -150,9 +148,7 @@ def get_metrics(
     predicted_bags = _answer_to_bags(predicted)
     gold_bags = _answer_to_bags(gold)
 
-    if set(predicted_bags[0]) == set(gold_bags[0]) and len(predicted_bags[0]) == len(
-        gold_bags[0]
-    ):
+    if set(predicted_bags[0]) == set(gold_bags[0]) and len(predicted_bags[0]) == len(gold_bags[0]):
         exact_match = 1.0
     else:
         exact_match = 0.0

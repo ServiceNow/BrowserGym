@@ -13,28 +13,30 @@ all_tasks = load_dataset(DATA_DATASET, trust_remote_code=True)
 
 # Extract answers and tasks for validation and test splits
 def extract_data(split_name: str) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
-    return {
-               str(i): row["answer"] for i, row in enumerate(all_tasks[split_name])
-           }, {
-               str(i): row["task"] for i, row in enumerate(all_tasks[split_name])
-           }, {
-               str(i): row["id"] for i, row in enumerate(all_tasks[split_name])
-           }
+    return (
+        {str(i): row["answer"] for i, row in enumerate(all_tasks[split_name])},
+        {str(i): row["task"] for i, row in enumerate(all_tasks[split_name])},
+        {str(i): row["id"] for i, row in enumerate(all_tasks[split_name])},
+    )
 
 
 # Implementation data for testing
 def get_implementation_testing_data() -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
     return (
         {"imp.0": "20"},
-        {"imp.0": "What is the weather in Paris yesterday in Celsius? Answer with the number only."},
-        {"imp.0": "test_imp_id_0"}
+        {
+            "imp.0": "What is the weather in Paris yesterday in Celsius? Answer with the number only."
+        },
+        {"imp.0": "test_imp_id_0"},
     )
 
 
 # Combine dev, test, and implementation-specific testing splits
 gold_answers_dev, tasks_dev, ids_dev = extract_data("validation")
 gold_answers_test, tasks_test, ids_test = extract_data("test")
-gold_answers_impl_testing, tasks_test_impl_testing, ids_imp_testing = get_implementation_testing_data()
+gold_answers_impl_testing, tasks_test_impl_testing, ids_imp_testing = (
+    get_implementation_testing_data()
+)
 gold_answers = {**gold_answers_dev, **gold_answers_test, **gold_answers_impl_testing}
 tasks = {**tasks_dev, **tasks_test, **tasks_test_impl_testing}
 ids = {**ids_dev, **ids_test, **ids_imp_testing}
@@ -68,17 +70,18 @@ class AssistantBenchTask(AbstractBrowserTask):
     def teardown(self) -> None:
         pass
 
-    def validate(
-            self, page: Page, chat_messages: list[dict]
-    ) -> Tuple[float, bool, str, dict]:
+    def validate(self, page: Page, chat_messages: list[dict]) -> Tuple[float, bool, str, dict]:
         score, done, msg, info = 0.0, False, "", {}
 
-
         for i, message in enumerate(chat_messages):
-            if message.get("role") == "assistant" and i > 0: # eval when the agent returns a response
+            if (
+                message.get("role") == "assistant" and i > 0
+            ):  # eval when the agent returns a response
                 done = True
                 prediction = chat_messages[-1]["message"]
                 score = question_scorer(prediction, self.gold)
-                add_prediction_to_jsonl(self.output_file_path, self.ab_task_id, prediction, True) # save answer to file
+                add_prediction_to_jsonl(
+                    self.output_file_path, self.ab_task_id, prediction, True
+                )  # save answer to file
 
         return score, done, msg, info

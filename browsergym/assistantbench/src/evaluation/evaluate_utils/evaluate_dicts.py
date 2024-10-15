@@ -11,7 +11,9 @@ def calculate_f1_score(precision, recall):
 
 
 def calc_recall(pred: Dict, gold: Dict, use_gold_for_eval: bool):
-    from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_factory import get_evaluator_from_gold_answer
+    from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_factory import (
+        get_evaluator_from_gold_answer,
+    )
 
     recall = []
     for gold_key, gold_value in gold.items():
@@ -38,9 +40,11 @@ def fix_number(number):
 
     if type(number) == str:
         copy_ans = number
-        copy_ans = ' '.join(' '.join(' '.join(copy_ans.split('$')).split('%')).split('sqft')).strip()
+        copy_ans = " ".join(
+            " ".join(" ".join(copy_ans.split("$")).split("%")).split("sqft")
+        ).strip()
         copy_ans = copy_ans.strip()
-        copy_ans = copy_ans.replace(',', '.')
+        copy_ans = copy_ans.replace(",", ".")
         try:
             return float(copy_ans)
         except:
@@ -50,6 +54,7 @@ def fix_number(number):
     else:
         return number
 
+
 def evaluate_pair_of_dicts(pred: Dict, gold: Dict):
     recall = calc_recall(pred, gold, True)
     precision = calc_recall(gold, pred, False)
@@ -58,11 +63,7 @@ def evaluate_pair_of_dicts(pred: Dict, gold: Dict):
 
 
 def evaluate_dicts(pred: List[Dict], gold: List[Dict]):
-    if not (
-        type(pred) == dict
-        or len(pred) == 0
-        or (type(pred) == list and type(pred[0]) == dict)
-    ):
+    if not (type(pred) == dict or len(pred) == 0 or (type(pred) == list and type(pred[0]) == dict)):
         return 0
     max_alignment_scores = _align_bags(pred, gold, evaluate_pair_of_dicts)
     return np.average(max_alignment_scores)
