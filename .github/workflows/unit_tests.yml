@@ -291,6 +291,7 @@ jobs:
 
   browsergym-visualwebarena-fast:
     runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/heads/main')
 
     defaults:
       run:
