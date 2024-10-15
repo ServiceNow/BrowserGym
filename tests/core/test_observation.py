@@ -1,29 +1,25 @@
 import ast
+import os
+from pathlib import Path
+
 import bs4
 import gymnasium as gym
 import numpy as np
-import os
-from pathlib import Path
 import pytest
 import regex as re
 
 # register gym environments
 import browsergym.core
-
-from browsergym.utils.obs import (
-    flatten_axtree_to_str,
-    flatten_dom_to_str,
-)
-
+from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from browsergym.core.observation import (
-    _pre_extract,
     _post_extract,
+    _pre_extract,
     extract_all_frame_axtrees,
     extract_dom_snapshot,
     extract_merged_axtree,
     extract_screenshot,
 )
-from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
+from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str
 
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
@@ -555,7 +551,7 @@ def test_simple_webpage():
     )
     obs, info = env.reset()
 
-    element = env.page.query_selector('[type="checkbox"]')
+    element = env.unwrapped.page.query_selector('[type="checkbox"]')
 
     assert not element.is_checked()
 
@@ -569,9 +565,9 @@ def test_simple_webpage():
     x, y = map(float, ast.literal_eval(input_elem.get("center")))
 
     # click input elem
-    env.page.mouse.click(x, y)
+    env.unwrapped.page.mouse.click(x, y)
 
-    element = env.page.query_selector('[type="checkbox"]')
+    element = env.unwrapped.page.query_selector('[type="checkbox"]')
 
     assert element.is_checked()
 
@@ -596,7 +592,7 @@ def test_basic_iframe_webpage():
     # click on the checkbox in the main frame
     obs, info = env.reset()
 
-    element = env.page.query_selector('[type="checkbox"]')
+    element = env.unwrapped.page.query_selector('[type="checkbox"]')
 
     assert not element.is_checked()
 
@@ -609,13 +605,13 @@ def test_basic_iframe_webpage():
     )
     input_elem = soup.find("input", attrs={"bid": bid})
     x, y = map(float, ast.literal_eval(input_elem.get("center")))
-    env.page.mouse.click(x, y)
+    env.unwrapped.page.mouse.click(x, y)
 
     assert element.is_checked()
 
     # click on the checkbox in the inner_frame
     obs, _, _, _, _ = env.step("")
-    element = env.page.frames[2].query_selector('[type="checkbox"]')
+    element = env.unwrapped.page.frames[2].query_selector('[type="checkbox"]')
 
     assert element.is_checked()  # instantiated as checked
 
@@ -628,14 +624,14 @@ def test_basic_iframe_webpage():
     )
     input_elem = soup.find("input", attrs={"bid": bid})
     x, y = map(float, ast.literal_eval(input_elem.get("center")))
-    env.page.mouse.click(x, y)
+    env.unwrapped.page.mouse.click(x, y)
 
     assert not element.is_checked()
 
     # scroll inside a frame, and click on the checkbox in the inner_frame
-    env.page.frames[1].evaluate("window.scrollTo(0, document.body.scrollHeight);")
+    env.unwrapped.page.frames[1].evaluate("window.scrollTo(0, document.body.scrollHeight);")
     obs, _, _, _, _ = env.step("")
-    element = env.page.frames[2].query_selector('[type="checkbox"]')
+    element = env.unwrapped.page.frames[2].query_selector('[type="checkbox"]')
 
     assert not element.is_checked()  # instantiated as checked
 
@@ -648,7 +644,7 @@ def test_basic_iframe_webpage():
     )
     input_elem = soup.find("input", attrs={"bid": bid})
     x, y = map(float, ast.literal_eval(input_elem.get("center")))
-    env.page.mouse.click(x, y)
+    env.unwrapped.page.mouse.click(x, y)
 
     assert element.is_checked()
     env.close()
@@ -672,10 +668,10 @@ def test_filter_visible_only():
     assert "textbox" not in axtree_txt
 
     # scroll on the main frame, then scroll inside a frame to find that hidden textbox element
-    env.page.evaluate(
+    env.unwrapped.page.evaluate(
         "window.scrollTo(document.body.scrollWidth / 3, document.body.scrollHeight / 3);"
     )
-    iframe = env.page.frames[1]
+    iframe = env.unwrapped.page.frames[1]
     iframe.evaluate("window.scrollTo(0, document.body.scrollHeight / 3.5);")
 
     obs, _, _, _, _ = env.step("")
