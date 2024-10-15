@@ -1,17 +1,17 @@
 import ast
 import logging
+import re
+from collections import defaultdict
+
 import numpy as np
 import PIL.Image
 import PIL.ImageDraw
 import PIL.ImageFont
-import re
-
-from collections import defaultdict
 from bs4 import BeautifulSoup
 
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
-from browsergym.core.constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 from browsergym.core.constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
+from browsergym.core.constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 
 logger = logging.getLogger(__name__)
 
@@ -437,28 +437,22 @@ def overlay_som(
     # https://stackoverflow.com/questions/51908563/dotted-or-dashed-line-with-python-pillow/58885306#58885306
     import math  # math has the fastest sqrt
 
-    def linedashed(draw: PIL.ImageDraw.Draw, x0, y0, x1, y1, fill, width, dashlen=4, ratio=3):
-        dx = x1 - x0  # delta x
-        dy = y1 - y0  # delta y
-        # check whether we can avoid sqrt
-        if dy == 0:
-            vlen = dx
-        elif dx == 0:
-            vlen = dy
-        else:
-            vlen = math.sqrt(dx * dx + dy * dy)  # length of line
-        xa = dx / vlen  # x add for 1px line length
-        ya = dy / vlen  # y add for 1px line length
-        step = dashlen * ratio  # step to the next dash
+    def linedashed(draw: PIL.ImageDraw.Draw, x0, y0, x1, y1, fill, width, dash_length=4, ratio=3):
+        dx = x1 - x0  # delta x (can be negative)
+        dy = y1 - y0  # delta y (can be negative)
+        line_length = math.hypot(dx, dy)  # line length (positive)
+        xa = dx / line_length  # x add for 1px line length
+        ya = dy / line_length  # y add for 1px line length
+        step_length = dash_length * ratio  # step to the next dash
         a0 = 0
-        while a0 < vlen:
-            a1 = a0 + dashlen
-            if a1 > vlen:
-                a1 = vlen
+        while a0 < line_length:
+            a1 = a0 + dash_length
+            if a1 > line_length:
+                a1 = line_length
             draw.line(
                 (x0 + xa * a0, y0 + ya * a0, x0 + xa * a1, y0 + ya * a1), fill=fill, width=width
             )
-            a0 += step
+            a0 += step_length
 
     for bid, properties in extra_properties.items():
         if properties["set_of_marks"] and properties["bbox"]:
