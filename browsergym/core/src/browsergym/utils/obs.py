@@ -436,24 +436,32 @@ def overlay_som(
     font = PIL.ImageFont.load_default(size=fontsize)
 
     # Adapted from https://stackoverflow.com/questions/51908563/dotted-or-dashed-line-with-python-pillow/58885306#58885306
-    def linedashed(draw: PIL.ImageDraw.Draw, x0, y0, x1, y1, fill, width, dash_length=4, ratio=3):
-        dx = x1 - x0  # delta x (can be negative)
-        dy = y1 - y0  # delta y (can be negative)
-        line_length = math.hypot(dx, dy)  # line length (positive)
+    def linedashed(
+        draw: PIL.ImageDraw.Draw, x0, y0, x1, y1, fill, width, dash_length=4, nodash_length=8
+    ):
+        line_dx = x1 - x0  # delta x (can be negative)
+        line_dy = y1 - y0  # delta y (can be negative)
+        line_length = math.hypot(line_dx, line_dy)  # line length (positive)
         if line_length == 0:
             return  # Avoid division by zero in case the line length is 0
-        xa = dx / line_length  # x add for 1px line length
-        ya = dy / line_length  # y add for 1px line length
-        step_length = dash_length * ratio  # step to the next dash
-        a0 = 0
-        while a0 < line_length:
-            a1 = a0 + dash_length
-            if a1 > line_length:
-                a1 = line_length
+        pixel_dx = line_dx / line_length  # x add for 1px line length
+        pixel_dy = line_dy / line_length  # y add for 1px line length
+        dash_start = 0
+        while dash_start < line_length:
+            dash_end = dash_start + dash_length
+            if dash_end > line_length:
+                dash_end = line_length
             draw.line(
-                (x0 + xa * a0, y0 + ya * a0, x0 + xa * a1, y0 + ya * a1), fill=fill, width=width
+                (
+                    round(x0 + pixel_dx * dash_start),
+                    round(y0 + pixel_dy * dash_start),
+                    round(x0 + pixel_dx * dash_end),
+                    round(y0 + pixel_dy * dash_end),
+                ),
+                fill=fill,
+                width=width,
             )
-            a0 += step_length
+            dash_start += dash_length + nodash_length
 
     for bid, properties in extra_properties.items():
         if properties["set_of_marks"] and properties["bbox"]:
