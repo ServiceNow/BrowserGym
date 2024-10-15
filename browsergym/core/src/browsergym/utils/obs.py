@@ -5,6 +5,7 @@ import PIL.Image
 import PIL.ImageDraw
 import PIL.ImageFont
 import re
+import html as html_utils
 
 from collections import defaultdict
 from bs4 import BeautifulSoup
@@ -77,12 +78,12 @@ def flatten_dom_to_str(
             # text nodes: print text content only if parent was not skipped
             if node_type == 3:  # node_name == "#text"
                 if not parent_node_skipped and node_value is not None:
-                    html_before += node_value
+                    html_before += html_utils.escape(node_value)
 
             # CData nodes: print content only if parent was not skipped
             elif node_type == 4:  # node_name == "#cdata-section":
                 if not parent_node_skipped and node_value is not None:
-                    html_before += f"<!CDATA[[{node_value}]]>"
+                    html_before += f"<!CDATA[[{html_utils.escape(node_value)}]]>"
 
             # processing instructions, comments, documents, doctypes, document fragments: don't print
             elif node_type in (7, 8, 9, 10, 11):
@@ -115,7 +116,7 @@ def flatten_dom_to_str(
                             attributes.append(f"{attr_name}")
                         else:
                             # attribute value present
-                            attributes.append(f'{attr_name}="{attr_value}"')
+                            attributes.append(f'{attr_name}="{html_utils.escape(attr_value)}"')
 
                 skip_node, extra_attributes_to_print = _process_bid(
                     bid,
