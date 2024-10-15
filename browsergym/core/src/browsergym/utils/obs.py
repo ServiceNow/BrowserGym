@@ -440,6 +440,8 @@ def overlay_som(
         dx = x1 - x0  # delta x (can be negative)
         dy = y1 - y0  # delta y (can be negative)
         line_length = math.hypot(dx, dy)  # line length (positive)
+        if line_length == 0:
+            return  # Avoid division by zero in case the line length is 0
         xa = dx / line_length  # x add for 1px line length
         ya = dy / line_length  # y add for 1px line length
         step_length = dash_length * ratio  # step to the next dash
