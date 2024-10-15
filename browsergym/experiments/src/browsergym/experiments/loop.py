@@ -289,12 +289,25 @@ class ExpArgs:
         # output logging traces to a log file
         file_handler = logging.FileHandler(self.exp_dir / "experiment.log")
         file_handler.setLevel(self.logging_level)  # same level as console outputs
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s - %(process)d - %(name)s - %(levelname)s - %(message)s"
+        )
         file_handler.setFormatter(formatter)
+        # output handler
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(self.logging_level)
+        stream_handler.setFormatter(formatter)
         # setup root logger
         root_logger = logging.getLogger()
+
+        # remove previous stream handlers
+        for handler in root_logger.handlers:
+            if isinstance(handler, logging.StreamHandler):
+                root_logger.removeHandler(handler)
+
         root_logger.setLevel(self.logging_level)
         root_logger.addHandler(file_handler)
+        root_logger.addHandler(stream_handler)
         # setup openai logger (don't go below INFO verbosity)
         openai_logger = logging.getLogger("openai._base_client")
         openai_logger.setLevel(max(logging.INFO, self.logging_level))
