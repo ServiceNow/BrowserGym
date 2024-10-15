@@ -1,5 +1,6 @@
 import ast
 import logging
+import math
 import re
 from collections import defaultdict
 
@@ -434,9 +435,7 @@ def overlay_som(
 
     font = PIL.ImageFont.load_default(size=fontsize)
 
-    # https://stackoverflow.com/questions/51908563/dotted-or-dashed-line-with-python-pillow/58885306#58885306
-    import math  # math has the fastest sqrt
-
+    # Adapted from https://stackoverflow.com/questions/51908563/dotted-or-dashed-line-with-python-pillow/58885306#58885306
     def linedashed(draw: PIL.ImageDraw.Draw, x0, y0, x1, y1, fill, width, dash_length=4, ratio=3):
         dx = x1 - x0  # delta x (can be negative)
         dy = y1 - y0  # delta y (can be negative)
