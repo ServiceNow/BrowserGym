@@ -141,7 +141,6 @@ tmp.py
 .vscode/settings.json
 
 # demo and results
-demo_agent/
 results/
 
 # predictions
