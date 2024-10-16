@@ -1,0 +1,33 @@
+{"id": "2aa5dd83fbcd0dce9a3dd4592106e5b5edf738008d932e357d477bba80e59ccf", "answer": "\\( \\frac{2}{7} \\times 100 \\approx 28.57 \\)", "gold_answer": "14.2", "score": 0, "has_ans": 1.0}
+{"id": "2ddae3b7a208e3c25f14d82d7a1faaaa1832fbf950b4dac345e755c4c361f294", "answer": 800000.0, "gold_answer": "1010000", "score": 0.7669061178326222, "has_ans": 1.0}
+{"id": "4e615af6f0348597b4133cc1ec5418bb3f35328e3d95e23a275027cee97b5e09", "answer": [], "gold_answer": "Adrenalinpark K\u00f6ln", "score": 0.0, "has_ans": 0}
+{"id": "c7afe00869f98cf363fd83677ac41757ed5e57f03eacc3d1304feb0a92084bd1", "answer": "Knives Out", "gold_answer": "Glass Onion: A Knives Out Mystery", "score": 0.5714285714285715, "has_ans": 1.0}
+{"id": "57d9dc6935e8a40b02e7f8ec81768fe70e68a0c05f6866927c9fda38db38a486", "answer": "-$108", "gold_answer": "45", "score": 0, "has_ans": 1.0}
+{"id": "748899d9d70c09beb3bd48ac8a3658bdcfd2f9114fe6dc4c4b8d2f9541ef4607", "answer": [{"sender": "dhl", "price (usd)": "50"}, {"sender": "fedex", "price (usd)": "60"}], "gold_answer": "{\"sender\": \"DHL\", \"price (usd)\": \"55-70\"}\n{\"sender\": \"Fedex\", \"price (usd)\": \"62-95\"}\n{\"sender\": \"USPS\", \"price (usd)\": \"73.4-78.15\"}", "score": 0.3333333333333333, "has_ans": 1.0}
+{"id": "9e31099fffa6a3891c94934fd4fc2f3f522d51c1904ff3561f3a10e4bf245821", "answer": "oshrat binyamin", "gold_answer": "Shiran Nawi, Yoni Osherov, Daniel Lereya", "score": 0.0, "has_ans": 1.0}
+{"id": "291b53e665b4dd4365cde995042db4a6f6fecef3fe3a6f4482f23d61bd673918", "answer": "ftp://ftp.ncbi.nlm.nih.gov/genomes/all/gcf_002288925.1_asm228892v2/gcf_002288925.1_asm228892v2_genomic.gff.gz", "gold_answer": "https://ftp.ensembl.org/pub/release-101/gff3/delphinapterus_leucas/Delphinapterus_leucas.ASM228892v3.101.gff3.gz", "score": 0.0, "has_ans": 1.0}
+{"id": "8fa42360185068216f2919935148d4e1ad28ddc18da0abd0f4bb0b6b6f84b127", "answer": "vgt", "gold_answer": "VGT", "score": 1.0, "has_ans": 1.0}
+{"id": "3af8028c2a59e28ca88baff0e6d91f2a9f170c5ef91003f1c8406755a2760ad4", "answer": "Oko, Thief of Crowns", "gold_answer": "Oko, Thief of Crowns", "score": 1.0, "has_ans": 1.0}
+{"id": "6b06d186921b8b390c65aebd0d16f09f60a47d2f1288ebe36953f734e84c0a3c", "answer": "", "gold_answer": "1148 sqft", "score": 0.0, "has_ans": 0.0}
+{"id": "9bdca8677af1e25cb7b0c7992dc62670c3e58e4afcd5ae60bcaa2483556bba00", "answer": ["'{\"sender\": \"usps\", \"price (usd)\": 25}'"], "gold_answer": "{\"sender\": \"USPS\", \"price (usd)\": \"41.75\"}", "score": 0, "has_ans": 1.0}
+{"id": "557e78eceec08ca8b0da5f9fdaca6e1c7ec6140a8ce600983ee716327dab005e", "answer": "Wolly Mammoth", "gold_answer": "For Pete's Sake", "score": 0.0, "has_ans": 1.0}
+{"id": "fb9ba3ab6a13d0adc677f993e90d54914a5cdf211305a1bba6bf16ec4ccb9b7c", "answer": "Instagram", "gold_answer": "Linkedin", "score": 0.0, "has_ans": 1.0}
+{"id": "52f7224e9c79431e7926afe317782711a0028750693e7456cde22ef6f4bd8bd5", "answer": "Nosferatu the Vampyre", "gold_answer": "Nosferatu the Vampyre", "score": 1.0, "has_ans": 1.0}
+{"id": "0ec4371851b96837b0a81b3dd3df401415061bb532fbafeb4609f3337c358508", "answer": ["anytime fitness", "point pleasant wellness center"], "gold_answer": "The Root Sports & Fitness Center\nMuscle Headz Gym", "score": 0.16666666666666666, "has_ans": 1.0}
+{"id": "6f224e7730ed027cbac73aebb1aea7f954053082041b02b19f4ff126a0a8a208", "answer": "Gina DiGioia", "gold_answer": "Gina DiGioia", "score": 1.0, "has_ans": 1.0}
+{"id": "99da66d8af02491f98b98c56b26c709e773b5a2ad945fb280375951ba600de09", "answer": 250.0, "gold_answer": "395", "score": 0.5425751529611245, "has_ans": 1.0}
+{"id": "ccec2229ced20a4b0cb4897e3a99120a3017ea030903e01c9bda6b13d40b0b14", "answer": "", "gold_answer": "McDonald's", "score": 0.0, "has_ans": 0.0}
+{"id": "9baaa267c95f9d8b75741ee9169c50563d297cfa592c20deaffd30dbc5984c74", "answer": 16.67, "gold_answer": "31.67", "score": 0.3582408362121543, "has_ans": 1.0}
+{"id": "6e3be83d1949fa52cba03fb1ce4b5b3bf7e37a83fd7d67694b10b2e439d90cf8", "answer": "wall street boxing & fitness", "gold_answer": "Renzo Gracie Jiu-Jitsu Wall Street", "score": 0.4, "has_ans": 1.0}
+{"id": "e2dc3a6b10b762e8aba7fa4d4e70f757f6d04dcbc8b56c48fc53fd9928d31d07", "answer": 40.0, "gold_answer": "30", "score": 0.7123179275482192, "has_ans": 1.0}
+{"id": "f88066d274e265edd6cd9d61cd80a41accb3a14baf2297652fdd05cdf716d455", "answer": "lower yosemite fall trail", "gold_answer": "Yosemite Falls\nBridalveil Fall", "score": 0.16666666666666666, "has_ans": 1.0}
+{"id": "e6bc98089608217e45b6956a46518fe3cce64a799b3ac43c6974c449ae14c408", "answer": 2140000.0, "gold_answer": "3080000", "score": 0.635876232048277, "has_ans": 1.0}
+{"id": "8ad84bd6fe38481ba49e7ad1f6fbd43219a999074e5c6fc940003281f55ec65b", "answer": ["trader joe's", "whole foods market", "aldi"], "gold_answer": "Potash Markets - Clark Street", "score": 0.0, "has_ans": 1.0}
+{"id": "55f4258484c5b398956133128a50462a767da211f8f72aa5ac5bbffb9bcbba1a", "answer": "Becker", "gold_answer": "CSI: Cyber", "score": 0.0, "has_ans": 1.0}
+{"id": "4dbedc5e1a0205e14b7ff3ba89bce3060dab15d0ada3b7e1351a6f2aa8287aec", "answer": 95.0, "gold_answer": "$55", "score": 0.4534562936319301, "has_ans": 1.0}
+{"id": "929b45f34805280d77c61d1e093e3d4e551d77ddb6ecd73552b12b1af286388d", "answer": "http://hgdownload.soe.ucsc.edu/goldenpath/canfam3/bigzips/", "gold_answer": "ftp://ftp.broadinstitute.org/distribution/assemblies/mammals/dog/canFam3.1/", "score": 0.0, "has_ans": 1.0}
+{"id": "cca4776df3c73e7f9430a2e624aafad056b14322a0b7ca6c0c22b7e7f3f0890a", "answer": "monica c. lozano", "gold_answer": "Wanda Austin\nRonald D. Sugar\nSue Wagner", "score": 0.0, "has_ans": 1.0}
+{"id": "efc0f3a47e9ed2ecdbcc037c2093865fe6e39f4d413a5d1ccdc7357160a4606b", "answer": "fidelity emerging asia fund (fseax)", "gold_answer": "Fidelity\u00ae Emerging Markets Index Fund (FPADX)", "score": 0.3636363636363636, "has_ans": 1.0}
+{"id": "b36ef2d8f2643b80e74a44ce3403f674ecb2aed7fd36afeaa289061a59feef92", "answer": "crunch fitness - east village", "gold_answer": "CrossFit East River\nAvea Pilates", "score": 0.14285714285714288, "has_ans": 1.0}
+{"id": "a9074997e698f912b9e751779ea19c1e92fa148404e90e0ae997acea3f9559b0", "answer": ["uncle tom's trail", "mount washburn", "fairy falls"], "gold_answer": "Trout lake trail\nArtist Point\nFountain Paint Pot\nLone Star Geyser\nStorm Point Trail", "score": 0.06666666666666667, "has_ans": 1.0}
+{"id": "797f7a5b65ca28b7e7156e7db1e9f117bd4a021de0cd512bfdbb0be897d89eab", "answer": ["red bamboo", "quantum leap"], "gold_answer": "Shanghai villa", "score": 0.0, "has_ans": 1.0}

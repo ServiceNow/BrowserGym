@@ -139,3 +139,9 @@ error_logs.txt
 tests/results
 tmp.py
 .vscode/settings.json
+
+# demo and results
+results/
+
+# predictions
+browsergym/assistantbench/predictions/
