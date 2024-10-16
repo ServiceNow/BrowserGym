@@ -67,9 +67,33 @@ def test_build_benchmarks():
         benchmark = benchmark_builder()
         assert name == benchmark.name
         assert benchmark.env_args_list  # non-empty
+        assert benchmark.task_metadata is not None
         assert len(benchmark.env_args_list) == expected_bench_size[name]
         benchmark_bis = Benchmark.from_json(benchmark.to_json())
         assert benchmark.to_dict() == benchmark_bis.to_dict()
+
+
+def test_benchmark_subset():
+    benchmark: Benchmark = BENCHMARKS["miniwob_all"]()
+
+    benchmark_subset = benchmark.subset(task_filter={"task_name": "click"})
+    assert len(benchmark_subset.env_args_list) == 31 * 10
+    assert benchmark_subset.name == "miniwob_all[task_name=/click/]"
+
+    benchmark_subset_1 = benchmark_subset.subset(task_filter={"miniwob_category": "original"})
+    benchmark_subset_2 = benchmark.subset(
+        task_filter={"task_name": "click", "miniwob_category": "original"}
+    )
+
+    assert benchmark_subset_1.name == "miniwob_all[task_name=/click/][miniwob_category=/original/]"
+    assert benchmark_subset_2.name == "miniwob_all[task_name=/click/,miniwob_category=/original/]"
+
+    dict_1 = benchmark_subset_1.to_dict()
+    dict_1.pop("name")
+    dict_2 = benchmark_subset_2.to_dict()
+    dict_2.pop("name")
+
+    assert dict_1 == dict_2
 
 
 def test_run_mock_benchmark():
