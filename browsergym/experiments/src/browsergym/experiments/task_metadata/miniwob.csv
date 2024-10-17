@@ -1,0 +1,126 @@
+task_name,miniwob_category,comment,webgum_subset
+miniwob.ascending-numbers,hidden test,,False
+miniwob.bisect-angle,original,,False
+miniwob.book-flight,original,delay,True
+miniwob.book-flight-nodelay,nodelay,,False
+miniwob.buy-ticket,hidden test,,False
+miniwob.choose-date,original,delay,True
+miniwob.choose-date-easy,debug,delay,True
+miniwob.choose-date-medium,debug,delay,True
+miniwob.choose-date-nodelay,nodelay,,False
+miniwob.choose-list,original,,True
+miniwob.circle-center,original,,False
+miniwob.click-button,original,,True
+miniwob.click-button-sequence,original,,True
+miniwob.click-checkboxes,original,,True
+miniwob.click-checkboxes-large,additional,,True
+miniwob.click-checkboxes-soft,additional,,True
+miniwob.click-checkboxes-transfer,additional,,True
+miniwob.click-collapsible,original,delay,True
+miniwob.click-collapsible-2,original,delay,True
+miniwob.click-collapsible-2-nodelay,nodelay,,False
+miniwob.click-collapsible-nodelay,nodelay,,False
+miniwob.click-color,original,,True
+miniwob.click-dialog,original,,True
+miniwob.click-dialog-2,original,,True
+miniwob.click-link,original,,True
+miniwob.click-menu,original,,True
+miniwob.click-menu-2,original,,False
+miniwob.click-option,original,,True
+miniwob.click-pie,original,delay,True
+miniwob.click-pie-nodelay,nodelay,,False
+miniwob.click-scroll-list,original,,True
+miniwob.click-shades,original,,True
+miniwob.click-shape,original,,True
+miniwob.click-tab,original,,True
+miniwob.click-tab-2,original,,True
+miniwob.click-tab-2-easy,debug,,False
+miniwob.click-tab-2-hard,additional,,True
+miniwob.click-tab-2-medium,debug,,False
+miniwob.click-test,original,,True
+miniwob.click-test-2,original,,True
+miniwob.click-test-transfer,debug,,False
+miniwob.click-widget,original,,True
+miniwob.copy-paste,original,,False
+miniwob.copy-paste-2,original,,False
+miniwob.count-shape,original,,True
+miniwob.count-sides,original,,False
+miniwob.daily-calendar,hidden test,,False
+miniwob.drag-box,original,,False
+miniwob.drag-circle,original,,False
+miniwob.drag-cube,original,,False
+miniwob.drag-items,original,,False
+miniwob.drag-items-grid,original,,False
+miniwob.drag-shapes,original,,False
+miniwob.drag-shapes-2,hidden test,,False
+miniwob.drag-single-shape,hidden test,,False
+miniwob.drag-sort-numbers,original,,False
+miniwob.draw-circle,hidden test,,False
+miniwob.draw-line,hidden test,,False
+miniwob.email-inbox,original,,True
+miniwob.email-inbox-delete,debug,,False
+miniwob.email-inbox-forward,debug,,False
+miniwob.email-inbox-forward-nl,additional,,True
+miniwob.email-inbox-forward-nl-turk,additional,,True
+miniwob.email-inbox-important,debug,,False
+miniwob.email-inbox-nl-turk,additional,,True
+miniwob.email-inbox-noscroll,debug,,False
+miniwob.email-inbox-reply,debug,,False
+miniwob.email-inbox-star-reply,debug,,False
+miniwob.enter-date,original,,True
+miniwob.enter-password,original,,True
+miniwob.enter-text,original,,True
+miniwob.enter-text-2,original,,False
+miniwob.enter-text-dynamic,original,,True
+miniwob.enter-time,original,,True
+miniwob.find-greatest,hidden test,,False
+miniwob.find-midpoint,original,,False
+miniwob.find-word,original,,False
+miniwob.focus-text,original,,True
+miniwob.focus-text-2,original,,True
+miniwob.form-sequence,hidden test,,False
+miniwob.form-sequence-2,hidden test,,False
+miniwob.form-sequence-3,hidden test,,False
+miniwob.generate-number,hidden test,,False
+miniwob.grid-coordinate,original,,True
+miniwob.guess-number,original,,True
+miniwob.highlight-text,original,,False
+miniwob.highlight-text-2,original,,False
+miniwob.hot-cold,hidden test,,False
+miniwob.identify-shape,original,,True
+miniwob.login-user,original,,True
+miniwob.login-user-popup,additional,,True
+miniwob.multi-layouts,additional,,True
+miniwob.multi-orderings,additional,,True
+miniwob.navigate-tree,original,,True
+miniwob.number-checkboxes,original,,False
+miniwob.odd-or-even,hidden test,,False
+miniwob.order-food,hidden test,,False
+miniwob.phone-book,hidden test,,False
+miniwob.read-table,original,,False
+miniwob.read-table-2,original,,False
+miniwob.resize-textarea,original,,False
+miniwob.right-angle,original,,False
+miniwob.scroll-text,original,,False
+miniwob.scroll-text-2,original,,False
+miniwob.search-engine,original,,True
+miniwob.sign-agreement,hidden test,,False
+miniwob.simple-algebra,original,,False
+miniwob.simple-arithmetic,original,,False
+miniwob.social-media,original,,True
+miniwob.social-media-all,additional,,True
+miniwob.social-media-some,additional,,True
+miniwob.stock-market,hidden test,delay,False
+miniwob.terminal,original,,False
+miniwob.text-editor,original,,False
+miniwob.text-transform,original,,False
+miniwob.tic-tac-toe,original,,True
+miniwob.unicode-test,debug,,False
+miniwob.use-autocomplete,original,delay,True
+miniwob.use-autocomplete-nodelay,nodelay,,False
+miniwob.use-colorwheel,original,,False
+miniwob.use-colorwheel-2,original,,False
+miniwob.use-slider,original,,False
+miniwob.use-slider-2,original,,False
+miniwob.use-spinner,original,,True
+miniwob.visual-addition,original,,False

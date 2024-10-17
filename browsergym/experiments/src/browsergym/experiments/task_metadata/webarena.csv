@@ -1,0 +1,813 @@
+task_name,requires_reset,sites,eval_types
+webarena.0,False,shopping_admin,string_match
+webarena.1,False,shopping_admin,string_match
+webarena.2,False,shopping_admin,string_match
+webarena.3,False,shopping_admin,string_match
+webarena.4,False,shopping_admin,string_match
+webarena.5,False,shopping_admin,string_match
+webarena.6,False,shopping_admin,string_match
+webarena.7,False,map,string_match
+webarena.8,False,map,string_match
+webarena.9,False,map,string_match
+webarena.10,False,map,string_match
+webarena.11,False,shopping_admin,string_match
+webarena.12,False,shopping_admin,string_match
+webarena.13,False,shopping_admin,string_match
+webarena.14,False,shopping_admin,string_match
+webarena.15,False,shopping_admin,string_match
+webarena.16,False,map,string_match
+webarena.17,False,map,string_match
+webarena.18,False,map,string_match
+webarena.19,False,map,string_match
+webarena.20,False,map,string_match
+webarena.21,False,shopping,string_match
+webarena.22,False,shopping,string_match
+webarena.23,False,shopping,string_match
+webarena.24,False,shopping,string_match
+webarena.25,False,shopping,string_match
+webarena.26,False,shopping,string_match
+webarena.27,False,reddit,string_match
+webarena.28,False,reddit,string_match
+webarena.29,False,reddit,string_match
+webarena.30,False,reddit,string_match
+webarena.31,False,reddit,string_match
+webarena.32,False,map,string_match
+webarena.33,False,map,string_match
+webarena.34,False,map,string_match
+webarena.35,False,map,string_match
+webarena.36,False,map,string_match
+webarena.37,False,map,string_match
+webarena.38,False,map,string_match
+webarena.39,False,map,string_match
+webarena.40,False,map,string_match
+webarena.41,False,shopping_admin,string_match
+webarena.42,False,shopping_admin,string_match
+webarena.43,False,shopping_admin,string_match
+webarena.44,False,gitlab,url_match
+webarena.45,False,gitlab,url_match
+webarena.46,False,gitlab,url_match
+webarena.47,False,shopping,string_match
+webarena.48,False,shopping,string_match
+webarena.49,False,shopping,string_match
+webarena.50,False,shopping,string_match
+webarena.51,False,shopping,string_match
+webarena.52,False,map,string_match
+webarena.53,False,map,string_match
+webarena.54,False,map,string_match
+webarena.55,False,map,string_match
+webarena.56,False,map,string_match
+webarena.57,False,map,string_match
+webarena.58,False,map,string_match
+webarena.59,False,map,string_match
+webarena.60,False,map,string_match
+webarena.61,False,map,string_match
+webarena.62,False,shopping_admin,string_match
+webarena.63,False,shopping_admin,string_match
+webarena.64,False,shopping_admin,string_match
+webarena.65,False,shopping_admin,string_match
+webarena.66,False,reddit,string_match
+webarena.67,False,reddit,string_match
+webarena.68,False,reddit,string_match
+webarena.69,False,reddit,string_match
+webarena.70,False,map,string_match
+webarena.71,False,map,string_match
+webarena.72,False,map,string_match
+webarena.73,False,map,string_match
+webarena.74,False,map,string_match
+webarena.75,False,map,string_match
+webarena.76,False,map,string_match
+webarena.77,False,shopping_admin,string_match
+webarena.78,False,shopping_admin,string_match
+webarena.79,False,shopping_admin,string_match
+webarena.80,False,map,string_match
+webarena.81,False,map,string_match
+webarena.82,False,map,string_match
+webarena.83,False,map,string_match
+webarena.84,False,map,string_match
+webarena.85,False,map,string_match
+webarena.86,False,map,string_match
+webarena.87,False,map,string_match
+webarena.88,False,map,string_match
+webarena.89,False,map,string_match
+webarena.90,False,map,string_match
+webarena.91,False,map,string_match
+webarena.92,False,map,string_match
+webarena.93,False,map,string_match
+webarena.94,False,shopping_admin,string_match
+webarena.95,False,shopping_admin,string_match
+webarena.96,False,shopping,string_match
+webarena.97,False,map wikipedia,string_match
+webarena.98,False,map,string_match
+webarena.99,False,map,string_match
+webarena.100,False,map,string_match
+webarena.101,False,map,string_match
+webarena.102,False,gitlab,url_match
+webarena.103,False,gitlab,url_match
+webarena.104,False,gitlab,url_match
+webarena.105,False,gitlab,url_match
+webarena.106,False,gitlab,url_match
+webarena.107,False,shopping_admin,string_match
+webarena.108,False,shopping_admin,string_match
+webarena.109,False,shopping_admin,string_match
+webarena.110,False,shopping_admin,string_match
+webarena.111,False,shopping_admin,string_match
+webarena.112,False,shopping_admin,string_match
+webarena.113,False,shopping_admin,string_match
+webarena.114,False,shopping_admin,string_match
+webarena.115,False,shopping_admin,string_match
+webarena.116,False,shopping_admin,string_match
+webarena.117,False,shopping,string_match
+webarena.118,False,shopping,program_html
+webarena.119,False,shopping_admin,string_match
+webarena.120,False,shopping_admin,string_match
+webarena.121,False,shopping_admin,string_match
+webarena.122,False,shopping_admin,string_match
+webarena.123,False,shopping_admin,string_match
+webarena.124,False,shopping,string_match
+webarena.125,False,shopping,string_match
+webarena.126,False,shopping,string_match
+webarena.127,False,shopping_admin,string_match
+webarena.128,False,shopping_admin,string_match
+webarena.129,False,shopping_admin,string_match
+webarena.130,False,shopping_admin,string_match
+webarena.131,False,shopping_admin,string_match
+webarena.132,False,gitlab,string_match
+webarena.133,False,gitlab,string_match
+webarena.134,False,gitlab,string_match
+webarena.135,False,gitlab,string_match
+webarena.136,False,gitlab,string_match
+webarena.137,False,map,string_match
+webarena.138,False,map,string_match
+webarena.139,False,map,string_match
+webarena.140,False,map,string_match
+webarena.141,False,shopping,string_match
+webarena.142,False,shopping,string_match
+webarena.143,False,shopping,string_match
+webarena.144,False,shopping,string_match
+webarena.145,False,shopping,string_match
+webarena.146,False,shopping,string_match
+webarena.147,False,shopping,string_match
+webarena.148,False,shopping,string_match
+webarena.149,False,shopping,string_match
+webarena.150,False,shopping,string_match
+webarena.151,False,map,string_match
+webarena.152,False,map,string_match
+webarena.153,False,map,string_match
+webarena.154,False,map,string_match
+webarena.155,False,map,string_match
+webarena.156,False,gitlab,url_match
+webarena.157,False,shopping_admin,url_match
+webarena.158,False,shopping,url_match
+webarena.159,False,shopping,url_match
+webarena.160,False,shopping,url_match
+webarena.161,False,shopping,url_match
+webarena.162,False,shopping,url_match
+webarena.163,False,shopping,string_match
+webarena.164,False,shopping,string_match
+webarena.165,False,shopping,string_match
+webarena.166,False,shopping,string_match
+webarena.167,False,shopping,string_match
+webarena.168,False,gitlab,string_match
+webarena.169,False,gitlab,string_match
+webarena.170,False,gitlab,string_match
+webarena.171,False,gitlab,string_match
+webarena.172,False,gitlab,string_match
+webarena.173,False,gitlab,string_match url_match
+webarena.174,False,gitlab,string_match url_match
+webarena.175,False,gitlab,string_match url_match
+webarena.176,False,gitlab,string_match url_match
+webarena.177,False,gitlab,string_match url_match
+webarena.178,False,gitlab,string_match url_match
+webarena.179,False,gitlab,string_match url_match
+webarena.180,False,gitlab,string_match url_match
+webarena.181,False,gitlab,string_match url_match
+webarena.182,False,gitlab,string_match url_match
+webarena.183,False,shopping_admin,string_match
+webarena.184,False,shopping_admin,string_match
+webarena.185,False,shopping_admin,string_match
+webarena.186,False,shopping_admin,string_match
+webarena.187,False,shopping_admin,string_match
+webarena.188,False,shopping,string_match
+webarena.189,False,shopping,string_match
+webarena.190,False,shopping,string_match
+webarena.191,False,shopping,string_match
+webarena.192,False,shopping,string_match
+webarena.193,False,shopping_admin,string_match
+webarena.194,False,shopping_admin,string_match
+webarena.195,False,shopping_admin,string_match
+webarena.196,False,shopping_admin,string_match
+webarena.197,False,shopping_admin,string_match
+webarena.198,False,shopping_admin,string_match
+webarena.199,False,shopping_admin,string_match
+webarena.200,False,shopping_admin,string_match
+webarena.201,False,shopping_admin,string_match
+webarena.202,False,shopping_admin,string_match
+webarena.203,False,shopping_admin,string_match
+webarena.204,False,shopping_admin,string_match
+webarena.205,False,gitlab,string_match
+webarena.206,False,gitlab,string_match
+webarena.207,False,gitlab,string_match
+webarena.208,False,shopping_admin,string_match
+webarena.209,False,shopping_admin,string_match
+webarena.210,False,shopping_admin,string_match
+webarena.211,False,shopping_admin,string_match
+webarena.212,False,shopping_admin,string_match
+webarena.213,False,shopping_admin,string_match
+webarena.214,False,shopping_admin,string_match
+webarena.215,False,shopping_admin,string_match
+webarena.216,False,shopping_admin,string_match
+webarena.217,False,shopping_admin,string_match
+webarena.218,False,map,string_match
+webarena.219,False,map,string_match
+webarena.220,False,map,string_match
+webarena.221,False,map,string_match
+webarena.222,False,map,string_match
+webarena.223,False,map,string_match
+webarena.224,False,map,string_match
+webarena.225,False,shopping,string_match
+webarena.226,False,shopping,string_match
+webarena.227,False,shopping,string_match
+webarena.228,False,shopping,string_match
+webarena.229,False,shopping,string_match
+webarena.230,False,shopping,string_match
+webarena.231,False,shopping,string_match
+webarena.232,False,shopping,string_match
+webarena.233,False,shopping,string_match
+webarena.234,False,shopping,string_match
+webarena.235,False,shopping,string_match
+webarena.236,False,map,string_match
+webarena.237,False,map,string_match
+webarena.238,False,shopping,url_match
+webarena.239,False,shopping,url_match
+webarena.240,False,shopping,url_match
+webarena.241,False,shopping,url_match
+webarena.242,False,shopping,url_match
+webarena.243,False,shopping_admin,string_match
+webarena.244,False,shopping_admin,string_match
+webarena.245,False,shopping_admin,string_match
+webarena.246,False,shopping_admin,string_match
+webarena.247,False,shopping_admin,string_match
+webarena.248,False,map,string_match
+webarena.249,False,map,string_match
+webarena.250,False,map,string_match
+webarena.251,False,map,string_match
+webarena.252,False,map,string_match
+webarena.253,False,map,string_match
+webarena.254,False,map,string_match
+webarena.255,False,map,string_match
+webarena.256,False,map,string_match
+webarena.257,False,map,string_match
+webarena.258,False,gitlab,url_match
+webarena.259,False,gitlab,string_match
+webarena.260,False,shopping,url_match
+webarena.261,False,shopping,url_match
+webarena.262,False,shopping,url_match
+webarena.263,False,shopping,url_match
+webarena.264,False,shopping,url_match
+webarena.265,False,wikipedia map,string_match
+webarena.266,False,wikipedia map,string_match
+webarena.267,False,wikipedia map,string_match
+webarena.268,False,wikipedia map,string_match
+webarena.269,False,shopping,url_match
+webarena.270,False,shopping,url_match
+webarena.271,False,shopping,url_match
+webarena.272,False,shopping,url_match
+webarena.273,False,shopping,url_match
+webarena.274,False,shopping,url_match
+webarena.275,False,shopping,url_match
+webarena.276,False,shopping,url_match
+webarena.277,False,shopping,url_match
+webarena.278,False,shopping,url_match
+webarena.279,False,shopping,string_match
+webarena.280,False,shopping,string_match
+webarena.281,False,shopping,string_match
+webarena.282,False,shopping,string_match
+webarena.283,False,shopping,url_match
+webarena.284,False,shopping,url_match
+webarena.285,False,shopping,url_match
+webarena.286,False,shopping,url_match
+webarena.287,False,map,string_match
+webarena.288,False,shopping_admin,string_match
+webarena.289,False,shopping_admin,string_match
+webarena.290,False,shopping_admin,string_match
+webarena.291,False,shopping_admin,string_match
+webarena.292,False,shopping_admin,string_match
+webarena.293,False,gitlab,string_match
+webarena.294,False,gitlab,string_match
+webarena.295,False,gitlab,string_match
+webarena.296,False,gitlab,string_match
+webarena.297,False,gitlab,string_match
+webarena.298,False,shopping,url_match
+webarena.299,False,shopping,url_match
+webarena.300,False,shopping,url_match
+webarena.301,False,shopping,string_match
+webarena.302,False,shopping,string_match
+webarena.303,False,gitlab,string_match
+webarena.304,False,gitlab,string_match
+webarena.305,False,gitlab,string_match
+webarena.306,False,gitlab,string_match
+webarena.307,False,gitlab,string_match
+webarena.308,False,gitlab,string_match
+webarena.309,False,gitlab,string_match
+webarena.310,False,gitlab,string_match
+webarena.311,False,gitlab,string_match
+webarena.312,False,gitlab,string_match
+webarena.313,False,shopping,string_match
+webarena.314,False,gitlab,string_match
+webarena.315,False,gitlab,string_match
+webarena.316,False,gitlab,string_match
+webarena.317,False,gitlab,string_match
+webarena.318,False,gitlab,string_match
+webarena.319,False,shopping,string_match
+webarena.320,False,shopping,string_match
+webarena.321,False,shopping,string_match
+webarena.322,False,shopping,string_match
+webarena.323,False,shopping,string_match
+webarena.324,False,shopping,url_match
+webarena.325,False,shopping,url_match
+webarena.326,False,shopping,url_match
+webarena.327,False,shopping,url_match
+webarena.328,False,shopping,url_match
+webarena.329,False,shopping,string_match
+webarena.330,False,shopping,string_match
+webarena.331,False,shopping,string_match
+webarena.332,False,shopping,string_match
+webarena.333,False,shopping,string_match
+webarena.334,False,shopping,string_match
+webarena.335,False,shopping,string_match
+webarena.336,False,shopping,string_match
+webarena.337,False,shopping,string_match
+webarena.338,False,shopping,string_match
+webarena.339,False,gitlab,url_match
+webarena.340,False,gitlab,url_match
+webarena.341,False,gitlab,url_match
+webarena.342,False,gitlab,url_match
+webarena.343,False,gitlab,url_match
+webarena.344,False,shopping_admin,string_match
+webarena.345,False,shopping_admin,string_match
+webarena.346,False,shopping_admin,string_match
+webarena.347,False,shopping_admin,string_match
+webarena.348,False,shopping_admin,string_match
+webarena.349,False,gitlab,string_match
+webarena.350,False,gitlab,string_match
+webarena.351,False,shopping,url_match
+webarena.352,False,shopping,url_match
+webarena.353,False,shopping,url_match
+webarena.354,False,shopping,url_match
+webarena.355,False,shopping,url_match
+webarena.356,False,map,program_html
+webarena.357,False,gitlab,url_match
+webarena.358,False,shopping,string_match
+webarena.359,False,shopping,string_match
+webarena.360,False,shopping,string_match
+webarena.361,False,shopping,string_match
+webarena.362,False,shopping,string_match
+webarena.363,False,map,string_match
+webarena.364,False,map,string_match
+webarena.365,False,map,string_match
+webarena.366,False,map,string_match
+webarena.367,False,map,string_match
+webarena.368,False,shopping,string_match
+webarena.369,False,map,program_html
+webarena.370,False,map,program_html
+webarena.371,False,map,program_html
+webarena.372,False,map,program_html
+webarena.373,False,map,program_html
+webarena.374,False,shopping_admin,url_match
+webarena.375,False,shopping_admin,url_match
+webarena.376,False,shopping,string_match
+webarena.377,False,map,url_match
+webarena.378,False,map,url_match
+webarena.379,False,map,url_match
+webarena.380,False,map,url_match
+webarena.381,False,map,url_match
+webarena.382,False,map,string_match
+webarena.383,False,map,string_match
+webarena.384,False,shopping,string_match
+webarena.385,False,shopping,string_match
+webarena.386,False,shopping,string_match
+webarena.387,False,shopping,string_match
+webarena.388,False,shopping,string_match
+webarena.389,False,gitlab,program_html
+webarena.390,False,gitlab,program_html
+webarena.391,False,gitlab,program_html
+webarena.392,False,gitlab,program_html
+webarena.393,False,gitlab,program_html
+webarena.394,False,gitlab,program_html
+webarena.395,False,gitlab,program_html
+webarena.396,False,gitlab,program_html
+webarena.397,False,gitlab,program_html
+webarena.398,False,gitlab,program_html
+webarena.399,False,reddit,program_html
+webarena.400,False,reddit,program_html
+webarena.401,False,reddit,program_html
+webarena.402,False,reddit,program_html
+webarena.403,False,reddit,program_html
+webarena.404,False,reddit,program_html
+webarena.405,False,reddit,program_html
+webarena.406,False,reddit,program_html
+webarena.407,False,reddit,program_html
+webarena.408,False,reddit,program_html
+webarena.409,False,reddit,program_html
+webarena.410,False,reddit,program_html
+webarena.411,False,gitlab,program_html
+webarena.412,False,gitlab,program_html
+webarena.413,False,gitlab,program_html
+webarena.414,False,gitlab,program_html
+webarena.415,False,gitlab,program_html
+webarena.416,False,gitlab,program_html
+webarena.417,False,gitlab,program_html
+webarena.418,False,gitlab,program_html
+webarena.419,False,gitlab,program_html
+webarena.420,False,gitlab,program_html
+webarena.421,False,gitlab,program_html
+webarena.422,False,gitlab,program_html
+webarena.423,False,shopping_admin,program_html
+webarena.424,False,wikipedia map,program_html
+webarena.425,False,wikipedia map,program_html
+webarena.426,False,wikipedia map,program_html
+webarena.427,False,wikipedia map,program_html
+webarena.428,False,wikipedia map,program_html
+webarena.429,False,wikipedia map,program_html
+webarena.430,False,wikipedia map,program_html
+webarena.431,False,shopping,program_html
+webarena.432,False,shopping,program_html
+webarena.433,False,shopping,program_html
+webarena.434,False,shopping,program_html
+webarena.435,False,shopping,program_html
+webarena.436,False,shopping,program_html
+webarena.437,False,shopping,program_html
+webarena.438,False,shopping,program_html
+webarena.439,False,shopping,program_html
+webarena.440,False,shopping,program_html
+webarena.441,False,gitlab,program_html
+webarena.442,False,gitlab,program_html
+webarena.443,False,gitlab,program_html
+webarena.444,False,gitlab,program_html
+webarena.445,False,gitlab,program_html
+webarena.446,False,gitlab,program_html
+webarena.447,False,gitlab,program_html
+webarena.448,False,gitlab,program_html
+webarena.449,False,gitlab,program_html
+webarena.450,False,gitlab,program_html
+webarena.451,False,gitlab,program_html
+webarena.452,False,gitlab,program_html
+webarena.453,False,shopping_admin,program_html
+webarena.454,False,shopping_admin,program_html
+webarena.455,False,shopping_admin,program_html
+webarena.456,False,shopping_admin,program_html
+webarena.457,False,shopping_admin,program_html
+webarena.458,False,shopping_admin,program_html
+webarena.459,False,shopping_admin,program_html
+webarena.460,False,shopping_admin,program_html
+webarena.461,False,shopping_admin,program_html
+webarena.462,False,shopping_admin,program_html
+webarena.463,False,shopping_admin,program_html
+webarena.464,False,shopping_admin,program_html
+webarena.465,False,shopping,program_html
+webarena.466,False,shopping,program_html
+webarena.467,False,shopping,program_html
+webarena.468,False,shopping,program_html
+webarena.469,False,shopping,program_html
+webarena.470,False,shopping_admin,program_html
+webarena.471,False,shopping_admin,program_html
+webarena.472,False,shopping_admin,program_html
+webarena.473,False,shopping_admin,program_html
+webarena.474,False,shopping_admin,program_html
+webarena.475,False,gitlab,program_html
+webarena.476,False,gitlab,program_html
+webarena.477,False,gitlab,program_html
+webarena.478,False,gitlab,program_html
+webarena.479,False,gitlab,program_html
+webarena.480,False,gitlab,program_html
+webarena.481,False,gitlab,program_html
+webarena.482,False,gitlab,program_html
+webarena.483,False,gitlab,program_html
+webarena.484,False,gitlab,program_html
+webarena.485,False,gitlab,program_html
+webarena.486,False,shopping_admin,program_html
+webarena.487,False,shopping_admin,program_html
+webarena.488,False,shopping_admin,program_html
+webarena.489,False,shopping_admin,program_html
+webarena.490,False,shopping_admin,program_html
+webarena.491,False,shopping_admin,string_match
+webarena.492,False,shopping_admin,program_html
+webarena.493,False,shopping_admin,program_html
+webarena.494,False,shopping_admin,program_html
+webarena.495,False,shopping_admin,program_html
+webarena.496,False,shopping_admin,program_html
+webarena.497,False,shopping_admin,program_html
+webarena.498,False,shopping_admin,program_html
+webarena.499,False,shopping_admin,program_html
+webarena.500,False,shopping_admin,program_html
+webarena.501,False,shopping_admin,program_html
+webarena.502,False,shopping_admin,program_html
+webarena.503,False,shopping_admin,program_html
+webarena.504,False,shopping_admin,program_html
+webarena.505,False,shopping_admin,program_html
+webarena.506,False,shopping,program_html
+webarena.507,False,shopping,program_html
+webarena.508,False,shopping,program_html
+webarena.509,False,shopping,program_html
+webarena.510,False,shopping,program_html
+webarena.511,False,shopping,program_html
+webarena.512,False,shopping,program_html
+webarena.513,False,shopping,program_html
+webarena.514,False,shopping,program_html
+webarena.515,False,shopping,program_html
+webarena.516,False,shopping,program_html
+webarena.517,False,shopping,program_html
+webarena.518,False,shopping,program_html
+webarena.519,False,shopping,program_html
+webarena.520,False,shopping,program_html
+webarena.521,False,shopping,program_html
+webarena.522,False,gitlab,program_html
+webarena.523,False,gitlab,program_html
+webarena.524,False,gitlab,program_html
+webarena.525,False,gitlab,program_html
+webarena.526,False,gitlab,program_html
+webarena.527,False,gitlab,program_html
+webarena.528,False,shopping,program_html
+webarena.529,False,shopping,program_html
+webarena.530,False,shopping,program_html
+webarena.531,False,shopping,program_html
+webarena.532,False,shopping,program_html
+webarena.533,False,gitlab,program_html
+webarena.534,False,gitlab,program_html
+webarena.535,False,gitlab,program_html
+webarena.536,False,gitlab,program_html
+webarena.537,False,gitlab,program_html
+webarena.538,False,shopping_admin,program_html
+webarena.539,False,shopping_admin,program_html
+webarena.540,False,shopping_admin,program_html
+webarena.541,False,shopping_admin,program_html
+webarena.542,False,shopping_admin,program_html
+webarena.543,False,shopping_admin,program_html
+webarena.544,False,shopping_admin,program_html
+webarena.545,False,shopping_admin,program_html
+webarena.546,False,shopping_admin,program_html
+webarena.547,False,shopping_admin,program_html
+webarena.548,False,shopping_admin,program_html
+webarena.549,False,shopping_admin,program_html
+webarena.550,False,shopping_admin,program_html
+webarena.551,False,shopping_admin,program_html
+webarena.552,False,gitlab reddit,program_html
+webarena.553,False,gitlab reddit,program_html
+webarena.554,False,gitlab reddit,program_html
+webarena.555,False,gitlab reddit,program_html
+webarena.556,False,gitlab wikipedia,program_html
+webarena.557,False,gitlab wikipedia,program_html
+webarena.558,False,gitlab wikipedia,program_html
+webarena.559,False,gitlab wikipedia,program_html
+webarena.560,False,gitlab wikipedia,program_html
+webarena.561,False,gitlab wikipedia,program_html
+webarena.562,False,gitlab reddit,program_html
+webarena.563,False,gitlab reddit,program_html
+webarena.564,False,gitlab reddit,program_html
+webarena.565,False,gitlab reddit,program_html
+webarena.566,False,gitlab reddit,program_html
+webarena.567,False,gitlab,program_html
+webarena.568,False,gitlab,program_html
+webarena.569,False,gitlab,program_html
+webarena.570,False,gitlab,program_html
+webarena.571,False,shopping,program_html
+webarena.572,False,shopping,program_html
+webarena.573,False,shopping,program_html
+webarena.574,False,shopping,program_html
+webarena.575,False,shopping,program_html
+webarena.576,False,gitlab,program_html
+webarena.577,False,gitlab,program_html
+webarena.578,False,gitlab,program_html
+webarena.579,False,gitlab,program_html
+webarena.580,False,reddit,program_html
+webarena.581,False,reddit,program_html
+webarena.582,False,reddit,program_html
+webarena.583,False,reddit,program_html
+webarena.584,False,reddit,program_html
+webarena.585,False,shopping,program_html
+webarena.586,False,shopping,program_html
+webarena.587,False,shopping,program_html
+webarena.588,False,shopping,program_html
+webarena.589,False,shopping,program_html
+webarena.590,False,gitlab,url_match program_html
+webarena.591,False,gitlab,url_match program_html
+webarena.592,False,gitlab,url_match program_html
+webarena.593,False,gitlab,url_match program_html
+webarena.594,False,gitlab,url_match program_html
+webarena.595,False,reddit,url_match program_html
+webarena.596,False,reddit,url_match program_html
+webarena.597,False,reddit,url_match program_html
+webarena.598,False,reddit,url_match program_html
+webarena.599,False,reddit,url_match program_html
+webarena.600,False,reddit,url_match program_html
+webarena.601,False,reddit,url_match program_html
+webarena.602,False,reddit,url_match program_html
+webarena.603,False,reddit,url_match program_html
+webarena.604,False,reddit,url_match program_html
+webarena.605,False,reddit,url_match program_html
+webarena.606,False,reddit,url_match program_html
+webarena.607,False,reddit,url_match program_html
+webarena.608,False,reddit,url_match program_html
+webarena.609,False,reddit,url_match program_html
+webarena.610,False,reddit,url_match program_html
+webarena.611,False,reddit,url_match program_html
+webarena.612,False,reddit,url_match program_html
+webarena.613,False,reddit,url_match program_html
+webarena.614,False,reddit,url_match program_html
+webarena.615,False,reddit,url_match program_html
+webarena.616,False,reddit,url_match program_html
+webarena.617,False,reddit,url_match program_html
+webarena.618,False,reddit,url_match program_html
+webarena.619,False,reddit,url_match program_html
+webarena.620,False,reddit,url_match program_html
+webarena.621,False,reddit,url_match program_html
+webarena.622,False,reddit,url_match program_html
+webarena.623,False,reddit,url_match program_html
+webarena.624,False,reddit,url_match program_html
+webarena.625,False,reddit,url_match program_html
+webarena.626,False,reddit,url_match program_html
+webarena.627,False,reddit,url_match program_html
+webarena.628,False,reddit,url_match program_html
+webarena.629,False,reddit,url_match program_html
+webarena.630,False,reddit,url_match program_html
+webarena.631,False,reddit,url_match program_html
+webarena.632,False,reddit,url_match program_html
+webarena.633,False,reddit,url_match program_html
+webarena.634,False,reddit,url_match program_html
+webarena.635,False,reddit,url_match program_html
+webarena.636,False,reddit,url_match program_html
+webarena.637,False,reddit,url_match program_html
+webarena.638,False,reddit,url_match program_html
+webarena.639,False,reddit,url_match program_html
+webarena.640,False,reddit,url_match program_html
+webarena.641,False,reddit,url_match program_html
+webarena.642,False,reddit,url_match program_html
+webarena.643,False,reddit,url_match program_html
+webarena.644,False,reddit,url_match program_html
+webarena.645,False,reddit,url_match program_html
+webarena.646,False,reddit,url_match program_html
+webarena.647,False,reddit,url_match program_html
+webarena.648,False,reddit,url_match program_html
+webarena.649,False,reddit,url_match program_html
+webarena.650,False,reddit,url_match program_html
+webarena.651,False,reddit,url_match program_html
+webarena.652,False,reddit,url_match program_html
+webarena.653,False,shopping,url_match program_html
+webarena.654,False,shopping,url_match program_html
+webarena.655,False,shopping,url_match program_html
+webarena.656,False,shopping,url_match program_html
+webarena.657,False,shopping,url_match program_html
+webarena.658,False,gitlab,url_match program_html
+webarena.659,False,gitlab,url_match program_html
+webarena.660,False,gitlab,url_match program_html
+webarena.661,False,gitlab,url_match program_html
+webarena.662,False,gitlab,url_match program_html
+webarena.663,False,gitlab,url_match program_html
+webarena.664,False,gitlab,url_match program_html
+webarena.665,False,gitlab,url_match program_html
+webarena.666,False,gitlab,url_match program_html
+webarena.667,False,gitlab,url_match program_html
+webarena.668,False,gitlab,url_match program_html
+webarena.669,False,gitlab,url_match program_html
+webarena.670,False,gitlab,url_match program_html
+webarena.671,False,shopping reddit,url_match program_html
+webarena.672,False,shopping reddit,url_match program_html
+webarena.673,False,shopping reddit,url_match program_html
+webarena.674,False,shopping reddit,url_match program_html
+webarena.675,False,shopping reddit,url_match program_html
+webarena.676,False,shopping_admin,url_match program_html
+webarena.677,False,shopping_admin,url_match program_html
+webarena.678,False,shopping_admin,url_match program_html
+webarena.679,False,shopping_admin,url_match program_html
+webarena.680,False,shopping_admin,url_match program_html
+webarena.681,False,reddit gitlab,url_match program_html
+webarena.682,False,reddit gitlab,url_match program_html
+webarena.683,False,reddit gitlab,url_match program_html
+webarena.684,False,reddit gitlab,url_match program_html
+webarena.685,False,reddit gitlab,url_match program_html
+webarena.686,False,reddit gitlab,url_match program_html
+webarena.687,False,reddit gitlab,url_match program_html
+webarena.688,False,reddit gitlab,url_match program_html
+webarena.689,False,shopping,url_match program_html
+webarena.690,False,shopping,url_match program_html
+webarena.691,False,shopping,url_match program_html
+webarena.692,False,shopping,url_match program_html
+webarena.693,False,shopping,url_match program_html
+webarena.694,False,shopping_admin,url_match program_html
+webarena.695,False,shopping_admin,url_match program_html
+webarena.696,False,shopping_admin,url_match program_html
+webarena.697,False,shopping_admin,url_match program_html
+webarena.698,False,shopping_admin,url_match program_html
+webarena.699,False,shopping_admin,url_match program_html
+webarena.700,False,shopping_admin,url_match program_html
+webarena.701,False,shopping_admin,url_match program_html
+webarena.702,False,shopping_admin,url_match program_html
+webarena.703,False,shopping_admin,url_match program_html
+webarena.704,False,shopping_admin,url_match program_html
+webarena.705,False,shopping_admin,url_match program_html
+webarena.706,False,shopping_admin,url_match program_html
+webarena.707,False,shopping_admin,url_match program_html
+webarena.708,False,shopping_admin,url_match program_html
+webarena.709,False,shopping_admin,url_match program_html
+webarena.710,False,shopping_admin,url_match program_html
+webarena.711,False,shopping_admin,url_match program_html
+webarena.712,False,shopping_admin,url_match program_html
+webarena.713,False,shopping_admin,url_match program_html
+webarena.714,False,reddit,program_html
+webarena.715,False,reddit,program_html
+webarena.716,False,reddit,program_html
+webarena.717,False,reddit,program_html
+webarena.718,False,reddit,program_html
+webarena.719,False,reddit,program_html
+webarena.720,False,reddit,program_html
+webarena.721,False,reddit,program_html
+webarena.722,False,reddit,program_html
+webarena.723,False,reddit,string_match
+webarena.724,False,reddit,program_html
+webarena.725,False,reddit,program_html
+webarena.726,False,reddit,string_match
+webarena.727,False,reddit,program_html
+webarena.728,False,reddit,program_html
+webarena.729,False,reddit,program_html
+webarena.730,False,reddit,program_html
+webarena.731,False,reddit,program_html
+webarena.732,False,reddit,program_html
+webarena.733,False,reddit,program_html
+webarena.734,False,reddit,program_html
+webarena.735,False,reddit,program_html
+webarena.736,False,gitlab,program_html
+webarena.737,False,wikipedia map,program_html
+webarena.738,False,wikipedia map,program_html
+webarena.739,False,wikipedia map,program_html
+webarena.740,False,wikipedia map,program_html
+webarena.741,False,wikipedia map,program_html
+webarena.742,False,gitlab,program_html
+webarena.743,False,gitlab,program_html
+webarena.744,False,gitlab,program_html
+webarena.745,False,gitlab,program_html
+webarena.746,False,gitlab,program_html
+webarena.747,False,gitlab,program_html
+webarena.748,False,gitlab,program_html
+webarena.749,False,gitlab,program_html
+webarena.750,False,gitlab,program_html
+webarena.751,False,gitlab,program_html
+webarena.752,False,gitlab,program_html
+webarena.753,False,gitlab,program_html
+webarena.754,False,gitlab,program_html
+webarena.755,False,gitlab,program_html
+webarena.756,False,gitlab,program_html
+webarena.757,False,map,program_html
+webarena.758,False,map,program_html
+webarena.759,False,map shopping_admin,program_html
+webarena.760,False,map shopping_admin,program_html
+webarena.761,False,map,program_html
+webarena.762,False,map,program_html
+webarena.763,False,map,program_html
+webarena.764,False,map,program_html
+webarena.765,False,map,program_html
+webarena.766,False,map,program_html
+webarena.767,False,map,program_html
+webarena.768,False,shopping_admin,program_html
+webarena.769,False,shopping_admin,program_html
+webarena.770,False,shopping_admin,program_html
+webarena.771,False,shopping_admin,program_html
+webarena.772,False,shopping_admin,program_html
+webarena.773,False,shopping_admin,program_html
+webarena.774,False,shopping_admin,program_html
+webarena.775,False,shopping_admin,program_html
+webarena.776,False,shopping_admin,program_html
+webarena.777,False,shopping_admin,program_html
+webarena.778,False,shopping_admin,program_html
+webarena.779,False,shopping_admin,program_html
+webarena.780,False,shopping_admin,program_html
+webarena.781,False,shopping_admin,program_html
+webarena.782,False,shopping_admin,program_html
+webarena.783,False,gitlab,string_match
+webarena.784,False,gitlab,string_match
+webarena.785,False,gitlab,string_match
+webarena.786,False,gitlab,string_match
+webarena.787,False,gitlab,string_match
+webarena.788,False,gitlab,string_match
+webarena.789,False,gitlab,string_match
+webarena.790,False,shopping_admin,string_match
+webarena.791,False,gitlab reddit,string_match
+webarena.792,False,shopping,string_match
+webarena.793,False,shopping,string_match
+webarena.794,False,shopping,string_match
+webarena.795,False,shopping,string_match
+webarena.796,False,shopping,string_match
+webarena.797,False,shopping,string_match
+webarena.798,False,shopping,string_match
+webarena.799,False,gitlab,program_html
+webarena.800,False,gitlab,program_html
+webarena.801,False,gitlab,program_html
+webarena.802,False,gitlab,program_html
+webarena.803,False,gitlab,program_html
+webarena.804,False,gitlab,program_html
+webarena.805,False,gitlab,url_match program_html
+webarena.806,False,gitlab,url_match program_html
+webarena.807,False,gitlab,url_match program_html
+webarena.808,False,gitlab,url_match program_html
+webarena.809,False,gitlab,url_match program_html
+webarena.810,False,gitlab,program_html
+webarena.811,False,gitlab,program_html
