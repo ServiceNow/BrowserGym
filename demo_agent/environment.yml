@@ -8,6 +8,7 @@ channels:
 dependencies:
   - python>=3.10
   - pip
+  - rust
 
   - pip:
       - -r requirements.txt
