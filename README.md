@@ -161,8 +161,7 @@ print("\n".join(env_ids))
 If you want to experiment with a demo agent in BrowserGym, follow these steps:
 
 ```sh
-cd demo-agent
-conda env create -f environment.yml
+conda env create -f demo-agent/environment.yml
 conda activate demo-agent
 # or simply use `pip install -r requirements.txt`
 playwright install chromium
@@ -172,27 +171,27 @@ Our demo agent uses `openai` as a backend, be sure to set your `OPENAI_API_KEY`.
 
 Launch the demo agent on the open web:
 ```sh
-python run_demo.py --task_name openended --start_url https://www.google.com
+python demo-agent/run_demo.py --task_name openended --start_url https://www.google.com
 ```
 
 Or use it to solve a simple MiniWoB task:
 ```sh
-python run_demo.py --task_name miniwob.click-test
+python demo-agent/run_demo.py --task_name miniwob.click-test
 ```
 
 A VisualWebArena task:
 ```sh
-python run_demo.py --task_name visualwebarena.398
+python demo-agent/run_demo.py --task_name visualwebarena.398
 ```
 
 A WebArena task:
 ```sh
-python run_demo.py --task_name webarena.4
+python demo-agent/run_demo.py --task_name webarena.4
 ```
 
 A WorkArena task:
 ```sh
-python run_demo.py --task_name workarena.servicenow.order-standard-laptop
+python demo-agent/run_demo.py --task_name workarena.servicenow.order-standard-laptop
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
