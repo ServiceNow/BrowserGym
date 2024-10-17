@@ -1,3 +1,4 @@
+import fnmatch
 import io
 import logging
 import pathlib
@@ -59,14 +60,36 @@ class Benchmark(DataClassJsonMixin):
         metadata_tasks = list(self.task_metadata["task_name"])
         assert all([env_args.task_name in metadata_tasks for env_args in self.env_args_list])
 
-    def subset(self, task_filter: dict[str, str]):
+    def subset_from_split(self, split: Literal["train", "eval", "test"]):
+        split_column = "split"
+
+        # check for a split column in metadata
+        if not split_column in self.task_metadata.columns:
+            raise NotImplementedError(
+                f"This benchmark does not provide train/eval/test {split_column} (missing split column in task metadata)"
+            )
+
+        # recover the target split
+        sub_benchmark = self.subset_from_regexp(split_column, regexp=f"^{split}$")
+
+        # check that the split exists (non-empty task list)
+        if not sub_benchmark.env_args_list:
+            raise ValueError(f"The {split} split for this benchmark is empty.")
+
+        return sub_benchmark
+
+    def subset_from_glob(self, column, glob):
+        subset = self.subset_from_regexp(column, regexp=fnmatch.translate(glob))
+        subset.name = f"{self.name}[{column}={glob}]"
+        return subset
+
+    def subset_from_regexp(self, column, regexp):
         # extract the filtered task_name subset
-        task_name_subset = task_list_from_metadata(self.task_metadata, task_filter)
+        task_name_subset = task_list_from_metadata(self.task_metadata, {column: regexp})
 
         # return the sub benchmark
-        filter_str = ",".join([f"{col_name}=/{regex}/" for col_name, regex in task_filter.items()])
         return Benchmark(
-            name=f"{self.name}[{filter_str}]",
+            name=f"{self.name}[{column}=/{regexp}/]",
             high_level_action_set_args=self.high_level_action_set_args,
             env_args_list=[
                 env_args

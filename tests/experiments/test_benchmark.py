@@ -76,17 +76,19 @@ def test_build_benchmarks():
 def test_benchmark_subset():
     benchmark: Benchmark = BENCHMARKS["miniwob_all"]()
 
-    benchmark_subset = benchmark.subset(task_filter={"task_name": "click"})
+    benchmark_subset = benchmark.subset_from_regexp(column="task_name", regexp="click")
     assert len(benchmark_subset.env_args_list) == 31 * 10
     assert benchmark_subset.name == "miniwob_all[task_name=/click/]"
 
-    benchmark_subset_1 = benchmark_subset.subset(task_filter={"miniwob_category": "original"})
-    benchmark_subset_2 = benchmark.subset(
-        task_filter={"task_name": "click", "miniwob_category": "original"}
+    benchmark_subset_1 = benchmark_subset.subset_from_regexp(
+        column="miniwob_category", regexp="original"
+    )
+    benchmark_subset_2 = benchmark_subset.subset_from_glob(
+        column="miniwob_category", glob="original"
     )
 
     assert benchmark_subset_1.name == "miniwob_all[task_name=/click/][miniwob_category=/original/]"
-    assert benchmark_subset_2.name == "miniwob_all[task_name=/click/,miniwob_category=/original/]"
+    assert benchmark_subset_2.name == "miniwob_all[task_name=/click/][miniwob_category=original]"
 
     dict_1 = benchmark_subset_1.to_dict()
     dict_1.pop("name")
