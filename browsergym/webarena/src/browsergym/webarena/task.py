@@ -156,10 +156,10 @@ If you believe the task is impossible to complete, provide the answer "N/A".
         self, page: playwright.sync_api.Page, chat_messages: list[str]
     ) -> Tuple[float, bool, str, dict]:
 
-        # check that all open tabs are either blank or within the list of WebArena URLs
-        authorized_locations = [
+        # safeguard: check that all open tabs are either blank or within the list of WebArena URLs
+        authorized_locations = ["newtab", ""] + [
             urllib.parse.urlparse(url).netloc
-            for url in [*self.webarena_instance.urls, self.webarena_instance.home_url]
+            for url in [*self.webarena_instance.urls.values(), self.webarena_instance.home_url]
         ]
         for open_page in page.context.pages:
             page_location = urllib.parse.urlparse(open_page.url).netloc
