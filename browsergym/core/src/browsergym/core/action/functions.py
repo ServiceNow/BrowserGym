@@ -69,8 +69,6 @@ def fill(bid: str, value: str):
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
 
-    print(f"demo_mode={repr(demo_mode)}")
-
     def do(force: bool):
         if demo_mode != "off":
             delay = max(2000 / len(value), 10)

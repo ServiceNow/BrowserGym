@@ -1,15 +1,14 @@
-import gymnasium as gym
 import logging
 import os
-import playwright.sync_api
-import pytest
 import random
 
-from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_fixed
+import gymnasium as gym
+import playwright.sync_api
+import pytest
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 # register gym environments
 import browsergym.visualwebarena
-
 
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
@@ -19,7 +18,6 @@ from browsergym.visualwebarena import VISUALWEBARENA_TASK_IDS_WITH_RESET
 
 rng = random.Random(1)
 task_ids = rng.sample(VISUALWEBARENA_TASK_IDS_WITH_RESET, 10)
-print(task_ids)
 
 
 @retry(
