@@ -578,6 +578,7 @@ def tab_focus(index: int):
     """
     global page  # set the focused page as the active page
     page = page.context.pages[index]
+    page.bring_to_front()
     # trigger the callback that sets this page as active in browsergym
     page.evaluate(
         """\
