@@ -1,7 +1,6 @@
 import fnmatch
 import io
 import logging
-import pathlib
 import pkgutil
 from dataclasses import dataclass, field
 from typing import Literal, Optional
@@ -125,6 +124,7 @@ def task_list_from_metadata(metadata: pd.DataFrame, filter: dict[str, str] = {})
 # These are mean as the default highlevel action set to fairly evaluate agents on each benchmark.
 # They are mostly arbitrary, the important thing is to evaluate different agents using the same action set for fairness.
 DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
+    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
     "miniwob": HighLevelActionSetArgs(
         subsets=["bid", "coord"],
         multiaction=False,
@@ -132,8 +132,17 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=False,
         demo_mode="off",
     ),
+    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
     "miniwob_bid": HighLevelActionSetArgs(
         subsets=["bid"],
+        multiaction=False,
+        strict=False,
+        retry_with_force=False,
+        demo_mode="off",
+    ),
+    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
+    "miniwob_coord": HighLevelActionSetArgs(
+        subsets=["coord"],
         multiaction=False,
         strict=False,
         retry_with_force=False,
@@ -153,6 +162,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=False,
         demo_mode="off",
     ),
+    # from https://arxiv.org/abs/2307.13854
     "webarena": HighLevelActionSetArgs(
         subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
@@ -160,6 +170,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=False,
         demo_mode="off",
     ),
+    # from https://arxiv.org/abs/2401.13649
     "visualwebarena": HighLevelActionSetArgs(
         subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
