@@ -1,14 +1,14 @@
 import base64
 import dataclasses
-import numpy as np
 import io
 import logging
 
+import numpy as np
 from PIL import Image
 
-from browsergym.experiments import Agent, AbstractAgentArgs
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
+from browsergym.experiments import AbstractAgentArgs, Agent
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,9 @@ class DemoAgent(Agent):
             "goal_object": obs["goal_object"],
             "last_action": obs["last_action"],
             "last_action_error": obs["last_action_error"],
+            "open_pages_urls": obs["open_pages_urls"],
+            "open_pages_titles": obs["open_pages_titles"],
+            "active_page_index": obs["active_page_index"],
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
             "pruned_html": prune_html(flatten_dom_to_str(obs["dom_object"])),
         }
@@ -68,7 +71,7 @@ class DemoAgent(Agent):
         self.openai_client = OpenAI()
 
         self.action_set = HighLevelActionSet(
-            subsets=["chat", "bid", "infeas"],  # define a subset of the action space
+            subsets=["chat", "tab", "nav", "bid", "infeas"],  # define a subset of the action space
             # subsets=["chat", "bid", "coord", "infeas"] # allow the agent to also use x,y coordinates
             strict=False,  # less strict on the parsing of the actions
             multiaction=False,  # does not enable the agent to take multiple actions at once
@@ -150,6 +153,29 @@ and executed by a program, make sure to follow the formatting instructions.
             )
             # goal_object is directly presented as a list of openai-style messages
             user_msgs.extend(obs["goal_object"])
+
+        # append url of all open tabs
+        user_msgs.append(
+            {
+                "type": "text",
+                "text": f"""\
+# Currently open tabs
+""",
+            }
+        )
+        for page_index, (page_url, page_title) in enumerate(
+            zip(obs["open_pages_urls"], obs["open_pages_titles"])
+        ):
+            user_msgs.append(
+                {
+                    "type": "text",
+                    "text": f"""\
+Tab {page_index}{" (active tab)" if page_index == obs["active_page_index"] else ""}
+  Title: {page_title}
+  URL: {page_url}
+""",
+                }
+            )
 
         # append page AXTree (if asked)
         if self.use_axtree:
@@ -234,6 +260,7 @@ I found the information requested by the user, I will send it to the chat.
                     {
                         "type": "text",
                         "text": f"""\
+
 {action}
 """,
                     }
@@ -261,7 +288,7 @@ I found the information requested by the user, I will send it to the chat.
                 "text": f"""\
 # Next action
 
-You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, the current state of the page before deciding on your next action.
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action.
 """,
             }
         )
