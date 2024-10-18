@@ -17,12 +17,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class HighLevelActionSetArgs(DataClassJsonMixin):
-    subsets: list[HighLevelActionSet.ActionSubset]
+    subsets: tuple[HighLevelActionSet.ActionSubset]
     # custom_actions: list[callable] | None  # non-serializable argument, not supported
-    multiaction: bool
-    strict: bool
-    retry_with_force: bool
-    demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"]
+    multiaction: bool = False
+    strict: bool = True
+    retry_with_force: bool = False
+    demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off"
+
+    def __post_init__(self):
+        if isinstance(self.subsets, list):
+            """Needs to be hashable for AgentLab when uniquely identifying agents."""
+            self.subsets = tuple(self.subsets)
 
     def make_action_set(self):
         return HighLevelActionSet(
