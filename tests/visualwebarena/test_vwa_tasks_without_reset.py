@@ -18,7 +18,6 @@ from browsergym.visualwebarena import VISUALWEBARENA_TASK_IDS_WITHOUT_RESET
 
 rng = random.Random(1)
 task_ids = rng.sample(VISUALWEBARENA_TASK_IDS_WITHOUT_RESET, 25)
-print(task_ids)
 
 
 @retry(
