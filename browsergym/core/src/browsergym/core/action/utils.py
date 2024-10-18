@@ -1,5 +1,6 @@
-import playwright.sync_api
 from typing import Literal
+
+import playwright.sync_api
 
 
 def get_elem_by_bid(
@@ -243,6 +244,7 @@ def add_demo_mode_effects(
     bid: str,
     demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"],
     move_cursor: bool = True,
+    highlight_box: bool = True,
 ):
     if demo_mode == "off":
         return
@@ -271,4 +273,16 @@ def add_demo_mode_effects(
 
         if move_cursor:
             smooth_move_visual_cursor_to(page, center_x, center_y)
-        highlight_by_box(page, box, color=color)
+
+        if highlight_box:
+            highlight_by_box(page, box, color=color)
+
+
+def call_fun(fun: callable, retry_with_force: bool):
+    try:
+        fun(force=False)
+    except playwright.sync_api.TimeoutError as e:
+        if retry_with_force:
+            fun(force=True)
+        else:
+            raise e
