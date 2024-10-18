@@ -139,3 +139,8 @@ error_logs.txt
 tests/results
 tmp.py
 .vscode/settings.json
+
+# webcanvas
+test_gpt.py
+temp_test.py
+results/

@@ -73,7 +73,8 @@ class BrowserEnv(gym.Env, ABC):
         pw_chromium_kwargs: dict = {},
         pw_context_kwargs: dict = {},
         # agent-related arguments
-        action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+        action_mapping: Optional[callable] = HighLevelActionSet(
+        ).to_python_code,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -227,7 +228,8 @@ class BrowserEnv(gym.Env, ABC):
             no_viewport=True if self.resizeable_window else None,
             viewport=viewport,
             record_video_dir=(
-                Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
+                Path(self.record_video_dir) /
+                "task_video" if self.record_video_dir else None
             ),
             record_video_size=viewport,
             # will raise an Exception if above args are overriden
@@ -241,7 +243,8 @@ class BrowserEnv(gym.Env, ABC):
         # there is no concept of active page in playwright
         # https://github.com/microsoft/playwright/issues/2603
         self.context.expose_binding(
-            "browsergym_page_activated", lambda source: self._activate_page_from_js(source["page"])
+            "browsergym_page_activated", lambda source: self._activate_page_from_js(
+                source["page"])
         )
         self.context.add_init_script(
             r"""
@@ -365,6 +368,15 @@ document.addEventListener("visibilitychange", () => {
             self.chat.add_message(role="infeasible", msg=reason)
             self.infeasible_message_received = True
 
+        if hasattr(self.task, 'webcanvas'):
+            logger.debug(f"Initiating  webcanvas task validation")
+            # extract reward, done, user_message, info (task-specific)
+            reward, done, user_message, task_info = self.task.validate(
+                self.page, self.chat.messages, action)
+            logger.info(f"WebCanvas task validation result:\n{self.task.evaluate_result}")
+            info["task_info"] = task_info
+            info["webcanvas_result"] = self.task.evaluate_result
+
         # try to execute the action
         logger.debug(f"Executing action")
         try:
@@ -381,15 +393,18 @@ document.addEventListener("visibilitychange", () => {
             self.last_action_error = ""
         except Exception as e:
             self.last_action_error = f"{type(e).__name__}: {e}"
-            match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
+            match = re.match(
+                "TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
             if match:
-                info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
+                info["action_exec_timeout"] = float(
+                    match.groups()[0]) / 1000  # ms to sec
         logger.debug(f"Action executed")
         info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
         time.sleep(0.5)  # wait for JS events to be fired (half a second)
-        self.context.cookies()  # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
+        # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
+        self.context.cookies()
 
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
@@ -403,11 +418,12 @@ document.addEventListener("visibilitychange", () => {
         self._wait_for_user_message()
         logger.debug(f"User message done")
 
-        logger.debug(f"Initiating task validation")
-        # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, task_info = self._task_validate()
-        info["task_info"] = task_info
-        logger.debug(f"Task validation done")
+        if not hasattr(self.task, 'webcanvas'):
+            logger.debug(f"Initiating task validation")
+            # extract reward, done, user_message, info (task-specific)
+            reward, done, user_message, task_info = self._task_validate()
+            info["task_info"] = task_info
+            logger.debug(f"Task validation done")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -430,8 +446,8 @@ document.addEventListener("visibilitychange", () => {
         prev_active_page = self.page
         prev_page_history = self.page_history.copy()
         # call validate
-        reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
-
+        reward, done, user_message, info = self.task.validate(
+            self.page, self.chat.messages)
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
             logger.info(
@@ -473,7 +489,8 @@ document.addEventListener("visibilitychange", () => {
                 page
             )  # move page to the end of dictionnary
         else:
-            self.page_history[page] = None  # add page to the end of dictionnary
+            # add page to the end of dictionnary
+            self.page_history[page] = None
 
         self.page = page
 
@@ -499,7 +516,8 @@ document.addEventListener("visibilitychange", () => {
 
         # active page should not be closed
         if self.page.is_closed():
-            raise RuntimeError(f"Unexpected: active page has been closed ({self.page}).")
+            raise RuntimeError(
+                f"Unexpected: active page has been closed ({self.page}).")
 
     def _get_obs(self):
 

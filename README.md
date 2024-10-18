@@ -16,6 +16,7 @@ BrowserGym includes the following benchmarks by default:
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - [WebCanvas](https://github.com/iMeanAI/WebCanvas)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -36,6 +37,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for webarena, see [webarena/README.md](browsergym/webarena/README.md)
  - for visualwebarena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - for webcanvas, see [WebCanvas](https://github.com/iMeanAI/WebCanvas)
 
 ### Development setup
 To install browsergym locally for development, use the following commands:
