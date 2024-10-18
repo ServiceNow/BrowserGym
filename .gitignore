@@ -140,4 +140,7 @@ tests/results
 tmp.py
 .vscode/settings.json
 
+# demo and results
 results/
+
+.vscode/launch.json

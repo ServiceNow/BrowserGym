@@ -16,14 +16,21 @@ BrowserGym includes the following benchmarks by default:
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - [AssistantBench](https://github.com/oriyor/assistantbench)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
 ## Setup
 
-To install browsergym, you can either install one of the `browsergym-miniwob`, `browsergym-webarena`, `browsergym-visualwebarena` and `browsergym-workarena` packages, or you can simply install `browsergym` which includes all of these by default.
+To install browsergym, you can install one of the following packages.
 ```sh
-pip install browsergym
+pip install browsergym  # (recommended) everything below
+pip install browsergym-core  # core functionalities only (no benchmark, just the openended task)
+pip install browsergym-miniwob  # core + miniwob
+pip install browsergym-webarena  # core + webarena
+pip install browsergym-visualwebarena  # core + visualwebarena
+pip install browsergym-workarena  # core + workarena
+pip install browsergym-assistantbench  # core + assistantbench
 ```
 
 Then, a required step is to setup playwright by running
