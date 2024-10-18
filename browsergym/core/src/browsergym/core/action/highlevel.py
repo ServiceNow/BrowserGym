@@ -168,7 +168,7 @@ from typing import Literal
 
 
 """
-        # include demo_mode and retry_with_force flags
+        # set demo_mode and retry_with_force flags
         self.python_includes += f"""\
 demo_mode={repr(demo_mode)}
 retry_with_force={repr(retry_with_force)}
