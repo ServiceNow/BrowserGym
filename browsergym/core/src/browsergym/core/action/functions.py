@@ -452,11 +452,9 @@ def keyboard_type(text: str):
     """
     if demo_mode != "off":
         delay = max(2000 / len(text), 10)
-        timeout = 0  # no timeout
     else:
         delay = None
-        timeout = 500
-    page.keyboard.type(text, delay=delay, timeout=timeout)
+    page.keyboard.type(text, delay=delay)
 
 
 # https://playwright.dev/python/docs/api/class-keyboard#keyboard-insert-text
