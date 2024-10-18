@@ -3,12 +3,11 @@ requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
 [project]
-name = "browsergym-miniwob"
-description = "AssistantBench - BrowserGym"
+name = "browsergym-assistantbench"
+description = "AssistantBench benchmark for BrowserGym"
 authors = [
     {name = "Ori Yoran"},
     {name = "Maxime Gasse"},
-
 ]
 readme = "README.md"
 requires-python = ">3.7"

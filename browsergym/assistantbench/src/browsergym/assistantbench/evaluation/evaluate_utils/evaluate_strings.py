@@ -3,10 +3,10 @@ Evaluation for two strings or list of strings.
 Code taken from the DROP benchmark - https://github.com/allenai/allennlp-reading-comprehension/blob/master/allennlp_rc/eval/drop_eval.py
 """
 
-from collections import defaultdict
-from typing import List, Set, Tuple, Union
-import string
 import re
+import string
+from typing import List, Set, Tuple, Union
+
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 

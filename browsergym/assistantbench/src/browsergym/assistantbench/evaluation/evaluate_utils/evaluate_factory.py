@@ -1,12 +1,8 @@
-from typing import Union, Dict
+from typing import Union
 
-from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_dicts import evaluate_dicts
-from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_numbers import (
-    evaluate_numbers,
-)
-from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_strings import (
-    evaluate_strings,
-)
+from .evaluate_dicts import evaluate_dicts
+from .evaluate_numbers import evaluate_numbers
+from .evaluate_strings import evaluate_strings
 
 EvaluatorFactory = {
     "string": evaluate_strings,

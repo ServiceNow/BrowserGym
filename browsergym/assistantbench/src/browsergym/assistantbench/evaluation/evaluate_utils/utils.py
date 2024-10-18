@@ -1,4 +1,5 @@
-from typing import List, Set, Tuple, Union, Callable
+from typing import Callable, List, Set
+
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 

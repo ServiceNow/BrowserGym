@@ -1,10 +1,16 @@
 import json
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 def add_prediction_to_jsonl(
     file_path: str, task_id: str, prediction: object, override_if_exists: bool
 ) -> None:
+    """
+    WARNING: this is not multiprocessing-safe.
+    """
     # Check if the file exists, if not, create it
     if not os.path.exists(file_path):
         with open(file_path, "w") as f:
@@ -22,13 +28,13 @@ def add_prediction_to_jsonl(
 
     if existing_record:
         if not override_if_exists:
-            print(
-                f"Warning: Task ID '{task_id}' already exists. Not overriding as 'override_if_exists' is set to False."
+            logger.warning(
+                f"Task ID '{task_id}' already exists. Not overriding as 'override_if_exists' is set to False."
             )
             return
         else:
-            print(
-                f"Warning: Task ID '{task_id}' already exists. Overriding as 'override_if_exists' is set to True."
+            logger.warning(
+                f"Task ID '{task_id}' already exists. Overriding as 'override_if_exists' is set to True."
             )
             existing_record["answer"] = prediction
     else:
