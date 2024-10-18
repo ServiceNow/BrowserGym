@@ -1,4 +1,4 @@
-task_name,requires_reset,sites,eval_types,reasoning_difficulty,visual_difficulty,overall_difficulty,task_number,browsergym_split
+task_name,requires_reset,sites,eval_types,reasoning_difficulty,visual_difficulty,overall_difficulty,task_id,browsergym_split
 visualwebarena.0,False,classifieds,medium,easy,medium,url_match,0,test
 visualwebarena.1,False,classifieds,medium,easy,medium,url_match,1,train
 visualwebarena.2,False,classifieds,medium,easy,medium,url_match,2,train
