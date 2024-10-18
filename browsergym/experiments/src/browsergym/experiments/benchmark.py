@@ -20,7 +20,7 @@ class HighLevelActionSetArgs(DataClassJsonMixin):
     subsets: tuple[HighLevelActionSet.ActionSubset]
     # custom_actions: list[callable] | None  # non-serializable argument, not supported
     multiaction: bool = False
-    strict: bool = True
+    strict: bool = False
     retry_with_force: bool = False
     demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off"
 
