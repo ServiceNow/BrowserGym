@@ -1,5 +1,3 @@
-from . import base
-
 DEMO_MODE = False
 
 
