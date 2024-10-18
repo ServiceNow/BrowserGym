@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import playwright.sync_api
 
-from . import DEMO_MODE
+from . import get_global_demo_mode
 
 
 class AbstractActionSet(ABC):
@@ -57,7 +57,7 @@ def execute_python_code(
         "page": page,
         "send_message_to_user": send_message_to_user,
         "report_infeasible_instructions": report_infeasible_instructions,
-        "DEMO_MODE": DEMO_MODE,
+        "DEMO_MODE": get_global_demo_mode(),
     }
 
     exec(code, globals)
