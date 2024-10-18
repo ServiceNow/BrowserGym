@@ -530,7 +530,15 @@ def new_tab():
     # set the new page as the active page
     page = page.context.new_page()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/api/class-page#page-close
@@ -551,7 +559,15 @@ def tab_close():
     else:
         page = context.new_page()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/api/class-page#page-bring-to-front
@@ -564,8 +580,17 @@ def tab_focus(index: int):
     """
     global page  # set the focused page as the active page
     page = page.context.pages[index]
+    page.bring_to_front()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/input#upload-files

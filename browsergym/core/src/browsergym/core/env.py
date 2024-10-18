@@ -141,6 +141,9 @@ class BrowserEnv(gym.Env, ABC):
                 "open_pages_urls": gym.spaces.Sequence(
                     Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
                 ),
+                "open_pages_titles": gym.spaces.Sequence(
+                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+                ),
                 "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
                 "url": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
                 "screenshot": AnyBox(
@@ -542,8 +545,9 @@ document.addEventListener("visibilitychange", () => {
             "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
             "goal_object": self.goal_object,  # new goal format, list of messages openai style
             "open_pages_urls": [page.url for page in self.context.pages],
+            "open_pages_titles": [page.title() for page in self.context.pages],
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
-            "url": self.page.url,
+            "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
             "screenshot": extract_screenshot(self.page),
             "dom_object": dom,
             "axtree_object": axtree,

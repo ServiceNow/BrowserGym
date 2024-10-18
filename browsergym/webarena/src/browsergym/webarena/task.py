@@ -1,11 +1,12 @@
+import importlib.resources
 import json
 import logging
+import tempfile
+import urllib.parse
+from typing import Optional, Tuple
+
 import numpy as np
 import playwright.sync_api
-import importlib.resources
-import tempfile
-
-from typing import Optional, Tuple
 
 from browsergym.core.task import AbstractBrowserTask
 
@@ -154,7 +155,18 @@ If you believe the task is impossible to complete, provide the answer "N/A".
     def validate(
         self, page: playwright.sync_api.Page, chat_messages: list[str]
     ) -> Tuple[float, bool, str, dict]:
-        # import webarena on instanciation
+
+        # safeguard: check that all open tabs are either blank or within the list of WebArena URLs
+        authorized_locations = ["newtab", ""] + [
+            urllib.parse.urlparse(url).netloc
+            for url in [*self.webarena_instance.urls.values(), self.webarena_instance.home_url]
+        ]
+        for open_page in page.context.pages:
+            page_location = urllib.parse.urlparse(open_page.url).netloc
+            if not page_location in authorized_locations:
+                return 0, True, "", {"error": "Unauthorized url, terminating task"}
+
+        # import webarena dynamically
         from webarena.browser_env.actions import ActionTypes
 
         # if any, use the last assistant message as the stop answer for webarena
