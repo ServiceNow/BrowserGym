@@ -1,4 +1,4 @@
-task_name,requires_reset,sites,eval_types,task_number,browsergym_split
+task_name,requires_reset,sites,eval_types,task_id,browsergym_split
 webarena.0,False,shopping_admin,string_match,0,train
 webarena.1,False,shopping_admin,string_match,1,test
 webarena.2,False,shopping_admin,string_match,2,train
