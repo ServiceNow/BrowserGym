@@ -1,11 +1,13 @@
-# tests/test_evaluate.py
 import json
-import numpy as np
-from browsergym.assistantbench.src.evaluation.evaluator import question_scorer
+import pathlib
+
+from browsergym.assistantbench.evaluation.evaluator import question_scorer
+
+__DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 
 
 def test_evaluate():
-    file_path = "tests/assistantbench/data/fallback_gpt4_seeplanact_predictions.jsonl"  # Update this path as needed
+    file_path = pathlib.Path(__DATA_DIR) / "fallback_gpt4_seeplanact_predictions.jsonl"
     # Open the JSONL file and read each line as a JSON object
     with open(file_path, "r") as f:
         for line in f:

@@ -1,9 +1,10 @@
 # todo export evaluation to a python package
 
 import json
+
 import numpy as np
 
-from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_factory import get_evaluator
+from .evaluate_utils.evaluate_factory import get_evaluator
 
 
 def find_isnan(samp):

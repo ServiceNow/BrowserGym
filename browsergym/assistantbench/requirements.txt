@@ -1,0 +1,4 @@
+browsergym-core==0.8.1
+datasets
+scipy
+numpy

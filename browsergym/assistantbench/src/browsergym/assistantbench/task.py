@@ -1,9 +1,12 @@
-from playwright.sync_api import Page
-from browsergym.core.task import AbstractBrowserTask
-from browsergym.assistantbench.src.evaluation.evaluator import question_scorer
-from browsergym.assistantbench.src.utils import add_prediction_to_jsonl
+from typing import Dict, Tuple
+
 from datasets import load_dataset
-from typing import Tuple, Dict
+from playwright.sync_api import Page
+
+from browsergym.core.task import AbstractBrowserTask
+
+from .evaluation.evaluator import question_scorer
+from .utils import add_prediction_to_jsonl
 
 # Load dataset
 
@@ -46,7 +49,10 @@ class AssistantBenchTask(AbstractBrowserTask):
 
     @classmethod
     def get_task_id(cls) -> str:
-        return f"ab.{cls.task_id}"
+        """
+        Generic class for several task ids, this way of obtaining the task id is not compatible for now.
+        """
+        raise NotImplementedError
 
     def __init__(self, seed: int, task_id: str, output_file_path: str = None) -> None:
         """
@@ -71,17 +77,16 @@ class AssistantBenchTask(AbstractBrowserTask):
         pass
 
     def validate(self, page: Page, chat_messages: list[dict]) -> Tuple[float, bool, str, dict]:
-        score, done, msg, info = 0.0, False, "", {}
+        accuracy, done, msg, info = 0.0, False, "", {}
 
-        for i, message in enumerate(chat_messages):
-            if (
-                message.get("role") == "assistant" and i > 0
-            ):  # eval when the agent returns a response
-                done = True
-                prediction = chat_messages[-1]["message"]
-                score = question_scorer(prediction, self.gold)
+        # eval when the agent returns a response
+        if chat_messages and chat_messages[-1]["role"] == "assistant":
+            done = True
+            prediction = chat_messages[-1]["message"]
+            accuracy, has_ans = question_scorer(prediction, self.gold)
+            if self.output_file_path:
                 add_prediction_to_jsonl(
                     self.output_file_path, self.ab_task_id, prediction, True
                 )  # save answer to file
 
-        return score, done, msg, info
+        return accuracy, done, msg, info

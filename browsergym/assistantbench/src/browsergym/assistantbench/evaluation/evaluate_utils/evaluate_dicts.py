@@ -1,7 +1,8 @@
 from typing import Dict, List
+
 import numpy as np
 
-from browsergym.assistantbench.src.evaluation.evaluate_utils.utils import _align_bags
+from .utils import _align_bags
 
 
 def calculate_f1_score(precision, recall):
@@ -11,9 +12,7 @@ def calculate_f1_score(precision, recall):
 
 
 def calc_recall(pred: Dict, gold: Dict, use_gold_for_eval: bool):
-    from browsergym.assistantbench.src.evaluation.evaluate_utils.evaluate_factory import (
-        get_evaluator_from_gold_answer,
-    )
+    from .evaluate_factory import get_evaluator_from_gold_answer
 
     recall = []
     for gold_key, gold_value in gold.items():
