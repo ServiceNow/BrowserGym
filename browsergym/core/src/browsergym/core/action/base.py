@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import playwright.sync_api
 
-DEMO_MODE = False
+from . import DEMO_MODE
 
 
 class AbstractActionSet(ABC):
