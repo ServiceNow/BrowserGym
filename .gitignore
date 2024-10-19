@@ -138,6 +138,6 @@ error_logs.txt
 # tests
 tests/results
 tmp.py
-.vscode/settings.json
+.vscode/**
 
 results/
