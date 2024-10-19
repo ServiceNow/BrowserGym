@@ -17,12 +17,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class HighLevelActionSetArgs(DataClassJsonMixin):
-    subsets: tuple[HighLevelActionSet.ActionSubset]
+    subsets: tuple[HighLevelActionSet.ActionSubset] = field(
+        metadata=config(
+            encoder=lambda x: list(x),
+            decoder=lambda x: tuple(x),
+        ),
+    )
     # custom_actions: list[callable] | None  # non-serializable argument, not supported
     multiaction: bool = False
     strict: bool = False
     retry_with_force: bool = False
-    demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off"
+    demo_mode: Optional[Literal["off", "default", "all_blue", "only_visible_elements"]] = None
 
     def __post_init__(self):
         if isinstance(self.subsets, list):
