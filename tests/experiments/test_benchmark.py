@@ -12,7 +12,12 @@ from browsergym.experiments.benchmark import (
     HighLevelActionSetArgs,
     _make_env_args_list_from_repeat_tasks,
 )
-from browsergym.experiments.loop import AbstractAgentArgs, EnvArgs, ExpArgs, get_exp_result
+from browsergym.experiments.loop import (
+    AbstractAgentArgs,
+    EnvArgs,
+    ExpArgs,
+    get_exp_result,
+)
 from browsergym.utils.obs import flatten_axtree_to_str
 
 
@@ -46,15 +51,11 @@ class MiniwobTestAgentArgs(AbstractAgentArgs):
 
 def test_build_benchmarks():
     expected_bench_size = {
-        "miniwob_all": 125 * 5,
-        "miniwob_webgum": 56 * 5,
+        "miniwob": 125 * 5,
         "miniwob_tiny_test": 2 * 2,
-        "miniwob_train": 107 * 5,
-        "miniwob_test": 18 * 5,
         "webarena": 812,
         "visualwebarena": 910,
         "workarena_l1": 33 * 10,
-        "workarena_l1_sort": 6 * 10,
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
     }
@@ -69,11 +70,11 @@ def test_build_benchmarks():
 
 
 def test_benchmark_subset():
-    benchmark: Benchmark = BENCHMARKS["miniwob_all"]()
+    benchmark: Benchmark = BENCHMARKS["miniwob"]()
 
     benchmark_subset = benchmark.subset_from_regexp(column="task_name", regexp="click")
     assert len(benchmark_subset.env_args_list) == 31 * 5
-    assert benchmark_subset.name == "miniwob_all[task_name=/click/]"
+    assert benchmark_subset.name == "miniwob[task_name=/click/]"
 
     benchmark_subset_1 = benchmark_subset.subset_from_regexp(
         column="miniwob_category", regexp="original"
@@ -82,8 +83,8 @@ def test_benchmark_subset():
         column="miniwob_category", glob="original"
     )
 
-    assert benchmark_subset_1.name == "miniwob_all[task_name=/click/][miniwob_category=/original/]"
-    assert benchmark_subset_2.name == "miniwob_all[task_name=/click/][miniwob_category=original]"
+    assert benchmark_subset_1.name == "miniwob[task_name=/click/][miniwob_category=/original/]"
+    assert benchmark_subset_2.name == "miniwob[task_name=/click/][miniwob_category=original]"
 
     dict_1 = benchmark_subset_1.to_dict()
     dict_1.pop("name")
