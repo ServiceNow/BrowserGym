@@ -211,7 +211,7 @@ BENCHMARKS = {
                 metadata=task_metadata("miniwob"), filter={"webgum_subset": "True"}
             ),
             max_steps=10,
-            n_repeats=10,
+            n_repeats=5,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
@@ -236,7 +236,7 @@ BENCHMARKS = {
                 filter={"miniwob_category": "original|nodelay|debug|additional"},
             ),
             max_steps=10,
-            n_repeats=10,
+            n_repeats=5,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
@@ -249,7 +249,7 @@ BENCHMARKS = {
                 metadata=task_metadata("miniwob"), filter={"miniwob_category": "hidden test"}
             ),
             max_steps=10,
-            n_repeats=10,
+            n_repeats=5,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
