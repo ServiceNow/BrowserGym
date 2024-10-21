@@ -279,13 +279,13 @@ BENCHMARKS = {
     "workarena_l1": lambda: Benchmark(
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("workarena"), filter={"level": "l1"}
-            ),
+        env_args_list=_make_env_args_list_from_workarena_curriculum(
+            level="l1",
+            task_category_filter=None,
+            meta_seed=42,  # meta seed for evaluation curriculum
             max_steps=15,
-            n_repeats=10,
-            seeds_rng=np.random.RandomState(42),
+            curriculum_type="agent",
+            seeds_l1=10,
         ),
         task_metadata=task_metadata("workarena"),
     ),
@@ -335,6 +335,7 @@ def _make_env_args_list_from_workarena_curriculum(
     meta_seed: int,
     max_steps: int,
     curriculum_type: Literal["human", "agent"],
+    seeds_l1: int = 10,
 ):
     """
     Returns a WorkArena predefined task curriculum (e.g., task and seed combination).
@@ -350,6 +351,7 @@ def _make_env_args_list_from_workarena_curriculum(
         filter=f"{level}.{task_category_filter}" if task_category_filter else level,
         meta_seed=meta_seed,
         is_agent_curriculum=(curriculum_type == "agent"),
+        n_seed_l1=seeds_l1,
     )
 
     for task, seed in all_task_tuples:
