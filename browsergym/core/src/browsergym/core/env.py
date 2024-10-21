@@ -362,9 +362,13 @@ document.addEventListener("visibilitychange", () => {
         info["action_exec_timeout"] = 0
 
         def send_message_to_user(text: str):
+            if not isinstance(text, str):
+                raise ValueError(f"Forbidden value: {text} is not a string")
             self.chat.add_message(role="assistant", msg=text)
 
         def report_infeasible_instructions(reason: str):
+            if not isinstance(reason, str):
+                raise ValueError(f"Forbidden value: {reason} is not a string")
             self.chat.add_message(role="infeasible", msg=reason)
             self.infeasible_message_received = True
 
