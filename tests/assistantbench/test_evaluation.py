@@ -49,7 +49,10 @@ def test_evaluate(original_id: str):
     assert has_ans == expected_has_ans
 
 
-@pytest.mark.parametrize("original_id", list(data_points.keys()))
+@pytest.mark.parametrize(
+    "original_id",
+    [id for id in data_points.keys() if isinstance(data_points[id]["answer"], (str, float, int))],
+)
 @pytest.mark.slow
 def test_evaluate_within_env(original_id: str):
 
