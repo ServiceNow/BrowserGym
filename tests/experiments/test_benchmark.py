@@ -12,12 +12,7 @@ from browsergym.experiments.benchmark import (
     HighLevelActionSetArgs,
     _make_env_args_list_from_repeat_tasks,
 )
-from browsergym.experiments.loop import (
-    AbstractAgentArgs,
-    EnvArgs,
-    ExpArgs,
-    get_exp_result,
-)
+from browsergym.experiments.loop import AbstractAgentArgs, EnvArgs, ExpArgs, get_exp_result
 from browsergym.utils.obs import flatten_axtree_to_str
 
 
@@ -51,7 +46,7 @@ class MiniwobTestAgentArgs(AbstractAgentArgs):
 
 def test_build_benchmarks():
     expected_bench_size = {
-        "miniwob_all": 125 * 10,
+        "miniwob_all": 125 * 5,
         "miniwob_webgum": 56 * 10,
         "miniwob_tiny_test": 2 * 2,
         "miniwob_train": 107 * 10,
