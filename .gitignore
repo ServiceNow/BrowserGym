@@ -144,3 +144,6 @@ tmp.py
 results/
 
 .vscode/launch.json
+
+# assistantbench
+tests/assistantbench/assistantbench-predictions-test.jsonl

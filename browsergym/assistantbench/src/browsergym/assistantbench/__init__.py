@@ -9,7 +9,7 @@ ALL_DEV_AB_TASK_IDS = []
 ALL_TEST_AB_TASK_IDS = []
 
 # register a toy easy task for testing implemenation
-gym_id = f"ab.imp.0"
+gym_id = f"assistantbench.imp.0"
 register_task(
     gym_id,
     task.AssistantBenchTask,
@@ -23,18 +23,18 @@ ALL_TOY_AB_TASK_IDS.append(gym_id)
 
 # register the AssistantBench dev set
 for task_id in range(33):
-    gym_id = f"ab.{task_id}"
+    gym_id = f"assistantbench.validation.{task_id}"
     register_task(
         gym_id,
         task.AssistantBenchTask,
-        task_kwargs={"task_id": f"{task_id}"},
+        task_kwargs={"task_id": f"validation.{task_id}"},
     )
     ALL_AB_TASK_IDS.append(gym_id)
     ALL_DEV_AB_TASK_IDS.append(gym_id)
 
 # register the AssistantBench test set
 for task_id in range(181):
-    gym_id = f"ab.test.{task_id}"
+    gym_id = f"assistantbench.test.{task_id}"
     register_task(
         gym_id,
         task.AssistantBenchTask,

@@ -17,9 +17,12 @@ all_tasks = load_dataset(DATA_DATASET, trust_remote_code=True)
 # Extract answers and tasks for validation and test splits
 def extract_data(split_name: str) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
     return (
-        {str(i): row["answer"] for i, row in enumerate(all_tasks[split_name])},
-        {str(i): row["task"] for i, row in enumerate(all_tasks[split_name])},
-        {str(i): row["id"] for i, row in enumerate(all_tasks[split_name])},
+        {
+            f"{split_name}.{i}": row["answer"] if row["answer"] is not None else ""
+            for i, row in enumerate(all_tasks[split_name])
+        },
+        {f"{split_name}.{i}": row["task"] for i, row in enumerate(all_tasks[split_name])},
+        {f"{split_name}.{i}": row["id"] for i, row in enumerate(all_tasks[split_name])},
     )
 
 
