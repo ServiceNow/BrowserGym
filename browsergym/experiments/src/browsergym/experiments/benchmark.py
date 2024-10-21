@@ -198,7 +198,7 @@ BENCHMARKS = {
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
             max_steps=10,
-            n_repeats=10,
+            n_repeats=5,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
