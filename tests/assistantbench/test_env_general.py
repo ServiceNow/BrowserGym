@@ -14,15 +14,11 @@ __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
 
 
-from browsergym.assistantbench import (
-    ALL_AB_TASK_IDS,
-    ALL_DEV_AB_TASK_IDS,
-    ALL_TEST_AB_TASK_IDS,
-)
+from browsergym.assistantbench import TEST_AB_TASK_IDS, VALID_AB_TASK_IDS
 
 rng = random.Random(1)
-dev_task_ids = rng.sample(ALL_DEV_AB_TASK_IDS, 10)
-test_task_ids = rng.sample(ALL_TEST_AB_TASK_IDS, 10)
+valid_task_ids = rng.sample(VALID_AB_TASK_IDS, 10)
+test_task_ids = rng.sample(TEST_AB_TASK_IDS, 10)
 
 
 @retry(
@@ -31,9 +27,9 @@ test_task_ids = rng.sample(ALL_TEST_AB_TASK_IDS, 10)
     reraise=True,
     before_sleep=lambda _: logging.info("Retrying due to a TimeoutError..."),
 )
-@pytest.mark.parametrize("task_id", dev_task_ids + test_task_ids)
+@pytest.mark.parametrize("task_id", valid_task_ids + test_task_ids)
 @pytest.mark.slow
-def test_dev_env(task_id):
+def test_valid_env(task_id):
     env = gym.make(
         f"browsergym/{task_id}",
         headless=__HEADLESS,

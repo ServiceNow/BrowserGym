@@ -4,9 +4,9 @@ from . import task
 
 ALL_AB_TASK_IDS = []
 
-ALL_TOY_AB_TASK_IDS = []
-ALL_DEV_AB_TASK_IDS = []
-ALL_TEST_AB_TASK_IDS = []
+TOY_AB_TASK_IDS = []
+VALID_AB_TASK_IDS = []
+TEST_AB_TASK_IDS = []
 
 # register a toy easy task for testing implemenation
 gym_id = f"assistantbench.imp.0"
@@ -19,7 +19,7 @@ register_task(
     },
 )
 ALL_AB_TASK_IDS.append(gym_id)
-ALL_TOY_AB_TASK_IDS.append(gym_id)
+TOY_AB_TASK_IDS.append(gym_id)
 
 # register the AssistantBench dev set
 for task_id in range(33):
@@ -30,7 +30,7 @@ for task_id in range(33):
         task_kwargs={"task_id": f"validation.{task_id}"},
     )
     ALL_AB_TASK_IDS.append(gym_id)
-    ALL_DEV_AB_TASK_IDS.append(gym_id)
+    VALID_AB_TASK_IDS.append(gym_id)
 
 # register the AssistantBench test set
 for task_id in range(181):
@@ -44,4 +44,4 @@ for task_id in range(181):
         },
     )
     ALL_AB_TASK_IDS.append(gym_id)
-    ALL_TEST_AB_TASK_IDS.append(gym_id)
+    TEST_AB_TASK_IDS.append(gym_id)
