@@ -192,24 +192,11 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = BENCHMARKS["miniwob_all"]()`
 BENCHMARKS = {
-    "miniwob_all": lambda: Benchmark(
-        name="miniwob_all",
+    "miniwob": lambda: Benchmark(
+        name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
-            max_steps=10,
-            n_repeats=5,
-            seeds_rng=np.random.RandomState(42),
-        ),
-        task_metadata=task_metadata("miniwob"),
-    ),
-    "miniwob_webgum": lambda: Benchmark(
-        name="miniwob_webgum",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("miniwob"), filter={"webgum_subset": "True"}
-            ),
             max_steps=10,
             n_repeats=5,
             seeds_rng=np.random.RandomState(42),
@@ -223,33 +210,6 @@ BENCHMARKS = {
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
             n_repeats=2,
-            seeds_rng=np.random.RandomState(42),
-        ),
-        task_metadata=task_metadata("miniwob"),
-    ),
-    "miniwob_train": lambda: Benchmark(
-        name="miniwob_train",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("miniwob"),
-                filter={"miniwob_category": "original|nodelay|debug|additional"},
-            ),
-            max_steps=10,
-            n_repeats=5,
-            seeds_rng=np.random.RandomState(42),
-        ),
-        task_metadata=task_metadata("miniwob"),
-    ),
-    "miniwob_test": lambda: Benchmark(
-        name="miniwob_test",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("miniwob"), filter={"miniwob_category": "hidden test"}
-            ),
-            max_steps=10,
-            n_repeats=5,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
@@ -282,19 +242,6 @@ BENCHMARKS = {
         env_args_list=_make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 metadata=task_metadata("workarena"), filter={"level": "l1"}
-            ),
-            max_steps=15,
-            n_repeats=10,
-            seeds_rng=np.random.RandomState(42),
-        ),
-        task_metadata=task_metadata("workarena"),
-    ),
-    "workarena_l1_sort": lambda: Benchmark(
-        name="workarena_l1_sort",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("workarena"), filter={"level": "l1", "category": "list-sort"}
             ),
             max_steps=15,
             n_repeats=10,
