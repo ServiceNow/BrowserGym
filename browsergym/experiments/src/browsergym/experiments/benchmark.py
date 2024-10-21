@@ -188,6 +188,13 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=False,
         demo_mode="off",
     ),
+    "assistantbench": HighLevelActionSetArgs(
+        subsets=["chat", "bid", "tab", "nav"],
+        multiaction=False,
+        strict=False,
+        retry_with_force=False,
+        demo_mode="off",
+    ),
 }
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = BENCHMARKS["miniwob_all"]()`
@@ -272,6 +279,19 @@ BENCHMARKS = {
             curriculum_type="agent",
         ),
         task_metadata=task_metadata("workarena"),
+    ),
+    "assistantbench": lambda: Benchmark(
+        name="assistantbench",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
+        env_args_list=_make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(
+                metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
+            ),
+            max_steps=15,
+            n_repeats=1,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("assistantbench"),
     ),
 }
 
