@@ -47,10 +47,10 @@ class MiniwobTestAgentArgs(AbstractAgentArgs):
 def test_build_benchmarks():
     expected_bench_size = {
         "miniwob_all": 125 * 5,
-        "miniwob_webgum": 56 * 10,
+        "miniwob_webgum": 56 * 5,
         "miniwob_tiny_test": 2 * 2,
-        "miniwob_train": 107 * 10,
-        "miniwob_test": 18 * 10,
+        "miniwob_train": 107 * 5,
+        "miniwob_test": 18 * 5,
         "webarena": 812,
         "visualwebarena": 910,
         "workarena_l1": 33 * 10,
@@ -72,7 +72,7 @@ def test_benchmark_subset():
     benchmark: Benchmark = BENCHMARKS["miniwob_all"]()
 
     benchmark_subset = benchmark.subset_from_regexp(column="task_name", regexp="click")
-    assert len(benchmark_subset.env_args_list) == 31 * 10
+    assert len(benchmark_subset.env_args_list) == 31 * 5
     assert benchmark_subset.name == "miniwob_all[task_name=/click/]"
 
     benchmark_subset_1 = benchmark_subset.subset_from_regexp(
