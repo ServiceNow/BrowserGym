@@ -780,6 +780,8 @@ def _get_env_name(task_name: str):
         import browsergym.webarena
     elif task_name.startswith("visualwebarena"):
         import browsergym.visualwebarena
+    elif task_name.startswith("assistantbench"):
+        import browsergym.assistantbench
 
     return f"browsergym/{task_name}"
 

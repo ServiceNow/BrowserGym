@@ -140,4 +140,10 @@ tests/results
 tmp.py
 .vscode/**
 
+# demo and results
 results/
+
+.vscode/launch.json
+
+# assistantbench
+tests/assistantbench/assistantbench-predictions-test.jsonl
