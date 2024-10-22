@@ -1,37 +1,37 @@
 task_name,level,category,browsergym_split
-workarena.servicenow.multi-chart-value-retrieval,l1,dashboard,
-workarena.servicenow.multi-chart-min-max-retrieval,l1,dashboard,
-workarena.servicenow.single-chart-value-retrieval,l1,dashboard,
-workarena.servicenow.single-chart-min-max-retrieval,l1,dashboard,
-workarena.servicenow.create-change-request,l1,form,
-workarena.servicenow.create-incident,l1,form,
-workarena.servicenow.create-hardware-asset,l1,form,
-workarena.servicenow.create-problem,l1,form,
-workarena.servicenow.create-user,l1,form,
-workarena.servicenow.knowledge-base-search,l1,knowledge,
-workarena.servicenow.filter-asset-list,l1,list-filter,
-workarena.servicenow.filter-change-request-list,l1,list-filter,
-workarena.servicenow.filter-hardware-list,l1,list-filter,
-workarena.servicenow.filter-incident-list,l1,list-filter,
-workarena.servicenow.filter-service-catalog-item-list,l1,list-filter,
-workarena.servicenow.filter-user-list,l1,list-filter,
-workarena.servicenow.sort-asset-list,l1,list-sort,
-workarena.servicenow.sort-change-request-list,l1,list-sort,
-workarena.servicenow.sort-hardware-list,l1,list-sort,
-workarena.servicenow.sort-incident-list,l1,list-sort,
-workarena.servicenow.sort-service-catalog-item-list,l1,list-sort,
-workarena.servicenow.sort-user-list,l1,list-sort,
-workarena.servicenow.all-menu,l1,menu,
-workarena.servicenow.impersonation,l1,menu,
-workarena.servicenow.order-developer-laptop,l1,service catalog,
-workarena.servicenow.order-ipad-mini,l1,service catalog,
-workarena.servicenow.order-ipad-pro,l1,service catalog,
-workarena.servicenow.order-sales-laptop,l1,service catalog,
-workarena.servicenow.order-standard-laptop,l1,service catalog,
-workarena.servicenow.order-apple-watch,l1,service catalog,
-workarena.servicenow.order-apple-mac-book-pro15,l1,service catalog,
-workarena.servicenow.order-development-laptop-p-c,l1,service catalog,
-workarena.servicenow.order-loaner-laptop,l1,service catalog,
+workarena.servicenow.multi-chart-value-retrieval,l1,dashboard,test
+workarena.servicenow.multi-chart-min-max-retrieval,l1,dashboard,test
+workarena.servicenow.single-chart-value-retrieval,l1,dashboard,train
+workarena.servicenow.single-chart-min-max-retrieval,l1,dashboard,train
+workarena.servicenow.create-change-request,l1,form,train
+workarena.servicenow.create-incident,l1,form,train
+workarena.servicenow.create-hardware-asset,l1,form,test
+workarena.servicenow.create-problem,l1,form,test
+workarena.servicenow.create-user,l1,form,test
+workarena.servicenow.knowledge-base-search,l1,knowledge,test
+workarena.servicenow.filter-asset-list,l1,list-filter,train
+workarena.servicenow.filter-change-request-list,l1,list-filter,train
+workarena.servicenow.filter-hardware-list,l1,list-filter,train
+workarena.servicenow.filter-incident-list,l1,list-filter,test
+workarena.servicenow.filter-service-catalog-item-list,l1,list-filter,test
+workarena.servicenow.filter-user-list,l1,list-filter,test
+workarena.servicenow.sort-asset-list,l1,list-sort,train
+workarena.servicenow.sort-change-request-list,l1,list-sort,train
+workarena.servicenow.sort-hardware-list,l1,list-sort,train
+workarena.servicenow.sort-incident-list,l1,list-sort,test
+workarena.servicenow.sort-service-catalog-item-list,l1,list-sort,test
+workarena.servicenow.sort-user-list,l1,list-sort,test
+workarena.servicenow.all-menu,l1,menu,test
+workarena.servicenow.impersonation,l1,menu,test
+workarena.servicenow.order-developer-laptop,l1,service catalog,train
+workarena.servicenow.order-ipad-mini,l1,service catalog,train
+workarena.servicenow.order-ipad-pro,l1,service catalog,train
+workarena.servicenow.order-sales-laptop,l1,service catalog,train
+workarena.servicenow.order-standard-laptop,l1,service catalog,train
+workarena.servicenow.order-apple-watch,l1,service catalog,test
+workarena.servicenow.order-apple-mac-book-pro15,l1,service catalog,test
+workarena.servicenow.order-development-laptop-p-c,l1,service catalog,test
+workarena.servicenow.order-loaner-laptop,l1,service catalog,test
 workarena.servicenow.basic-filter-problems-and-mark-duplicates-small-l2,l2,planning_and_problem_solving,
 workarena.servicenow.basic-filter-problems-and-mark-duplicates-medium-l2,l2,planning_and_problem_solving,
 workarena.servicenow.basic-filter-problems-and-mark-duplicates-large-l2,l2,planning_and_problem_solving,
