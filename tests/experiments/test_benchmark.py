@@ -100,6 +100,7 @@ def test_run_mock_benchmark():
             retry_with_force=False,
             demo_mode="off",
         ),
+        is_multi_tab=False,
         env_args_list=make_env_args_list_from_fixed_seeds(
             task_list=["miniwob.click-test"],
             max_steps=5,

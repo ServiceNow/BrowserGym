@@ -105,6 +105,7 @@ class Benchmark(DataClassJsonMixin):
         return Benchmark(
             name=f"{self.name}[{column}=/{regexp}/]",
             high_level_action_set_args=self.high_level_action_set_args,
+            is_multi_tab=self.is_multi_tab,
             env_args_list=[
                 env_args
                 for env_args in self.env_args_list
