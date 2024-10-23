@@ -15,7 +15,7 @@ BrowserGym includes the following benchmarks by default:
  - [MiniWob++](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
- - [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - [WorkArena++](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
