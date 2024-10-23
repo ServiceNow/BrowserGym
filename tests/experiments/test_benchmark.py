@@ -97,7 +97,7 @@ def test_run_mock_benchmark():
             subsets=["bid"],
             multiaction=False,
             strict=False,
-            retry_with_force=False,
+            retry_with_force=True,
             demo_mode="off",
         ),
         is_multi_tab=False,
