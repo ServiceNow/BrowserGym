@@ -81,7 +81,8 @@ ACTION_SUBSETS = {
         tab_focus,
         new_tab,
     ],
-    # loosely taken from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
     "miniwob_all": [
         mouse_move,  # MOVE_COORDS
         mouse_click,  # CLICK_COORDS
@@ -94,7 +95,8 @@ ACTION_SUBSETS = {
         keyboard_type,  # TYPE_TEX (and substitute for TYPE_FIELD()
         fill,  # FOCUS_ELEMENT_AND_TYPE_TEXT (and substitute for FOCUS_ELEMENT_AND_TYPE_FIELD)
     ],
-    # loosely taken from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L142
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L142
     "miniwob_shi17": [
         mouse_click,  # CLICK_COORDS
         mouse_dblclick,  # DBLCLICK_COORDS
@@ -103,12 +105,14 @@ ACTION_SUBSETS = {
         scroll,  # SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         keyboard_press,  # PRESS_KEY
     ],
-    # loosely taken from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
     "miniwob_liu18": [
         click,  # CLICK_ELEMENT
         fill,  # substitute for FOCUS_ELEMENT_AND_TYPE_FIELD
     ],
-    # loosely taken from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
     "miniwob_humphreys22": [
         mouse_move,  # MOVE_COORDS
         mouse_click,  # CLICK_COORDS
@@ -119,7 +123,8 @@ ACTION_SUBSETS = {
         keyboard_press,  # PRESS_KEY
         keyboard_type,  # substitute for TYPE_FIELD
     ],
-    # from webarena paper https://arxiv.org/abs/2307.13854
+    # from webarena paper
+    # https://arxiv.org/abs/2307.13854
     "webarena": [
         click,  # click(elem)
         hover,  # hover(elem)
@@ -135,7 +140,8 @@ ACTION_SUBSETS = {
         send_msg_to_user,  #
         report_infeasible,  # explicit unachievable action, equivalent to "N/A" answer
     ],
-    # from visualwebarena paper https://arxiv.org/abs/2401.13649
+    # from visualwebarena paper
+    # https://arxiv.org/abs/2401.13649
     "visualwebarena": [
         click,  # click(elem)
         hover,  # hover(elem)
@@ -152,7 +158,8 @@ ACTION_SUBSETS = {
         report_infeasible,  # explicit unachievable action, equivalent to "N/A" answer
         upload_file,  #
     ],
-    # from workarena paper https://arxiv.org/abs/2403.07718
+    # from workarena paper
+    # https://arxiv.org/abs/2403.07718
     "workarena": [
         scroll,
         fill,
@@ -166,7 +173,8 @@ ACTION_SUBSETS = {
         drag_and_drop,
         send_msg_to_user,
     ],
-    # from workarena++ paper https://arxiv.org/abs/2407.05291
+    # from workarena++ paper
+    # https://arxiv.org/abs/2407.05291
     "workarena++": [
         scroll,
         fill,
