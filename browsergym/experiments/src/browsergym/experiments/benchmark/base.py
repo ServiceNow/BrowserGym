@@ -118,39 +118,43 @@ class Benchmark(DataClassJsonMixin):
 # These are mean as the default highlevel action set to fairly evaluate agents on each benchmark.
 # They are mostly arbitrary, the important thing is to evaluate different agents using the same action set for fairness.
 DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
-    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
-    "miniwob": HighLevelActionSetArgs(
-        subsets=["bid", "coord"],
+    "miniwob_all": HighLevelActionSetArgs(
+        subsets=["miniwob_all"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
         demo_mode="off",
     ),
-    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
-    "miniwob_bid": HighLevelActionSetArgs(
-        subsets=["bid"],
+    "miniwob_liu18": HighLevelActionSetArgs(
+        subsets=["miniwob_liu18"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
         demo_mode="off",
     ),
-    # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
-    "miniwob_coord": HighLevelActionSetArgs(
-        subsets=["coord"],
+    "miniwob_shi17": HighLevelActionSetArgs(
+        subsets=["miniwob_shi17"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
         demo_mode="off",
     ),
-    "workarena_l1": HighLevelActionSetArgs(
-        subsets=["chat", "bid"],  # no need for infeasible action
+    "miniwob_humphreys22": HighLevelActionSetArgs(
+        subsets=["miniwob_humphreys22"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
         demo_mode="off",
     ),
     "workarena": HighLevelActionSetArgs(
-        subsets=["chat", "infeas", "bid", "tab", "nav"],
+        subsets=["workarena"],  # no need for infeasible action
+        multiaction=False,
+        strict=False,
+        retry_with_force=True,
+        demo_mode="off",
+    ),
+    "workarena++": HighLevelActionSetArgs(
+        subsets=["workarena++"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -158,7 +162,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
     ),
     # from https://arxiv.org/abs/2307.13854
     "webarena": HighLevelActionSetArgs(
-        subsets=["chat", "infeas", "bid", "tab", "nav"],
+        subsets=["webarena"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -166,7 +170,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
     ),
     # from https://arxiv.org/abs/2401.13649
     "visualwebarena": HighLevelActionSetArgs(
-        subsets=["chat", "infeas", "bid", "tab", "nav"],
+        subsets=["visualwebarena"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -185,7 +189,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
 DEFAULT_BENCHMARKS = {
     "miniwob": lambda: Benchmark(
         name="miniwob",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
@@ -197,7 +201,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "miniwob_tiny_test": lambda: Benchmark(
         name="miniwob_tiny_test",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
@@ -233,7 +237,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "workarena_l1": lambda: Benchmark(
         name="workarena_l1",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         is_multi_tab=False,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l1",
@@ -247,7 +251,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "workarena_l2_agent_curriculum_eval": lambda: Benchmark(
         name="workarena_l2_agent_curriculum_eval",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l2",
@@ -260,7 +264,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "workarena_l3_agent_curriculum_eval": lambda: Benchmark(
         name="workarena_l3_agent_curriculum_eval",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l3",
