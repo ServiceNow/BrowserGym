@@ -1,8 +1,10 @@
 import dataclasses
+import os
 import re
 import tempfile
 
 import numpy as np
+import pytest
 
 from browsergym.core.action.base import AbstractActionSet
 from browsergym.experiments.agent import Agent
@@ -88,6 +90,44 @@ def test_benchmark_subset():
     dict_2.pop("name")
 
     assert dict_1 == dict_2
+
+
+@pytest.mark.skip
+def test_webarena_benchmark_reset():
+    WA_FULL_RESET = os.environ["WA_FULL_RESET"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
+
+        exec(benchmark.full_reset_script)
+
+        del os.environ["WA_FULL_RESET"]
+        with pytest.raises(Exception):
+            exec(benchmark.full_reset_script)
+
+        os.environ["WA_FULL_RESET"] = "http://localhost:12345/reset"
+        with pytest.raises(Exception):
+            exec(benchmark.full_reset_script)
+    finally:
+        os.environ["WA_FULL_RESET"] = WA_FULL_RESET
+
+
+@pytest.mark.skip
+def test_visualwebarena_benchmark_reset():
+    VWA_FULL_RESET = os.environ["VWA_FULL_RESET"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["visualwebarena"]()
+
+        exec(benchmark.full_reset_script)
+
+        del os.environ["VWA_FULL_RESET"]
+        with pytest.raises(Exception):
+            exec(benchmark.full_reset_script)
+
+        os.environ["VWA_FULL_RESET"] = "http://localhost:12345/reset"
+        with pytest.raises(Exception):
+            exec(benchmark.full_reset_script)
+    finally:
+        os.environ["VWA_FULL_RESET"] = VWA_FULL_RESET
 
 
 def test_run_mock_benchmark():

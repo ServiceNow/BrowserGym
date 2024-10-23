@@ -55,6 +55,7 @@ class Benchmark(DataClassJsonMixin):
     high_level_action_set_args: HighLevelActionSetArgs
     is_multi_tab: bool
     env_args_list: list[EnvArgs]
+    full_reset_script: Optional[str]
     task_metadata: Optional[pd.DataFrame] = field(
         default_factory=lambda: None,
         metadata=config(
@@ -106,6 +107,7 @@ class Benchmark(DataClassJsonMixin):
             name=f"{self.name}[{column}=/{regexp}/]",
             high_level_action_set_args=self.high_level_action_set_args,
             is_multi_tab=self.is_multi_tab,
+            full_reset_script=self.full_reset_script,
             env_args_list=[
                 env_args
                 for env_args in self.env_args_list
@@ -191,6 +193,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
             max_steps=10,
@@ -203,6 +206,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob_tiny_test",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
@@ -215,6 +219,10 @@ DEFAULT_BENCHMARKS = {
         name="webarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
+        full_reset_script="""\
+import browsergym.webarena.instance
+browsergym.webarena.instance.WebArenaInstance().full_reset()
+""",
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
             max_steps=15,
@@ -227,6 +235,10 @@ DEFAULT_BENCHMARKS = {
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         is_multi_tab=True,
+        full_reset_script="""\
+import browsergym.visualwebarena.instance
+browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
+""",
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
             max_steps=15,
@@ -239,6 +251,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         is_multi_tab=False,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l1",
             task_category_filter=None,
@@ -253,6 +266,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l2",
             task_category_filter=None,
@@ -266,6 +280,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l3",
             task_category_filter=None,
@@ -279,6 +294,7 @@ DEFAULT_BENCHMARKS = {
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
         is_multi_tab=True,
+        full_reset_script=None,
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
