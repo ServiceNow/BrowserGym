@@ -166,7 +166,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         demo_mode="off",
     ),
     "workarena": HighLevelActionSetArgs(
-        subsets=["chat", "infeas", "bid"],
+        subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
         strict=False,
         retry_with_force=False,
