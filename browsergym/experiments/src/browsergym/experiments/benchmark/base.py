@@ -1,7 +1,5 @@
 import fnmatch
-import io
 import logging
-import pkgutil
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 
@@ -10,7 +8,13 @@ import pandas as pd
 from dataclasses_json import DataClassJsonMixin, config
 
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.experiments.loop import SEED_MAX, EnvArgs
+from browsergym.experiments.loop import EnvArgs
+
+from .metadata.utils import task_list_from_metadata, task_metadata
+from .utils import (
+    make_env_args_list_from_repeat_tasks,
+    make_env_args_list_from_workarena_curriculum,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +53,7 @@ class HighLevelActionSetArgs(DataClassJsonMixin):
 class Benchmark(DataClassJsonMixin):
     name: str
     high_level_action_set_args: HighLevelActionSetArgs
+    is_multi_tab: bool
     env_args_list: list[EnvArgs]
     task_metadata: Optional[pd.DataFrame] = field(
         default_factory=lambda: None,
@@ -107,28 +112,6 @@ class Benchmark(DataClassJsonMixin):
             ],
             task_metadata=self.task_metadata,
         )
-
-
-def task_metadata(benchmark_name: str):
-    return task_metadata_from_csv(
-        io.StringIO(
-            pkgutil.get_data(__name__, f"task_metadata/{benchmark_name}.csv").decode("utf-8")
-        )
-    )
-
-
-def task_metadata_from_csv(filepath):
-    return pd.read_csv(filepath).fillna("")
-
-
-def task_list_from_metadata(metadata: pd.DataFrame, filter: dict[str, str] = {}):
-    df = metadata
-    # filter the desired columns (AND filter)
-    for col_name, regex in filter.items():
-        col_filter = df[col_name].astype(str).str.contains(regex, regex=True)
-        df = df[col_filter]
-    # return only the task names
-    return list(df["task_name"])
 
 
 # These are mean as the default highlevel action set to fairly evaluate agents on each benchmark.
@@ -197,12 +180,13 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
     ),
 }
 
-# all benchmarks are callables designed for lazy loading, i.e. `bench = BENCHMARKS["miniwob_all"]()`
-BENCHMARKS = {
+# all benchmarks are callables designed for lazy loading, i.e. `bench = DEFAULT_BENCHMARKS["miniwob_all"]()`
+DEFAULT_BENCHMARKS = {
     "miniwob": lambda: Benchmark(
         name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        is_multi_tab=False,
+        env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
             max_steps=10,
             n_repeats=5,
@@ -213,7 +197,8 @@ BENCHMARKS = {
     "miniwob_tiny_test": lambda: Benchmark(
         name="miniwob_tiny_test",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        is_multi_tab=False,
+        env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
             n_repeats=2,
@@ -224,7 +209,8 @@ BENCHMARKS = {
     "webarena": lambda: Benchmark(
         name="webarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        is_multi_tab=True,
+        env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
             max_steps=15,
             n_repeats=1,
@@ -235,7 +221,8 @@ BENCHMARKS = {
     "visualwebarena": lambda: Benchmark(
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        is_multi_tab=True,
+        env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
             max_steps=15,
             n_repeats=1,
@@ -246,7 +233,8 @@ BENCHMARKS = {
     "workarena_l1": lambda: Benchmark(
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena_l1"],
-        env_args_list=_make_env_args_list_from_workarena_curriculum(
+        is_multi_tab=False,
+        env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l1",
             task_category_filter=None,
             meta_seed=42,  # meta seed for evaluation curriculum
@@ -259,7 +247,8 @@ BENCHMARKS = {
     "workarena_l2_agent_curriculum_eval": lambda: Benchmark(
         name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
-        env_args_list=_make_env_args_list_from_workarena_curriculum(
+        is_multi_tab=True,
+        env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l2",
             task_category_filter=None,
             meta_seed=42,  # meta seed for evaluation curriculum
@@ -271,7 +260,8 @@ BENCHMARKS = {
     "workarena_l3_agent_curriculum_eval": lambda: Benchmark(
         name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
-        env_args_list=_make_env_args_list_from_workarena_curriculum(
+        is_multi_tab=True,
+        env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l3",
             task_category_filter=None,
             meta_seed=42,  # meta seed for evaluation curriculum
@@ -283,7 +273,8 @@ BENCHMARKS = {
     "assistantbench": lambda: Benchmark(
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        is_multi_tab=True,
+        env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
             ),
@@ -294,62 +285,3 @@ BENCHMARKS = {
         task_metadata=task_metadata("assistantbench"),
     ),
 }
-
-
-def _make_env_args_list_from_workarena_curriculum(
-    level: Literal["l1", "l2", "l3"],
-    task_category_filter: str,
-    meta_seed: int,
-    max_steps: int,
-    curriculum_type: Literal["human", "agent"],
-    seeds_l1: int = 10,
-):
-    """
-    Returns a WorkArena predefined task curriculum (e.g., task and seed combination).
-    """
-    assert level in ("l1", "l2", "l3")
-    assert curriculum_type in ("human", "agent")
-
-    env_args_list = []
-
-    from browsergym.workarena import get_all_tasks_agents
-
-    all_task_tuples = get_all_tasks_agents(
-        filter=f"{level}.{task_category_filter}" if task_category_filter else level,
-        meta_seed=meta_seed,
-        is_agent_curriculum=(curriculum_type == "agent"),
-        n_seed_l1=seeds_l1,
-    )
-
-    for task, seed in all_task_tuples:
-        task_name = task.get_task_id()
-        env_args_list.append(EnvArgs(task_name=task_name, task_seed=seed, max_steps=max_steps))
-
-    return env_args_list
-
-
-def _make_env_args_list_from_repeat_tasks(
-    task_list: list[str], max_steps: int, n_repeats: int, seeds_rng: np.random.RandomState
-):
-    """
-    Generates a list of `len(task_list)` time `n_repeats` environments arguments, using randomly generated seeds.
-    """
-    env_args_list = []
-    for task in task_list:
-        for seed in seeds_rng.randint(low=0, high=SEED_MAX, size=n_repeats):
-            env_args_list.append(
-                EnvArgs(
-                    task_name=task,
-                    task_seed=int(seed),
-                    max_steps=max_steps,
-                    headless=True,
-                    record_video=False,
-                    wait_for_user_message=False,
-                    viewport=None,
-                    slow_mo=None,
-                    storage_state=None,
-                    task_kwargs=None,
-                )
-            )
-
-    return env_args_list

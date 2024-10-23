@@ -7,17 +7,12 @@ import numpy as np
 from browsergym.core.action.base import AbstractActionSet
 from browsergym.experiments.agent import Agent
 from browsergym.experiments.benchmark import (
-    BENCHMARKS,
+    DEFAULT_BENCHMARKS,
     Benchmark,
     HighLevelActionSetArgs,
-    _make_env_args_list_from_repeat_tasks,
 )
-from browsergym.experiments.loop import (
-    AbstractAgentArgs,
-    EnvArgs,
-    ExpArgs,
-    get_exp_result,
-)
+from browsergym.experiments.benchmark.utils import make_env_args_list_from_fixed_seeds
+from browsergym.experiments.loop import AbstractAgentArgs, ExpArgs, get_exp_result
 from browsergym.utils.obs import flatten_axtree_to_str
 
 
@@ -60,7 +55,7 @@ def test_build_benchmarks():
         "workarena_l3_agent_curriculum_eval": 235,
         "assistantbench": 214,
     }
-    for name, benchmark_builder in BENCHMARKS.items():
+    for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
         assert name == benchmark.name
         assert benchmark.env_args_list  # non-empty
@@ -71,7 +66,7 @@ def test_build_benchmarks():
 
 
 def test_benchmark_subset():
-    benchmark: Benchmark = BENCHMARKS["miniwob"]()
+    benchmark: Benchmark = DEFAULT_BENCHMARKS["miniwob"]()
 
     benchmark_subset = benchmark.subset_from_regexp(column="task_name", regexp="click")
     assert len(benchmark_subset.env_args_list) == 31 * 5
@@ -105,11 +100,10 @@ def test_run_mock_benchmark():
             retry_with_force=False,
             demo_mode="off",
         ),
-        env_args_list=_make_env_args_list_from_repeat_tasks(
+        env_args_list=make_env_args_list_from_fixed_seeds(
             task_list=["miniwob.click-test"],
             max_steps=5,
-            n_repeats=2,
-            seeds_rng=np.random.RandomState(42),
+            fixed_seeds=[0, 1],
         ),
     )
 
