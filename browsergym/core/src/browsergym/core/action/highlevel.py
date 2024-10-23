@@ -201,7 +201,23 @@ class HighLevelAction:
 class HighLevelActionSet(AbstractActionSet):
 
     # static class variables
-    ActionSubset = typing.Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
+    ActionSubset = typing.Literal[
+        "chat",
+        "infeas",
+        "bid",
+        "coord",
+        "nav",
+        "tab",
+        "miniwob_all",
+        "miniwob_shi17",
+        "miniwob_liu18",
+        "miniwob_humphreys22",
+        "webarena",
+        "visualwebarena",
+        "workarena",
+        "workarena++",
+        "custom",
+    ]
     DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]
 
     def __init__(
@@ -441,4 +457,6 @@ Only a single action can be provided at once."""
 
 # consistency checks
 assert "custom" not in ACTION_SUBSETS
-assert set(typing.get_args(HighLevelActionSet.ActionSubset)) == set(ACTION_SUBSETS.keys())
+assert set(typing.get_args(HighLevelActionSet.ActionSubset)) == set(
+    list(ACTION_SUBSETS.keys()) + ["custom"]
+)
