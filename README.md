@@ -12,7 +12,7 @@ https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3
 _Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)_
 
 BrowserGym includes the following benchmarks by default:
- - [MiniWob++](https://miniwob.farama.org/)
+ - [MiniWoB++](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena++](https://github.com/ServiceNow/WorkArena)
@@ -22,7 +22,7 @@ Designing new web benchmarks with BrowserGym is easy, and simply requires to inh
 
 ## Setup
 
-To install browsergym, you can install one of the following packages.
+To use browsergym, install one of the following packages:
 ```sh
 pip install browsergym  # (recommended) everything below
 pip install browsergym-experiment  # experiment utilities (agent, loop, benchmarks) + everything below
@@ -34,16 +34,17 @@ pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
 ```
 
-Then, a required step is to setup playwright by running
+Then setup playwright by running
 ```sh
 playwright install chromium
 ```
 
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
- - for miniwob, see [miniwob/README.md](browsergym/miniwob/README.md)
- - for webarena, see [webarena/README.md](browsergym/webarena/README.md)
- - for visualwebarena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
- - for workarena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - for MiniWoB++, see [miniwob/README.md](browsergym/miniwob/README.md)
+ - for WebArena, see [webarena/README.md](browsergym/webarena/README.md)
+ - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
+ - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
+ - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
 
 ### Development setup
 To install browsergym locally for development, use the following commands:
