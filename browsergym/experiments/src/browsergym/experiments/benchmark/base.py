@@ -123,7 +123,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         subsets=["bid", "coord"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
@@ -131,7 +131,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         subsets=["bid"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     # loosely from https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
@@ -139,21 +139,21 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         subsets=["coord"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     "workarena_l1": HighLevelActionSetArgs(
         subsets=["chat", "bid"],  # no need for infeasible action
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     "workarena": HighLevelActionSetArgs(
         subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     # from https://arxiv.org/abs/2307.13854
@@ -161,7 +161,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     # from https://arxiv.org/abs/2401.13649
@@ -169,14 +169,14 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         subsets=["chat", "infeas", "bid", "tab", "nav"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
     "assistantbench": HighLevelActionSetArgs(
         subsets=["chat", "bid", "tab", "nav"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
 }
