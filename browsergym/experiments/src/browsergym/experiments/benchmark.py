@@ -69,13 +69,13 @@ class Benchmark(DataClassJsonMixin):
         metadata_tasks = list(self.task_metadata["task_name"])
         assert all([env_args.task_name in metadata_tasks for env_args in self.env_args_list])
 
-    def subset_from_split(self, split: Literal["train", "eval", "test"]):
-        split_column = "split"
+    def subset_from_split(self, split: Literal["train", "valid", "test"]):
+        split_column = "browsergym_split"
 
         # check for a split column in metadata
         if not split_column in self.task_metadata.columns:
             raise NotImplementedError(
-                f"This benchmark does not provide train/eval/test {split_column} (missing split column in task metadata)"
+                f"This benchmark does not provide default train/valid/test splits (missing a {repr(split_column)} column in task metadata)"
             )
 
         # recover the target split
@@ -83,7 +83,7 @@ class Benchmark(DataClassJsonMixin):
 
         # check that the split exists (non-empty task list)
         if not sub_benchmark.env_args_list:
-            raise ValueError(f"The {split} split for this benchmark is empty.")
+            raise ValueError(f"The default {split} split for this benchmark is empty.")
 
         return sub_benchmark
 
