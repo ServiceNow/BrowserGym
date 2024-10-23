@@ -410,8 +410,8 @@ jobs:
           OPENAI_API_KEY: ""
         run: |
           pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
-  
-  workarena-fast-tests:
+
+  workarena-fast:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-22.04
     steps:
@@ -445,8 +445,8 @@ jobs:
           SNOW_INSTANCE_UNAME: ${{ secrets.SNOW_INSTANCE_UNAME }}
           SNOW_INSTANCE_PWD: ${{ secrets.SNOW_INSTANCE_PWD }}
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests
-    
-  scheduled-workarena-slow-tests:
+
+  scheduled-workarena-slow:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-22.04
     steps:
@@ -474,4 +474,3 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: ServiceNow/WorkArena
           event-type: dependency-update
-    
