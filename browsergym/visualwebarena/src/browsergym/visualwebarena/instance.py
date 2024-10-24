@@ -1,6 +1,10 @@
-import playwright.sync_api
+import logging
 import os
+
+import playwright.sync_api
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 ENV_VARS = ("SHOPPING", "REDDIT", "WIKIPEDIA", "HOMEPAGE", "CLASSIFIEDS", "CLASSIFIEDS_RESET_TOKEN")
@@ -30,12 +34,12 @@ class VisualWebArenaInstance:
         # import webarena on instantiation
         from visualwebarena.browser_env.env_config import (
             ACCOUNTS,
+            CLASSIFIEDS,
+            CLASSIFIEDS_RESET_TOKEN,
+            HOMEPAGE,
             REDDIT,
             SHOPPING,
             WIKIPEDIA,
-            HOMEPAGE,
-            CLASSIFIEDS,
-            CLASSIFIEDS_RESET_TOKEN,
         )
 
         self.urls = {
@@ -48,6 +52,29 @@ class VisualWebArenaInstance:
         self.classifieds_reset_token = CLASSIFIEDS_RESET_TOKEN
 
         self.credentials = ACCOUNTS
+
+    def full_reset(self):
+        reset_url = os.environ.get("VWA_FULL_RESET", None)
+
+        assert (
+            reset_url
+        ), f"Environment variable VWA_FULL_RESET is missing or empty, required for a full instance reset."
+
+        # Send the GET request to trigger the reset script
+        logger.info(f"VisualWebArena full instance reset in progress.")
+
+        # 5 minutes timeout (takes 2-3 minutes in practice)
+        # https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
+        response = requests.get(reset_url, timeout=(3.05, 5 * 60))
+
+        # Print the response from the server
+        logger.info(f"Reset status code: {response.status_code}")
+        logger.info(f"Reset response: {response.text}")
+
+        if not response.status_code == 200:
+            raise Exception(
+                f"Full instance reset failed ({response.status_code}): {response.status_code}"
+            )
 
     def check_status(self):
         """

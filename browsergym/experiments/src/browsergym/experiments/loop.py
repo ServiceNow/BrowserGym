@@ -34,15 +34,15 @@ SEED_MAX = 2 ^ 32  # arbitrary max value (exclusive), seems large enough
 @dataclass
 class EnvArgs(DataClassJsonMixin):
     task_name: str
-    task_seed: int = None
-    max_steps: int = None
+    task_seed: Optional[int] = None
+    max_steps: Optional[int] = None
     headless: bool = True
     record_video: bool = False
     wait_for_user_message: bool = False
-    viewport: dict = None  # use default value from BrowserGym
-    slow_mo: int = None  # use default value from BrowserGym
+    viewport: Optional[dict] = None  # use default value from BrowserGym
+    slow_mo: Optional[int] = None  # use default value from BrowserGym
     storage_state: Optional[str | Path | dict] = None
-    task_kwargs: dict = None  # use default value from BrowserGym
+    task_kwargs: Optional[dict] = None  # use default value from BrowserGym
 
     def make_env(self, action_mapping, exp_dir):
         extra_kwargs = {}

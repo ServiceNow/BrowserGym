@@ -2,6 +2,7 @@ import os
 from typing import Optional, Tuple
 
 import playwright.sync_api
+
 from browsergym.core.task import AbstractBrowserTask
 
 

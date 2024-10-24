@@ -1,7 +1,10 @@
-import playwright.sync_api
+import logging
 import os
+
+import playwright.sync_api
 import requests
 
+logger = logging.getLogger(__name__)
 
 ENV_VARS = ("SHOPPING", "SHOPPING_ADMIN", "REDDIT", "GITLAB", "WIKIPEDIA", "MAP", "HOMEPAGE")
 
@@ -29,13 +32,13 @@ class WebArenaInstance:
         # import webarena on instanciation
         from webarena.browser_env.env_config import (
             ACCOUNTS,
+            GITLAB,
+            HOMEPAGE,
+            MAP,
             REDDIT,
             SHOPPING,
             SHOPPING_ADMIN,
-            GITLAB,
             WIKIPEDIA,
-            MAP,
-            HOMEPAGE,
         )
 
         self.urls = {
@@ -50,21 +53,58 @@ class WebArenaInstance:
 
         self.credentials = ACCOUNTS
 
+    def full_reset(self):
+        reset_url = os.environ.get("WA_FULL_RESET", None)
+
+        assert (
+            reset_url
+        ), f"Environment variable WA_FULL_RESET is missing or empty, required for a full instance reset."
+
+        # Send the GET request to trigger the reset script
+        logger.info(f"WebArena full instance reset in progress.")
+
+        # 5 minutes timeout (takes 2-3 minutes in practice)
+        # https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
+        response = requests.get(reset_url, timeout=(3.05, 5 * 60))
+
+        # Print the response from the server
+        logger.info(f"Reset status code: {response.status_code}")
+        logger.info(f"Reset response: {response.text}")
+
+        if not response.status_code == 200:
+            raise Exception(
+                f"Full instance reset failed ({response.status_code}): {response.status_code}"
+            )
+
+        # warm-start the instance (navigate to every domain)
+        retries_left = 3
+        while retries_left:
+            retries_left -= 1
+            try:
+                self._check_is_reachable(timeout=60)  # 60 seconds, cold starting might be slow
+                break
+            except Exception as e:
+                if not retries_left:
+                    raise
+                logger.info(
+                    f"Instance unresponsive after reset, retrying ({retries_left} retries left)\n{e}"
+                )
+
     def check_status(self):
         """
         Check the status of the instance. Raises an error if the instance is not ready to be used.
 
         """
-        self._check_is_reachable()
+        self._check_is_reachable(timeout=10)  # 10 seconds
 
-    def _check_is_reachable(self):
+    def _check_is_reachable(self, timeout: int):
         """
         Test that every website is reachable.
 
         """
         for site, url in self.urls.items():
             try:
-                requests.get(url, timeout=5000)  # 5 secs
+                requests.get(url, timeout=timeout)
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
                 raise RuntimeError(
                     f'WebArena site "{site}" ({url}) is not reacheable. Please check the URL.'

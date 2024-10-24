@@ -1,8 +1,10 @@
 import dataclasses
+import os
 import re
 import tempfile
 
 import numpy as np
+import pytest
 
 from browsergym.core.action.base import AbstractActionSet
 from browsergym.experiments.agent import Agent
@@ -90,6 +92,67 @@ def test_benchmark_subset():
     assert dict_1 == dict_2
 
 
+def test_miniwob_benchmark_reset():
+    MINIWOB_URL = os.environ["MINIWOB_URL"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["miniwob"]()
+
+        benchmark.prepare_backends()
+
+        del os.environ["MINIWOB_URL"]
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+
+        os.environ["MINIWOB_URL"] = ""
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+    finally:
+        os.environ["MINIWOB_URL"] = MINIWOB_URL
+
+
+def test_assistantbench_benchmark_reset():
+    benchmark: Benchmark = DEFAULT_BENCHMARKS["assistantbench"]()
+    benchmark.prepare_backends()
+
+
+@pytest.mark.skip
+def test_webarena_benchmark_reset():
+    WA_FULL_RESET = os.environ["WA_FULL_RESET"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
+
+        benchmark.prepare_backends()
+
+        del os.environ["WA_FULL_RESET"]
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+
+        os.environ["WA_FULL_RESET"] = "http://localhost:12345/reset"
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+    finally:
+        os.environ["WA_FULL_RESET"] = WA_FULL_RESET
+
+
+@pytest.mark.skip
+def test_visualwebarena_benchmark_reset():
+    VWA_FULL_RESET = os.environ["VWA_FULL_RESET"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["visualwebarena"]()
+
+        benchmark.prepare_backends()
+
+        del os.environ["VWA_FULL_RESET"]
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+
+        os.environ["VWA_FULL_RESET"] = "http://localhost:12345/reset"
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+    finally:
+        os.environ["VWA_FULL_RESET"] = VWA_FULL_RESET
+
+
 def test_run_mock_benchmark():
     benchmark = Benchmark(
         name="miniwob_click_test",
@@ -101,6 +164,7 @@ def test_run_mock_benchmark():
             demo_mode="off",
         ),
         is_multi_tab=False,
+        backends=["miniwob"],
         env_args_list=make_env_args_list_from_fixed_seeds(
             task_list=["miniwob.click-test"],
             max_steps=5,
