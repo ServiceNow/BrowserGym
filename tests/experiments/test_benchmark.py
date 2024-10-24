@@ -110,6 +110,11 @@ def test_miniwob_benchmark_reset():
         os.environ["MINIWOB_URL"] = MINIWOB_URL
 
 
+def test_assistantbench_benchmark_reset():
+    benchmark: Benchmark = DEFAULT_BENCHMARKS["assistantbench"]()
+    benchmark.prepare_backends()
+
+
 @pytest.mark.skip
 def test_webarena_benchmark_reset():
     WA_FULL_RESET = os.environ["WA_FULL_RESET"]
