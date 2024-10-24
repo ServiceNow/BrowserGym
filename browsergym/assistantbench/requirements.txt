@@ -1,4 +1,4 @@
-browsergym-core==0.10.1
+browsergym-core==0.10.2
 datasets
 scipy
 numpy
