@@ -1,5 +1,6 @@
 import fnmatch
 import logging
+import typing
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 
@@ -49,13 +50,16 @@ class HighLevelActionSetArgs(DataClassJsonMixin):
         )
 
 
+BenchmarkBackend = Literal["miniwob", "webarena", "visualwebarena", "workarena", "assistantbench"]
+
+
 @dataclass
 class Benchmark(DataClassJsonMixin):
     name: str
     high_level_action_set_args: HighLevelActionSetArgs
     is_multi_tab: bool
     env_args_list: list[EnvArgs]
-    full_reset_script: Optional[str]
+    backends: list[BenchmarkBackend]
     task_metadata: Optional[pd.DataFrame] = field(
         default_factory=lambda: None,
         metadata=config(
@@ -74,6 +78,57 @@ class Benchmark(DataClassJsonMixin):
         # make sure all tasks in env_args are in the metadata
         metadata_tasks = list(self.task_metadata["task_name"])
         assert all([env_args.task_name in metadata_tasks for env_args in self.env_args_list])
+        # check backend values
+        assert all([backend in typing.get_args(BenchmarkBackend) for backend in self.backends])
+
+    def prepare_backends(self):
+        for backend in self.backends:
+            match backend:
+                case "miniwob":
+                    # register environments
+                    import browsergym.miniwob
+
+                    # check setup
+                    browsergym.miniwob.environment_variables_precheck()
+
+                case "webarena":
+                    # register environments
+                    import browsergym.webarena
+
+                    # full reset the instance (requires environment variables properly set up)
+                    from browsergym.webarena.instance import WebArenaInstance
+
+                    default_instance = WebArenaInstance()
+                    default_instance.full_reset()
+
+                case "visualwebarena":
+                    # register environments
+                    import browsergym.visualwebarena
+
+                    # full reset the instance (requires environment variables properly set up)
+                    from browsergym.visualwebarena.instance import (
+                        VisualWebArenaInstance,
+                    )
+
+                    default_instance = VisualWebArenaInstance()
+                    default_instance.full_reset()
+
+                case "workarena":
+                    # register environments
+                    import browsergym.workarena
+
+                    # check server status
+                    from browsergym.workarena.instance import SNowInstance
+
+                    default_instance = SNowInstance()
+                    default_instance.check_status()
+
+                case "assistantbench":
+                    # register environments
+                    import browsergym.assistantbench
+
+                case _:
+                    raise ValueError(f"Unknown benchmark backend {repr(backend)}")
 
     def subset_from_split(self, split: Literal["train", "valid", "test"]):
         split_column = "browsergym_split"
@@ -107,7 +162,7 @@ class Benchmark(DataClassJsonMixin):
             name=f"{self.name}[{column}=/{regexp}/]",
             high_level_action_set_args=self.high_level_action_set_args,
             is_multi_tab=self.is_multi_tab,
-            full_reset_script=self.full_reset_script,
+            backends=self.backends,
             env_args_list=[
                 env_args
                 for env_args in self.env_args_list
@@ -193,7 +248,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
-        full_reset_script=None,
+        backends=["miniwob"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
             max_steps=10,
@@ -206,7 +261,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob_tiny_test",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
-        full_reset_script=None,
+        backends=["miniwob"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
@@ -219,10 +274,7 @@ DEFAULT_BENCHMARKS = {
         name="webarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
-        full_reset_script="""\
-import browsergym.webarena.instance
-browsergym.webarena.instance.WebArenaInstance().full_reset()
-""",
+        backends=["webarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
             max_steps=15,
@@ -235,10 +287,7 @@ browsergym.webarena.instance.WebArenaInstance().full_reset()
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         is_multi_tab=True,
-        full_reset_script="""\
-import browsergym.visualwebarena.instance
-browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
-""",
+        backends=["visualwebarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
             max_steps=15,
@@ -251,7 +300,7 @@ browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         is_multi_tab=False,
-        full_reset_script=None,
+        backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l1",
             task_category_filter=None,
@@ -266,7 +315,7 @@ browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
         name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
-        full_reset_script=None,
+        backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l2",
             task_category_filter=None,
@@ -280,7 +329,7 @@ browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
         name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
-        full_reset_script=None,
+        backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l3",
             task_category_filter=None,
@@ -294,7 +343,7 @@ browsergym.visualwebarena.instance.VisualWebArenaInstance().full_reset()
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
         is_multi_tab=True,
-        full_reset_script=None,
+        backends=["assistantbench"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
