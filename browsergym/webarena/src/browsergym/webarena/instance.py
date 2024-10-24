@@ -63,9 +63,9 @@ class WebArenaInstance:
         # Send the GET request to trigger the reset script
         logger.info(f"WebArena full instance reset in progress.")
 
-        # 5 minutes timeout (takes 2-3 minutes in practice)
+        # 10 minutes timeout (takes about 4 minutes in practice)
         # https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
-        response = requests.get(reset_url, timeout=(3.05, 5 * 60))
+        response = requests.get(reset_url, timeout=(3.05, 10 * 60))
 
         # Print the response from the server
         logger.info(f"Reset status code: {response.status_code}")
