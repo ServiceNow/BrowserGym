@@ -171,10 +171,10 @@ class ElementEvaluator(StepEvaluator):
 
     @ staticmethod
     def element_value_exact_match(input_answer, reference_answer, input_netloc, reference_netloc):
-        if reference_netloc != input_netloc:
-            # print("reference_netloc:", reference_netloc,
-            #       "input_netloc:", input_netloc)
-            return 0
+        # if reference_netloc != input_netloc:
+        #     # print("reference_netloc:", reference_netloc,
+        #     #       "input_netloc:", input_netloc)
+        #     return 0
         result_score = MatchFunction.exact_match(
             input_answer, reference_answer)
         return result_score

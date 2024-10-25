@@ -1,2 +1,4 @@
-browsergym-core==0.8.0
-libwebarena==0.0.3
+browsergym-core==0.13.3
+openai
+bs4
+lxml

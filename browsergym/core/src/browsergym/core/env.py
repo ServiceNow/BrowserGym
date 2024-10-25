@@ -267,6 +267,12 @@ class BrowserEnv(gym.Env, ABC):
             "browsergym_page_activated", lambda source: self._activate_page_from_js(
                 source["page"])
         )
+
+        self.context.expose_binding(
+            "handleEvent", lambda source,
+            selector, event_type,element_text: self._handle_event(selector, event_type,element_text)
+        )
+
         self.context.add_init_script(
             r"""
 window.browsergym_page_activated();
@@ -396,11 +402,16 @@ document.addEventListener("visibilitychange", () => {
         if hasattr(self.task, 'webcanvas'):
             logger.debug(f"Initiating  webcanvas task validation")
             # extract reward, done, user_message, info (task-specific)
-            reward, done, user_message, task_info = self.task.validate(
-                self.page, self.chat.messages, action)
-            logger.info(f"WebCanvas task validation result:\n{self.task.evaluate_result}")
-            info["task_info"] = task_info
-            info["webcanvas_result"] = self.task.evaluate_result
+            self.events = self.task.events
+            self._event_listener(
+                [event["selector"] for event in self.events if event and event["selector"] and event["status"] == False])
+            
+            # reward, done, user_message, task_info = self.task.validate(
+            #     self.page, self.chat.messages, action)
+            # logger.info(f"WebCanvas task validation result:\n{
+            #             self.task.evaluate_result}")
+            # info["task_info"] = task_info
+            # info["webcanvas_result"] = self.task.evaluate_result
 
         # try to execute the action
         logger.debug(f"Executing action")
@@ -443,12 +454,14 @@ document.addEventListener("visibilitychange", () => {
         self._wait_for_user_message()
         logger.debug(f"User message done")
 
-        if not hasattr(self.task, 'webcanvas'):
-            logger.debug(f"Initiating task validation")
-            # extract reward, done, user_message, info (task-specific)
-            reward, done, user_message, task_info = self._task_validate()
-            info["task_info"] = task_info
-            logger.debug(f"Task validation done")
+        # if not hasattr(self.task, 'webcanvas'):
+        logger.debug(f"Initiating task validation")
+        # extract reward, done, user_message, info (task-specific)
+        reward, done, user_message, task_info = self._task_validate()
+        logger.info(f"WebCanvas task validation result:\n{
+                        self.task.evaluate_result}")
+        info["task_info"] = task_info
+        logger.debug(f"Task validation done")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -472,7 +485,8 @@ document.addEventListener("visibilitychange", () => {
         prev_page_history = self.page_history.copy()
         # call validate
         reward, done, user_message, info = self.task.validate(
-            self.page, self.chat.messages)
+            self.page, self.chat.messages,self.last_action)
+            # info["webcanvas_result"] = self.task.evaluate_result
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
             logger.debug(
@@ -602,3 +616,41 @@ document.addEventListener("visibilitychange", () => {
         }
 
         return obs
+
+    def _event_listener(self, selectors):
+        """
+        Add a universal event listener to specified selectors to capture various event types
+        :param page: Current page object
+        :param selectors: List of selectors to listen to
+        """
+        self.page.evaluate(
+            """
+            ({selectors}) => {
+                selectors.forEach((selector) => {
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        const allEvents = [
+                            'click', 'input', 'change', 'keydown', 'keyup', 
+                            'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+                        ];
+                        allEvents.forEach((eventType) => {
+                            element.addEventListener(eventType, (event) => {
+                                const elementText = event.target.textContent || null;
+                                window.handleEvent(selector, eventType, elementText);
+                            }, true); // 'true' indicates capture phase
+                        });
+                    }
+                });
+            }
+            """,
+            {"selectors": selectors}
+        )
+
+    def _handle_event(self, selector, event_type, element_text=None):
+        logger.debug(f"Element with selector '{selector}' triggered '{
+                     event_type}' event, text content: {element_text}")
+        for idx, event in enumerate(self.events):
+            if event and event["selector"] == selector:
+                self.events[idx]["status"] = True
+                self.events[idx]["target_value"] = element_text if element_text else ""
+        self.task.update_events(self.events)

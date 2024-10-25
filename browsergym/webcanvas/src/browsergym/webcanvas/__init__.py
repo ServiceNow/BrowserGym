@@ -1,13 +1,12 @@
 from browsergym.core.registration import register_task
 
-# register the WebArena benchmark
+# register the WebCanvas benchmark
 from . import config, task
 
 ALL_WEBCANVAS_TASK_IDS = []
 
-# register the WebArena benchmark
 for task_id in config.TASK_IDS:
-    gym_id = f"webcanvas.{task_id}"
+    gym_id = f"webcanvas.mind2web-live.{task_id}"
     register_task(
         gym_id,
         task.GenericWebCanvasTask,

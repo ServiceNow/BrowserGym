@@ -36,6 +36,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         self.step_score_rate: str = None
         self.match_result: str = None
         self.task_finish: bool = False
+        self.activate_element = None
 
         if task_id is None:
             raise ValueError(
@@ -45,7 +46,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         # read the list of all WebCanvas task configs
         import browsergym.webcanvas as wcs
         all_configs_str = importlib.resources.files(wcs).joinpath(
-            "data/mind2web-test_104tasks_20240528.json").read_text()
+            "data/mind2web-train_130.json").read_text()
         all_task_configs = json.loads(all_configs_str)
         all_task = WebCanvasInstance.read_task_configs(all_task_configs)
         if task_id is not None and task_id < len(all_task):
@@ -72,6 +73,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         self.reference_evaluate_steps = reference_evaluate_steps
         start_url = start_url if start_url else self.start_url
         page.goto(start_url, timeout=10000)
+        self._init_task_events()
         return self.goal, {}
 
     def teardown(self) -> None:
@@ -104,18 +106,37 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         step_action_info["evaluation"] = []
 
         actions = WebCanvasInstance.parse_bid_from_action(action)
+        # if len(actions) > 0:
+        #     for action_type, bid, target_value in actions:
+        #         locator = None
+        #         # if bid != '':
+        #         #     try:
+        #         #         locator = self.get_element_by_bid(page, bid)
+        #         #     except Exception as e:
+        #         #         logger.warning(f"warning:{e}")
+        #         #         locator = None
+        #         self.evaluaion_step, self.step_score_rate, self.match_result, self.task_finished = WebCanvasInstance.evaluate(
+        #             page, locator, target_value, self.evaluaion_step, self.reference_evaluate_steps)
+
+        #         step_action_info["evaluation"].append(
+        #             {
+        #                 "action_type": action_type,
+        #                 "bid": bid,
+        #                 "target_value": target_value,
+        #                 "step_score_rate": self.step_score_rate,
+        #                 "match_result": self.match_result,
+        #                 "task_status": self.task_finished
+        #             }
+        #         )
+
+        #         if self.task_finished:
+        #             done = True
+        #             break
         if len(actions) > 0:
             for action_type, bid, target_value in actions:
-                locator = None
-                if bid != '':
-                    try:
-                        locator = self.get_element_by_bid(page, bid)
-                    except Exception as e:
-                        logger.warning(f"warning:{e}")
-                        locator = None
-                self.evaluaion_step, self.step_score_rate, self.match_result, self.task_finished = WebCanvasInstance.evaluate(
-                    page, locator, target_value, self.evaluaion_step, self.reference_evaluate_steps)
-                
+                self.evaluaion_step, self.step_score_rate, self.match_result, self.task_finished = WebCanvasInstance.evaluate_events(
+                    page, self.evaluaion_step, self.task_events, target_value, self.reference_evaluate_steps)
+
                 step_action_info["evaluation"].append(
                     {
                         "action_type": action_type,
@@ -126,12 +147,10 @@ class GenericWebCanvasTask(AbstractBrowserTask):
                         "task_status": self.task_finished
                     }
                 )
-
                 if self.task_finished:
                     done = True
                     break
-                
-
+            print(self.task_events)
         self.trace_info.append(step_action_info)
         return reward, done, msg, info
 
@@ -176,3 +195,29 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         if scroll_into_view:
             elem.scroll_into_view_if_needed(timeout=500)
         return elem
+
+    @property
+    def events(self):
+        return self.task_events
+
+    def _init_task_events(self):
+        self.task_events = []
+        for evaluation_step in self.reference_evaluate_steps:
+            event = {}
+            if evaluation_step["match_function"] in ["element_path_exactly_match", "element_path_included_match"]:
+                event["selector"] = evaluation_step['reference_answer']
+                event["target_value"] = ""
+                event["reference_value"] = ""
+                event["status"] = False
+            elif evaluation_step["match_function"] in ["element_value_exactly_match", "element_value_semantic_match"]:
+                event["selector"] = evaluation_step.get('path')
+                event["target_value"] = ""
+                event["reference_value"] = evaluation_step['reference_answer']
+                event["status"] = False
+            self.task_events.append(event)
+
+    def update_events(self, agent_event):
+        for ix, event in enumerate(agent_event):
+            if event and event['status']:
+                self.task_events[ix]["status"] = event['status']
+                self.task_events[ix]["target_value"] = event['target_value']
