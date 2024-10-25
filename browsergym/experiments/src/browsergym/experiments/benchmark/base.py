@@ -133,8 +133,6 @@ class Benchmark(DataClassJsonMixin):
                     # register environments
                     import weblinx_browsergym
 
-                    weblinx_browsergym.register_weblinx_tasks()
-
                 case _:
                     raise ValueError(f"Unknown benchmark backend {repr(backend)}")
 
