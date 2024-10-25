@@ -17,6 +17,7 @@ BrowserGym includes the following benchmarks by default:
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena++](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
+ - [GAIA](https://huggingface.co/gaia-benchmark)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -32,6 +33,7 @@ pip install browsergym-webarena  # core + webarena
 pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
+pip install browsergym-gaia  # core + GAIA
 ```
 
 Then setup playwright by running

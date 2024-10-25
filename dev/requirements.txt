@@ -11,4 +11,5 @@ tenacity
 -e ../browsergym/visualwebarena # local package
 -e ../browsergym/experiments # local package
 -e ../browsergym/assistantbench # local package
+-e ../browsergym/gaia # local package
 browsergym-workarena

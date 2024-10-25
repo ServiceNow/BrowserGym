@@ -2,27 +2,32 @@ from typing import Dict, Tuple
 
 from datasets import load_dataset
 from playwright.sync_api import Page
-
 from browsergym.core.task import AbstractBrowserTask
 
-from .evaluation.evaluator import question_scorer
+from browsergym.gaia.src.browsergym.evaluation.evaluator import question_scorer
 from browsergym.utils.utils import add_prediction_to_jsonl
 
 # Load dataset
 
-DATA_DATASET = "AssistantBench/AssistantBench"
-all_tasks = load_dataset(DATA_DATASET, trust_remote_code=True)
+DATA_DATASET = "gaia-benchmark/GAIA"
+all_tasks = load_dataset(DATA_DATASET, "2023_all", trust_remote_code=True)
 
 
 # Extract answers and tasks for validation and test splits
 def extract_data(split_name: str) -> Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]:
     return (
         {
-            f"{split_name}.{i}": row["answer"] if row["answer"] is not None else ""
+            f"{split_name}.{i}": row["Final answer"] if row["Final answer"] is not None else ""
             for i, row in enumerate(all_tasks[split_name])
         },
-        {f"{split_name}.{i}": row["task"] for i, row in enumerate(all_tasks[split_name])},
-        {f"{split_name}.{i}": row["id"] for i, row in enumerate(all_tasks[split_name])},
+        {f"{split_name}.{i}": row["Question"] for i, row in enumerate(all_tasks[split_name])},
+        {f"{split_name}.{i}": row["task_id"] for i, row in enumerate(all_tasks[split_name])},
+        {
+            f"{split_name}.{i}": {
+                k: v for k, v in row.items() if k not in {"task_id", "Question", "Final answer"}
+            }
+            for i, row in enumerate(all_tasks[split_name])
+        },
     )
 
 
@@ -34,21 +39,23 @@ def get_implementation_testing_data() -> Tuple[Dict[str, str], Dict[str, str], D
             "imp.0": "What is the weather in Paris yesterday in Celsius? Answer with the number only."
         },
         {"imp.0": "test_imp_id_0"},
+        {"imp.0": {}},
     )
 
 
 # Combine dev, test, and implementation-specific testing splits
-gold_answers_dev, tasks_dev, ids_dev = extract_data("validation")
-gold_answers_test, tasks_test, ids_test = extract_data("test")
-gold_answers_impl_testing, tasks_test_impl_testing, ids_imp_testing = (
+gold_answers_dev, tasks_dev, ids_dev, metadata_dev = extract_data("validation")
+gold_answers_test, tasks_test, ids_test, metadata_test = extract_data("test")
+gold_answers_impl_testing, tasks_test_impl_testing, ids_imp_testing, metadata_imp = (
     get_implementation_testing_data()
 )
 gold_answers = {**gold_answers_dev, **gold_answers_test, **gold_answers_impl_testing}
 tasks = {**tasks_dev, **tasks_test, **tasks_test_impl_testing}
 ids = {**ids_dev, **ids_test, **ids_imp_testing}
+metadatas = {**metadata_dev, **metadata_test, **metadata_imp}
 
 
-class AssistantBenchTask(AbstractBrowserTask):
+class GAIATask(AbstractBrowserTask):
 
     @classmethod
     def get_task_id(cls) -> str:
@@ -69,7 +76,8 @@ class AssistantBenchTask(AbstractBrowserTask):
         self.start_url = "https://google.com"
         self.goal = tasks[str(self.task_id)]
         self.gold = gold_answers[str(self.task_id)]
-        self.ab_task_id = ids[self.task_id]
+        self.gaia_task_id = ids[self.task_id]
+        self.metadata = metadatas[self.task_id]
         self.output_file_path = output_file_path
 
     def setup(self, page: Page) -> Tuple[str, dict]:
@@ -86,10 +94,10 @@ class AssistantBenchTask(AbstractBrowserTask):
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             done = True
             prediction = chat_messages[-1]["message"]
-            accuracy, has_ans = question_scorer(prediction, self.gold)
+            accuracy, has_ans = questieon_scorer(prediction, self.gold)
             if self.output_file_path:
                 add_prediction_to_jsonl(
-                    self.output_file_path, self.ab_task_id, prediction, True
+                    self.output_file_path, self.gaia_task_id, prediction, True
                 )  # save answer to file
 
         return accuracy, done, msg, info

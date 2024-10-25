@@ -145,5 +145,6 @@ results/
 
 .vscode/launch.json
 
-# assistantbench
+# hidden-test set predictions
 tests/assistantbench/assistantbench-predictions-test.jsonl
+tests/assistantbench/gaia-predictions-test.jsonl

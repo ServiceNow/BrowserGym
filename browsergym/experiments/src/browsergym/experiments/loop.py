@@ -800,7 +800,8 @@ def _get_env_name(task_name: str):
         import browsergym.visualwebarena
     elif task_name.startswith("assistantbench"):
         import browsergym.assistantbench
-
+    elif task_name.startswith("gaia"):
+        import browsergym.gaia
     return f"browsergym/{task_name}"
 
 
