@@ -181,20 +181,20 @@ class ElementEvaluator(StepEvaluator):
 
     @ staticmethod
     def element_value_include_match(input_answer, reference_answer, input_netloc, reference_netloc):
-        if reference_netloc != input_netloc:
-            # print("reference_netloc:", reference_netloc,
-            #       "input_netloc:", input_netloc)
-            return 0
+        # if reference_netloc != input_netloc:
+        #     # print("reference_netloc:", reference_netloc,
+        #     #       "input_netloc:", input_netloc)
+        #     return 0
         result_score = MatchFunction.include_match(
             input_answer, reference_answer)
         return result_score
 
     @ staticmethod
     def element_value_semantic_match(input_answer, semantic_method, input_netloc, reference_netloc=0):
-        if reference_netloc != input_netloc:
-            # print("reference_netloc:", reference_netloc,
-            #       "input_netloc:", input_netloc)
-            return 0
+        # if reference_netloc != input_netloc:
+        #     # print("reference_netloc:", reference_netloc,
+        #     #       "input_netloc:", input_netloc)
+        #     return 0
         if len(input_answer) == 0:
             return 0
         result_score = MatchFunction.semantic_match(

@@ -1,1 +1,2 @@
-TASK_IDS = range(104)
+TASK_TEST_IDS = range(104)
+TASK_TRAIN_IDS = range(130)

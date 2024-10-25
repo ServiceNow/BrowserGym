@@ -127,6 +127,13 @@ def step_event_evaluate(page, evaluate_steps, task_events, target_value):
                     return 1, event
         return 0, None
 
+    def check_event_by_element_value(events, element_value):
+        for event in events:
+            if event and event["target_value"] == element_value:
+                if event["status"]:
+                    return 1, event
+        return 0, None
+
     step_score = 0
     match_result = []
     for evaluate in evaluate_steps:
@@ -159,10 +166,10 @@ def step_event_evaluate(page, evaluate_steps, task_events, target_value):
                     else:
                         score = ElementEvaluator.element_value_exact_match(
                             event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
-                        print("score:",score)
+                        # print("score:",score)
                 else:
-                    score = ElementEvaluator.element_value_exact_match(
-                        target_value, evaluate["reference_answer"], input_netloc, evaluate["netloc"])
+                    score, _ = check_event_by_element_value(
+                        task_events, evaluate["reference_answer"])
 
             elif match_function == "element_value_included_match":
                 input_netloc = get_netloc(page.url)
@@ -175,8 +182,8 @@ def step_event_evaluate(page, evaluate_steps, task_events, target_value):
                         score = ElementEvaluator.element_value_include_match(
                             event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
                 else:
-                    score = ElementEvaluator.element_value_include_match(
-                        event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
+                    score, _ = check_event_by_element_value(
+                        task_events, evaluate["reference_answer"])
 
             elif match_function == "element_value_semantic_match":
                 input_netloc = get_netloc(page.url)
@@ -189,8 +196,8 @@ def step_event_evaluate(page, evaluate_steps, task_events, target_value):
                         score = ElementEvaluator.element_value_semantic_match(
                             event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
                 else:
-                    score = ElementEvaluator.element_value_semantic_match(
-                        event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
+                    score, _ = check_event_by_element_value(
+                        task_events, evaluate["reference_answer"])
 
             evaluate["score"] = max(evaluate["score"], score)
         if evaluate["score"] >= 1:

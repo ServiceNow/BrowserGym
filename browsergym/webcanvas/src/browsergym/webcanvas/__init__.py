@@ -5,7 +5,7 @@ from . import config, task
 
 ALL_WEBCANVAS_TASK_IDS = []
 
-for task_id in config.TASK_IDS:
+for task_id in config.TASK_TRAIN_IDS:
     gym_id = f"webcanvas.mind2web-live.{task_id}"
     register_task(
         gym_id,

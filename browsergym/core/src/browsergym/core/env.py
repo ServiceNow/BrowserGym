@@ -270,7 +270,7 @@ class BrowserEnv(gym.Env, ABC):
 
         self.context.expose_binding(
             "handleEvent", lambda source,
-            selector, event_type,element_text: self._handle_event(selector, event_type,element_text)
+            selector, event_type, element_text: self._handle_event(selector, event_type, element_text)
         )
 
         self.context.add_init_script(
@@ -401,11 +401,13 @@ document.addEventListener("visibilitychange", () => {
 
         if hasattr(self.task, 'webcanvas'):
             logger.debug(f"Initiating  webcanvas task validation")
-            # extract reward, done, user_message, info (task-specific)
             self.events = self.task.events
-            self._event_listener(
-                [event["selector"] for event in self.events if event and event["selector"] and event["status"] == False])
-            
+            selectors = [event["selector"]
+                         for event in self.events if event and event["selector"] and event["status"] == False]
+            element_value = [event["reference_value"]
+                             for event in self.events if event and event["reference_value"] and event["status"] == False]
+            self._event_listener(selectors, element_value)
+
             # reward, done, user_message, task_info = self.task.validate(
             #     self.page, self.chat.messages, action)
             # logger.info(f"WebCanvas task validation result:\n{
@@ -459,7 +461,7 @@ document.addEventListener("visibilitychange", () => {
         # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, task_info = self._task_validate()
         logger.info(f"WebCanvas task validation result:\n{
-                        self.task.evaluate_result}")
+            self.task.evaluate_result}")
         info["task_info"] = task_info
         logger.debug(f"Task validation done")
 
@@ -485,8 +487,8 @@ document.addEventListener("visibilitychange", () => {
         prev_page_history = self.page_history.copy()
         # call validate
         reward, done, user_message, info = self.task.validate(
-            self.page, self.chat.messages,self.last_action)
-            # info["webcanvas_result"] = self.task.evaluate_result
+            self.page, self.chat.messages, self.last_action)
+        # info["webcanvas_result"] = self.task.evaluate_result
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
             logger.debug(
@@ -617,40 +619,96 @@ document.addEventListener("visibilitychange", () => {
 
         return obs
 
-    def _event_listener(self, selectors):
+    # def _event_listener(self, selectors):
+    #     """
+    #     Add a universal event listener to specified selectors to capture various event types
+    #     :param page: Current page object
+    #     :param selectors: List of selectors to listen to
+    #     """
+    #     self.page.evaluate(
+    #         """
+    #         ({selectors}) => {
+    #             selectors.forEach((selector) => {
+    #                 const element = document.querySelector(selector);
+    #                 if (element) {
+    #                     const allEvents = [
+    #                         'click', 'input', 'change', 'keydown', 'keyup',
+    #                         'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+    #                     ];
+    #                     allEvents.forEach((eventType) => {
+    #                         element.addEventListener(eventType, (event) => {
+    #                             const elementText = event.target.textContent || null;
+    #                             window.handleEvent(selector, eventType, elementText);
+    #                         }, true); // 'true' indicates capture phase
+    #                     });
+    #                 }
+    #             });
+    #         }
+    #         """,
+    #         {"selectors": selectors}
+    #     )
+
+    def _event_listener(self, selectors: list = [], target_values: list = []):
         """
-        Add a universal event listener to specified selectors to capture various event types
+        Add event listeners to either specified selectors or globally across all elements.
         :param page: Current page object
-        :param selectors: List of selectors to listen to
+        :param selectors: Optional list of selectors to listen to. If None, will apply globally.
+        :param target_values: Optional list of text content values to filter events by, used for global listening.
         """
-        self.page.evaluate(
-            """
-            ({selectors}) => {
-                selectors.forEach((selector) => {
-                    const element = document.querySelector(selector);
-                    if (element) {
-                        const allEvents = [
-                            'click', 'input', 'change', 'keydown', 'keyup', 
-                            'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
-                        ];
-                        allEvents.forEach((eventType) => {
-                            element.addEventListener(eventType, (event) => {
-                                const elementText = event.target.textContent || null;
-                                window.handleEvent(selector, eventType, elementText);
-                            }, true); // 'true' indicates capture phase
-                        });
-                    }
-                });
-            }
-            """,
-            {"selectors": selectors}
-        )
+        if selectors:
+            # Specific selectors case
+            self.page.evaluate(
+                """
+                ({selectors}) => {
+                    selectors.forEach((selector) => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            const allEvents = [
+                                'click', 'input', 'change', 'keydown', 'keyup', 
+                                'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+                            ];
+                            allEvents.forEach((eventType) => {
+                                element.addEventListener(eventType, (event) => {
+                                    const elementText = event.target.textContent || '';
+                                    window.handleEvent(selector, eventType, elementText);
+                                }, true); // 'true' indicates capture phase
+                            });
+                        }
+                    });
+                }
+                """,
+                {"selectors": selectors}
+            )
+        elif target_values:
+
+            self.page.evaluate(
+                """
+                (targetValues) => {
+                    const allEvents = [
+                        'click', 'input', 'change', 'keydown', 'keyup', 
+                        'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+                    ];
+                    allEvents.forEach((eventType) => {
+                        document.addEventListener(eventType, (event) => {
+                            const elementText = event.target.textContent || '';
+                            if (targetValues.includes(elementText)) { 
+                                window.handleEvent(null, eventType, elementText); // No selector in this case
+                            }
+                        }, true); // 'true' indicates capture phase
+                    });
+                }
+                """,
+                target_values
+            )
 
     def _handle_event(self, selector, event_type, element_text=None):
         logger.debug(f"Element with selector '{selector}' triggered '{
                      event_type}' event, text content: {element_text}")
         for idx, event in enumerate(self.events):
             if event and event["selector"] == selector:
+                self.events[idx]["status"] = True
+                self.events[idx]["target_value"] = element_text if element_text else ""
+            elif event and event["reference_value"] == element_text:
                 self.events[idx]["status"] = True
                 self.events[idx]["target_value"] = element_text if element_text else ""
         self.task.update_events(self.events)

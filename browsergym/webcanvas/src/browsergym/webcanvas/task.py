@@ -46,7 +46,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         # read the list of all WebCanvas task configs
         import browsergym.webcanvas as wcs
         all_configs_str = importlib.resources.files(wcs).joinpath(
-            "data/mind2web-train_130.json").read_text()
+            "data/mind2web-live-train_130.json").read_text()
         all_task_configs = json.loads(all_configs_str)
         all_task = WebCanvasInstance.read_task_configs(all_task_configs)
         if task_id is not None and task_id < len(all_task):
@@ -150,7 +150,6 @@ class GenericWebCanvasTask(AbstractBrowserTask):
                 if self.task_finished:
                     done = True
                     break
-            print(self.task_events)
         self.trace_info.append(step_action_info)
         return reward, done, msg, info
 

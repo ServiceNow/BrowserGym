@@ -63,7 +63,7 @@
             {
                 "match_function_name": "element_value_exactly_match",
                 "content": {
-                    "path": "#main > div:nth-child(3) > section > div > p:nth-child(3) > a",
+        
                     "reference_answer": "View Full Menu",
                     "netloc": "amctheatres",
                     "url": "https://www.amctheatres.com/food-and-drink/dine-in/explore-menu"
