@@ -139,8 +139,7 @@ def flatten_dom_to_str(
                 # insert bid as first attribute
                 if not (
                     hide_all_bids
-                    or
-                    bid is None
+                    or bid is None
                     or (
                         hide_bid_if_invisible
                         and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
@@ -389,8 +388,7 @@ def flatten_axtree_to_str(
 
                 if not (
                     hide_all_bids
-                    or
-                    bid is None
+                    or bid is None
                     or (
                         hide_bid_if_invisible
                         and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
