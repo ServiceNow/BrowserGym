@@ -409,3 +409,43 @@ jobs:
           OPENAI_API_KEY: ""
         run: |
           pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
+
+
+  browsergym-gaia:
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Run browsergym-gaia Unit Tests
+        env:
+          VWA_CLASSIFIEDS: "${{ vars.VWA_CLASSIFIEDS }}"
+          VWA_CLASSIFIEDS_RESET_TOKEN: "${{ vars.VWA_CLASSIFIEDS_RESET_TOKEN }}"
+          VWA_SHOPPING: "${{ vars.VWA_SHOPPING }}"
+          VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
+          VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
+          VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
+        run: |
+          pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/gaia
