@@ -42,6 +42,7 @@ def flatten_dom_to_str(
     filter_som_only: bool = False,
     coord_decimals: int = 0,
     hide_bid_if_invisible: int = False,
+    hide_all_bids: bool = False,
 ) -> str:
     """Formats a DOM snapshot into a string text"""
 
@@ -137,6 +138,8 @@ def flatten_dom_to_str(
 
                 # insert bid as first attribute
                 if not (
+                    hide_all_bids
+                    or
                     bid is None
                     or (
                         hide_bid_if_invisible
@@ -294,6 +297,7 @@ def flatten_axtree_to_str(
     remove_redundant_static_text: bool = True,
     hide_bid_if_invisible: bool = False,
     hide_all_children: bool = False,
+    hide_all_bids: bool = False,
 ) -> str:
     """Formats the accessibility tree into a string text"""
     node_id_to_idx = {}
@@ -384,6 +388,8 @@ def flatten_axtree_to_str(
                     node_str = f"{node_role} {repr(node_name.strip())}"
 
                 if not (
+                    hide_all_bids
+                    or
                     bid is None
                     or (
                         hide_bid_if_invisible
