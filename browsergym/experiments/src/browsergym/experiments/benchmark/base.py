@@ -368,7 +368,7 @@ DEFAULT_BENCHMARKS = {
         backends=["gaia"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
-                metadata=task_metadata(","), filter={"browsergym_split": "valid|test"}
+                metadata=task_metadata("gaia"), filter={"browsergym_split": "valid|test"}
             ),
             max_steps=15,
             n_repeats=1,
