@@ -1,1 +1,2 @@
-from .base import DEFAULT_BENCHMARKS, Benchmark, HighLevelActionSetArgs
+from .base import Benchmark, HighLevelActionSetArgs
+from .configs import DEFAULT_BENCHMARKS
