@@ -108,7 +108,9 @@ class Benchmark(DataClassJsonMixin):
                     import browsergym.visualwebarena
 
                     # full reset the instance (requires environment variables properly set up)
-                    from browsergym.visualwebarena.instance import VisualWebArenaInstance
+                    from browsergym.visualwebarena.instance import (
+                        VisualWebArenaInstance,
+                    )
 
                     default_instance = VisualWebArenaInstance()
                     default_instance.full_reset()
@@ -129,9 +131,9 @@ class Benchmark(DataClassJsonMixin):
 
                 case "weblinx":
                     # register environments
-                    from weblinx_browsergym import register_weblinx_tasks
+                    import weblinx_browsergym
 
-                    register_weblinx_tasks()
+                    weblinx_browsergym.register_weblinx_tasks()
 
                 case _:
                     raise ValueError(f"Unknown benchmark backend {repr(backend)}")
@@ -247,10 +249,10 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         demo_mode="off",
     ),
     "weblinx": HighLevelActionSetArgs(
-        subsets=["chat", "bid"],
+        subsets=["weblinx"],
         multiaction=False,
         strict=False,
-        retry_with_force=False,
+        retry_with_force=True,
         demo_mode="off",
     ),
 }

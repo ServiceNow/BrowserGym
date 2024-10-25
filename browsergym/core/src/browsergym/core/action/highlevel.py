@@ -195,6 +195,23 @@ ACTION_SUBSETS = {
         send_msg_to_user,
         report_infeasible,
     ],
+    # from weblinx_browsergym
+    # https://github.com/McGill-NLP/agentlab-weblinx-mvp/blob/a91b6d19870c5187d252e70a2e2013511cc6f1d2/weblinx_browsergym/__init__.py#L274-L286
+    "weblinx": [
+        send_msg_to_user,  # say(speaker="assistant", utterance=[str]) -> send_msg_to_user(text=[str])
+        click,  # click(uid=[element id]) -> click(bid=[element id])
+        hover,  # hover(uid=[element id]) -> hover(bid=[element id])
+        fill,  # textinput(uid=[element id], value=[str]) -> fill(bid=[element id], value=[str])
+        # change(uid=[element], value=[str]) -> ❌
+        goto,  # load(url=[link]) -> goto(url=[link])
+        # submit(uid=[element]) -> click(bid=[element id])
+        scroll,  # scroll(x=[int x],y=[int y]) -> scroll(delta_x=[int x], delta_y=[int y])
+        # copy(uid=[element],text=[str]) -> ❌
+        # paste(uid=[element],text=[str]) -> ❌
+        new_tab,  # tabcreate() -> new_tab()
+        tab_close,  # tabremove(target=[tabId]) -> tab_close()
+        tab_focus,  # tabswitch(origin=[origin tabId],target=[target tabId]) -> tab_focus(index=[target tabid])
+    ],
 }
 
 
