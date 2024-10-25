@@ -5,7 +5,10 @@ import gymnasium as gym
 import pytest
 
 from browsergym.assistantbench.evaluation.evaluator import question_scorer
-from browsergym.experiments.benchmark.base import task_list_from_metadata, task_metadata
+from browsergym.experiments.benchmark.metadata.utils import (
+    task_list_from_metadata,
+    task_metadata,
+)
 
 __DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 
