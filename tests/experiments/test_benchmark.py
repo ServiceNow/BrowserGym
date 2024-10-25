@@ -8,11 +8,8 @@ import pytest
 
 from browsergym.core.action.base import AbstractActionSet
 from browsergym.experiments.agent import Agent
-from browsergym.experiments.benchmark import (
-    DEFAULT_BENCHMARKS,
-    Benchmark,
-    HighLevelActionSetArgs,
-)
+from browsergym.experiments.benchmark import Benchmark, HighLevelActionSetArgs
+from browsergym.experiments.benchmark.configs import DEFAULT_BENCHMARKS
 from browsergym.experiments.benchmark.utils import make_env_args_list_from_fixed_seeds
 from browsergym.experiments.loop import AbstractAgentArgs, ExpArgs, get_exp_result
 from browsergym.utils.obs import flatten_axtree_to_str
@@ -56,6 +53,7 @@ def test_build_benchmarks():
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
         "assistantbench": 214,
+        "weblinx": 36578,
     }
     for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
