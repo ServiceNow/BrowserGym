@@ -14,7 +14,7 @@ from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
-from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES, TEXT_MAX_LENGTH
+from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
 from .observation import (
     MarkingError,
     _post_extract,
@@ -131,21 +131,17 @@ class BrowserEnv(gym.Env, ABC):
                 "chat_messages": gym.spaces.Sequence(
                     gym.spaces.Dict(
                         {
-                            "role": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                            "message": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                            "role": Unicode(),
+                            "message": Unicode(),
                         }
                     )
                 ),
-                "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "goal": Unicode(),
                 "goal_object": gym.spaces.Sequence(AnyDict()),
-                "open_pages_urls": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
-                "open_pages_titles": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
+                "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                "open_pages_titles": gym.spaces.Sequence(Unicode()),
                 "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
-                "url": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "url": Unicode(),
                 "screenshot": AnyBox(
                     low=0,
                     high=255,
@@ -155,15 +151,15 @@ class BrowserEnv(gym.Env, ABC):
                 "dom_object": AnyDict(),
                 "axtree_object": AnyDict(),
                 "extra_element_properties": AnyDict(),
-                "focused_element_bid": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "last_action": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "last_action_error": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "focused_element_bid": Unicode(),
+                "last_action": Unicode(),
+                "last_action_error": Unicode(),
                 "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
             }
         )
 
         # action space
-        self.action_space = Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+        self.action_space = Unicode()
 
     def close(self):
         if self.task:
