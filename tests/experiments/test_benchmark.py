@@ -162,6 +162,7 @@ def test_run_mock_benchmark():
             demo_mode="off",
         ),
         is_multi_tab=False,
+        supports_parallel_seeds=True,
         backends=["miniwob"],
         env_args_list=make_env_args_list_from_fixed_seeds(
             task_list=["miniwob.click-test"],

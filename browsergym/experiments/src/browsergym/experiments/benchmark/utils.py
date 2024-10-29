@@ -1,9 +1,6 @@
-import io
-import pkgutil
 from typing import Literal
 
 import numpy as np
-import pandas as pd
 
 from browsergym.experiments.loop import SEED_MAX, EnvArgs
 
