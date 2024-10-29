@@ -197,7 +197,9 @@ class Benchmark(DataClassJsonMixin):
         # recover the task dependency graph, for tasks in the benchmark only
         task_dependencies = extract_sparse_task_dependency_graph_from_subset(
             task_subset=task_names,
-            parents=build_full_task_dependency_graph_from_metadata(metadata=self.task_metadata),
+            parents=build_full_task_dependency_graph_from_metadata(
+                task_metadata=self.task_metadata
+            ),
         )
 
         return task_dependencies
@@ -207,9 +209,10 @@ class Benchmark(DataClassJsonMixin):
         Returns a list of dependency graphs to be executed sequentially, typically with a full instance reset in-between.
         Ideally, a job scheduler should connect these graphs by injecting a reset task in-between each, which depends on all previous tasks being completed.
         """
+        task_dependencies = self.dependency_graph_over_tasks()
         env_args_dependencies = build_env_args_dependency_graphs(
             env_args_list=self.env_args_list,
-            task_metadata=self.task_metadata,
+            task_dependencies=task_dependencies,
             supports_parallel_seeds=self.supports_parallel_seeds,
         )
         return env_args_dependencies

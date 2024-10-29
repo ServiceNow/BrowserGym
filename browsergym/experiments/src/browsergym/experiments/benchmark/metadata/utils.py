@@ -74,7 +74,7 @@ def extract_sparse_task_dependency_graph_from_subset(
     subgraph_children = deepcopy(children)
 
     # prune the graph (node contraction)
-    for task_name in subgraph_parents.keys():
+    for task_name in parents.keys():
         # if task is not present in the target task subset, drop its node
         if task_name not in task_subset:
             # connect node's children to node's parents
@@ -97,7 +97,9 @@ def extract_sparse_task_dependency_graph_from_subset(
 
 
 def build_env_args_dependency_graphs(
-    env_args_list: list[EnvArgs], task_metadata: pd.DataFrame, supports_parallel_seeds: bool
+    env_args_list: list[EnvArgs],
+    task_dependencies: dict[str, list[str]],
+    supports_parallel_seeds: bool,
 ) -> list[dict[int, list[int]]]:
     """
     Returns a list of dependency graphs to be executed sequentially, typically with a full instance reset in-between.
@@ -107,6 +109,9 @@ def build_env_args_dependency_graphs(
     task_runs = defaultdict(list)
     for i, env_args in enumerate(env_args_list):
         task_runs[env_args.task_name].append(i)
+
+    # consistency check
+    assert all([task in task_dependencies for task in task_runs.keys()])
 
     # divide same-task runs into distinct splits if needed
     task_runs_splits = []
@@ -122,16 +127,19 @@ def build_env_args_dependency_graphs(
             # update task list to only those with remaining runs (seeds)
             task_runs = {task_name: runs for task_name, runs in task_runs.items() if runs}
 
-    # recover the full task dependency graph
-    task_parents, task_children = build_full_task_dependency_graph_from_metadata(task_metadata)
+    # recover the parent and child mappings of the task dependency graph
+    task_parents = task_dependencies
+    task_children = extract_graph_children(task_parents)
 
-    # for each split, build the marginal task dependency graph (task_name), then build the run dependency graph (env_args)
+    # for each split, build the task dependency subgraph (task_name nodes), then build the run dependency graph (env_args index nodes)
     run_parents_split = []
     for split in task_runs_splits:
         # build the task dependency graph (task_name nodes)
         split_task_names = list(split.keys())
-        split_task_parents, _ = extract_sparse_task_dependency_graph_from_subset(
-            task_subset=split_task_names, parents=task_parents, children=task_children
+        split_task_parents = extract_sparse_task_dependency_graph_from_subset(
+            task_subset=split_task_names,
+            parents=task_parents,
+            children=task_children,
         )
         # then, build the run dependency graph (env_args index nodes)
         split_run_parents = defaultdict(list)
