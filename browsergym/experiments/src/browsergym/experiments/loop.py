@@ -722,6 +722,22 @@ class ExpResult:
             self._logs = (self.exp_dir / "experiment.log").read_text()
         return self._logs
 
+    @property
+    def status(self):
+        """Return one of the following status:
+        * "done": completed with no error
+        * "error": completed with error
+        * "incomplete": not completed yet (may be pending or just stalled)
+        """
+        try:
+            summary_info = self.summary_info
+        except FileNotFoundError:
+            return "incomplete"
+
+        if summary_info.get("err_msg", None) is not None:
+            return "error"
+        return "done"
+
 
 EXP_RESULT_CACHE = {}
 
