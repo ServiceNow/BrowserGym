@@ -147,6 +147,7 @@ class Benchmark(DataClassJsonMixin):
                     metadata_path = cache_dir / "metadata.json"
 
                     if not metadata_path.exists():
+                        logger.info(f"Downloading metadata.json")
                         huggingface_hub.snapshot_download(
                             repo_id="McGill-NLP/weblinx-browsergym",
                             repo_type="dataset",
@@ -167,13 +168,13 @@ class Benchmark(DataClassJsonMixin):
                                 if not base_demo_dir.joinpath(demo_id).exists():
                                     # first, if zip file does not exist, download the zip file
                                     if not base_zip_dir.joinpath(f"{demo_id}.zip").exists():
+                                        logger.info(f"Downloading demonstrations_zip/{demo_id}.zip")
                                         huggingface_hub.snapshot_download(
                                             repo_id="McGill-NLP/weblinx-browsergym",
                                             repo_type="dataset",
                                             local_dir=cache_dir,
                                             allow_patterns=[f"demonstrations_zip/{demo_id}.zip"],
                                         )
-                                        logger.debug(f"Downloaded {demo_id}.zip to {base_zip_dir}")
 
                                     # then, unzip the file
                                     with zipfile.ZipFile(
