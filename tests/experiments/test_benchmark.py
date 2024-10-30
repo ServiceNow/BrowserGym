@@ -223,16 +223,19 @@ def test_dependency_graphs():
         ),
     )
 
+    # one task, two seeds
     task_dependencies = benchmark.dependency_graph_over_tasks()
     assert task_dependencies == {"miniwob.click-test": []}
 
     env_args_dependencies = benchmark.dependency_graphs_over_env_args()
     assert env_args_dependencies == [{0: [], 1: []}]
 
+    # change to no parallel seed support
     benchmark.supports_parallel_seeds = False
     env_args_dependencies = benchmark.dependency_graphs_over_env_args()
     assert env_args_dependencies == [{0: []}, {1: []}]
 
+    # webarena, 3 tasks x 1 seed
     benchmark = DEFAULT_BENCHMARKS["webarena"]().subset_from_regexp(
         column="task_name", regexp="^webarena\.[012]$"
     )
@@ -246,3 +249,23 @@ def test_dependency_graphs():
 
     env_args_dependencies = benchmark.dependency_graphs_over_env_args()
     assert env_args_dependencies == [{0: [], 1: [0], 2: [1]}]
+
+    # workarena L2, 2 task x (2 seeds, 1 seed)
+    benchmark = DEFAULT_BENCHMARKS["workarena_l2_agent_curriculum_eval"]().subset_from_regexp(
+        column="task_name",
+        regexp="^workarena\.servicenow\.workload-balancing-small-l2$|^workarena\.servicenow\.easy-expense-management-small-l2$",
+    )
+
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert task_dependencies == {
+        "workarena.servicenow.workload-balancing-small-l2": [],
+        "workarena.servicenow.easy-expense-management-small-l2": [],
+    }
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 1: [], 2: []}]
+
+    # change to no parallel seed support
+    benchmark.supports_parallel_seeds = False
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 2: []}, {1: []}]

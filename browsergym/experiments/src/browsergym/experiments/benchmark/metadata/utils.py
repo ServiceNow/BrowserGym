@@ -109,6 +109,7 @@ def build_env_args_dependency_graphs(
     task_runs = defaultdict(list)
     for i, env_args in enumerate(env_args_list):
         task_runs[env_args.task_name].append(i)
+    task_runs = dict(task_runs)
 
     # consistency check
     assert all([task in task_dependencies for task in task_runs.keys()])
@@ -147,6 +148,7 @@ def build_env_args_dependency_graphs(
             parent_tasks_runs = sum([split[parent] for parent in split_task_parents[task_name]], [])
             for run in runs:
                 split_run_parents[run].extend(parent_tasks_runs)
+        split_run_parents = dict(split_run_parents)
         run_parents_split.append(split_run_parents)
 
     return run_parents_split
