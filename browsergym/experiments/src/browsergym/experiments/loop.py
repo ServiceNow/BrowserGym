@@ -606,29 +606,29 @@ class ExpResult:
         if self._steps_info.get(step, None) is None:
             with gzip.open(self.exp_dir / f"step_{step}.pkl.gz", "rb") as f:
                 self._steps_info[step] = pickle.load(f)
-            if "screenshot" not in self._steps_info[step].obs:
-                try:
-                    self._steps_info[step].obs["screenshot"] = np.array(
-                        self.get_screenshot(step), dtype=np.uint8
-                    )
-                except FileNotFoundError:
-                    pass
-            if "screenshot_som" not in self._steps_info[step].obs:
-                try:
-                    self._steps_info[step].obs["screenshot_som"] = np.array(
-                        self.get_screenshot(step, som=True), dtype=np.uint8
-                    )
-                except FileNotFoundError:
-                    pass
-        # if goal_object is set to None, it indicates it has been saved into a separate file
-        if (
-            self._steps_info[step].obs
-            and "goal_object" in self._steps_info[step].obs
-            and self._steps_info[step].obs["goal_object"] is None
-        ):
-            with gzip.open(self.exp_dir / "goal_object.pkl.gz", "rb") as f:
-                goal_object = pickle.load(f)
-                self._steps_info[step].obs["goal_object"] = goal_object
+            if self._steps_info[step].obs:
+                if "screenshot" not in self._steps_info[step].obs:
+                    try:
+                        self._steps_info[step].obs["screenshot"] = np.array(
+                            self.get_screenshot(step), dtype=np.uint8
+                        )
+                    except FileNotFoundError:
+                        pass
+                if "screenshot_som" not in self._steps_info[step].obs:
+                    try:
+                        self._steps_info[step].obs["screenshot_som"] = np.array(
+                            self.get_screenshot(step, som=True), dtype=np.uint8
+                        )
+                    except FileNotFoundError:
+                        pass
+                # if goal_object is set to None, it indicates it has been saved into a separate file
+                if (
+                    "goal_object" in self._steps_info[step].obs
+                    and self._steps_info[step].obs["goal_object"] is None
+                ):
+                    with gzip.open(self.exp_dir / "goal_object.pkl.gz", "rb") as f:
+                        goal_object = pickle.load(f)
+                        self._steps_info[step].obs["goal_object"] = goal_object
 
         return self._steps_info[step]
 
