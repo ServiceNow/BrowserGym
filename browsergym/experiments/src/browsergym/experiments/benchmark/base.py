@@ -99,6 +99,13 @@ class Benchmark(DataClassJsonMixin):
                     default_instance.full_reset()
 
                 case "visualwebarena":
+                    # download necessary tokenizer ressources
+                    import nltk
+
+                    # vhttps://github.com/nltk/nltk/issues/3293
+                    # nltk.download('punkt')  # deprecated
+                    nltk.download("punkt_tab")
+
                     # register environments
                     import browsergym.visualwebarena
 
@@ -111,6 +118,13 @@ class Benchmark(DataClassJsonMixin):
                     default_instance.full_reset()
 
                 case "workarena":
+                    # download necessary tokenizer ressources
+                    import nltk
+
+                    # vhttps://github.com/nltk/nltk/issues/3293
+                    # nltk.download('punkt')  # deprecated
+                    nltk.download("punkt_tab")
+
                     # register environments
                     import browsergym.workarena
 
