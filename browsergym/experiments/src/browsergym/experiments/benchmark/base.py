@@ -1,7 +1,9 @@
 import fnmatch
 import logging
+import os
 import typing
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal, Optional
 
 import pandas as pd
@@ -131,8 +133,59 @@ class Benchmark(DataClassJsonMixin):
                     import browsergym.assistantbench
 
                 case "weblinx":
+                    import json
+                    import zipfile
+
+                    # download weblinx ressources from huggingface hub
+                    import huggingface_hub
+
+                    cache_dir = os.getenv("BROWSERGYM_WEBLINX_CACHE_DIR", "./bg_wl_data")
+                    cache_dir = Path(cache_dir).expanduser()
+                    base_demo_dir = cache_dir / "demonstrations"
+                    base_zip_dir = cache_dir / "demonstrations_zip"
+
+                    metadata_path = cache_dir / "metadata.json"
+
+                    if not metadata_path.exists():
+                        huggingface_hub.snapshot_download(
+                            repo_id="McGill-NLP/weblinx-browsergym",
+                            repo_type="dataset",
+                            local_dir=cache_dir,
+                            allow_patterns=["metadata.json"],
+                        )
+
+                    with open(metadata_path, "r") as f:
+                        metadata = json.load(f)
+
+                    for split, meta_split_dict in metadata.items():
+                        for demo_id, steps in meta_split_dict.items():
+                            for step_num, task_dict in steps.items():
+                                if task_dict["is_task"] is False:
+                                    pass
+
+                                # if the base_dir / project_id does not exist, download the dataset
+                                if not base_demo_dir.joinpath(demo_id).exists():
+                                    # first, if zip file does not exist, download the zip file
+                                    if not base_zip_dir.joinpath(f"{demo_id}.zip").exists():
+                                        huggingface_hub.snapshot_download(
+                                            repo_id="McGill-NLP/weblinx-browsergym",
+                                            repo_type="dataset",
+                                            local_dir=cache_dir,
+                                            allow_patterns=[f"demonstrations_zip/{demo_id}.zip"],
+                                        )
+                                        logger.debug(f"Downloaded {demo_id}.zip to {base_zip_dir}")
+
+                                    # then, unzip the file
+                                    with zipfile.ZipFile(
+                                        base_zip_dir.joinpath(f"{demo_id}.zip"), "r"
+                                    ) as zip_ref:
+                                        zip_ref.extractall(base_demo_dir.joinpath(demo_id))
+
                     # register environments
                     import weblinx_browsergym
+
+                    weblinx_browsergym.register_weblinx_tasks(split="train")
+                    weblinx_browsergym.register_weblinx_tasks(split="valid")
 
                 case _:
                     raise ValueError(f"Unknown benchmark backend {repr(backend)}")
