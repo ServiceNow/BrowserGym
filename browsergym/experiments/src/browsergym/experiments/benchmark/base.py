@@ -1,6 +1,8 @@
 import fnmatch
 import logging
 import typing
+from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 
@@ -10,7 +12,12 @@ from dataclasses_json import DataClassJsonMixin, config
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.experiments.loop import EnvArgs
 
-from .metadata.utils import task_list_from_metadata
+from .metadata.utils import (
+    build_env_args_dependency_graphs,
+    build_full_task_dependency_graph_from_metadata,
+    extract_sparse_task_dependency_graph_from_subset,
+    task_list_from_metadata,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +62,7 @@ class Benchmark(DataClassJsonMixin):
     name: str
     high_level_action_set_args: HighLevelActionSetArgs
     is_multi_tab: bool
+    supports_parallel_seeds: bool
     env_args_list: list[EnvArgs]
     backends: list[BenchmarkBackend]
     task_metadata: Optional[pd.DataFrame] = field(
@@ -135,7 +143,7 @@ class Benchmark(DataClassJsonMixin):
         split_column = "browsergym_split"
 
         # check for a split column in metadata
-        if not split_column in self.task_metadata.columns:
+        if split_column not in self.task_metadata.columns:
             raise NotImplementedError(
                 f"This benchmark does not provide default train/valid/test splits (missing a {repr(split_column)} column in task metadata)"
             )
@@ -164,6 +172,7 @@ class Benchmark(DataClassJsonMixin):
             name=f"{self.name}[{column}=/{regexp}/]",
             high_level_action_set_args=self.high_level_action_set_args,
             is_multi_tab=self.is_multi_tab,
+            supports_parallel_seeds=self.supports_parallel_seeds,
             backends=self.backends,
             env_args_list=[
                 env_args
@@ -172,3 +181,39 @@ class Benchmark(DataClassJsonMixin):
             ],
             task_metadata=self.task_metadata,
         )
+
+    def dependency_graph_over_tasks(self) -> dict[str, list[str]]:
+        # recover all unique task_names present in the benchmark
+        task_names = list(set([env_args.task_name for env_args in self.env_args_list]))
+
+        # if "depends_on" column is missing, raise a warning and deal with it
+        # (we don't want the "depends_on" column to be mandatory)
+        if "depends_on" not in self.task_metadata.columns:
+            logger.warning(
+                f'This benchmark does not provide a dependency graph (missing a "depends_on" column in task metadata). Assuming no task dependencies.'
+            )
+            zero_dependencies = {task_name: [] for task_name in task_names}
+            return zero_dependencies
+
+        # recover the task dependency graph, for tasks in the benchmark only
+        task_dependencies = extract_sparse_task_dependency_graph_from_subset(
+            task_subset=task_names,
+            parents=build_full_task_dependency_graph_from_metadata(
+                task_metadata=self.task_metadata
+            ),
+        )
+
+        return task_dependencies
+
+    def dependency_graphs_over_env_args(self) -> list[dict[str, list[str]]]:
+        """
+        Returns a list of dependency graphs to be executed sequentially, typically with a full instance reset in-between.
+        Ideally, a job scheduler should connect these graphs by injecting a reset task in-between each, which depends on all previous tasks being completed.
+        """
+        task_dependencies = self.dependency_graph_over_tasks()
+        env_args_dependencies = build_env_args_dependency_graphs(
+            env_args_list=self.env_args_list,
+            task_dependencies=task_dependencies,
+            supports_parallel_seeds=self.supports_parallel_seeds,
+        )
+        return env_args_dependencies
