@@ -142,6 +142,7 @@ class Benchmark(DataClassJsonMixin):
 
         # recover the target split
         sub_benchmark = self.subset_from_regexp(split_column, regexp=f"^{split}$")
+        sub_benchmark.name = f"{self.name}_{split}"
 
         # check that the split exists (non-empty task list)
         if not sub_benchmark.env_args_list:
