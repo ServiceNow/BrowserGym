@@ -123,7 +123,7 @@ DEFAULT_BENCHMARKS = {
         backends=["webarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
@@ -136,7 +136,7 @@ DEFAULT_BENCHMARKS = {
         backends=["visualwebarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
