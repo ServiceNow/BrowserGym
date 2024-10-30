@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import pickle
+import re
 import sys
 import time
 import traceback
@@ -179,13 +180,16 @@ class ExpArgs:
     def _make_dir(self, exp_root):
         """Create a unique directory for the experiment."""
         date_str = self.exp_date.strftime("%Y-%m-%d_%H-%M-%S")
+        exp_str = re.sub(
+            r"[\/:*?<>|]", "_", self.exp_name
+        )  # sanitize exp_name to be used as a file name (substitute forbidden characters)
 
         for i in range(1000):
             if i >= 999:  # make sure we don't loop forever
                 raise ValueError("Could not find a unique name for the experiment directory.")
 
             tag = f"_{i}" if i > 0 else ""
-            self.exp_dir = Path(exp_root) / f"{date_str}_{self.exp_name}{tag}"
+            self.exp_dir = Path(exp_root) / f"{date_str}_{exp_str}{tag}"
             if not self.exp_dir.exists():
                 break
 
