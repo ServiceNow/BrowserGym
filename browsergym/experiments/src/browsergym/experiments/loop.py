@@ -740,7 +740,11 @@ class ExpResult:
 
         if summary_info.get("err_msg", None) is not None:
             return "error"
-        return "done"
+
+        if summary_info.get("terminated", False) or summary_info.get("truncated", False):
+            return "done"
+
+        return "incomplete"
 
 
 EXP_RESULT_CACHE = {}
