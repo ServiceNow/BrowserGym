@@ -237,7 +237,7 @@ def test_dependency_graphs():
 
     # webarena, 3 tasks x 1 seed
     benchmark = DEFAULT_BENCHMARKS["webarena"]().subset_from_regexp(
-        column="task_name", regexp="^webarena\.[012]$"
+        column="task_name", regexp=r"^webarena\.[012]$"
     )
 
     task_dependencies = benchmark.dependency_graph_over_tasks()
@@ -253,7 +253,7 @@ def test_dependency_graphs():
     # workarena L2, 2 task x (2 seeds, 1 seed)
     benchmark = DEFAULT_BENCHMARKS["workarena_l2_agent_curriculum_eval"]().subset_from_regexp(
         column="task_name",
-        regexp="^workarena\.servicenow\.workload-balancing-small-l2$|^workarena\.servicenow\.easy-expense-management-small-l2$",
+        regexp=r"^workarena\.servicenow\.workload-balancing-small-l2$|^workarena\.servicenow\.easy-expense-management-small-l2$",
     )
 
     task_dependencies = benchmark.dependency_graph_over_tasks()
@@ -269,3 +269,27 @@ def test_dependency_graphs():
     benchmark.supports_parallel_seeds = False
     env_args_dependencies = benchmark.dependency_graphs_over_env_args()
     assert env_args_dependencies == [{0: [], 2: []}, {1: []}]
+
+    # webarena, 6 dependent tasks x 1 seed
+    benchmark = DEFAULT_BENCHMARKS["webarena"]().subset_from_regexp(
+        column="task_name",
+        regexp=r"^webarena\.533$|^webarena\.537$|^webarena\.552$|^webarena\.410$|^webarena\.561$|^webarena\.562$",
+    )
+
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert {k: set(v) for k, v in task_dependencies.items()} == {
+        k: set(v)
+        for k, v in {
+            "webarena.410": [],
+            "webarena.533": [],
+            "webarena.537": ["webarena.533"],
+            "webarena.552": ["webarena.410", "webarena.537"],
+            "webarena.561": ["webarena.552"],
+            "webarena.562": ["webarena.552", "webarena.561"],
+        }.items()
+    }
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert [{k: set(v) for k, v in deps.items()} for deps in env_args_dependencies] == [
+        {k: set(v) for k, v in {0: [], 1: [], 2: [1], 3: [0, 2], 4: [3], 5: [3, 4]}.items()}
+    ]
