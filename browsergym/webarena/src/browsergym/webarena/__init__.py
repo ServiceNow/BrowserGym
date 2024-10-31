@@ -1,11 +1,16 @@
+import nltk
+
 from browsergym.core.registration import register_task
 
-# register the WebArena benchmark
 from . import config, task
+
+# download necessary tokenizer ressources
+# nltk.download('punkt')  # deprecated https://github.com/nltk/nltk/issues/3293
+nltk.download("punkt_tab")
 
 ALL_WEBARENA_TASK_IDS = []
 
-# register the WebArena benchmark
+# register all WebArena benchmark
 for task_id in config.TASK_IDS:
     gym_id = f"webarena.{task_id}"
     register_task(
