@@ -151,6 +151,9 @@ class ExpArgs:
     save_screenshot: bool = True
     save_som: bool = False
 
+    def __post_init__(self):
+        self.exp_id = str(uuid.uuid4().hex)
+
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
 
@@ -162,9 +165,6 @@ class ExpArgs:
         if self.exp_name is None:
             task_name = self.env_args.task_name
             self.exp_name = f"{self.agent_args.agent_name}_on_{task_name}_{self.env_args.task_seed}"
-
-        if self.exp_id is None:  # reuse the same task_id if it's a relaunch
-            self.exp_id = str(uuid.uuid4().hex)
 
         # if exp_dir exists, it means it's a re-run, move the old one
         if self.exp_dir is not None:
