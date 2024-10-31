@@ -6,7 +6,7 @@ from . import config, task
 
 # download necessary tokenizer ressources
 # nltk.download('punkt')  # deprecated https://github.com/nltk/nltk/issues/3293
-nltk.download("punkt_tab")
+nltk.download("punkt_tab", quiet=True)
 
 ALL_WEBARENA_TASK_IDS = []
 
