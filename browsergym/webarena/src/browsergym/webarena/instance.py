@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 import playwright.sync_api
 import requests
@@ -14,6 +15,8 @@ class WebArenaInstance:
     Utility class to access a WebArena instance.
 
     """
+
+    RESET_URL_VAR = "WA_FULL_RESET"  # used by full_reset()
 
     def __init__(
         self,
@@ -54,34 +57,61 @@ class WebArenaInstance:
         self.credentials = ACCOUNTS
 
     def full_reset(self):
-        reset_url = os.environ.get("WA_FULL_RESET", None)
+        base_url = os.environ.get(self.RESET_URL_VAR, None)
+        reset_url = f"{base_url}/reset"
+        status_url = f"{base_url}/status"
 
         assert (
             reset_url
-        ), f"Environment variable WA_FULL_RESET is missing or empty, required for a full instance reset."
+        ), f"Environment variable {self.RESET_URL_VAR} is missing or empty, required for a full instance reset."
 
-        # Send the GET request to trigger the reset script
-        logger.info(f"WebArena full instance reset in progress.")
+        logger.info(f"Initiating {self.__class__.__name__} instance reset.")
 
-        # 10 minutes timeout (takes about 4 minutes in practice)
-        # https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
-        response = requests.get(reset_url, timeout=(3.05, 10 * 60))
+        # trigger instance reset
+        response = requests.get(reset_url)
+        match response.status_code:
+            case 200:
+                logger.info(f"Reset started.")
+            case 418:
+                logger.warning("Reset was already running.")
+            case _:
+                raise Exception(
+                    f"{self.__class__.__name__} reset request {reset_url} failed ({response.status_code}): {response.text}"
+                )
 
-        # Print the response from the server
-        logger.info(f"Reset status code: {response.status_code}")
-        logger.info(f"Reset response: {response.text}")
-
-        if not response.status_code == 200:
-            raise Exception(
-                f"Full instance reset failed ({response.status_code}): {response.status_code}"
-            )
+        # wait until reset complete
+        retry_after = 20  # 20 seconds wait between status checks
+        timeout = 10 * 60  # 10 minutes timeout
+        start_time = time.time()
+        while True:
+            # request instance status
+            response = requests.get(status_url)
+            # check for server error
+            if response.status_code != 200:
+                raise Exception(
+                    f"{self.__class__.__name__} status request {status_url} failed ({response.status_code}): {response.text}"
+                )
+            # check for readiness
+            if response.text == "Ready for duty!":
+                break
+            # check for timeout
+            time_elapsed = time.time() - start_time
+            logger.info(f"Reset still running after {time_elapsed:.0f} seconds...")
+            if time_elapsed > timeout:
+                raise Exception(
+                    f"Reset still running after {time_elapsed} seconds (> {timeout}), aborting."
+                )
+            # wait a bit before next retry
+            time.sleep(retry_after)
 
         # warm-start the instance (navigate to every domain)
         retries_left = 3
         while retries_left:
             retries_left -= 1
             try:
-                self._check_is_reachable(timeout=60)  # 60 seconds, cold starting might be slow
+                self._check_is_reachable(
+                    timeout=60
+                )  # 60 seconds, warming up after reset might be slow
                 break
             except Exception as e:
                 if not retries_left:
