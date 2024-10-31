@@ -3,6 +3,7 @@ import os
 
 import playwright.sync_api
 
+# we inherit some code base from webarena to avoid too much duplication
 from browsergym.webarena.instance import WebArenaInstance
 
 logger = logging.getLogger(__name__)

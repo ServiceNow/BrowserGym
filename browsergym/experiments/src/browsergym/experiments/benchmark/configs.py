@@ -5,6 +5,7 @@ from browsergym.experiments.benchmark.metadata.utils import (
     task_metadata,
 )
 from browsergym.experiments.benchmark.utils import (
+    make_env_args_list_from_fixed_seeds,
     make_env_args_list_from_repeat_tasks,
     make_env_args_list_from_workarena_curriculum,
 )
@@ -129,6 +130,26 @@ DEFAULT_BENCHMARKS = {
             max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("webarena"),
+    ),
+    "webarena_tiny": lambda: Benchmark(
+        name="webarena",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[
+                "webarena.410",
+                "webarena.533",
+                "webarena.537",
+                "webarena.552",
+                "webarena.561",
+                "webarena.562",
+            ],
+            max_steps=30,
+            fixed_seeds=[0],
         ),
         task_metadata=task_metadata("webarena"),
     ),
