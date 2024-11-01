@@ -15,7 +15,7 @@ pip install browsergym-assistantbench
 
 - Run inference, e.g., run the following commands for demo on a simple toy task
 ```
-python demo_agent/run_demo.py --task_name ab.imp.0
+python demo_agent/run_demo.py --task_name assistantbench.validation.3
 ```
 
 - Test set predictions will be saved to `./assistantbench-predictions-test.jsonl`. To evaluate on the official test set, upload these predictions to the official [leaderboard](https://huggingface.co/spaces/AssistantBench/leaderboard).
