@@ -136,15 +136,19 @@ class Benchmark(DataClassJsonMixin):
                     # register environments
                     import weblinx_browsergym
 
-                    # pre-download weblinx files
+                    # pre-download all weblinx files
                     cache_dir = os.environ.get("BROWSERGYM_WEBLINX_CACHE_DIR", None)
 
                     assert (
                         cache_dir
                     ), f"Environment variable BROWSERGYM_WEBLINX_CACHE_DIR is missing or empty, required to prepare the weblinx backend."
 
-                    tasks = weblinx_browsergym.list_tasks(split="test_iid", cache_dir=cache_dir)
-                    demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=tasks)
+                    all_tasks = []
+                    for split in ("train", "valid", "test_iid"):
+                        all_tasks.extend(
+                            weblinx_browsergym.list_tasks(split=split, cache_dir=cache_dir)
+                        )
+                    demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=all_tasks)
                     weblinx_browsergym.download_and_unzip_demos(
                         demo_ids=demo_ids, cache_dir=cache_dir
                     )
