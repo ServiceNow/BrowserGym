@@ -140,7 +140,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/vi
 print("\n".join(env_ids))
 ```
 
-### Assistantbench
+### AssistantBench example
 
 ```python
 import gymnasium as gym
