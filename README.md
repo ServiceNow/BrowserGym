@@ -56,7 +56,7 @@ make install
 
 ## Usage
 
-### Open-ended task example
+### Open-ended example
 
 Boilerplate code to run an agent on an interactive, open-ended task:
 ```python
@@ -76,20 +76,14 @@ while not done:
     done = terminated or truncated
 ```
 
-### MiniWoB++ task example
+### MiniWoB++ example
 
-Boilerplate code to run an agent on a MiniWoB++ task:
 ```python
 import gymnasium as gym
 import browsergym.miniwob  # register miniwob tasks as gym environments
 
 env = gym.make("browsergym/miniwob.choose-list")
-obs, info = env.reset()
-done = False
-while not done:
-    action = ...  # implement your agent here
-    obs, reward, terminated, truncated, info = env.step(action)
-    done = terminated or truncated
+...
 ```
 
 To list all the available MiniWoB++ environments run
@@ -98,64 +92,14 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/mi
 print("\n".join(env_ids))
 ```
 
-### WebArena task example
+### WorkArena example
 
-Boilerplate code to run an agent on a WebArena task:
-```python
-import gymnasium as gym
-import browsergym.webarena  # register webarena tasks as gym environments
-
-env = gym.make("browsergym/webarena.310")
-obs, info = env.reset()
-done = False
-while not done:
-    action = ...  # implement your agent here
-    obs, reward, terminated, truncated, info = env.step(action)
-    done = terminated or truncated
-```
-
-To list all the available WebArena environments run
-```python
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webarena")]
-print("\n".join(env_ids))
-```
-
-### VisualWebArena task example
-
-Boilerplate code to run an agent on a VisualWebArena task:
-```python
-import gymnasium as gym
-import browsergym.webarena  # register webarena tasks as gym environments
-
-env = gym.make("browsergym/webarena.721")
-obs, info = env.reset()
-done = False
-while not done:
-    action = ...  # implement your agent here
-    obs, reward, terminated, truncated, info = env.step(action)
-    done = terminated or truncated
-```
-
-To list all the available VisualWebArena environments run
-```python
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/visualwebarena")]
-print("\n".join(env_ids))
-```
-
-### WorkArena task example
-
-Boilerplate code to run an agent on a WorkArena task:
 ```python
 import gymnasium as gym
 import browsergym.workarena  # register workarena tasks as gym environments
 
 env = gym.make("browsergym/workarena.servicenow.order-ipad-pro")
-obs, info = env.reset()
-done = False
-while not done:
-    action = ...  # implement your agent here
-    obs, reward, terminated, truncated, info = env.step(action)
-    done = terminated or truncated
+...
 ```
 
 To list all the available WorkArena environments run
@@ -164,6 +108,53 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
+### WebArena example
+
+```python
+import gymnasium as gym
+import browsergym.webarena  # register webarena tasks as gym environments
+
+env = gym.make("browsergym/webarena.310")
+...
+```
+
+To list all the available WebArena environments run
+```python
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webarena")]
+print("\n".join(env_ids))
+```
+
+### VisualWebArena example
+
+```python
+import gymnasium as gym
+import browsergym.webarena  # register webarena tasks as gym environments
+
+env = gym.make("browsergym/visualwebarena.721")
+...
+```
+
+To list all the available VisualWebArena environments run
+```python
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/visualwebarena")]
+print("\n".join(env_ids))
+```
+
+### Assistantbench
+
+```python
+import gymnasium as gym
+import browsergym.workarena  # register assistantbench tasks as gym environments
+
+env = gym.make("browsergym/assistantbench.validation.3")
+...
+```
+
+To list all the available AssistantBench environments run
+```python
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
+print("\n".join(env_ids))
+```
 
 ## Demo
 
@@ -223,5 +214,6 @@ Please use the following BibTeX to cite our work:
     publisher = {PMLR},
     url = {https://proceedings.mlr.press/v235/drouin24a.html},
 }
+
 
 ```
