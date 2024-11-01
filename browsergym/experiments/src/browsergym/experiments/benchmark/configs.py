@@ -134,7 +134,7 @@ DEFAULT_BENCHMARKS = {
         task_metadata=task_metadata("webarena"),
     ),
     "webarena_tiny": lambda: Benchmark(
-        name="webarena",
+        name="webarena_tiny",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,

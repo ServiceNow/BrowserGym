@@ -1,8 +1,6 @@
 import fnmatch
 import logging
 import typing
-from collections import defaultdict
-from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 

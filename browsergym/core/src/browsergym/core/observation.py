@@ -1,17 +1,17 @@
 import base64
 import io
 import logging
-import numpy as np
-import playwright.sync_api
-import PIL.Image
 import pkgutil
 import re
-
 from typing import Literal
 
+import numpy as np
+import PIL.Image
+import playwright.sync_api
+
 from .constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
-from .constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 from .constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
+from .constants import BROWSERGYM_VISIBILITY_ATTRIBUTE as VIS_ATTR
 
 MARK_FRAMES_MAX_TRIES = 3
 
@@ -142,15 +142,17 @@ __BID_EXPR = r"([a-zA-Z0-9]+)"
 __DATA_REGEXP = re.compile(r"^browsergym_id_" + __BID_EXPR + r"\s?" + r"(.*)")
 
 
-def extract_data_items_from_aria(string: str, with_warning: bool = True):
+def extract_data_items_from_aria(string: str, log_level: int = logging.NOTSET):
     """
     Utility function to extract temporary data stored in the ARIA attributes of a node
     """
 
     match = __DATA_REGEXP.fullmatch(string)
     if not match:
-        if with_warning:
-            logger.warning(f"Failed to extract BrowserGym data from ARIA string: {repr(string)}")
+        logger.log(
+            level=log_level,
+            msg=f"Failed to extract BrowserGym data from ARIA string: {repr(string)}",
+        )
         return [], string
 
     groups = match.groups()
@@ -221,9 +223,7 @@ def pop_bids_from_attribute(dom_snapshot, attr: str):
                         attr_value = dom_snapshot["strings"][attr_value_id]
                         # remove any data stored in the target attribute
                         if attr_value_id not in processed_string_ids:
-                            _, new_attr_value = extract_data_items_from_aria(
-                                attr_value, with_warning=False
-                            )
+                            _, new_attr_value = extract_data_items_from_aria(attr_value)
                             dom_snapshot["strings"][
                                 attr_value_id
                             ] = new_attr_value  # update the string in the metadata
