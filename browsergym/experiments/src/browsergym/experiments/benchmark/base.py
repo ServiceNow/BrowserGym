@@ -3,7 +3,6 @@ import logging
 import os
 import typing
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Literal, Optional
 
 import pandas as pd
@@ -88,6 +87,7 @@ class Benchmark(DataClassJsonMixin):
 
     def prepare_backends(self):
         for backend in self.backends:
+            logger.info(f"Preparing {backend} backend...")
             match backend:
                 case "miniwob":
                     # register environments
@@ -149,6 +149,8 @@ class Benchmark(DataClassJsonMixin):
 
                 case _:
                     raise ValueError(f"Unknown benchmark backend {repr(backend)}")
+
+            logger.info(f"{backend} backend ready")
 
     def subset_from_split(self, split: Literal["train", "valid", "test"]):
         split_column = "browsergym_split"
