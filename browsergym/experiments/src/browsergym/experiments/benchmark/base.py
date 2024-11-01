@@ -144,8 +144,10 @@ class Benchmark(DataClassJsonMixin):
                     ), f"Environment variable BROWSERGYM_WEBLINX_CACHE_DIR is missing or empty, required to prepare the weblinx backend."
 
                     tasks = weblinx_browsergym.list_tasks(split="test_iid", cache_dir=cache_dir)
-                    demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks)
-                    weblinx_browsergym.download_and_unzip_demos(demo_ids)
+                    demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=tasks)
+                    weblinx_browsergym.download_and_unzip_demos(
+                        demo_ids=demo_ids, cache_dir=cache_dir
+                    )
 
                 case _:
                     raise ValueError(f"Unknown benchmark backend {repr(backend)}")
