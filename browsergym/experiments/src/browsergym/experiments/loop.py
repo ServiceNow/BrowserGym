@@ -151,8 +151,10 @@ class ExpArgs:
     save_screenshot: bool = True
     save_som: bool = False
 
-    def __post_init__(self):
-        self.exp_id = str(uuid.uuid4().hex)
+    def make_id(self):
+        """Create a unique id for the experiment."""
+        if self.exp_id is None:
+            self.exp_id = str(uuid.uuid4())
 
     def prepare(self, exp_root):
         """Prepare the experiment directory and save the experiment arguments.
@@ -169,6 +171,8 @@ class ExpArgs:
         # if exp_dir exists, it means it's a re-run, move the old one
         if self.exp_dir is not None:
             _move_old_exp(self.exp_dir)
+
+        self.make_id()
 
         self.exp_date = datetime.now()
         self._make_dir(exp_root)
@@ -259,6 +263,7 @@ class ExpArgs:
 
             logger.warning(err_msg + "\n" + stack_trace)
             if _is_debugging() and self.enable_debug:
+                logger.warning("Debug mode is enabled. Raising the error.")
                 raise
 
         finally:
@@ -277,6 +282,7 @@ class ExpArgs:
                 ):
                     e = KeyboardInterrupt("Early termination??")
                     err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
+                logger.info(f"Saving summary info.")
                 _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
