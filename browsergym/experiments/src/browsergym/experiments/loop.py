@@ -670,7 +670,7 @@ class ExpResult:
                 screenshot_som: str = ""
                 obs_dict = step_info.obs.copy()
                 if "screenshot" in obs_dict:
-                    screenshot =  str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
+                    screenshot = str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
                     obs_dict.pop("screenshot")
                 if "screenshot_som" in obs_dict:
                     screenshot_som = str(self.exp_dir / f"screenshot_som_step_{step_info.step}.png")
@@ -692,9 +692,8 @@ class ExpResult:
 
             # extract action step
             action_str = step_info.action
-            if (
-                "(" in action_str
-            ):  # TODO: this is a very naive way to split the arguments, make proper parsing later
+            # TODO: this is a very naive way to split the arguments, make proper parsing later
+            if "(" in action_str:
                 name, args_str = action_str.split("(", maxsplit=1)
                 args_str = args_str.rstrip(")")
                 arguments = {i: a.strip() for i, a in enumerate(args_str.split(","))}
