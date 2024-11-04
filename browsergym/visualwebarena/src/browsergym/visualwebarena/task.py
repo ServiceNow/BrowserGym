@@ -176,6 +176,15 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
             self.config_file = f.name
 
         # build the evaluator
+        from transformers.utils.logging import (
+            disable_progress_bar,
+            enable_progress_bar,
+            is_progress_bar_enabled,
+        )
+
+        hide_progress_bar = is_progress_bar_enabled()
+        if hide_progress_bar:
+            disable_progress_bar()
         captioning_fn = get_captioning_fn(
             device=self.eval_captioning_model_device,
             dtype=(
@@ -185,6 +194,8 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
             ),
             model_name="Salesforce/blip2-flan-t5-xl",
         )
+        if hide_progress_bar:
+            enable_progress_bar()
         self.evaluator = evaluator_router(self.config_file, captioning_fn=captioning_fn)
 
         # reset instance if needed (classifieds domain only)
