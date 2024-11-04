@@ -25,7 +25,7 @@ Designing new web benchmarks with BrowserGym is easy, and simply requires to inh
 To use browsergym, install one of the following packages:
 ```sh
 pip install browsergym  # (recommended) everything below
-pip install browsergym-experiment  # experiment utilities (agent, loop, benchmarks) + everything below
+pip install browsergym-experiments  # experiment utilities (agent, loop, benchmarks) + everything below
 pip install browsergym-core  # core functionalities only (no benchmark, just the openended task)
 pip install browsergym-miniwob  # core + miniwob
 pip install browsergym-webarena  # core + webarena
