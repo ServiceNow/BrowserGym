@@ -148,9 +148,7 @@ def prepare_backend(backend: str):
             ), f"Environment variable BROWSERGYM_WEBLINX_CACHE_DIR is missing or empty, required to prepare the weblinx backend."
 
             all_tasks = []
-            for split in (
-                "test_iid",
-            ):  # TODO include all splits once weblinx download is fixed ("train", "valid", "test_iid")
+            for split in ("train", "valid", "test_iid"):
                 all_tasks.extend(weblinx_browsergym.list_tasks(split=split, cache_dir=cache_dir))
             demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=all_tasks)
             weblinx_browsergym.download_and_unzip_demos(demo_ids=demo_ids, cache_dir=cache_dir)
