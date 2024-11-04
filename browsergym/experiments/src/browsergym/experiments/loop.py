@@ -24,8 +24,9 @@ from tqdm import tqdm
 
 from browsergym.core.chat import Chat
 
-from .agent import Agent
+from .agent import Agent, AgentInfo
 from .utils import count_messages_token, count_tokens
+from .tape import Action, Observation, Tape, Thought
 
 logger = logging.getLogger(__name__)
 
@@ -656,6 +657,73 @@ class ExpResult:
                     raise FileNotFoundError(f"summary_info.json is empty.")
                 self._summary_info = json.load(f)
         return self._summary_info
+
+    def get_tape(self) -> Tape:
+        """
+        Return experiment trace in a format compatible with the TapeAgents framework
+        """
+        tape_steps = []
+        for step_info in self.steps_info:
+            # extract observation step
+            if step_info.obs is not None:
+                screenshot: str = ""
+                screenshot_som: str = ""
+                if "screenshot" in step_info.obs:
+                    screenshot = f"{self.exp_dir}/screenshot_step_{step_info.step}.png"
+                    step_info.obs.pop("screenshot")
+                if "screenshot_som" in step_info.obs:
+                    screenshot_som = f"{self.exp_dir}/screenshot_som_step_{step_info.step}.png"
+                    step_info.obs.pop("screenshot_som")
+                observation = Observation(
+                    metadata={"step": step_info.step},
+                    obs=step_info.obs,
+                    screenshot=screenshot,
+                    screenshot_som=screenshot_som
+                )
+                tape_steps.append(observation)
+
+            # extract thought step
+            think = ""
+            if isinstance(step_info.agent_info, AgentInfo):
+                think = step_info.agent_info.think
+            elif isinstance(step_info.agent_info, dict):
+                think = step_info.agent_info.get("think", "")
+            if think:
+                thought = Thought(metadata={"step": step_info.step}, text=think)
+                tape_steps.append(thought)
+
+            # extract action step
+            action_str = step_info.action
+            if "(" in action_str: # TODO: this is a very naive way to split the arguments, make proper parsing later
+                name, args_str = action_str.split("(", maxsplit=1)
+                args_str = args_str.rstrip(")")
+                arguments = {i: a.strip() for i,a in enumerate(args_str.split(","))}
+            else:
+                name = action_str
+                arguments = {}
+            action = Action(
+                metadata={
+                    "step": step_info.step,
+                    "reward": step_info.reward,
+                    "raw_reward": step_info.raw_reward,
+                    "terminated": step_info.terminated,
+                    "truncated": step_info.truncated,
+                    "agent_info": step_info.agent_info,
+                    "stats": step_info.stats,
+                    "task_info": step_info.task_info,
+                },
+                name=name,
+                arguments=arguments
+            )
+            tape_steps.append(action)
+        return Tape(steps=tape_steps, metadata=self.get_exp_record())
+
+    def save_tape(self):
+        tape = self.get_tape()
+        if os.path.exists(self.exp_dir / "tape.json"):
+            raise FileExistsError(f"tape.json already exists in {self.exp_dir}")
+        with open(self.exp_dir / "tape.json", "w") as f:
+            json.dump(tape.as_dict(), f, indent=4, ensure_ascii=False)
 
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
