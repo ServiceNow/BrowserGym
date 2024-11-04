@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 import numpy as np
@@ -90,3 +91,67 @@ def make_env_args_list_from_fixed_seeds(
             )
 
     return env_args_list
+
+
+def prepare_backend(backend: str):
+    match backend:
+        case "miniwob":
+            # register environments
+            import browsergym.miniwob
+
+            # check setup
+            browsergym.miniwob.environment_variables_precheck()
+
+        case "webarena":
+            # register environments
+            import browsergym.webarena
+
+            # full reset the instance (requires environment variables properly set up)
+            from browsergym.webarena.instance import WebArenaInstance
+
+            default_instance = WebArenaInstance()
+            default_instance.full_reset()
+
+        case "visualwebarena":
+            # register environments
+            import browsergym.visualwebarena
+
+            # full reset the instance (requires environment variables properly set up)
+            from browsergym.visualwebarena.instance import VisualWebArenaInstance
+
+            default_instance = VisualWebArenaInstance()
+            default_instance.full_reset()
+
+        case "workarena":
+            # register environments
+            import browsergym.workarena
+
+            # check server status
+            from browsergym.workarena.instance import SNowInstance
+
+            default_instance = SNowInstance()
+            default_instance.check_status()
+
+        case "assistantbench":
+            # register environments
+            import browsergym.assistantbench
+
+        case "weblinx":
+            # register environments
+            import weblinx_browsergym
+
+            # pre-download all weblinx files
+            cache_dir = os.environ.get("BROWSERGYM_WEBLINX_CACHE_DIR", None)
+
+            assert (
+                cache_dir
+            ), f"Environment variable BROWSERGYM_WEBLINX_CACHE_DIR is missing or empty, required to prepare the weblinx backend."
+
+            all_tasks = []
+            for split in ("train", "valid", "test_iid"):
+                all_tasks.extend(weblinx_browsergym.list_tasks(split=split, cache_dir=cache_dir))
+            demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=all_tasks)
+            weblinx_browsergym.download_and_unzip_demos(demo_ids=demo_ids, cache_dir=cache_dir)
+
+        case _:
+            raise NotImplementedError(f"Unknown benchmark backend {repr(backend)}")
