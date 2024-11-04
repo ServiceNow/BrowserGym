@@ -24,6 +24,34 @@ classifiers = [
 ]
 dynamic = ["dependencies", "version"]
 
+[project.optional-dependencies]
+miniwob = [
+  "browsergym-miniwob",
+]
+workarena = [
+  "browsergym-workarena",
+]
+webarena = [
+  "browsergym-webarena",
+]
+visualwebarena = [
+  "browsergym-visualwebarena",
+]
+assistantbench = [
+  "browsergym-assistantbench",
+]
+weblinx = [
+  "weblinx_browsergym",
+]
+all = [
+  "browsergym-experiment[miniwob]",
+  "browsergym-experiment[workarena]",
+  "browsergym-experiment[webarena]",
+  "browsergym-experiment[visualwebarena]",
+  "browsergym-experiment[assistantbench]",
+  "browsergym-experiment[weblinx]",
+]
+
 [project.urls]
 homepage = "https://github.com/ServiceNow/BrowserGym"
 

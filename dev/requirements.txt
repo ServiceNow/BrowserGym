@@ -12,3 +12,4 @@ tenacity
 -e ../browsergym/experiments # local package
 -e ../browsergym/assistantbench # local package
 browsergym-workarena
+weblinx_browsergym
