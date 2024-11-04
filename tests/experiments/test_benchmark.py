@@ -54,7 +54,7 @@ def test_build_benchmarks():
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
         "assistantbench": 214,
-        "weblinx": 35568,
+        "weblinx": 31586,
     }
     for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
