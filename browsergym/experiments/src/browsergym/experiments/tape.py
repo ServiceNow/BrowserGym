@@ -1,7 +1,7 @@
-# 
+#
 # TapeAgents compatibility layer
 #
-# This file contains the Tape, Step, Thought, Action, and Observation classes 
+# This file contains the Tape, Step, Thought, Action, and Observation classes
 # providing a compatibility layer between the TapeAgents framework (https://github.com/ServiceNow/TapeAgents)
 # and the BrowserGym without any additional dependencies.
 
@@ -13,15 +13,11 @@ class Step:
     metadata: dict
 
     def __init__(self, metadata: dict):
-        self.metadata = {
-            "id": uuid.uuid4().hex,
-            "agent": "browsergym_agent",
-            "other": metadata
-        }
+        self.metadata = {"id": uuid.uuid4().hex, "agent": "browsergym_agent", "other": metadata}
 
     def as_dict(self) -> dict:
         return self.__dict__
-    
+
 
 class Thought(Step):
     kind: str = "browsergym_thought"
@@ -30,6 +26,7 @@ class Thought(Step):
     def __init__(self, metadata: dict, text: str):
         super().__init__(metadata)
         self.text = text
+
 
 class Action(Step):
     kind: str = "browsergym_action"
@@ -54,6 +51,7 @@ class Observation(Step):
         self.screenshot = screenshot
         self.screenshot_som = screenshot_som
 
+
 class Tape:
     steps: list[Step]
     metadata: dict
@@ -63,11 +61,8 @@ class Tape:
         self.metadata = {
             "id": uuid.uuid4().hex,
             "author": "browsergym_agent",
-            "browsergym_data": metadata
+            "browsergym_data": metadata,
         }
 
     def as_dict(self) -> dict:
-        return {
-            "metadata": self.metadata,
-            "steps": [step.as_dict() for step in self.steps]
-        }
+        return {"metadata": self.metadata, "steps": [step.as_dict() for step in self.steps]}
