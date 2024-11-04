@@ -678,7 +678,7 @@ class ExpResult:
                     metadata={"step": step_info.step},
                     obs=step_info.obs,
                     screenshot=screenshot,
-                    screenshot_som=screenshot_som
+                    screenshot_som=screenshot_som,
                 )
                 tape_steps.append(observation)
 
@@ -694,10 +694,12 @@ class ExpResult:
 
             # extract action step
             action_str = step_info.action
-            if "(" in action_str: # TODO: this is a very naive way to split the arguments, make proper parsing later
+            if (
+                "(" in action_str
+            ):  # TODO: this is a very naive way to split the arguments, make proper parsing later
                 name, args_str = action_str.split("(", maxsplit=1)
                 args_str = args_str.rstrip(")")
-                arguments = {i: a.strip() for i,a in enumerate(args_str.split(","))}
+                arguments = {i: a.strip() for i, a in enumerate(args_str.split(","))}
             else:
                 name = action_str
                 arguments = {}
@@ -713,7 +715,7 @@ class ExpResult:
                     "task_info": step_info.task_info,
                 },
                 name=name,
-                arguments=arguments
+                arguments=arguments,
             )
             tape_steps.append(action)
         return Tape(steps=tape_steps, metadata=self.get_exp_record())
