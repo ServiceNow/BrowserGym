@@ -24,7 +24,7 @@ from tqdm import tqdm
 
 from browsergym.core.chat import Chat
 
-from .agent import Agent, AgentInfo
+from .agent import Agent
 from .utils import count_messages_token, count_tokens
 from .tape import Action, Observation, Tape, Thought
 
@@ -668,27 +668,25 @@ class ExpResult:
             if step_info.obs is not None:
                 screenshot: str = ""
                 screenshot_som: str = ""
-                if "screenshot" in step_info.obs:
-                    screenshot = f"{self.exp_dir}/screenshot_step_{step_info.step}.png"
-                    step_info.obs.pop("screenshot")
-                if "screenshot_som" in step_info.obs:
-                    screenshot_som = f"{self.exp_dir}/screenshot_som_step_{step_info.step}.png"
-                    step_info.obs.pop("screenshot_som")
+                obs_dict = step_info.obs.copy()
+                if "screenshot" in obs_dict:
+                    screenshot =  str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
+                    obs_dict.pop("screenshot")
+                if "screenshot_som" in obs_dict:
+                    screenshot_som = str(self.exp_dir / f"screenshot_som_step_{step_info.step}.png")
+                    obs_dict.pop("screenshot_som")
                 observation = Observation(
                     metadata={"step": step_info.step},
-                    obs=step_info.obs,
+                    obs=obs_dict,
                     screenshot=screenshot,
                     screenshot_som=screenshot_som,
                 )
                 tape_steps.append(observation)
 
             # extract thought step
-            think = ""
-            if isinstance(step_info.agent_info, AgentInfo):
-                think = step_info.agent_info.think
-            elif isinstance(step_info.agent_info, dict):
-                think = step_info.agent_info.get("think", "")
+            think = step_info.agent_info.get("think", "")
             if think:
+                # TODO: add check for the type after introduction of tape segments as thoughts
                 thought = Thought(metadata={"step": step_info.step}, text=think)
                 tape_steps.append(thought)
 
