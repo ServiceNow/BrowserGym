@@ -1,5 +1,6 @@
 import logging
 import os
+import logging
 import pathlib
 from typing import Dict, Tuple
 
@@ -113,12 +114,19 @@ class AssistantBenchTask(AbstractBrowserTask):
         page.goto(self.start_url, timeout=10000)
         # TODO create empty task entry in output_file_path, raise Exception if entry already there
         if self.save_predictions and self.output_file_path:
-            add_prediction_to_jsonl(
-                file_path=self.output_file_path,
-                task_id=self.ab_task_id,
-                prediction="",
-                override_if_exists=False,
-            )
+            try:
+                add_prediction_to_jsonl(
+                    file_path=self.output_file_path,
+                    task_id=self.ab_task_id,
+                    prediction="",
+                    override_if_exists=False,
+                )
+            except ValueError as e:
+                raise ValueError(
+                    f"Task ID '{self.ab_task_id}' already exists in the output file. "
+                    f"Please provide a different task ID or output file path. "
+                    f"Original error: {e}"
+                )
         return self.goal, {}
 
     def teardown(self) -> None:
