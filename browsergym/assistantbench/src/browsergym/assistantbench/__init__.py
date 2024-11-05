@@ -43,7 +43,7 @@ for task_id in range(181):
         task.AssistantBenchTask,
         task_kwargs={
             "task_id": f"test.{task_id}",
-            "output_file_path": f"{ASSISTANTBENCH_OUTPUT_DIR}/assistantbench-predictions-test.jsonl",
+            "output_file_path": f"{ASSISTANTBENCH_OUTPUT_DIR}/assistantbench-predictions-test-{task_id}.jsonl",
         },
     )
     TEST_AB_TASK_IDS.append(gym_id)
