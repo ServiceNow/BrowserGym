@@ -10,6 +10,9 @@ TEST_AB_TASK_IDS = []
 
 ASSISTANTBENCH_OUTPUT_DIR = os.getenv("ASSISTANTBENCH_OUTPUT_DIR", ".")
 
+if not os.path.exists(ASSISTANTBENCH_OUTPUT_DIR):
+    os.makedirs(ASSISTANTBENCH_OUTPUT_DIR)
+
 # register a toy easy task for testing implementation
 gym_id = f"assistantbench.imp.0"
 register_task(
