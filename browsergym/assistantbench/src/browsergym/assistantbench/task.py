@@ -99,8 +99,11 @@ class AssistantBenchTask(AbstractBrowserTask):
         if output_file_path:
             self.output_file_path = pathlib.Path(output_file_path)
         # else get value form environment variable
-        elif "ASSISTANTBENCH_OUTPUT_FILE" in os.environ:
-            self.output_file_path = pathlib.Path(os.environ["ASSISTANTBENCH_OUTPUT_FILE"])
+        elif "ASSISTANTBENCH_OUTPUT_DIR" in os.environ:
+            self.output_file_path = (
+                pathlib.Path(os.environ["ASSISTANTBENCH_OUTPUT_DIR"]) / "predictions.jsonl"
+            )
+            logging.info(f"Output file path set to {self.output_file_path}")
         # else get value from default
         else:
             self.output_file_path = get_default_output_file()
