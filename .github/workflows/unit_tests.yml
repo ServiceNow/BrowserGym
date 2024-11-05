@@ -203,9 +203,10 @@ jobs:
           directory: "${{ github.workspace }}/miniwob-plusplus/miniwob/html"
           port: 8080
 
-      - name: Run browsergym-miniwob Unit Tests
+      - name: Run browsergym-experiments Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
+          BROWSERGYM_WEBLINX_CACHE_DIR: "${{ runner.temp }}/weblinx_data"
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:

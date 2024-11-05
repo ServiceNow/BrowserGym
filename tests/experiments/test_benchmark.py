@@ -54,7 +54,7 @@ def test_build_benchmarks():
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
         "assistantbench": 214,
-        "weblinx": 35568,
+        "weblinx": 31586,
     }
     for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
@@ -91,7 +91,7 @@ def test_benchmark_subset():
     assert dict_1 == dict_2
 
 
-def test_miniwob_benchmark_reset():
+def test_prepare_backend_miniwob():
     MINIWOB_URL = os.environ["MINIWOB_URL"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["miniwob"]()
@@ -109,13 +109,13 @@ def test_miniwob_benchmark_reset():
         os.environ["MINIWOB_URL"] = MINIWOB_URL
 
 
-def test_assistantbench_benchmark_reset():
+def test_prepare_backend_assistantbench():
     benchmark: Benchmark = DEFAULT_BENCHMARKS["assistantbench"]()
     benchmark.prepare_backends()
 
 
 @pytest.mark.skip
-def test_webarena_benchmark_reset():
+def test_prepare_backend_webarena():
     WA_FULL_RESET = os.environ["WA_FULL_RESET"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
@@ -134,7 +134,7 @@ def test_webarena_benchmark_reset():
 
 
 @pytest.mark.skip
-def test_visualwebarena_benchmark_reset():
+def test_prepare_backend_visualwebarena():
     VWA_FULL_RESET = os.environ["VWA_FULL_RESET"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["visualwebarena"]()
@@ -150,6 +150,22 @@ def test_visualwebarena_benchmark_reset():
             benchmark.prepare_backends()
     finally:
         os.environ["VWA_FULL_RESET"] = VWA_FULL_RESET
+
+
+@pytest.mark.skip
+def test_prepare_backend_weblinx():
+    BROWSERGYM_WEBLINX_CACHE_DIR = os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["weblinx"]()
+
+        benchmark.prepare_backends()
+
+        del os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"]
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+
+    finally:
+        os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"] = BROWSERGYM_WEBLINX_CACHE_DIR
 
 
 def test_run_mock_benchmark():
