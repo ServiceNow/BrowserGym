@@ -48,6 +48,8 @@ def add_prediction_to_jsonl(
 
     if existing_record:
         if not override_if_exists:
+            raise ValueError(f"Task ID '{task_id}' already exists.")
+
             logger.warning(
                 f"Task ID '{task_id}' already exists. Not overriding as 'override_if_exists' is set to False."
             )
