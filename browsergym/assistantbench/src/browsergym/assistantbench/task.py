@@ -1,7 +1,5 @@
 import logging
 import os
-import logging
-import pathlib
 from typing import Dict, Tuple
 
 from datasets import load_dataset
@@ -76,13 +74,13 @@ class AssistantBenchTask(AbstractBrowserTask):
         raise NotImplementedError
 
     def __init__(
-        self, seed: int, task_id: str, output_file_path: str = None, save_predictions: bool = False
+        self, seed: int, task_id: str, output_file: str = None, save_predictions: bool = False
     ) -> None:
         """
         Args:
             seed (int): Random seed for task initialization.
             task_id (str): Unique identifier for the task (for the BrowserGym environment).
-            output_file_path (str, optional): Path to the output file for saving results, needed for test set.
+            output_file (str, optional): Path to the output file for saving results, needed for test set.
             save_predictions (bool, optional): Save predictions to the output file (yes/no).
         """
         super().__init__(seed)
@@ -96,37 +94,28 @@ class AssistantBenchTask(AbstractBrowserTask):
         self.ab_task_id = ids[self.task_id]
         self.save_predictions = save_predictions
 
-        # get output_file_path value from constructor if provided
-        if output_file_path:
-            self.output_file_path = pathlib.Path(output_file_path)
-        # else get value form environment variable
-        elif "ASSISTANTBENCH_OUTPUT_DIR" in os.environ:
-            self.output_file_path = (
-                pathlib.Path(os.environ["ASSISTANTBENCH_OUTPUT_DIR"]) / "predictions.jsonl"
-            )
-            logging.info(f"Output file path set to {self.output_file_path}")
-        # else get value from default
+        # get output_file value from constructor (if provided), or env variable (if provided), or default
+        if output_file:
+            self.output_file = output_file
+        elif "ASSISTANTBENCH_OUTPUT_FILE" in os.environ:
+            self.output_file = os.environ["ASSISTANTBENCH_OUTPUT_FILE"]
         else:
-            self.output_file_path = get_default_output_file()
+            self.output_file = get_default_output_file()
+
+        if self.save_predictions and self.output_file:
+            logger.info(f"Task prediction will be written to output file {self.output_file}")
 
     def setup(self, page: Page) -> Tuple[str, dict]:
         logger.info(f"Navigating to start url: {self.start_url}")
         page.goto(self.start_url, timeout=10000)
-        # TODO create empty task entry in output_file_path, raise Exception if entry already there
-        if self.save_predictions and self.output_file_path:
-            try:
-                add_prediction_to_jsonl(
-                    file_path=self.output_file_path,
-                    task_id=self.ab_task_id,
-                    prediction="",
-                    override_if_exists=False,
-                )
-            except ValueError as e:
-                raise ValueError(
-                    f"Task ID '{self.ab_task_id}' already exists in the output file. "
-                    f"Please provide a different task ID or output file path. "
-                    f"Original error: {e}"
-                )
+        if self.save_predictions and self.output_file:
+            # create an empty task entry in the output file (will raise an Exception if the entry is already there)
+            add_prediction_to_jsonl(
+                file_path=self.output_file,
+                task_id=self.ab_task_id,
+                prediction="",
+                override_if_exists=False,
+            )
         return self.goal, {}
 
     def teardown(self) -> None:
@@ -139,9 +128,10 @@ class AssistantBenchTask(AbstractBrowserTask):
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             done = True
             prediction = chat_messages[-1]["message"]
-            if self.save_predictions and self.output_file_path:
+            if self.save_predictions and self.output_file:
+                # update the task entry in the output file
                 add_prediction_to_jsonl(
-                    file_path=self.output_file_path,
+                    file_path=self.output_file,
                     task_id=self.ab_task_id,
                     prediction=prediction,
                     override_if_exists=True,
