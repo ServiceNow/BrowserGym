@@ -74,7 +74,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         demo_mode="off",
     ),
     "assistantbench": HighLevelActionSetArgs(
-        subsets=["chat", "bid", "tab", "nav"],
+        subsets=["assistantbench"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -231,7 +231,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "weblinx": lambda: Benchmark(
         name="weblinx",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["weblinx"],
         is_multi_tab=True,
         supports_parallel_seeds=True,
         backends=["weblinx"],

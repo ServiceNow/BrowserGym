@@ -212,6 +212,18 @@ ACTION_SUBSETS = {
         tab_close,  # tabremove(target=[tabId]) -> tab_close()
         tab_focus,  # tabswitch(origin=[origin tabId],target=[target tabId]) -> tab_focus(index=[target tabid])
     ],
+    # from assistantbench paper
+    # https://arxiv.org/abs/2407.15711
+    "assistantbench": [
+        scroll,  # SCROLL
+        fill,  # TYPE
+        select_option,  # SELECT
+        click,  # CLICK
+        press,  # PRESS ENTER
+        go_back,  # GOBACK
+        goto,  # GOTO, SEARCH
+        send_msg_to_user,  # TERMINATE
+    ],
 }
 
 
