@@ -520,7 +520,7 @@ document.addEventListener("visibilitychange", () => {
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
-                _pre_extract(self.page, self.tags_to_mark)
+                _pre_extract(self.page, tags_to_mark=self.tags_to_mark, lenient=(retries_left == 0))
 
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
