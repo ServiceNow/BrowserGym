@@ -25,6 +25,8 @@ class AbstractBrowserTask(ABC):
         self.viewport = {"width": 1280, "height": 720}
         self.slow_mo = 1000  # ms
         self.timeout = 5000  # ms
+        self.locale = None  # see https://playwright.dev/python/docs/api/class-browser#browser-new-context-option-locale
+        self.timezone_id = None  # see https://playwright.dev/python/docs/api/class-browser#browser-new-context-option-timezone-id
 
     @abstractmethod
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
