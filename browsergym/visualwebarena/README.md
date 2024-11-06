@@ -13,7 +13,7 @@ pip install browsergym-visualwebarena
 
 2. Download tokenizer ressources
 ```sh
-python -c "import nltk; nltk.download('punkt')"
+python -c "import nltk; nltk.download('punkt_tab')"
 ```
 
 3. Setup the web servers (follow the [visualwebarena README](https://github.com/web-arena-x/visualwebarena?tab=readme-ov-file)).
