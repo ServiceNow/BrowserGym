@@ -223,7 +223,7 @@ DEFAULT_BENCHMARKS = {
             task_list=task_list_from_metadata(
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
             ),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
