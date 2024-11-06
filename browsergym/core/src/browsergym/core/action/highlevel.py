@@ -254,6 +254,7 @@ class HighLevelActionSet(AbstractActionSet):
         "workarena",
         "workarena++",
         "weblinx",
+        "assistantbench",
         "custom",
     ]
     DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]
