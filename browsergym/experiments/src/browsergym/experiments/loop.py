@@ -214,9 +214,28 @@ class ExpArgs:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
+
+            # assistantbench hack, tell the task where to write its output
+            # TODO: find a better way to deal with this
+            if self.env_args.task_name.startswith("assistantbench.test"):
+                task_kwargs_backup = self.env_args.task_kwargs
+                if self.env_args.task_kwargs is None:
+                    self.env_args.task_kwargs = {}
+                else:
+                    self.env_args.task_kwargs = dict(self.env_args.task_kwargs)  # make a copy
+                self.env_args.task_kwargs["output_file"] = (
+                    self.exp_dir / "assistantbench-prediction.json"
+                )
+
             env = self.env_args.make_env(
                 action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
             )
+
+            # assistantbench hack
+            # TODO: find a better way to deal with this
+            if self.env_args.task_name.startswith("assistantbench.test"):
+                self.env_args.task_kwargs = task_kwargs_backup
+
             logger.debug(f"Environment created.")
 
             step_info = StepInfo(step=0)
