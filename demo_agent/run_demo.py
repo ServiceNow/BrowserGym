@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument(
         "--task_name",
         type=str,
-        default="webcanvas.0",
+        default="webcanvas.mind2web-live.1",
         help="Name of the Browsergym task to run. If 'openended', you need to specify a 'start_url'",
     )
     parser.add_argument(

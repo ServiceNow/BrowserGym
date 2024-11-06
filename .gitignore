@@ -141,6 +141,6 @@ tmp.py
 .vscode/settings.json
 
 # webcanvas
-test_gpt.py
-temp_test.py
+.vscode/*
 results/
+tests/webcanvas/*
