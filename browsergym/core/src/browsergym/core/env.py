@@ -63,6 +63,8 @@ class BrowserEnv(gym.Env, ABC):
         viewport: Optional[dict] = None,  # will override the task's viewport
         slow_mo: Optional[int] = None,  # will override the task's slow_mo
         timeout: Optional[int] = None,  # will override the task's timeout
+        locale: Optional[str] = None,  # will override the task's locale
+        timezone_id: Optional[str] = None,  # will override the task's timezone_id
         tags_to_mark: Literal["all", "standard_html"] = "standard_html",
         # interactive / debugging arguments
         headless: bool = True,
@@ -84,6 +86,8 @@ class BrowserEnv(gym.Env, ABC):
             viewport: desired viewport size. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             slow_mo: desired slow_mo value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             timeout: desired timeout value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            locale: desired user locale for Playwright, for example en-GB, de-DE, etc. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            timezone_id. desired timezone for Playwright, for example "Pacific/Tahiti". This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             tags_to_mark: which HTML tags should be marked by BrowserGym and receive a bid. Value "all" will mark every element in the page, while "standard_html" (default) will only mark standard html tags.
             headless: whether the browser should run in headless mode or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Headless mode should only be disabled for debugging/testing.
             wait_for_user_message: whether the environment should pause and wait for a user message in the chat after a new message is sent by the agent. Useful for running agents in interactive mode.
@@ -100,6 +104,8 @@ class BrowserEnv(gym.Env, ABC):
         self.viewport = viewport
         self.slow_mo = slow_mo
         self.timeout = timeout
+        self.locale = locale
+        self.timezone_id = timezone_id
         self.tags_to_mark = tags_to_mark
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
@@ -193,15 +199,18 @@ class BrowserEnv(gym.Env, ABC):
             if env_value is None:
                 return task_value
             else:
-                logger.warning(
-                    f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
-                )
+                if task_value is not None:
+                    logger.warning(
+                        f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
+                    )
                 return env_value
 
         # fetch task's desired parameters for browser setup
         viewport = override_property(self.task, self, "viewport")
         slow_mo = override_property(self.task, self, "slow_mo")
         timeout = override_property(self.task, self, "timeout")
+        locale = override_property(self.task, self, "locale")
+        timezone_id = override_property(self.task, self, "timezone_id")
 
         # use the global Playwright instance
         pw: playwright.sync_api.Playwright = _get_global_playwright()
@@ -229,6 +238,8 @@ class BrowserEnv(gym.Env, ABC):
                 Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
             ),
             record_video_size=viewport,
+            locale=locale,
+            timezone_id=timezone_id,
             # will raise an Exception if above args are overriden
             **self.pw_context_kwargs,
         )
