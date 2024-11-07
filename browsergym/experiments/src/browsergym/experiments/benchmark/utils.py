@@ -1,9 +1,13 @@
+import logging
 import os
 from typing import Literal
 
+import gymnasium as gym
 import numpy as np
 
 from browsergym.experiments.loop import SEED_MAX, EnvArgs
+
+logger = logging.getLogger(__name__)
 
 
 def make_env_args_list_from_workarena_curriculum(
@@ -121,6 +125,32 @@ def prepare_backend(backend: str):
 
             default_instance = VisualWebArenaInstance()
             default_instance.full_reset()
+
+            vwa_massage_task_ids = [
+                0,  # classifieds
+                33,  # classifieds
+                150,  # classifieds
+                253,  # reddit
+                325,  # reddit
+                390,  # reddit
+                444,  # shopping
+                555,  # shopping
+                666,  # shopping
+            ]
+            for task_id in vwa_massage_task_ids:
+                gym_id = f"browsergym/visualwebarena.{task_id}"
+                logger.info(
+                    f"VisualWebArena instance massaging {task_id} / {len(vwa_massage_task_ids)} ({gym_id} reset)"
+                )
+                env = gym.make(gym_id)
+                try:
+                    env.reset()  # task setup and logging
+                except Exception as e:
+                    logger.warning(
+                        f"Error during VisualWebArena instance massaging ({gym_id} reset): {e}"
+                    )
+                finally:
+                    env.close()
 
         case "workarena":
             # register environments
