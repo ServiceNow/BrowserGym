@@ -26,7 +26,6 @@ from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
-from .tape import Action, Observation, Tape, Thought
 
 logger = logging.getLogger(__name__)
 
@@ -658,49 +657,67 @@ class ExpResult:
                 self._summary_info = json.load(f)
         return self._summary_info
 
-    def get_tape(self) -> Tape:
+    def get_tape(self) -> dict:
         """
-        Return experiment trace in a format compatible with the TapeAgents framework
+        Return experiment trace in the format compatible with TapeAgents framework
         """
-        tape_steps = []
+        steps = []
         for step_info in self.steps_info:
-            # extract observation step
-            if step_info.obs is not None:
-                screenshot: str = ""
-                screenshot_som: str = ""
-                obs_dict = step_info.obs.copy()
-                if "screenshot" in obs_dict:
-                    screenshot = str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
-                    obs_dict.pop("screenshot")
-                if "screenshot_som" in obs_dict:
-                    screenshot_som = str(self.exp_dir / f"screenshot_som_step_{step_info.step}.png")
-                    obs_dict.pop("screenshot_som")
-                observation = Observation(
+            if "tape_segment" in step_info.agent_info["extra_info"]:
+                tape_segment = step_info.agent_info["extra_info"]["tape_segment"]
+            else:
+                tape_segment = self.create_tape_segment(step_info)
+            steps += tape_segment
+        metadata = dict(
+            id=str(uuid.uuid4()),
+            author="browsergym_agent",
+            exp_record=self.get_exp_record(),
+        )
+        return dict(steps=steps, metadata=metadata)
+
+    def create_tape_segment(self, step_info) -> list[dict]:
+        tape_segment = []
+        # extract observation step
+        if step_info.obs is not None:
+            screenshot: str = ""
+            screenshot_som: str = ""
+            obs_dict = step_info.obs.copy()
+            if "screenshot" in obs_dict:
+                screenshot = str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
+                obs_dict.pop("screenshot")
+            if "screenshot_som" in obs_dict:
+                screenshot_som = str(self.exp_dir / f"screenshot_som_step_{step_info.step}.png")
+                obs_dict.pop("screenshot_som")
+            tape_segment.append(
+                dict(
+                    kind="browsergym_observation",
                     metadata={"step": step_info.step},
                     obs=obs_dict,
                     screenshot=screenshot,
                     screenshot_som=screenshot_som,
                 )
-                tape_steps.append(observation)
+            )
 
-            # extract thought step
-            think = step_info.agent_info.get("think", "")
-            if think:
-                # TODO: add check for the type after introduction of tape segments as thoughts
-                thought = Thought(metadata={"step": step_info.step}, text=think)
-                tape_steps.append(thought)
+        # extract thought step
+        think = step_info.agent_info.get("think", "")
+        if think:
+            tape_segment.append(
+                dict(kind="browsergym_thought", metadata={"step": step_info.step}, text=think)
+            )
 
-            # extract action step
-            action_str = step_info.action
-            # TODO: this is a very naive way to split the arguments, make proper parsing later
-            if "(" in action_str:
-                name, args_str = action_str.split("(", maxsplit=1)
-                args_str = args_str.rstrip(")")
-                arguments = {i: a.strip() for i, a in enumerate(args_str.split(","))}
-            else:
-                name = action_str
-                arguments = {}
-            action = Action(
+        # extract action step
+        action_str = step_info.action
+        # TODO: this is a naive way to split the arguments, make proper parsing later
+        if "(" in action_str:
+            name, args_str = action_str.split("(", maxsplit=1)
+            args_str = args_str.rstrip(")")
+            arguments = {i: a.strip() for i, a in enumerate(args_str.split(","))}
+        else:
+            name = action_str
+            arguments = {}
+        tape_segment.append(
+            dict(
+                kind="browsergym_action",
                 metadata={
                     "step": step_info.step,
                     "reward": step_info.reward,
@@ -714,15 +731,15 @@ class ExpResult:
                 name=name,
                 arguments=arguments,
             )
-            tape_steps.append(action)
-        return Tape(steps=tape_steps, metadata=self.get_exp_record())
+        )
+        return tape_segment
 
     def save_tape(self):
         tape = self.get_tape()
         if os.path.exists(self.exp_dir / "tape.json"):
             raise FileExistsError(f"tape.json already exists in {self.exp_dir}")
         with open(self.exp_dir / "tape.json", "w") as f:
-            json.dump(tape.as_dict(), f, indent=4, ensure_ascii=False)
+            json.dump(tape, f, indent=4, ensure_ascii=False)
 
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
