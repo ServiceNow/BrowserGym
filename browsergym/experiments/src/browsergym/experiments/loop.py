@@ -657,16 +657,21 @@ class ExpResult:
                 self._summary_info = json.load(f)
         return self._summary_info
 
-    def get_tape(self) -> dict:
+    @property
+    def tape(self) -> dict:
         """
-        Return experiment trace in the format compatible with TapeAgents framework
+        TapeAgents (https://github.com/ServiceNow/TapeAgents) framework compatibility.
+        Exports experiment trace in the format of serialized tape.
+        Reuses tape segments if they were already placed in the agent_info during the experiment.
+
+        :returns: dict: serialized tape of the experiment
         """
         steps = []
         for step_info in self.steps_info:
             if "tape_segment" in step_info.agent_info["extra_info"]:
                 tape_segment = step_info.agent_info["extra_info"]["tape_segment"]
             else:
-                tape_segment = self.create_tape_segment(step_info)
+                tape_segment = self._create_tape_segment(step_info)
             steps += tape_segment
         metadata = dict(
             id=str(uuid.uuid4()),
@@ -675,7 +680,7 @@ class ExpResult:
         )
         return dict(steps=steps, metadata=metadata)
 
-    def create_tape_segment(self, step_info) -> list[dict]:
+    def _create_tape_segment(self, step_info: StepInfo) -> list[dict]:
         tape_segment = []
         # extract observation step
         if step_info.obs is not None:
@@ -734,12 +739,11 @@ class ExpResult:
         )
         return tape_segment
 
-    def save_tape(self):
-        tape = self.get_tape()
-        if os.path.exists(self.exp_dir / "tape.json"):
-            raise FileExistsError(f"tape.json already exists in {self.exp_dir}")
-        with open(self.exp_dir / "tape.json", "w") as f:
-            json.dump(tape, f, indent=4, ensure_ascii=False)
+    def save_tape(self, filename: str = "tape.json"):
+        if os.path.exists(self.exp_dir / filename):
+            raise FileExistsError(f"{filename} already exists in {self.exp_dir}")
+        with open(self.exp_dir / filename, "w") as f:
+            json.dump(self.tape, f, indent=4, ensure_ascii=False)
 
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
