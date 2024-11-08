@@ -696,7 +696,7 @@ class ExpResult:
             tape_segment.append(
                 dict(
                     kind="browsergym_observation",
-                    metadata={"step": step_info.step},
+                    metadata=dict(step=step_info.step),
                     obs=obs_dict,
                     screenshot=screenshot,
                     screenshot_som=screenshot_som,
@@ -723,16 +723,16 @@ class ExpResult:
         tape_segment.append(
             dict(
                 kind="browsergym_action",
-                metadata={
-                    "step": step_info.step,
-                    "reward": step_info.reward,
-                    "raw_reward": step_info.raw_reward,
-                    "terminated": step_info.terminated,
-                    "truncated": step_info.truncated,
-                    "agent_info": step_info.agent_info,
-                    "stats": step_info.stats,
-                    "task_info": step_info.task_info,
-                },
+                metadata=dict(
+                    step=step_info.step,
+                    reward=step_info.reward,
+                    raw_reward=step_info.raw_reward,
+                    terminated=step_info.terminated,
+                    truncated=step_info.truncated,
+                    agent_info=step_info.agent_info,
+                    stats=step_info.stats,
+                    task_info=step_info.task_info,
+                ),
                 name=name,
                 arguments=arguments,
             )
