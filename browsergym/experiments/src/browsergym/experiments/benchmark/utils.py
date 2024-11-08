@@ -137,10 +137,10 @@ def prepare_backend(backend: str):
                 555,  # shopping
                 666,  # shopping
             ]
-            for task_id in vwa_massage_task_ids:
+            for i, task_id in enumerate(vwa_massage_task_ids):
                 gym_id = f"browsergym/visualwebarena.{task_id}"
                 logger.info(
-                    f"VisualWebArena instance massaging {task_id} / {len(vwa_massage_task_ids)} ({gym_id} reset)"
+                    f"VisualWebArena instance massaging {i} / {len(vwa_massage_task_ids)} ({gym_id} reset)"
                 )
                 env = gym.make(gym_id)
                 try:
