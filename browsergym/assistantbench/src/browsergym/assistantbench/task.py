@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Tuple
 
 from datasets import load_dataset
@@ -7,6 +8,8 @@ from browsergym.core.task import AbstractBrowserTask
 
 from .evaluation.evaluator import question_scorer
 from .utils import add_prediction_to_jsonl
+
+logger = logging.getLogger(__name__)
 
 # Load dataset
 
@@ -65,6 +68,9 @@ class AssistantBenchTask(AbstractBrowserTask):
             output_file_path (str, optional): Path to the output file for saving results, needed for test set.
         """
         super().__init__(seed)
+        self.locale = "en-US"
+        self.timezone_id = "America/New_York"
+
         self.task_id = task_id
         self.start_url = "https://google.com"
         self.goal = tasks[str(self.task_id)]
@@ -73,6 +79,7 @@ class AssistantBenchTask(AbstractBrowserTask):
         self.output_file_path = output_file_path
 
     def setup(self, page: Page) -> Tuple[str, dict]:
+        logger.info(f"Navigating to start url: {self.start_url}")
         page.goto(self.start_url, timeout=10000)
         return self.goal, {}
 
