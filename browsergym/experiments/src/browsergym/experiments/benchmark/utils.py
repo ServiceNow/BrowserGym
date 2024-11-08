@@ -133,7 +133,7 @@ def prepare_backend(backend: str):
                 253,  # reddit
                 325,  # reddit
                 390,  # reddit
-                444,  # shopping
+                410,  # shopping
                 555,  # shopping
                 666,  # shopping
             ]
