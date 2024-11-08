@@ -15,7 +15,7 @@ readme = "README.md"
 requires-python = ">3.7"
 license = {text = "Apache-2.0"}
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
@@ -23,6 +23,34 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
 ]
 dynamic = ["dependencies", "version"]
+
+[project.optional-dependencies]
+miniwob = [
+  "browsergym-miniwob",
+]
+workarena = [
+  "browsergym-workarena",
+]
+webarena = [
+  "browsergym-webarena",
+]
+visualwebarena = [
+  "browsergym-visualwebarena",
+]
+assistantbench = [
+  "browsergym-assistantbench",
+]
+weblinx = [
+  "weblinx_browsergym",
+]
+all = [
+  "browsergym-experiment[miniwob]",
+  "browsergym-experiment[workarena]",
+  "browsergym-experiment[webarena]",
+  "browsergym-experiment[visualwebarena]",
+  "browsergym-experiment[assistantbench]",
+  "browsergym-experiment[weblinx]",
+]
 
 [project.urls]
 homepage = "https://github.com/ServiceNow/BrowserGym"

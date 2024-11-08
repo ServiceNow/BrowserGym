@@ -24,7 +24,9 @@ class MarkingError(Exception):
 
 
 def _pre_extract(
-    page: playwright.sync_api.Page, tags_to_mark: Literal["all", "standard_html"] = "standard_html"
+    page: playwright.sync_api.Page,
+    tags_to_mark: Literal["all", "standard_html"] = "standard_html",
+    lenient: bool = False,
 ):
     """
     pre-extraction routine, marks dom elements (set bid and dynamic attributes like value and checked)
@@ -66,7 +68,11 @@ def _pre_extract(
                 continue
             child_frame_bid = child_frame_elem.get_attribute(BID_ATTR)
             if child_frame_bid is None:
-                raise MarkingError("Cannot mark a child frame without a bid.")
+                if lenient:
+                    logger.warning("Cannot mark a child frame without a bid. Skipping frame.")
+                    continue
+                else:
+                    raise MarkingError("Cannot mark a child frame without a bid.")
             mark_frames_recursive(child_frame, frame_bid=child_frame_bid)
 
     # mark all frames recursively
