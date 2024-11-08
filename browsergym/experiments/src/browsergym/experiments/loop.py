@@ -676,7 +676,7 @@ class ExpResult:
         metadata = dict(
             id=str(uuid.uuid4()),
             author="browsergym_agent",
-            exp_record=self.get_exp_record(),
+            result=self.get_exp_record(),
         )
         return dict(steps=steps, metadata=metadata)
 
