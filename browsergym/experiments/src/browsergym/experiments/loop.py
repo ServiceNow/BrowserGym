@@ -1,3 +1,4 @@
+import copy
 import gzip
 import importlib.metadata
 import json
@@ -686,7 +687,7 @@ class ExpResult:
         if step_info.obs is not None:
             screenshot: str = ""
             screenshot_som: str = ""
-            obs_dict = step_info.obs.copy()
+            obs_dict = copy.deepcopy(step_info.obs)
             if "screenshot" in obs_dict:
                 screenshot = str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
                 obs_dict.pop("screenshot")
