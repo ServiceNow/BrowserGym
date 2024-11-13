@@ -162,6 +162,7 @@ def prepare_backend(backend: str):
                             # fallback plan
                             no_action = ""
                         env.step(no_action)  # task validation
+                        env.step(no_action)  # task validation again
                         logger.info(f"Massage successful")
                         break
                     except Exception as e:
