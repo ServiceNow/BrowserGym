@@ -173,16 +173,22 @@ class BrowserEnv(gym.Env, ABC):
         self.action_space = Unicode()
 
     def close(self):
+        # stop the task
         if self.task:
-            # stop the task
             self.task.teardown()
-            # close the chat
-            self.chat.close()
-            # close the browser context
-            self.context.close()
-            # close the browser
-            self.browser.close()
             self.task = None
+        # close the chat
+        if self.chat:
+            self.chat.close()
+            self.chat = None
+        # close the browser context
+        if self.context:
+            self.context.close()
+            self.context = None
+        # close the browser
+        if self.browser:
+            self.browser.close()
+            self.browser = None
 
     def reset(self, seed=None, *args, **kwargs):
         super().reset(seed=seed, *args, **kwargs)
