@@ -129,28 +129,55 @@ def prepare_backend(backend: str):
             vwa_massage_task_ids = [
                 0,  # classifieds
                 33,  # classifieds
-                150,  # classifieds
-                253,  # reddit
-                325,  # reddit
-                390,  # reddit
-                410,  # shopping
                 555,  # shopping
                 666,  # shopping
+                282,  # __REDDIT__/f/dataisbeautiful
+                305,  # __REDDIT__/f/memes/new
+                314,  # __REDDIT__/f/mildlyinteresting
+                317,  # __REDDIT__/f/Art/active
+                318,  # __REDDIT__/f/consoles
+                319,  # __REDDIT__/f/EarthPorn
+                410,  # __REDDIT__/f/food
+                411,  # __REDDIT__/f/food
+                427,  # __REDDIT__/f/EarthPorn
+                436,  # __REDDIT__/f/Art
+                440,  # __REDDIT__/f/EarthPorn
             ]
+            vwa_massage_max_retries = 1
             for i, task_id in enumerate(vwa_massage_task_ids):
                 gym_id = f"browsergym/visualwebarena.{task_id}"
                 logger.info(
                     f"VisualWebArena instance massaging {i + 1} / {len(vwa_massage_task_ids)} ({gym_id} reset)"
                 )
-                env = gym.make(gym_id)
-                try:
-                    env.reset()  # task setup and logging
-                except Exception as e:
-                    logger.warning(
-                        f"Error during VisualWebArena instance massaging ({gym_id} reset): {e}"
-                    )
-                finally:
-                    env.close()
+                retries = 0
+                while True:
+                    env = gym.make(gym_id)
+                    try:
+                        env.reset()  # task setup
+                        no_action = "noop()"
+                        try:
+                            # check if action space exists and is compatible with "noop()"
+                            env.unwrapped.action_mapping(no_action)
+                        except:
+                            # fallback plan
+                            no_action = ""
+                        env.step(no_action)  # task validation
+                        logger.info(f"Massage successful")
+                        break
+                    except Exception as e:
+                        if retries < vwa_massage_max_retries:
+                            retries += 1
+                            logger.info(
+                                f"Massage failed, retrying ({retries} / {vwa_massage_max_retries})"
+                            )
+                            continue
+                        else:
+                            logger.warning(
+                                f"Error during VisualWebArena instance massaging ({gym_id}, {retries} retries): {e}"
+                            )
+                            break
+                    finally:
+                        env.close()
 
         case "workarena":
             # register environments
