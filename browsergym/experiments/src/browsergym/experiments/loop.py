@@ -675,7 +675,7 @@ class ExpResult:
             steps += tape_segment
         metadata = dict(
             id=str(uuid.uuid4()),
-            author="browsergym_agent",
+            author=f"browsergym_agent_[{agent_name}]",
             result=self.get_exp_record(),
         )
         return dict(steps=steps, metadata=metadata)
