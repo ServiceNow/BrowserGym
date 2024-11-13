@@ -25,7 +25,7 @@ from .observation import (
     extract_merged_axtree,
     extract_screenshot,
 )
-from .spaces import AnyBox, AnyDict, Unicode
+from .spaces import AnyBox, AnyDict, Float, Unicode
 from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
@@ -138,6 +138,7 @@ class BrowserEnv(gym.Env, ABC):
                     gym.spaces.Dict(
                         {
                             "role": Unicode(),
+                            "timestamp": Float(),
                             "message": Unicode(),
                         }
                     )
@@ -146,7 +147,9 @@ class BrowserEnv(gym.Env, ABC):
                 "goal_object": gym.spaces.Sequence(AnyDict()),
                 "open_pages_urls": gym.spaces.Sequence(Unicode()),
                 "open_pages_titles": gym.spaces.Sequence(Unicode()),
-                "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
+                "active_page_index": gym.spaces.Box(
+                    low=0, high=255, dtype=int
+                ),  # TODO: change to an Integer (breaking change for users)
                 "url": Unicode(),
                 "screenshot": AnyBox(
                     low=0,
@@ -160,7 +163,9 @@ class BrowserEnv(gym.Env, ABC):
                 "focused_element_bid": Unicode(),
                 "last_action": Unicode(),
                 "last_action_error": Unicode(),
-                "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
+                "elapsed_time": gym.spaces.Box(
+                    low=0, high=np.inf, dtype=float
+                ),  # TODO: change to a Float (breaking change for users)
             }
         )
 
@@ -448,7 +453,7 @@ document.addEventListener("visibilitychange", () => {
 
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
-            logger.info(
+            logger.debug(
                 "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
             )
             self.page = prev_active_page
@@ -552,11 +557,13 @@ document.addEventListener("visibilitychange", () => {
 
         # obs is generic to all tasks
         obs = {
-            "chat_messages": copy.deepcopy(self.chat.messages),
+            "chat_messages": tuple(copy.deepcopy(self.chat.messages)),
             "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
-            "goal_object": self.goal_object,  # new goal format, list of messages openai style
-            "open_pages_urls": [page.url for page in self.context.pages],
-            "open_pages_titles": [page.title() for page in self.context.pages],
+            "goal_object": tuple(
+                copy.deepcopy(self.goal_object)
+            ),  # new goal format, list of messages openai style
+            "open_pages_urls": tuple(page.url for page in self.context.pages),
+            "open_pages_titles": tuple(page.title() for page in self.context.pages),
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
             "screenshot": extract_screenshot(self.page),
