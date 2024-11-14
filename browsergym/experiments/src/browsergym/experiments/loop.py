@@ -45,7 +45,15 @@ class EnvArgs(DataClassJsonMixin):
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: Optional[dict] = None  # use default value from BrowserGym
 
-    def make_env(self, action_mapping, exp_dir):
+    def make_env(self, action_mapping, exp_dir, exp_task_kwargs: dict):
+        """
+        Instantiates the BrowserGym environment corresponding to the arguments (with some tweaks).
+
+        Args:
+            action_mapping: overrides the action mapping of the environment.
+            exp_dir: will set the environment's "record_video_dir" to the directory where the experiment is running.
+            exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assitantbench).
+        """
         extra_kwargs = {}
         if self.record_video:
             extra_kwargs["record_video_dir"] = exp_dir
@@ -57,6 +65,8 @@ class EnvArgs(DataClassJsonMixin):
             extra_kwargs["pw_context_kwargs"] = {"storage_state": self.storage_state}
         if self.task_kwargs is not None:
             extra_kwargs["task_kwargs"] = self.task_kwargs
+        if exp_task_kwargs:
+            extra_kwargs["task_kwargs"] = extra_kwargs.get("task_kwargs", {}) | exp_task_kwargs
 
         return gym.make(
             _get_env_name(self.task_name),
@@ -215,26 +225,17 @@ class ExpArgs:
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
 
-            # assistantbench hack, tell the task where to write its output
-            # TODO: find a better way to deal with this
+            # assistantbench hack, write the task output (agent prediction) to a file in the experiment's directory
             if self.env_args.task_name.startswith("assistantbench.test"):
-                task_kwargs_backup = self.env_args.task_kwargs
-                if self.env_args.task_kwargs is None:
-                    self.env_args.task_kwargs = {}
-                else:
-                    self.env_args.task_kwargs = dict(self.env_args.task_kwargs)  # make a copy
-                self.env_args.task_kwargs["output_file"] = (
-                    self.exp_dir / "assistantbench-prediction.json"
-                )
+                exp_task_kwargs = {"output_file": self.exp_dir / "assistantbench-prediction.json"}
+            else:
+                exp_task_kwargs = {}
 
             env = self.env_args.make_env(
-                action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
+                action_mapping=agent.action_set.to_python_code,
+                exp_dir=self.exp_dir,
+                exp_task_kwargs=exp_task_kwargs,
             )
-
-            # assistantbench hack
-            # TODO: find a better way to deal with this
-            if self.env_args.task_name.startswith("assistantbench.test"):
-                self.env_args.task_kwargs = task_kwargs_backup
 
             logger.debug(f"Environment created.")
 
