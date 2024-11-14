@@ -42,13 +42,6 @@ class AbstractBrowserTask(ABC):
         """
 
     @abstractmethod
-    def teardown(self) -> None:
-        """
-        Tear down the task and clean up any ressource / data created by the task.
-
-        """
-
-    @abstractmethod
     def validate(
         self, page: playwright.sync_api.Page, chat_messages: list[str]
     ) -> Tuple[float, bool, str, dict]:
@@ -73,6 +66,13 @@ class AbstractBrowserTask(ABC):
 
         """
         raise NotImplementedError
+
+    def teardown(self) -> None:
+        """
+        Tear down the task and clean up any ressource / data created by the task (optional).
+
+        """
+        pass
 
 
 class OpenEndedTask(AbstractBrowserTask):
