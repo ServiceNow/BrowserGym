@@ -13,7 +13,7 @@ pip install browsergym-webarena
 
 2. Download tokenizer ressources
 ```sh
-python -c "import nltk; nltk.download('punkt')"
+python -c "import nltk; nltk.download('punkt_tab')"
 ```
 
 3. Setup the web servers (follow the [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)).

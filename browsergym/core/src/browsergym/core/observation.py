@@ -99,6 +99,10 @@ def _post_extract(page: playwright.sync_api.Page):
                 sandbox_attr = frame.frame_element().get_attribute("sandbox")
                 if sandbox_attr is not None and "allow-scripts" not in sandbox_attr.split():
                     continue
+                # deal with frames without a BID
+                bid = frame.frame_element().get_attribute(BID_ATTR)
+                if bid is None:
+                    continue
 
             frame.evaluate(js_frame_unmark_elements)
         except playwright.sync_api.Error as e:
