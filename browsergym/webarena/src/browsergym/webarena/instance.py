@@ -147,6 +147,9 @@ class WebArenaInstance:
 
         url = self.urls[site]
 
+        # open a new page (tab) to perform the login
+        page = page.context.new_page()
+
         match site:
             case "reddit":
                 username = self.credentials[site]["username"]
@@ -193,3 +196,6 @@ class WebArenaInstance:
 
             case _:
                 raise ValueError
+
+        # release login page
+        page.close()
