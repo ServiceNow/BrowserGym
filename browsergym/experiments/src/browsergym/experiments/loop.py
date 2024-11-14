@@ -51,7 +51,7 @@ class EnvArgs(DataClassJsonMixin):
 
         Args:
             action_mapping: overrides the action mapping of the environment.
-            exp_dir: will set the environment's "record_video_dir" to the directory where the experiment is running.
+            exp_dir: will set some environment parameters (e.g., record_video_dir) with respect to the directory where the experiment is running.
             exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assitantbench).
         """
         extra_kwargs = {}
@@ -67,6 +67,13 @@ class EnvArgs(DataClassJsonMixin):
             extra_kwargs["task_kwargs"] = self.task_kwargs
         if exp_task_kwargs:
             extra_kwargs["task_kwargs"] = extra_kwargs.get("task_kwargs", {}) | exp_task_kwargs
+
+        # assistantbench hack, write the task output (agent prediction) to a file in the experiment's directory
+        # TODO: find a better way to deal with this
+        if self.task_name.startswith("assistantbench.test"):
+            extra_kwargs["task_kwargs"] = extra_kwargs.get("task_kwargs", {}) | {
+                "output_file": exp_dir / "assistantbench-prediction.json"
+            }
 
         return gym.make(
             _get_env_name(self.task_name),
@@ -225,16 +232,9 @@ class ExpArgs:
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
 
-            # assistantbench hack, write the task output (agent prediction) to a file in the experiment's directory
-            if self.env_args.task_name.startswith("assistantbench.test"):
-                exp_task_kwargs = {"output_file": self.exp_dir / "assistantbench-prediction.json"}
-            else:
-                exp_task_kwargs = {}
-
             env = self.env_args.make_env(
                 action_mapping=agent.action_set.to_python_code,
                 exp_dir=self.exp_dir,
-                exp_task_kwargs=exp_task_kwargs,
             )
 
             logger.debug(f"Environment created.")
