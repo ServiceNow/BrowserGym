@@ -24,6 +24,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from browsergym.core.chat import Chat
+from browsergym.core.action.parsers import highlevel_action_parser
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -711,33 +712,26 @@ class ExpResult:
                 dict(kind="browsergym_thought", metadata={"step": step_info.step}, text=think)
             )
 
-        # extract action step
-        action_str = step_info.action
-        # TODO: this is a naive way to split the arguments, make proper parsing later
-        if "(" in action_str:
-            name, args_str = action_str.split("(", maxsplit=1)
-            args_str = args_str.rstrip(")")
-            arguments = {i: a.strip() for i, a in enumerate(args_str.split(","))}
-        else:
-            name = action_str
-            arguments = {}
-        tape_segment.append(
-            dict(
-                kind="browsergym_action",
-                metadata=dict(
-                    step=step_info.step,
-                    reward=step_info.reward,
-                    raw_reward=step_info.raw_reward,
-                    terminated=step_info.terminated,
-                    truncated=step_info.truncated,
-                    agent_info=step_info.agent_info,
-                    stats=step_info.stats,
-                    task_info=step_info.task_info,
-                ),
-                name=name,
-                arguments=arguments,
+        # extract action steps
+        function_calls = highlevel_action_parser.parse_string(step_info.action, parse_all=True)
+        for name, arguments in function_calls:
+            tape_segment.append(
+                dict(
+                    kind="browsergym_action",
+                    metadata=dict(
+                        step=step_info.step,
+                        reward=step_info.reward,
+                        raw_reward=step_info.raw_reward,
+                        terminated=step_info.terminated,
+                        truncated=step_info.truncated,
+                        agent_info=step_info.agent_info,
+                        stats=step_info.stats,
+                        task_info=step_info.task_info,
+                    ),
+                    name=name,
+                    arguments=arguments,
+                )
             )
-        )
         return tape_segment
 
     def save_tape(self, filename: str = "tape.json"):
