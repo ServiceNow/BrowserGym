@@ -15,6 +15,9 @@ register_task(
     task_kwargs={
         "task_id": f"imp.0",
     },
+    default_task_kwargs={
+        "save_predictions": False,  # can be overriden
+    },
 )
 TOY_AB_TASK_IDS.append(gym_id)
 
@@ -27,6 +30,9 @@ for task_id in range(33):
         task_kwargs={
             "task_id": f"validation.{task_id}",
         },
+        default_task_kwargs={
+            "save_predictions": False,  # can be overriden
+        },
     )
     VALID_AB_TASK_IDS.append(gym_id)
 
@@ -38,7 +44,9 @@ for task_id in range(181):
         task.AssistantBenchTask,
         task_kwargs={
             "task_id": f"test.{task_id}",
-            "save_predictions": True,
+        },
+        default_task_kwargs={
+            "save_predictions": True,  # can be overriden
         },
     )
     TEST_AB_TASK_IDS.append(gym_id)
