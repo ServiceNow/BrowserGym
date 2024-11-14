@@ -52,7 +52,7 @@ class EnvArgs(DataClassJsonMixin):
         Args:
             action_mapping: overrides the action mapping of the environment.
             exp_dir: will set some environment parameters (e.g., record_video_dir) with respect to the directory where the experiment is running.
-            exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assitantbench).
+            exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assistantbench).
         """
         extra_kwargs = {}
         if self.record_video:
