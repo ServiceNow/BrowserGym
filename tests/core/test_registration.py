@@ -7,7 +7,7 @@ from browsergym.core.registration import register_task
 from browsergym.core.task import AbstractBrowserTask
 
 
-class TestTask(AbstractBrowserTask):
+class RegistrationTestTask(AbstractBrowserTask):
     @classmethod
     def get_task_id(cls):
         raise NotImplementedError
@@ -28,10 +28,10 @@ class TestTask(AbstractBrowserTask):
         return 0, True, "", {}
 
 
-register_task("test_task", TestTask)
+register_task("test_task", RegistrationTestTask)
 register_task(
     "test_task_with_defaults",
-    TestTask,
+    RegistrationTestTask,
     task_kwargs={"a": "new value"},
     default_task_kwargs={"b": 1},
 )
@@ -42,7 +42,7 @@ def test_registration():
     with pytest.raises(ValueError):
         register_task(
             "test_task_forbidden",
-            TestTask,
+            RegistrationTestTask,
             task_kwargs={"a": "new value"},
             default_task_kwargs={"a": "other value"},
         )
