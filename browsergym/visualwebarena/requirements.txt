@@ -1,3 +1,4 @@
 browsergym-core==0.10.2
-libvisualwebarena==0.0.14
+--no-deps libvisualwebarena==0.0.14
 requests
+playwright~=1.47.0

@@ -1,2 +1,3 @@
 browsergym-core==0.10.2
-libwebarena==0.0.3
+--no-deps libwebarena==0.0.3
+playwright~=1.47.0
