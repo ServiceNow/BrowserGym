@@ -36,6 +36,7 @@ dependencies = [
     "browsergym-assistantbench==0.13.1",
     "browsergym-experiments==0.13.1",
     "browsergym-workarena>=0.4.1",
+    "weblinx-browsergym>=0.0.1dev14",
 ]
 
 [tool.setuptools]
