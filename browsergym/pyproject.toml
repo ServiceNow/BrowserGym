@@ -11,7 +11,9 @@ authors = [
     {name = "Massimo Caccia"},
     {name = "Alex Drouin"},
     {name = "Maxime Gasse"},
+    {name = "Imene Kerboua"},
     {name = "Alex Lacoste"},
+    {name = "Thibault Le Sellier De Chezelles"},
     {name = "Tom Marty"},
 ]
 readme = "README.md"

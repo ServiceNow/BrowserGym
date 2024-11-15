@@ -6,10 +6,10 @@ build-backend = "hatchling.build"
 name = "browsergym-experiments"
 description = "Experimentation tools for BrowserGym"
 authors = [
-    {name = "Alex Lacoste"},
     {name = "Massimo Caccia"},
-    {name = "Maxime Gasse"},
+    {name = "Alex Lacoste"},
     {name = "Thibault Le Sellier De Chezelles"},
+    {name = "Maxime Gasse"},
 ]
 readme = "README.md"
 requires-python = ">3.7"
