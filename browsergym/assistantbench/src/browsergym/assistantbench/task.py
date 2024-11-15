@@ -94,13 +94,14 @@ class AssistantBenchTask(AbstractBrowserTask):
         self.ab_task_id = ids[self.task_id]
         self.save_predictions = save_predictions
 
-        # get output_file value from constructor (if provided), or env variable (if provided), or default
-        if output_file:
-            self.output_file = output_file
-        elif "ASSISTANTBENCH_OUTPUT_FILE" in os.environ:
-            self.output_file = os.environ["ASSISTANTBENCH_OUTPUT_FILE"]
-        else:
+        self.output_file = output_file
+
+        # set output_file using the global default value, if not provided in constructor
+        if not self.output_file:
             self.output_file = get_default_output_file()
+        # use env variable in last resort
+        if not self.output_file:
+            self.output_file = os.getenv("ASSISTANTBENCH_OUTPUT_FILE", None)
 
         if self.save_predictions and self.output_file:
             logger.info(f"Task prediction will be written to output file {self.output_file}")
