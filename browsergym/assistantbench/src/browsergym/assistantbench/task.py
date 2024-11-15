@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Dict, Tuple
 
 from datasets import load_dataset
@@ -10,6 +11,18 @@ from .evaluation.evaluator import question_scorer
 from .utils import add_prediction_to_jsonl
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_OUTPUT_FILE = None
+
+
+def set_default_output_file(output_file: str):
+    global _DEFAULT_OUTPUT_FILE
+    _DEFAULT_OUTPUT_FILE = output_file
+
+
+def get_default_output_file():
+    return _DEFAULT_OUTPUT_FILE
+
 
 # Load dataset
 
@@ -60,12 +73,15 @@ class AssistantBenchTask(AbstractBrowserTask):
         """
         raise NotImplementedError
 
-    def __init__(self, seed: int, task_id: str, output_file_path: str = None) -> None:
+    def __init__(
+        self, seed: int, task_id: str, output_file: str = None, save_predictions: bool = False
+    ) -> None:
         """
         Args:
             seed (int): Random seed for task initialization.
             task_id (str): Unique identifier for the task (for the BrowserGym environment).
-            output_file_path (str, optional): Path to the output file for saving results, needed for test set.
+            output_file (str, optional): Path to the output file for saving results, needed for test set.
+            save_predictions (bool, optional): Save predictions to the output file (yes/no).
         """
         super().__init__(seed)
         self.locale = "en-US"
@@ -76,11 +92,31 @@ class AssistantBenchTask(AbstractBrowserTask):
         self.goal = tasks[str(self.task_id)]
         self.gold = gold_answers[str(self.task_id)]
         self.ab_task_id = ids[self.task_id]
-        self.output_file_path = output_file_path
+        self.save_predictions = save_predictions
+
+        self.output_file = output_file
+
+        # set output_file using the global default value, if not provided in constructor
+        if not self.output_file:
+            self.output_file = get_default_output_file()
+        # use env variable in last resort
+        if not self.output_file:
+            self.output_file = os.getenv("ASSISTANTBENCH_OUTPUT_FILE", None)
+
+        if self.save_predictions and self.output_file:
+            logger.info(f"Task prediction will be written to output file {self.output_file}")
 
     def setup(self, page: Page) -> Tuple[str, dict]:
         logger.info(f"Navigating to start url: {self.start_url}")
         page.goto(self.start_url, timeout=10000)
+        if self.save_predictions and self.output_file:
+            # create an empty task entry in the output file (will raise an Exception if the entry is already there)
+            add_prediction_to_jsonl(
+                file_path=self.output_file,
+                task_id=self.ab_task_id,
+                prediction="",
+                override_if_exists=False,
+            )
         return self.goal, {}
 
     def teardown(self) -> None:
@@ -93,10 +129,14 @@ class AssistantBenchTask(AbstractBrowserTask):
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             done = True
             prediction = chat_messages[-1]["message"]
-            accuracy, has_ans = question_scorer(prediction, self.gold)
-            if self.output_file_path:
+            if self.save_predictions and self.output_file:
+                # update the task entry in the output file
                 add_prediction_to_jsonl(
-                    self.output_file_path, self.ab_task_id, prediction, True
-                )  # save answer to file
+                    file_path=self.output_file,
+                    task_id=self.ab_task_id,
+                    prediction=prediction,
+                    override_if_exists=True,
+                )
+            accuracy, has_ans = question_scorer(prediction, self.gold)
 
         return accuracy, done, msg, info

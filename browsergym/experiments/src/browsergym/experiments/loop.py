@@ -45,7 +45,15 @@ class EnvArgs(DataClassJsonMixin):
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: Optional[dict] = None  # use default value from BrowserGym
 
-    def make_env(self, action_mapping, exp_dir):
+    def make_env(self, action_mapping, exp_dir, exp_task_kwargs: dict = {}):
+        """
+        Instantiates the BrowserGym environment corresponding to the arguments (with some tweaks).
+
+        Args:
+            action_mapping: overrides the action mapping of the environment.
+            exp_dir: will set some environment parameters (e.g., record_video_dir) with respect to the directory where the experiment is running.
+            exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assistantbench).
+        """
         extra_kwargs = {}
         if self.record_video:
             extra_kwargs["record_video_dir"] = exp_dir
@@ -57,6 +65,15 @@ class EnvArgs(DataClassJsonMixin):
             extra_kwargs["pw_context_kwargs"] = {"storage_state": self.storage_state}
         if self.task_kwargs is not None:
             extra_kwargs["task_kwargs"] = self.task_kwargs
+        if exp_task_kwargs:
+            extra_kwargs["task_kwargs"] = extra_kwargs.get("task_kwargs", {}) | exp_task_kwargs
+
+        # assistantbench hack, write the task output (agent prediction) to a file in the experiment's directory
+        # TODO: find a better way to deal with this
+        if self.task_name.startswith("assistantbench.test"):
+            extra_kwargs["task_kwargs"] = extra_kwargs.get("task_kwargs", {}) | {
+                "output_file": exp_dir / "assistantbench-prediction.json"
+            }
 
         return gym.make(
             _get_env_name(self.task_name),
@@ -214,9 +231,12 @@ class ExpArgs:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
+
             env = self.env_args.make_env(
-                action_mapping=agent.action_set.to_python_code, exp_dir=self.exp_dir
+                action_mapping=agent.action_set.to_python_code,
+                exp_dir=self.exp_dir,
             )
+
             logger.debug(f"Environment created.")
 
             step_info = StepInfo(step=0)

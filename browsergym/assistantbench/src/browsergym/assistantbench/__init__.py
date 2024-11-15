@@ -6,6 +6,7 @@ TOY_AB_TASK_IDS = []
 VALID_AB_TASK_IDS = []
 TEST_AB_TASK_IDS = []
 
+
 # register a toy easy task for testing implementation
 gym_id = f"assistantbench.imp.0"
 register_task(
@@ -13,7 +14,9 @@ register_task(
     task.AssistantBenchTask,
     task_kwargs={
         "task_id": f"imp.0",
-        "output_file_path": "./assistantbench-predictions-imp.jsonl",
+    },
+    default_task_kwargs={
+        "save_predictions": False,  # can be overriden
     },
 )
 TOY_AB_TASK_IDS.append(gym_id)
@@ -24,7 +27,12 @@ for task_id in range(33):
     register_task(
         gym_id,
         task.AssistantBenchTask,
-        task_kwargs={"task_id": f"validation.{task_id}"},
+        task_kwargs={
+            "task_id": f"validation.{task_id}",
+        },
+        default_task_kwargs={
+            "save_predictions": False,  # can be overriden
+        },
     )
     VALID_AB_TASK_IDS.append(gym_id)
 
@@ -36,7 +44,9 @@ for task_id in range(181):
         task.AssistantBenchTask,
         task_kwargs={
             "task_id": f"test.{task_id}",
-            "output_file_path": "./assistantbench-predictions-test.jsonl",
+        },
+        default_task_kwargs={
+            "save_predictions": True,  # can be overriden
         },
     )
     TEST_AB_TASK_IDS.append(gym_id)
