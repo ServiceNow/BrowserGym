@@ -62,6 +62,12 @@ def parse_args():
         default=False,
         help="Use screenshot in the agent's observation space.",
     )
+    # parser.add_argument(
+    #     "--use_chrome",
+    #     type=str2bool,
+    #     default=False,
+    #     help="use system Chrome instead of bundled Chromium."
+    # )
 
     return parser.parse_args()
 
@@ -93,6 +99,7 @@ https://github.com/ServiceNow/AgentLab"""
         task_seed=None,
         max_steps=100,
         headless=False,  # keep the browser open
+        # use_chrome=args.use_chrome,
         # viewport={"width": 1500, "height": 1280},  # can be played with if needed
     )
 

@@ -2,10 +2,13 @@ import base64
 import dataclasses
 import io
 import logging
+import os, getpass
 
 import numpy as np
+from typing import List
 import openai
 from PIL import Image
+from langsmith.run_helpers import traceable
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
@@ -13,6 +16,17 @@ from browsergym.experiments import AbstractAgentArgs, Agent
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
 
 logger = logging.getLogger(__name__)
+
+
+# set the environment variables incl. OPENAI_API_KEY, and LANGCHAIN_API_KEY (for tracing pruposes).
+def _set_env(var: str):
+    if not os.environ.get(var):
+        os.environ[var] = getpass.getpass(f"{var}: ")
+
+_set_env("OPENAI_API_KEY")
+_set_env("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "browsergym_dev" 
 
 
 def image_to_jpg_base64_url(image: np.ndarray | Image.Image):
@@ -81,6 +95,16 @@ class DemoAgent(Agent):
 
         self.action_history = []
 
+    @traceable(run_type="llm")
+    def call_openai(
+        self, messages: List[dict], model: str = "gpt-4o-mini", temperature: float = 0.0
+    ) -> str:
+        return self.openai_client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+        )
+
     def get_action(self, obs: dict) -> tuple[str, dict]:
         system_msgs = []
         user_msgs = []
@@ -113,7 +137,7 @@ and executed by a program, make sure to follow the formatting instructions.
                 }
             )
             for msg in obs["chat_messages"]:
-                if msg["role"] in ("user", "assistant", "infeasible"):
+                if msg["role"] in ("user", "assistant", "infeasible"): # TODO: check what is `infeasible` (guess: is it the system message, e.g., instructions stating the task?)
                     user_msgs.append(
                         {
                             "type": "text",
@@ -315,7 +339,7 @@ You will now think step by step and produce your next best action. Reflect on yo
         logger.info(full_prompt_txt)
 
         # query OpenAI model
-        response = self.openai_client.chat.completions.create(
+        response = self.call_openai(
             model=self.model_name,
             messages=[
                 {"role": "system", "content": system_msgs},
