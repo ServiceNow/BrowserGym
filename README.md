@@ -12,11 +12,12 @@ https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3
 _Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)_
 
 BrowserGym includes the following benchmarks by default:
- - [MiniWoB++](https://miniwob.farama.org/)
+ - [MiniWoB](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
  - [VisualWebArena](https://jykoh.com/vwa)
- - [WorkArena++](https://github.com/ServiceNow/WorkArena)
+ - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
+ - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -203,12 +204,13 @@ You can customize your experience by changing the `model_name` to your preferred
 - [WorkArena](https://github.com/ServiceNow/WorkArena): A benchmark for web agents on the ServiceNow platform.
 - [WebArena](https://github.com/web-arena-x/webarena): A benchmark of realistic web tasks on self-hosted domains.
 - [VisualWebArena](https://github.com/web-arena-x/visualwebarena): A benchmark of realistic visual web tasks on self-hosted domains.
+- [MiniWoB](https://miniwob.farama.org/): A collection of over 100 web tasks on synthetic web pages.
 - [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
 - [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
 
 ## 🌟 Contributors
 
-[![langchain contributors](https://contrib.rocks/image?repo=ServiceNow/BrowserGym&max=2000)](https://github.com/ServiceNow/BrowserGym/graphs/contributors)
+[![BrowserGym contributors](https://contrib.rocks/image?repo=ServiceNow/BrowserGym&max=2000)](https://github.com/ServiceNow/BrowserGym/graphs/contributors)
 
 ## 📝 Citing This Work
 
