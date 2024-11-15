@@ -11,10 +11,10 @@ authors = [
     {name = "Massimo Caccia"},
     {name = "Alex Drouin"},
     {name = "Maxime Gasse"},
+    {name = "Imene Kerboua"},
     {name = "Alex Lacoste"},
     {name = "Thibault Le Sellier De Chezelles"},
     {name = "Tom Marty"},
-    {name = "Imene Kerboua"},
 ]
 readme = "README.md"
 requires-python = ">3.9"
