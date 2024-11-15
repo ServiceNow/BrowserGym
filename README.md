@@ -56,7 +56,7 @@ make install
 
 ## 🏋 Usage
 
-### Open-ended example
+### Open-ended
 
 Boilerplate code to run an agent on an interactive, open-ended task:
 ```python
@@ -76,7 +76,7 @@ while not done:
     done = terminated or truncated
 ```
 
-### MiniWoB++ example
+### MiniWoB++
 
 ```python
 import gymnasium as gym
@@ -92,7 +92,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/mi
 print("\n".join(env_ids))
 ```
 
-### WorkArena example
+### WorkArena
 
 ```python
 import gymnasium as gym
@@ -108,7 +108,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
-### WebArena example
+### WebArena
 
 ```python
 import gymnasium as gym
@@ -124,7 +124,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/we
 print("\n".join(env_ids))
 ```
 
-### VisualWebArena example
+### VisualWebArena
 
 ```python
 import gymnasium as gym
@@ -140,7 +140,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/vi
 print("\n".join(env_ids))
 ```
 
-### AssistantBench example
+### AssistantBench
 
 ```python
 import gymnasium as gym
@@ -201,12 +201,16 @@ You can customize your experience by changing the `model_name` to your preferred
 
 - [AgentLab](https://github.com/ServiceNow/AgentLab): Seamlessly run agents on benchmarks, collect and analyse traces.
 - [WorkArena](https://github.com/ServiceNow/WorkArena): A benchmark for web agents on the ServiceNow platform.
+- [WebArena](https://github.com/web-arena-x/webarena): A benchmark of realistic web tasks on self-hosted domains.
+- [VisualWebArena](https://github.com/web-arena-x/visualwebarena): A benchmark of realistic visual web tasks on self-hosted domains.
+- [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
+- [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
 
 ## 🌟 Contributors
 
 [![langchain contributors](https://contrib.rocks/image?repo=ServiceNow/BrowserGym&max=2000)](https://github.com/ServiceNow/BrowserGym/graphs/contributors)
 
-## Citing This Work
+## 📝 Citing This Work
 
 Please use the following BibTeX to cite our work:
 ```tex
