@@ -1,15 +1,23 @@
 # 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
 
-[[Setup](#setup)] 
-[[Usage](#usage)] 
-[[Demo](#demo)] 
-[[Citation](#citing-this-work)]
+[![PyPI - License](https://img.shields.io/pypi/l/browsergym?style=flat-square)]([https://opensource.org/licenses/MIT](http://www.apache.org/licenses/LICENSE-2.0))
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/browsergym-core?style=flat-square)](https://pypistats.org/packages/browsergym-core)
+[![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
 
-This package provides `browsergym`, a gym environment for web task automation in the Chromium browser.
+[Setup](#setup)
+[Usage](#usage)
+[Demo](#demo)
+[Ecosystem](#ecosystem)
+[Contributors](#contributors)
+[Citation](#citing-this-work)
+
+```python
+pip install browsergym
+```
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
 
-_Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)_
+_Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)._
 
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)
@@ -57,8 +65,6 @@ make install
 
 ## 🏋 Usage
 
-### Open-ended
-
 Boilerplate code to run an agent on an interactive, open-ended task:
 ```python
 import gymnasium as gym
@@ -77,82 +83,72 @@ while not done:
     done = terminated or truncated
 ```
 
-### MiniWoB++
-
+MiniWoB
 ```python
 import gymnasium as gym
 import browsergym.miniwob  # register miniwob tasks as gym environments
 
+# start a miniwob task
 env = gym.make("browsergym/miniwob.choose-list")
 ...
-```
 
-To list all the available MiniWoB++ environments run
-```python
+# list all the available miniwob tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/miniwob")]
 print("\n".join(env_ids))
 ```
 
-### WorkArena
-
+WorkArena
 ```python
 import gymnasium as gym
 import browsergym.workarena  # register workarena tasks as gym environments
 
+# start a workarena task
 env = gym.make("browsergym/workarena.servicenow.order-ipad-pro")
 ...
-```
 
-To list all the available WorkArena environments run
-```python
+# list all the available workarena tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
 ```
 
-### WebArena
-
+WebArena
 ```python
 import gymnasium as gym
 import browsergym.webarena  # register webarena tasks as gym environments
 
+# start a webarena task
 env = gym.make("browsergym/webarena.310")
 ...
-```
 
-To list all the available WebArena environments run
-```python
+# list all the available webarena tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webarena")]
 print("\n".join(env_ids))
 ```
 
-### VisualWebArena
-
+VisualWebArena
 ```python
 import gymnasium as gym
 import browsergym.webarena  # register webarena tasks as gym environments
 
+# start a visualwebarena task
 env = gym.make("browsergym/visualwebarena.721")
 ...
-```
 
-To list all the available VisualWebArena environments run
-```python
+# list all the available visualwebarena tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/visualwebarena")]
 print("\n".join(env_ids))
 ```
 
-### AssistantBench
-
+AssistantBench
 ```python
 import gymnasium as gym
 import browsergym.workarena  # register assistantbench tasks as gym environments
 
+# start an assistantbench task
 env = gym.make("browsergym/assistantbench.validation.3")
 ...
-```
 
-To list all the available AssistantBench environments run
-```python
+# list all the available assistantbench tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
 ```
@@ -164,35 +160,28 @@ If you want to experiment with a demo agent in BrowserGym, follow these steps:
 ```sh
 conda env create -f demo_agent/environment.yml
 conda activate demo_agent
-# or simply use `pip install -r requirements.txt`
+# or simply use `pip install -r demo_agent/requirements.txt`
 playwright install chromium
 ```
 
 Our demo agent uses `openai` as a backend, be sure to set your `OPENAI_API_KEY`.
 
-Launch the demo agent on the open web:
+Launch the demo agent as follows
 ```sh
+# openended (interactive chat mode)
 python demo_agent/run_demo.py --task_name openended --start_url https://www.google.com
-```
 
-Or use it to solve a simple MiniWoB task:
-```sh
+# miniwob
 python demo_agent/run_demo.py --task_name miniwob.click-test
-```
 
-A VisualWebArena task:
-```sh
-python demo_agent/run_demo.py --task_name visualwebarena.398
-```
-
-A WebArena task:
-```sh
-python demo_agent/run_demo.py --task_name webarena.4
-```
-
-A WorkArena task:
-```sh
+# workarena
 python demo_agent/run_demo.py --task_name workarena.servicenow.order-standard-laptop
+
+# webarena
+python demo_agent/run_demo.py --task_name webarena.4
+
+# visualwebarena
+python demo_agent/run_demo.py --task_name visualwebarena.398
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
