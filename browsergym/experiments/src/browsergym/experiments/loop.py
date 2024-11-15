@@ -1,3 +1,4 @@
+import copy
 import gzip
 import importlib.metadata
 import json
@@ -23,6 +24,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from browsergym.core.chat import Chat
+from browsergym.core.action.parsers import highlevel_action_parser
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -676,6 +678,87 @@ class ExpResult:
                     raise FileNotFoundError(f"summary_info.json is empty.")
                 self._summary_info = json.load(f)
         return self._summary_info
+
+    @property
+    def tape(self) -> dict:
+        """
+        TapeAgents (https://github.com/ServiceNow/TapeAgents) framework compatibility.
+        Exports experiment trace in the format of serialized tape.
+        Reuses tape segments if they were already placed in the agent_info during the experiment.
+
+        :returns: dict: serialized tape of the experiment
+        """
+        steps = []
+        for step_info in self.steps_info:
+            if "tape_segment" in step_info.agent_info["extra_info"]:
+                tape_segment = step_info.agent_info["extra_info"]["tape_segment"]
+            else:
+                tape_segment = self._create_tape_segment(step_info)
+            steps += tape_segment
+        metadata = dict(
+            id=str(uuid.uuid4()),
+            author=f"browsergym_agent_[{self.exp_args.agent_args.agent_name}]",
+            result=self.get_exp_record(),
+        )
+        return dict(steps=steps, metadata=metadata)
+
+    def _create_tape_segment(self, step_info: StepInfo) -> list[dict]:
+        tape_segment = []
+        # extract observation step
+        if step_info.obs is not None:
+            screenshot: str = ""
+            screenshot_som: str = ""
+            obs_dict = copy.deepcopy(step_info.obs)
+            if "screenshot" in obs_dict:
+                screenshot = str(self.exp_dir / f"screenshot_step_{step_info.step}.png")
+                obs_dict.pop("screenshot")
+            if "screenshot_som" in obs_dict:
+                screenshot_som = str(self.exp_dir / f"screenshot_som_step_{step_info.step}.png")
+                obs_dict.pop("screenshot_som")
+            tape_segment.append(
+                dict(
+                    kind="browsergym_observation",
+                    metadata=dict(step=step_info.step),
+                    obs=obs_dict,
+                    screenshot=screenshot,
+                    screenshot_som=screenshot_som,
+                )
+            )
+
+        # extract thought step
+        think = step_info.agent_info.get("think", "")
+        if think:
+            tape_segment.append(
+                dict(kind="browsergym_thought", metadata={"step": step_info.step}, text=think)
+            )
+
+        # extract action steps
+        function_calls = highlevel_action_parser.parse_string(step_info.action, parse_all=True)
+        for name, arguments in function_calls:
+            tape_segment.append(
+                dict(
+                    kind="browsergym_action",
+                    metadata=dict(
+                        step=step_info.step,
+                        reward=step_info.reward,
+                        raw_reward=step_info.raw_reward,
+                        terminated=step_info.terminated,
+                        truncated=step_info.truncated,
+                        agent_info=step_info.agent_info,
+                        stats=step_info.stats,
+                        task_info=step_info.task_info,
+                    ),
+                    name=name,
+                    arguments=arguments,
+                )
+            )
+        return tape_segment
+
+    def save_tape(self, filename: str = "tape.json"):
+        if os.path.exists(self.exp_dir / filename):
+            raise FileExistsError(f"{filename} already exists in {self.exp_dir}")
+        with open(self.exp_dir / filename, "w") as f:
+            json.dump(self.tape, f, indent=4, ensure_ascii=False)
 
     def get_screenshot(self, step: int, som=False) -> Image:
         key = (step, som)
