@@ -546,6 +546,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Execution context was destroyed" in err_msg
                     or "Frame has been detached" in err_msg
                     or "Cannot mark a child frame without a bid" in err_msg
+                    or "Cannot read properties of undefined" in err_msg
                 ):
                     logger.warning(
                         f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
