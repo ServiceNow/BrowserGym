@@ -1,4 +1,4 @@
-# BrowserGym: a Gym Environment for Web Task Automation
+# 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
 
 [[Setup](#setup)] 
 [[Usage](#usage)] 
@@ -20,7 +20,7 @@ BrowserGym includes the following benchmarks by default:
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
-## Setup
+## 🛠️ Setup
 
 To use browsergym, install one of the following packages:
 ```sh
@@ -46,7 +46,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
 
-### Development setup
+### 🏗️ Development setup
 To install browsergym locally for development, use the following commands:
 ```sh
 git clone https://github.com/ServiceNow/BrowserGym.git
@@ -54,7 +54,7 @@ cd BrowserGym
 make install
 ```
 
-## Usage
+## 🏋 Usage
 
 ### Open-ended example
 
@@ -156,7 +156,7 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
-## Demo
+## 💻 Demo
 
 If you want to experiment with a demo agent in BrowserGym, follow these steps:
 
@@ -197,6 +197,15 @@ python demo_agent/run_demo.py --task_name workarena.servicenow.order-standard-la
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
 
 
+## 🌐 Ecosystem
+
+- [AgentLab](https://github.com/ServiceNow/AgentLab): Seamlessly run agents on benchmarks, collect and analyse traces.
+- [WorkArena](https://github.com/ServiceNow/WorkArena): A benchmark for web agents on the ServiceNow platform.
+
+## 🌟 Contributors
+
+[![langchain contributors](https://contrib.rocks/image?repo=ServiceNow/BrowserGym&max=2000)](https://github.com/ServiceNow/BrowserGym/graphs/contributors)
+
 ## Citing This Work
 
 Please use the following BibTeX to cite our work:
@@ -214,6 +223,4 @@ Please use the following BibTeX to cite our work:
     publisher = {PMLR},
     url = {https://proceedings.mlr.press/v235/drouin24a.html},
 }
-
-
 ```
