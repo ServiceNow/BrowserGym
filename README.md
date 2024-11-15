@@ -70,6 +70,7 @@ Boilerplate code to run an agent on an interactive, open-ended task:
 import gymnasium as gym
 import browsergym.core  # register the openended task as a gym environment
 
+# start an openended task
 env = gym.make(
     "browsergym/openended",
     task_kwargs={"start_url": "https://www.google.com/"},  # starting URL
@@ -184,8 +185,11 @@ python demo_agent/run_demo.py --task_name webarena.4
 python demo_agent/run_demo.py --task_name visualwebarena.398
 ```
 
-You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more! (see `python run_demo.py --help`)
+You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more!
 
+```python
+python demo_agent/run_demo.py --help
+```
 
 ## 🌐 Ecosystem
 
