@@ -163,7 +163,7 @@ class ExpArgs:
 
     agent_args: AbstractAgentArgs
     env_args: EnvArgs
-    attack_args: AttackArgs
+    attack_args: AttackArgs = None
     exp_dir: str = None
     exp_name: str = None
     enable_debug: bool = True
