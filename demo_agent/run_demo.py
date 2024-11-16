@@ -27,6 +27,12 @@ def parse_args():
         help="OpenAI model name.",
     )
     parser.add_argument(
+        "--attack_args",
+        type=str,
+        default=None,
+        help="Attack arguments.",
+    )
+    parser.add_argument(
         "--task_name",
         type=str,
         default="openended",
@@ -106,6 +112,7 @@ https://github.com/ServiceNow/AgentLab"""
     exp_args = ExpArgs(
         env_args=env_args,
         agent_args=agent_args,
+        attack_args=args.attack_args,
     )
 
     # running and logging results
