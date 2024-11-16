@@ -29,6 +29,7 @@ from browsergym.core.action.parsers import highlevel_action_parser
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
 from .attacks import CorruptedAgent
+from .attacks import CorruptedAgent
 
 logger = logging.getLogger(__name__)
 
