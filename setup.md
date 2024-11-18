@@ -65,6 +65,7 @@ git clone https://github.com/Nid989/webarena
 YOUR_ACTUAL_HOSTNAME="ec2-18-223-217-129.us-east-2.compute.amazonaws.com"
 YOUR_ACTUAL_HOSTNAME=${YOUR_ACTUAL_HOSTNAME%/}
 perl -pi -e "s|<your-server-hostname>|${YOUR_ACTUAL_HOSTNAME}|g" environment_docker/webarena-homepage/templates/index.html
+cd environment_docker/webarena-homepage/
 flask run --host=0.0.0.0 --port=4399
 
 # Install Python dependencies

@@ -312,7 +312,7 @@ class DemoAgentArgs(AbstractAgentArgs):
     def make_agent(self):
         return DemoAgent(
             model_name=self.model_name,
-            chat_model=self.chat_mode,
+            chat_mode=self.chat_mode,
             demo_mode=self.demo_mode,
             use_html=self.use_html,
             use_axtree=self.use_axtree,
