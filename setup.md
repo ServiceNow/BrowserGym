@@ -73,6 +73,7 @@ pip install browsergym
 pip uninstall playwright
 pip install playwright==1.47.0
 playwright install chromium
+pip install ext-requirements.txt
 ```
 
 ## 5. Environment Configuration
@@ -94,7 +95,11 @@ export HOMEPAGE="http://10.15.29.154:4399"  # Update with your local host
 
 ## 6. Run Demo 
 ```
-python3 demo_agent/run_demo.py --model_name=gpt-4o --task_name=webarena.196
+# runs the demo-agent provided by BrowserGym developers
+python3 demo_agent/run_demo.py --model_name=gpt-4o --task_name=webarena.196 
+
+# runs the agent created using `langgraph` with tracing via `langsmith`
+python3 agents/langgraph_demo_agent/run_demo.py --model_name=gpt-4o --task_name=webarena.196
 ```
 
 Note: If you encounter any issues during setup, please contact me for assistance.
