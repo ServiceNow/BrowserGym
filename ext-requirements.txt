@@ -1,0 +1,6 @@
+langgraph
+langsmith
+langchain-community
+langchain-core
+langchain-openai
+notebook
