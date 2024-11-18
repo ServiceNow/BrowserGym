@@ -84,79 +84,100 @@ ACTION_SUBSETS = {
     # adapted from MiniWoB repo
     # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
     "miniwob_all": [
-        mouse_move,  # MOVE_COORDS
-        mouse_click,  # CLICK_COORDS
+        mouse_move,  #     MOVE_COORDS
+        mouse_click,  #    CLICK_COORDS
         mouse_dblclick,  # DBLCLICK_COORDS
-        mouse_down,  # MOUSEDOWN_COORDS
-        mouse_up,  # MOUSEUP_COORDS
-        scroll,  # SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
-        click,  # CLICK_ELEMENT
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        click,  #          CLICK_ELEMENT
         keyboard_press,  # PRESS_KEY
-        keyboard_type,  # TYPE_TEX (and substitute for TYPE_FIELD()
-        fill,  # FOCUS_ELEMENT_AND_TYPE_TEXT (and substitute for FOCUS_ELEMENT_AND_TYPE_FIELD)
+        keyboard_type,  #  TYPE_TEX (and substitute for TYPE_FIELD()
+        fill,  #           FOCUS_ELEMENT_AND_TYPE_TEXT (and substitute for FOCUS_ELEMENT_AND_TYPE_FIELD)
     ],
     # adapted from MiniWoB repo
     # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L142
     "miniwob_shi17": [
-        mouse_click,  # CLICK_COORDS
+        mouse_click,  #    CLICK_COORDS
         mouse_dblclick,  # DBLCLICK_COORDS
-        mouse_down,  # MOUSEDOWN_COORDS
-        mouse_up,  # MOUSEUP_COORDS
-        scroll,  # SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         keyboard_press,  # PRESS_KEY
     ],
     # adapted from MiniWoB repo
     # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
     "miniwob_liu18": [
         click,  # CLICK_ELEMENT
-        fill,  # substitute for FOCUS_ELEMENT_AND_TYPE_FIELD
+        fill,  #  substitute for FOCUS_ELEMENT_AND_TYPE_FIELD
     ],
     # adapted from MiniWoB repo
     # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
     "miniwob_humphreys22": [
-        mouse_move,  # MOVE_COORDS
-        mouse_click,  # CLICK_COORDS
+        mouse_move,  #     MOVE_COORDS
+        mouse_click,  #    CLICK_COORDS
         mouse_dblclick,  # DBLCLICK_COORDS
-        mouse_down,  # MOUSEDOWN_COORDS
-        mouse_up,  # MOUSEUP_COORDS
-        scroll,  # SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         keyboard_press,  # PRESS_KEY
-        keyboard_type,  # substitute for TYPE_FIELD
+        keyboard_type,  #  substitute for TYPE_FIELD
     ],
-    # from webarena paper
+    # from the webarena paper
     # https://arxiv.org/abs/2307.13854
+    # from the webarena source code
+    # https://github.com/web-arena-x/webarena/blob/e31c190c9b43f63e5724322b847e00249300df40/browser_env/actions.py#L240
+    # from the webarena default prompt
+    # https://github.com/web-arena-x/webarena/blob/e31c190c9b43f63e5724322b847e00249300df40/agent/prompts/raw/p_cot_id_actree_2s.py#L13
     "webarena": [
-        click,  # click(elem)
-        hover,  # hover(elem)
-        fill,  # type(elem, text)
-        keyboard_press,  # press(key_comb)
-        scroll,  # scroll(dir)
-        tab_focus,  # tab_focus(index)
-        new_tab,  # new_tab()
-        tab_close,  # tab_close()
-        go_back,  # go_back()
-        go_forward,  # go_forward()
-        goto,  # goto(url)
-        send_msg_to_user,  #
-        report_infeasible,  # explicit unachievable action, equivalent to "N/A" answer
+        #                   #     code      |      paper       |      prompt
+        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
+        #                     MOUSE_CLICK   |                  |
+        #                     KEYBOARD_TYPE |                  |
+        #                     MOUSE_HOVER   |                  |
+        click,  #             CLICK         | click(elem)      | click [id]
+        fill,  #              TYPE          | type(elem, text) | type [id] [content]
+        hover,  #             HOVER         | hover(elem)      | hover [id]
+        tab_focus,  #         PAGE_FOCUS    | tab_focus(index) | tab_focus [tab_index]
+        new_tab,  #           NEW_TAB       | new_tab()        | new_tab
+        go_back,  #           GO_BACK       | go_back()        | go_back
+        go_forward,  #        GO_FORWARD    | go_forward()     | go_forward
+        goto,  #              GOTO_URL      | goto(url)        | goto [url]
+        tab_close,  #         PAGE_CLOSE    | tab_close()      | close_tab
+        #                     CHECK         |                  |
+        select_option,  #     SELECT_OPTION |                  |
+        send_msg_to_user,  #  STOP          | stop(answer)     | stop [answer]
+        report_infeasible,  ## explicit unachievable action, equivalent STOP "N/A"
     ],
-    # from visualwebarena paper
+    # from the visualwebarena paper
     # https://arxiv.org/abs/2401.13649
+    # from the visualwebarena source code
+    # https://github.com/web-arena-x/visualwebarena/blob/15890922c97a8694e366fde2d7de8dbd1ff63fb5/browser_env/actions.py#L311-L343
+    # from the visualwebarena default prompt
+    # https://github.com/web-arena-x/visualwebarena/blob/15890922c97a8694e366fde2d7de8dbd1ff63fb5/agent/prompts/jsons/p_cot_id_actree_3s.json#L2
     "visualwebarena": [
-        click,  # click(elem)
-        hover,  # hover(elem)
-        fill,  # type(elem, text)
-        keyboard_press,  # press(key_comb)
-        scroll,  # scroll(dir)
-        tab_focus,  # tab_focus(index)
-        new_tab,  # new_tab()
-        tab_close,  # tab_close()
-        go_back,  # go_back()
-        go_forward,  # go_forward()
-        goto,  # goto(url)
-        send_msg_to_user,  # stop(answer)
-        report_infeasible,  # explicit unachievable action, equivalent to "N/A" answer
-        upload_file,  #
+        #                   #     code      |      paper       |      prompt
+        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
+        #                     MOUSE_CLICK   |                  |
+        #                     KEYBOARD_TYPE |                  |
+        #                     MOUSE_HOVER   |                  |
+        click,  #             CLICK         | click(elem)      | click [id]
+        fill,  #              TYPE          | type(elem, text) | type [id] [content]
+        hover,  #             HOVER         | hover(elem)      | hover [id]
+        tab_focus,  #         PAGE_FOCUS    | tab_focus(index) | tab_focus [tab_index]
+        new_tab,  #           NEW_TAB       | new_tab()        | new_tab
+        go_back,  #           GO_BACK       | go_back()        | go_back
+        go_forward,  #        GO_FORWARD    | go_forward()     | go_forward
+        goto,  #              GOTO_URL      | goto(url)        | goto [url]
+        tab_close,  #         PAGE_CLOSE    | tab_close()      | close_tab
+        #                     CHECK         |                  |
+        select_option,  #     SELECT_OPTION |                  |
+        send_msg_to_user,  #  STOP          | stop(answer)     | stop [answer]
+        #                     CLEAR         |                  |
+        upload_file,  #       UPLOAD        |                  |
+        report_infeasible,  ## explicit unachievable action, equivalent STOP "N/A"
     ],
     # from workarena paper
     # https://arxiv.org/abs/2403.07718
@@ -212,6 +233,18 @@ ACTION_SUBSETS = {
         tab_close,  # tabremove(target=[tabId]) -> tab_close()
         tab_focus,  # tabswitch(origin=[origin tabId],target=[target tabId]) -> tab_focus(index=[target tabid])
     ],
+    # from assistantbench paper
+    # https://arxiv.org/abs/2407.15711
+    "assistantbench": [
+        scroll,  # SCROLL
+        fill,  # TYPE
+        select_option,  # SELECT
+        click,  # CLICK
+        press,  # PRESS ENTER
+        go_back,  # GOBACK
+        goto,  # GOTO, SEARCH
+        send_msg_to_user,  # TERMINATE
+    ],
 }
 
 
@@ -242,6 +275,7 @@ class HighLevelActionSet(AbstractActionSet):
         "workarena",
         "workarena++",
         "weblinx",
+        "assistantbench",
         "custom",
     ]
     DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]

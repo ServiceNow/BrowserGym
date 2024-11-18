@@ -14,7 +14,7 @@ from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
-from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES, TEXT_MAX_LENGTH
+from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
 from .observation import (
     MarkingError,
     _post_extract,
@@ -25,7 +25,7 @@ from .observation import (
     extract_merged_axtree,
     extract_screenshot,
 )
-from .spaces import AnyBox, AnyDict, Unicode
+from .spaces import AnyBox, AnyDict, Float, Unicode
 from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,8 @@ class BrowserEnv(gym.Env, ABC):
         viewport: Optional[dict] = None,  # will override the task's viewport
         slow_mo: Optional[int] = None,  # will override the task's slow_mo
         timeout: Optional[int] = None,  # will override the task's timeout
+        locale: Optional[str] = None,  # will override the task's locale
+        timezone_id: Optional[str] = None,  # will override the task's timezone_id
         tags_to_mark: Literal["all", "standard_html"] = "standard_html",
         # interactive / debugging arguments
         headless: bool = True,
@@ -84,6 +86,8 @@ class BrowserEnv(gym.Env, ABC):
             viewport: desired viewport size. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             slow_mo: desired slow_mo value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             timeout: desired timeout value for Playwright. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            locale: desired user locale for Playwright, for example en-GB, de-DE, etc. This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
+            timezone_id. desired timezone for Playwright, for example "Pacific/Tahiti". This will override the value defined by the task, which might change its behaviour and difficulty. Should only be set for debugging/testing.
             tags_to_mark: which HTML tags should be marked by BrowserGym and receive a bid. Value "all" will mark every element in the page, while "standard_html" (default) will only mark standard html tags.
             headless: whether the browser should run in headless mode or not. This will affect the viewport size, which might change the behaviour and difficulty of the task. Headless mode should only be disabled for debugging/testing.
             wait_for_user_message: whether the environment should pause and wait for a user message in the chat after a new message is sent by the agent. Useful for running agents in interactive mode.
@@ -100,6 +104,8 @@ class BrowserEnv(gym.Env, ABC):
         self.viewport = viewport
         self.slow_mo = slow_mo
         self.timeout = timeout
+        self.locale = locale
+        self.timezone_id = timezone_id
         self.tags_to_mark = tags_to_mark
         self.headless = headless
         self.wait_for_user_message = wait_for_user_message
@@ -131,21 +137,20 @@ class BrowserEnv(gym.Env, ABC):
                 "chat_messages": gym.spaces.Sequence(
                     gym.spaces.Dict(
                         {
-                            "role": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                            "message": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                            "role": Unicode(),
+                            "timestamp": Float(),
+                            "message": Unicode(),
                         }
                     )
                 ),
-                "goal": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "goal": Unicode(),
                 "goal_object": gym.spaces.Sequence(AnyDict()),
-                "open_pages_urls": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
-                "open_pages_titles": gym.spaces.Sequence(
-                    Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
-                ),
-                "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
-                "url": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
+                "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                "open_pages_titles": gym.spaces.Sequence(Unicode()),
+                "active_page_index": gym.spaces.Box(
+                    low=0, high=255, dtype=int
+                ),  # TODO: change to an Integer (breaking change for users)
+                "url": Unicode(),
                 "screenshot": AnyBox(
                     low=0,
                     high=255,
@@ -155,27 +160,35 @@ class BrowserEnv(gym.Env, ABC):
                 "dom_object": AnyDict(),
                 "axtree_object": AnyDict(),
                 "extra_element_properties": AnyDict(),
-                "focused_element_bid": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "last_action": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "last_action_error": Unicode(min_length=0, max_length=TEXT_MAX_LENGTH),
-                "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
+                "focused_element_bid": Unicode(),
+                "last_action": Unicode(),
+                "last_action_error": Unicode(),
+                "elapsed_time": gym.spaces.Box(
+                    low=0, high=np.inf, dtype=float
+                ),  # TODO: change to a Float (breaking change for users)
             }
         )
 
         # action space
-        self.action_space = Unicode(min_length=0, max_length=TEXT_MAX_LENGTH)
+        self.action_space = Unicode()
 
     def close(self):
+        # stop the task
         if self.task:
-            # stop the task
             self.task.teardown()
-            # close the chat
-            self.chat.close()
-            # close the browser context
-            self.context.close()
-            # close the browser
-            self.browser.close()
             self.task = None
+        # close the chat
+        if self.chat:
+            self.chat.close()
+            self.chat = None
+        # close the browser context
+        if self.context:
+            self.context.close()
+            self.context = None
+        # close the browser
+        if self.browser:
+            self.browser.close()
+            self.browser = None
 
     def reset(self, seed=None, *args, **kwargs):
         super().reset(seed=seed, *args, **kwargs)
@@ -197,15 +210,18 @@ class BrowserEnv(gym.Env, ABC):
             if env_value is None:
                 return task_value
             else:
-                logger.warning(
-                    f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
-                )
+                if task_value is not None:
+                    logger.warning(
+                        f"Overriding the task's {property} parameter ({repr(task_value)} => {repr(env_value)}). This might change the task's behaviour and difficulty."
+                    )
                 return env_value
 
         # fetch task's desired parameters for browser setup
         viewport = override_property(self.task, self, "viewport")
         slow_mo = override_property(self.task, self, "slow_mo")
         timeout = override_property(self.task, self, "timeout")
+        locale = override_property(self.task, self, "locale")
+        timezone_id = override_property(self.task, self, "timezone_id")
 
         # use the global Playwright instance
         pw: playwright.sync_api.Playwright = _get_global_playwright()
@@ -233,6 +249,8 @@ class BrowserEnv(gym.Env, ABC):
                 Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
             ),
             record_video_size=viewport,
+            locale=locale,
+            timezone_id=timezone_id,
             # will raise an Exception if above args are overriden
             **self.pw_context_kwargs,
         )
@@ -441,7 +459,7 @@ document.addEventListener("visibilitychange", () => {
 
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
-            logger.info(
+            logger.debug(
                 "The active page and / or page history has changed during task.validate(). A recovery fix will be applied."
             )
             self.page = prev_active_page
@@ -513,7 +531,7 @@ document.addEventListener("visibilitychange", () => {
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
-                _pre_extract(self.page, self.tags_to_mark)
+                _pre_extract(self.page, tags_to_mark=self.tags_to_mark, lenient=(retries_left == 0))
 
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
@@ -528,6 +546,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Execution context was destroyed" in err_msg
                     or "Frame has been detached" in err_msg
                     or "Cannot mark a child frame without a bid" in err_msg
+                    or "Cannot read properties of undefined" in err_msg
                 ):
                     logger.warning(
                         f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
@@ -545,11 +564,13 @@ document.addEventListener("visibilitychange", () => {
 
         # obs is generic to all tasks
         obs = {
-            "chat_messages": copy.deepcopy(self.chat.messages),
+            "chat_messages": tuple(copy.deepcopy(self.chat.messages)),
             "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
-            "goal_object": self.goal_object,  # new goal format, list of messages openai style
-            "open_pages_urls": [page.url for page in self.context.pages],
-            "open_pages_titles": [page.title() for page in self.context.pages],
+            "goal_object": tuple(
+                copy.deepcopy(self.goal_object)
+            ),  # new goal format, list of messages openai style
+            "open_pages_urls": tuple(page.url for page in self.context.pages),
+            "open_pages_titles": tuple(page.title() for page in self.context.pages),
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
             "screenshot": extract_screenshot(self.page),

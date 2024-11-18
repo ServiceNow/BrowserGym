@@ -405,7 +405,7 @@ click("4", "aa", "bb")
     obs, reward, term, trunc, info = env.step(action)
 
     # error
-    assert obs["last_action_error"] == "Error: modifiers: expected array, got string"
+    assert obs["last_action_error"] == "Error: Locator.click: modifiers: expected array, got string"
 
     # invalid action args (not enough)
     action = f"""\

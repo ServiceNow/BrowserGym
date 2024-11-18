@@ -2,7 +2,9 @@ import logging
 import os
 
 import playwright.sync_api
-import requests
+
+# we inherit some code base from webarena to avoid too much duplication
+from browsergym.webarena.instance import WebArenaInstance
 
 logger = logging.getLogger(__name__)
 
@@ -10,11 +12,13 @@ logger = logging.getLogger(__name__)
 ENV_VARS = ("SHOPPING", "REDDIT", "WIKIPEDIA", "HOMEPAGE", "CLASSIFIEDS", "CLASSIFIEDS_RESET_TOKEN")
 
 
-class VisualWebArenaInstance:
+class VisualWebArenaInstance(WebArenaInstance):
     """
     Utility class to access a WebArena instance.
 
     """
+
+    RESET_URL_VAR = "VWA_FULL_RESET"  # used by full_reset()
 
     def __init__(
         self,
@@ -53,69 +57,15 @@ class VisualWebArenaInstance:
 
         self.credentials = ACCOUNTS
 
-    def full_reset(self):
-        reset_url = os.environ.get("VWA_FULL_RESET", None)
-
-        assert (
-            reset_url
-        ), f"Environment variable VWA_FULL_RESET is missing or empty, required for a full instance reset."
-
-        # Send the GET request to trigger the reset script
-        logger.info(f"VisualWebArena full instance reset in progress.")
-
-        # 10 minutes timeout (takes about 4 minutes in practice)
-        # https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
-        response = requests.get(reset_url, timeout=(3.05, 10 * 60))
-
-        # Print the response from the server
-        logger.info(f"Reset status code: {response.status_code}")
-        logger.info(f"Reset response: {response.text}")
-
-        if not response.status_code == 200:
-            raise Exception(
-                f"Full instance reset failed ({response.status_code}): {response.status_code}"
-            )
-
-        # warm-start the instance (navigate to every domain)
-        retries_left = 3
-        while retries_left:
-            retries_left -= 1
-            try:
-                self._check_is_reachable(timeout=60)  # 60 seconds, cold starting might be slow
-                break
-            except Exception as e:
-                if not retries_left:
-                    raise
-                logger.info(
-                    f"Instance unresponsive after reset, retrying ({retries_left} retries left)\n{e}"
-                )
-
-    def check_status(self):
-        """
-        Check the status of the instance. Raises an error if the instance is not ready to be used.
-
-        """
-        self._check_is_reachable(timeout=10)  # 10 seconds
-
-    def _check_is_reachable(self, timeout: int):
-        """
-        Test that every website is reachable.
-
-        """
-        for site, url in self.urls.items():
-            try:
-                requests.get(url, timeout=timeout)
-            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-                raise RuntimeError(
-                    f'WebArena site "{site}" ({url}) is not reacheable. Please check the URL.'
-                )
-
     def ui_login(self, site: str, page: playwright.sync_api.Page):
         """
         Should only be called once per site (expects user to be logged out).
         """
 
         url = self.urls[site]
+
+        # open a new page (tab) to perform the login
+        page = page.context.new_page()
 
         match site:
             case "reddit":
@@ -148,3 +98,6 @@ class VisualWebArenaInstance:
 
             case _:
                 raise ValueError
+
+        # release login page
+        page.close()

@@ -263,7 +263,7 @@ def test_dom_has_bids_no_aria(url):
 
     # exceptions
     dom_node_names_without_bid = ["html", "#text", "#document", "#comment"]
-    axtree_roles_without_bid = ["RootWebArea", "none", "generic", "StaticText"]
+    axtree_roles_without_bid = ["RootWebArea", "none", "generic", "StaticText", "InlineTextBox"]
 
     # 1. test the DOM snapshot for BID_ATTR, "aria-description" and "aria-roledescription"
 

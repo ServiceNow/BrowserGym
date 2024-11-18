@@ -3,63 +3,72 @@
 from typing import Any
 
 import numpy as np
-from gymnasium.spaces import Space, Box, Text
-from gymnasium.spaces.utils import flatdim, flatten, flatten_space, unflatten
+from gymnasium.spaces import Space
 from numpy.typing import NDArray
 
 
-MAX_UNICODE_CODEPOINT = 0x10FFFF
-
-
-class Unicode(Text):
-    """A space representing a unicode string.
-
-    Unicode is a replacement for the Text space in Gymnasium, with the
-    following differences:
-
-    - Each character can be an arbitrary unicode character.
-    - The sample method samples from the specified character set.
+class Unicode(Space):
     """
+    A space representing a unicode string.
+    """
+
+    def __init__(self):
+        super().__init__()
 
     def contains(self, x: Any) -> bool:
         """Return boolean specifying if x is a valid member of this space."""
         # Do not check the character set.
-        return isinstance(x, str) and self.min_length <= len(x) <= self.max_length
+        return isinstance(x, str)
 
     def __repr__(self) -> str:
         """Gives a string representation of this space."""
-        return f"Unicode({self.min_length}, {self.max_length})"
+        return f"Unicode()"
 
     def __eq__(self, other: Any) -> bool:
         """Check whether ``other`` is equivalent to this instance."""
-        return (
-            isinstance(other, Unicode)
-            and self.min_length == other.min_length
-            and self.max_length == other.max_length
-        )
+        return isinstance(other, Unicode)
 
 
-@flatdim.register(Unicode)
-def _flatdim_unicode(space: Unicode) -> int:
-    return space.max_length
+class Float(Space):
+    """
+    A space representing a float.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def contains(self, x: Any) -> bool:
+        """Return boolean specifying if x is a valid member of this space."""
+        return isinstance(x, float)
+
+    def __repr__(self) -> str:
+        """Gives a string representation of this space."""
+        return f"Float()"
+
+    def __eq__(self, other: Any) -> bool:
+        """Check whether ``other`` is equivalent to this instance."""
+        return isinstance(other, Float)
 
 
-@flatten.register(Unicode)
-def _flatten_unicode(space: Unicode, x: str) -> NDArray[np.int32]:
-    arr = np.full(shape=(space.max_length,), fill_value=0, dtype=np.int32)
-    for i, val in enumerate(x):
-        arr[i] = ord(val)
-    return arr
+class Integer(Space):
+    """
+    A space representing an integer.
+    """
 
+    def __init__(self):
+        super().__init__()
 
-@unflatten.register(Unicode)
-def _unflatten_unicode(space: Unicode, x: NDArray[np.int32]) -> str:
-    return "".join(chr(val) for val in x if val)
+    def contains(self, x: Any) -> bool:
+        """Return boolean specifying if x is a valid member of this space."""
+        return isinstance(x, int)
 
+    def __repr__(self) -> str:
+        """Gives a string representation of this space."""
+        return f"Integer()"
 
-@flatten_space.register(Unicode)
-def _flatten_space_unicode(space: Unicode) -> Box:
-    return Box(low=0, high=MAX_UNICODE_CODEPOINT, shape=(space.max_length,), dtype=np.int32)
+    def __eq__(self, other: Any) -> bool:
+        """Check whether ``other`` is equivalent to this instance."""
+        return isinstance(other, Integer)
 
 
 class AnyDict(Space):

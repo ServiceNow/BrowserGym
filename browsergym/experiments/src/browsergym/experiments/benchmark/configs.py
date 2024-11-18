@@ -5,6 +5,7 @@ from browsergym.experiments.benchmark.metadata.utils import (
     task_metadata,
 )
 from browsergym.experiments.benchmark.utils import (
+    make_env_args_list_from_fixed_seeds,
     make_env_args_list_from_repeat_tasks,
     make_env_args_list_from_workarena_curriculum,
 )
@@ -73,7 +74,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         demo_mode="off",
     ),
     "assistantbench": HighLevelActionSetArgs(
-        subsets=["chat", "bid", "tab", "nav"],
+        subsets=["assistantbench"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -94,6 +95,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
+        supports_parallel_seeds=True,
         backends=["miniwob"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
@@ -107,6 +109,7 @@ DEFAULT_BENCHMARKS = {
         name="miniwob_tiny_test",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
+        supports_parallel_seeds=True,
         backends=["miniwob"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
@@ -120,12 +123,33 @@ DEFAULT_BENCHMARKS = {
         name="webarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
+        supports_parallel_seeds=False,
         backends=["webarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("webarena"),
+    ),
+    "webarena_tiny": lambda: Benchmark(
+        name="webarena_tiny",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[
+                "webarena.410",
+                "webarena.533",
+                "webarena.537",
+                "webarena.552",
+                "webarena.561",
+                "webarena.562",
+            ],
+            max_steps=30,
+            fixed_seeds=[0],
         ),
         task_metadata=task_metadata("webarena"),
     ),
@@ -133,10 +157,11 @@ DEFAULT_BENCHMARKS = {
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         is_multi_tab=True,
+        supports_parallel_seeds=False,
         backends=["visualwebarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
@@ -146,6 +171,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         is_multi_tab=False,
+        supports_parallel_seeds=True,
         backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l1",
@@ -161,6 +187,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
+        supports_parallel_seeds=True,
         backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l2",
@@ -175,6 +202,7 @@ DEFAULT_BENCHMARKS = {
         name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
+        supports_parallel_seeds=True,
         backends=["workarena"],
         env_args_list=make_env_args_list_from_workarena_curriculum(
             level="l3",
@@ -189,12 +217,13 @@ DEFAULT_BENCHMARKS = {
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
         is_multi_tab=True,
+        supports_parallel_seeds=True,
         backends=["assistantbench"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
             ),
-            max_steps=15,
+            max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
@@ -202,8 +231,9 @@ DEFAULT_BENCHMARKS = {
     ),
     "weblinx": lambda: Benchmark(
         name="weblinx",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["weblinx"],
         is_multi_tab=True,
+        supports_parallel_seeds=True,
         backends=["weblinx"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("weblinx")),

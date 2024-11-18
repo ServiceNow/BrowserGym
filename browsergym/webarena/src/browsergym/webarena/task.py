@@ -191,8 +191,8 @@ If you believe the task is impossible to complete, provide the answer "N/A".
                 client=None,  # none of webarena's evaluators requires a cdp session
             )
         # llm_fuzzy_match() bugfix (assert "correct" in response)
-        except AssertionError as e:
-            logger.info(
+        except AssertionError:
+            logger.debug(
                 "llm_fuzzy_match() bugfix applied: AssertionError in evaluator, using score = 0.0"
             )
             score = 0.0

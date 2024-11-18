@@ -1,4 +1,6 @@
-browsergym-core==0.10.2
---no-deps libvisualwebarena==0.0.14
+browsergym-core==0.13.1
+browsergym-webarena
+--no-deps libvisualwebarena==0.0.15
 requests
 playwright~=1.47.0
+torch

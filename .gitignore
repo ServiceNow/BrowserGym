@@ -148,7 +148,5 @@ results/
 # assistantbench
 tests/assistantbench/assistantbench-predictions-test.jsonl
 
-# Environment variables files - includes .env, any .env.* files (like .env.local), and any files ending in .env
-.env
-*.env
-.env.*
+# weblinx
+bg_wl_data/

@@ -48,12 +48,13 @@ def test_build_benchmarks():
         "miniwob": 125 * 5,
         "miniwob_tiny_test": 2 * 2,
         "webarena": 812,
+        "webarena_tiny": 6,
         "visualwebarena": 910,
         "workarena_l1": 33 * 10,
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
         "assistantbench": 214,
-        "weblinx": 36578,
+        "weblinx": 31586,
     }
     for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
@@ -90,7 +91,7 @@ def test_benchmark_subset():
     assert dict_1 == dict_2
 
 
-def test_miniwob_benchmark_reset():
+def test_prepare_backend_miniwob():
     MINIWOB_URL = os.environ["MINIWOB_URL"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["miniwob"]()
@@ -108,13 +109,13 @@ def test_miniwob_benchmark_reset():
         os.environ["MINIWOB_URL"] = MINIWOB_URL
 
 
-def test_assistantbench_benchmark_reset():
+def test_prepare_backend_assistantbench():
     benchmark: Benchmark = DEFAULT_BENCHMARKS["assistantbench"]()
     benchmark.prepare_backends()
 
 
 @pytest.mark.skip
-def test_webarena_benchmark_reset():
+def test_prepare_backend_webarena():
     WA_FULL_RESET = os.environ["WA_FULL_RESET"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
@@ -133,7 +134,7 @@ def test_webarena_benchmark_reset():
 
 
 @pytest.mark.skip
-def test_visualwebarena_benchmark_reset():
+def test_prepare_backend_visualwebarena():
     VWA_FULL_RESET = os.environ["VWA_FULL_RESET"]
     try:
         benchmark: Benchmark = DEFAULT_BENCHMARKS["visualwebarena"]()
@@ -151,6 +152,22 @@ def test_visualwebarena_benchmark_reset():
         os.environ["VWA_FULL_RESET"] = VWA_FULL_RESET
 
 
+@pytest.mark.skip
+def test_prepare_backend_weblinx():
+    BROWSERGYM_WEBLINX_CACHE_DIR = os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"]
+    try:
+        benchmark: Benchmark = DEFAULT_BENCHMARKS["weblinx"]()
+
+        benchmark.prepare_backends()
+
+        del os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"]
+        with pytest.raises(Exception):
+            benchmark.prepare_backends()
+
+    finally:
+        os.environ["BROWSERGYM_WEBLINX_CACHE_DIR"] = BROWSERGYM_WEBLINX_CACHE_DIR
+
+
 def test_run_mock_benchmark():
     benchmark = Benchmark(
         name="miniwob_click_test",
@@ -162,6 +179,7 @@ def test_run_mock_benchmark():
             demo_mode="off",
         ),
         is_multi_tab=False,
+        supports_parallel_seeds=True,
         backends=["miniwob"],
         env_args_list=make_env_args_list_from_fixed_seeds(
             task_list=["miniwob.click-test"],
@@ -200,3 +218,95 @@ def test_run_mock_benchmark():
             for key, target_val in target.items():
                 assert key in exp_record
                 assert exp_record[key] == target_val
+
+
+def test_dependency_graphs():
+    benchmark = Benchmark(
+        name="my_bench",
+        high_level_action_set_args=HighLevelActionSetArgs(
+            subsets=["bid"],
+            multiaction=False,
+            strict=False,
+            retry_with_force=True,
+            demo_mode="off",
+        ),
+        is_multi_tab=False,
+        supports_parallel_seeds=True,
+        backends=["miniwob"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=["miniwob.click-test"],
+            max_steps=5,
+            fixed_seeds=[0, 1],
+        ),
+    )
+
+    # one task, two seeds
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert task_dependencies == {"miniwob.click-test": []}
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 1: []}]
+
+    # change to no parallel seed support
+    benchmark.supports_parallel_seeds = False
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: []}, {1: []}]
+
+    # webarena, 3 tasks x 1 seed
+    benchmark = DEFAULT_BENCHMARKS["webarena"]().subset_from_regexp(
+        column="task_name", regexp=r"^webarena\.[012]$"
+    )
+
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert task_dependencies == {
+        "webarena.0": [],
+        "webarena.1": ["webarena.0"],
+        "webarena.2": ["webarena.1"],
+    }
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 1: [0], 2: [1]}]
+
+    # workarena L2, 2 task x (2 seeds, 1 seed)
+    benchmark = DEFAULT_BENCHMARKS["workarena_l2_agent_curriculum_eval"]().subset_from_regexp(
+        column="task_name",
+        regexp=r"^workarena\.servicenow\.workload-balancing-small-l2$|^workarena\.servicenow\.easy-expense-management-small-l2$",
+    )
+
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert task_dependencies == {
+        "workarena.servicenow.workload-balancing-small-l2": [],
+        "workarena.servicenow.easy-expense-management-small-l2": [],
+    }
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 1: [], 2: []}]
+
+    # change to no parallel seed support
+    benchmark.supports_parallel_seeds = False
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert env_args_dependencies == [{0: [], 2: []}, {1: []}]
+
+    # webarena, 6 dependent tasks x 1 seed
+    benchmark = DEFAULT_BENCHMARKS["webarena"]().subset_from_regexp(
+        column="task_name",
+        regexp=r"^webarena\.533$|^webarena\.537$|^webarena\.552$|^webarena\.410$|^webarena\.561$|^webarena\.562$",
+    )
+
+    task_dependencies = benchmark.dependency_graph_over_tasks()
+    assert {k: set(v) for k, v in task_dependencies.items()} == {
+        k: set(v)
+        for k, v in {
+            "webarena.410": [],
+            "webarena.533": [],
+            "webarena.537": ["webarena.533"],
+            "webarena.552": ["webarena.410", "webarena.537"],
+            "webarena.561": ["webarena.552"],
+            "webarena.562": ["webarena.552", "webarena.561"],
+        }.items()
+    }
+
+    env_args_dependencies = benchmark.dependency_graphs_over_env_args()
+    assert [{k: set(v) for k, v in deps.items()} for deps in env_args_dependencies] == [
+        {k: set(v) for k, v in {0: [], 1: [], 2: [1], 3: [0, 2], 4: [3], 5: [3, 4]}.items()}
+    ]
