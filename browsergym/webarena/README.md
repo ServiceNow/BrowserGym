@@ -11,7 +11,7 @@ Note: the original WebArena codebase has been slightly adapted to ensure compati
 pip install browsergym-webarena
 ```
 
-2. Download tokenizer ressources
+2. Download tokenizer resources
 ```sh
 python -c "import nltk; nltk.download('punkt_tab')"
 ```

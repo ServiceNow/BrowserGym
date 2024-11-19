@@ -4,7 +4,7 @@ from browsergym.core.registration import register_task
 
 from . import config, task
 
-# download necessary tokenizer ressources
+# download necessary tokenizer resources
 # note: deprecated punkt -> punkt_tab https://github.com/nltk/nltk/issues/3293
 try:
     nltk.data.find("tokenizers/punkt_tab")

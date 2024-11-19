@@ -69,7 +69,7 @@ class AbstractBrowserTask(ABC):
 
     def teardown(self) -> None:
         """
-        Tear down the task and clean up any ressource / data created by the task (optional).
+        Tear down the task and clean up any resource / data created by the task (optional).
 
         """
         pass
