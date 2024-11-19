@@ -11,7 +11,7 @@ Note: the original VisualWebArena codebase has been slightly adapted to ensure c
 pip install browsergym-visualwebarena
 ```
 
-2. Download tokenizer ressources
+2. Download tokenizer resources
 ```sh
 python -c "import nltk; nltk.download('punkt_tab')"
 ```
