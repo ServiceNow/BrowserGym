@@ -28,10 +28,15 @@ from browsergym.core.action.parsers import highlevel_action_parser
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
+from .attacks import CorruptedAgent
+from .attacks import CorruptedAgent
 
 logger = logging.getLogger(__name__)
 
 SEED_MAX = 2 ^ 32  # arbitrary max value (exclusive), seems large enough
+
+#TODO(dvij): Update this to a real data structure for attack arguments
+AttackArgs = str
 
 
 @dataclass
@@ -138,6 +143,8 @@ class ExpArgs:
         The arguments to instantiate the agent.
     env_args: EnvArgs
         The arguments to instantiate the environment.
+    attack_args: AttackArgs
+        The arguments to instantiate the attack.
     exp_dir: str
         The directory where the experiment will be saved.
     exp_name: str
@@ -157,6 +164,7 @@ class ExpArgs:
 
     agent_args: AbstractAgentArgs
     env_args: EnvArgs
+    attack_args: AttackArgs = None
     exp_dir: str = None
     exp_name: str = None
     enable_debug: bool = True
@@ -232,6 +240,8 @@ class ExpArgs:
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
             agent = self.agent_args.make_agent()
+            if self.attack_args is not None:
+                agent = CorruptedAgent(agent, self.attack_args)
             logger.debug(f"Agent created.")
 
             env = self.env_args.make_env(
