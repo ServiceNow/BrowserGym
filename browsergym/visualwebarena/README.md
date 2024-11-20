@@ -1,4 +1,4 @@
-# WebArena benchmark for BrowserGym
+# VisualWebArena benchmark for BrowserGym
 
 This package provides `browsergym.visualwebarena`, which is an unofficial port of the [VisualWebArena](https://jykoh.com/vwa) benchmark for BrowserGym.
 
