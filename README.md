@@ -4,12 +4,12 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/browsergym-core?style=flat-square)](https://pypistats.org/packages/browsergym-core)
 [![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
 
-[Setup](#setup)
-[Usage](#usage)
-[Demo](#demo)
-[Ecosystem](#ecosystem)
-[Contributors](#contributors)
-[Citation](#citing-this-work)
+[Setup](#%EF%B8%8F-setup)
+[Usage](#-usage)
+[Demo](#-demo)
+[Ecosystem](#-ecosystem)
+[Contributors](#-contributors)
+[Citation](#-citing-this-work)
 
 ```python
 pip install browsergym
