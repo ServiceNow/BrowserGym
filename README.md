@@ -1,23 +1,23 @@
 # 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
 
+[🛠️ Setup](#%EF%B8%8F-setup) -
+[🏋 Usage](#-usage) -
+[💻 Demo](#-demo) -
+[🌐 Ecosystem](#-ecosystem) -
+[🌟 Contributors](#-contributors) -
+[📝 Citation](#-citing-this-work)
+
 [![PyPI - License](https://img.shields.io/pypi/l/browsergym?style=flat-square)]([https://opensource.org/licenses/MIT](http://www.apache.org/licenses/LICENSE-2.0))
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/browsergym-core?style=flat-square)](https://pypistats.org/packages/browsergym-core)
 [![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
-
-[Setup](#%EF%B8%8F-setup)
-[Usage](#-usage)
-[Demo](#-demo)
-[Ecosystem](#-ecosystem)
-[Contributors](#-contributors)
-[Citation](#-citing-this-work)
 
 ```python
 pip install browsergym
 ```
 
-https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
-
 _Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)._
+
+https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
 
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)
@@ -41,6 +41,7 @@ pip install browsergym-webarena  # core + webarena
 pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
+pip install weblinx-browsergym  # core + weblinx
 ```
 
 Then setup playwright by running
@@ -70,18 +71,21 @@ Boilerplate code to run an agent on an interactive, open-ended task:
 import gymnasium as gym
 import browsergym.core  # register the openended task as a gym environment
 
-# start an openended task
+# start an openended environment
 env = gym.make(
     "browsergym/openended",
     task_kwargs={"start_url": "https://www.google.com/"},  # starting URL
     wait_for_user_message=True,  # wait for a user message after each agent message sent to the chat
 )
+# run the environment <> agent loop until termination
 obs, info = env.reset()
-done = False
-while not done:
+while True:
     action = ...  # implement your agent here
     obs, reward, terminated, truncated, info = env.step(action)
-    done = terminated or truncated
+    if terminated or truncated:
+        break
+# release the environment
+env.close()
 ```
 
 MiniWoB
