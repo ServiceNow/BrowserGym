@@ -41,7 +41,7 @@ export WA_HOMEPAGE="$BASE_URL:80"
 export WA_FULL_RESET="$BASE_URL:7565"
 ```
 
-5. Setup an OpenAI API key
+4. Setup an OpenAI API key
 
 ```sh
 export OPENAI_API_KEY=...

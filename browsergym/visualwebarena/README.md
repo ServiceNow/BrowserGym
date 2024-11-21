@@ -4,6 +4,15 @@ This package provides `browsergym.visualwebarena`, which is an unofficial port o
 
 Note: the original VisualWebArena codebase has been slightly adapted to ensure compatibility.
 
+
+## Server installation
+
+You have two options to setup your webarena instance:
+ - option 1: follow the official [visualwebarena README](https://github.com/web-arena-x/visualwebarena/blob/main/environment_docker/README.md)
+ - option 2: use our [unofficial setup scripts](https://github.com/gasse/webarena-setup/tree/main/visualwebarena)
+
+We recommend **option 2** as it allows you to easily customize the ports of each webarena domain, and offers a reset functionality that allwos browsergym to trigger a full instance reset remotely.
+
 ## Setup
 
 1. Install the package
@@ -16,22 +25,24 @@ pip install browsergym-visualwebarena
 python -c "import nltk; nltk.download('punkt_tab')"
 ```
 
-3. Setup the web servers (follow the [visualwebarena README](https://github.com/web-arena-x/visualwebarena?tab=readme-ov-file)).
-
-4. Setup the URLs as environment variables (note the `VWA_` prefix)
+3. Setup the URLs as environment variables. The ports for each domain here should correspond to those you used when setting up your webarena instance. Note also the `VWA_` prefix which is specific to browsergym.
 ```sh
-export VWA_CLASSIFIEDS="$BASE_URL:9001/"
-export VWA_CLASSIFIEDS_RESET_TOKEN="4b61655535e7ed388f0d40a93600254c"  # Default reset token for classifieds site, change if you edited its docker-compose.yml
-export VWA_SHOPPING="$BASE_URL:7770/"
-export VWA_REDDIT="$BASE_URL:9999"
-export VWA_WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-export VWA_HOMEPAGE="$BASE_URL:4399"
+BASE_URL=<YOUR_SERVER_URL_HERE>  # example: "http://myazuremachine.eastus.cloudapp.azure.com"
+
+# visualwebarena environment variables (change ports as needed)
+export VWA_CLASSIFIEDS="$BASE_URL:8083"
+export VWA_CLASSIFIEDS_RESET_TOKEN="4b61655535e7ed388f0d40a93600254c"
+export VWA_SHOPPING="$BASE_URL:8082"
+export VWA_REDDIT="$BASE_URL:8080"
+export VWA_WIKIPEDIA="$BASE_URL:8081"
+export VWA_HOMEPAGE="$BASE_URL:80"
+
+# if your webarena instances offers the FULL_RESET feature (optional)
+export VWA_FULL_RESET="$BASE_URL:7565"
 ```
 
-5. Setup an OpenAI API key
+4. Setup an OpenAI API key
 
 ```sh
 export OPENAI_API_KEY=...
 ```
-
-> **_NOTE:_**  be mindful of costs, as VisualWebArena will call GPT4 for certain evaluations ([llm_fuzzy_match](https://github.com/web-arena-x/webarena/blob/1469b7c9d8eaec3177855b3131569751f43a40d6/evaluation_harness/helper_functions.py#L146C5-L146C20)).
