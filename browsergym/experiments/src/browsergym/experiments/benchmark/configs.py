@@ -153,6 +153,24 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("webarena"),
     ),
+    "visualwebarena_tiny": lambda: Benchmark(
+        name="visualwebarena_tiny",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["visualwebarena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[
+                "visualwebarena.228",
+                "visualwebarena.263",
+                "visualwebarena.550",
+                "visualwebarena.784",
+            ],
+            max_steps=30,
+            fixed_seeds=[0],
+        ),
+        task_metadata=task_metadata("visualwebarena"),
+    ),
     "visualwebarena": lambda: Benchmark(
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
