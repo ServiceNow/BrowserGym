@@ -116,6 +116,9 @@ def prepare_backend(backend: str):
             default_instance = WebArenaInstance()
             default_instance.full_reset()
 
+            logging.info(
+                f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
+            )
             massage_tasks(
                 [
                     f"webarena.{id}"
@@ -142,6 +145,9 @@ def prepare_backend(backend: str):
             default_instance = VisualWebArenaInstance()
             default_instance.full_reset()
 
+            logging.info(
+                f"Initiating VisualWebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
+            )
             massage_tasks(
                 [
                     f"visualwebarena.{id}"
