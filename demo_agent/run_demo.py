@@ -1,4 +1,5 @@
 import argparse
+import gymnasium as gym
 
 # locally defined agent
 from agent import DemoAgentArgs
@@ -29,7 +30,7 @@ def parse_args():
     parser.add_argument(
         "--task_name",
         type=str,
-        default="webcanvas.mind2web-live.1",
+        default="browsergym/webcanvas.mind2web-live.1",
         help="Name of the Browsergym task to run. If 'openended', you need to specify a 'start_url'",
     )
     parser.add_argument(
