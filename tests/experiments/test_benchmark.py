@@ -50,6 +50,7 @@ def test_build_benchmarks():
         "webarena": 812,
         "webarena_tiny": 6,
         "visualwebarena": 910,
+        "visualwebarena_tiny": 4,
         "workarena_l1": 33 * 10,
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
