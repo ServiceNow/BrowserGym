@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
 
 [🛠️ Setup](#%EF%B8%8F-setup) -
@@ -10,6 +12,8 @@
 [![PyPI - License](https://img.shields.io/pypi/l/browsergym?style=flat-square)]([https://opensource.org/licenses/MIT](http://www.apache.org/licenses/LICENSE-2.0))
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/browsergym-core?style=flat-square)](https://pypistats.org/packages/browsergym-core)
 [![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
+
+</div>
 
 ```python
 pip install browsergym
