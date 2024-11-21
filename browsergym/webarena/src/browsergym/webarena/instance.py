@@ -56,53 +56,66 @@ class WebArenaInstance:
 
         self.credentials = ACCOUNTS
 
-    def full_reset(self):
+    def full_reset(self, skip_if_not_set: bool = True):
         base_url = os.environ.get(self.RESET_URL_VAR, None)
-        reset_url = f"{base_url}/reset"
-        status_url = f"{base_url}/status"
 
-        assert (
-            reset_url
-        ), f"Environment variable {self.RESET_URL_VAR} is missing or empty, required for a full instance reset."
-
-        logger.info(f"Initiating {self.__class__.__name__} instance reset.")
-
-        # trigger instance reset
-        response = requests.get(reset_url)
-        match response.status_code:
-            case 200:
-                logger.info(f"Reset started.")
-            case 418:
-                logger.warning("Reset was already running.")
-            case _:
-                raise Exception(
-                    f"{self.__class__.__name__} reset request {reset_url} failed ({response.status_code}): {response.text}"
+        if not base_url:
+            # check for reset URL
+            logger.error(
+                f"Environment variable {self.RESET_URL_VAR} is missing or empty, required for a full instance reset."
+            )
+            if skip_if_not_set:
+                logger.warning(
+                    f"Skipping automated reset. Make sure the instance has been manually reset."
                 )
+            else:
+                raise RuntimeError(f"Could not reset instance, aborting.")
 
-        # wait until reset complete
-        retry_after = 20  # 20 seconds wait between status checks
-        timeout = 10 * 60  # 10 minutes timeout
-        start_time = time.time()
-        while True:
-            # request instance status
-            response = requests.get(status_url)
-            # check for server error
-            if response.status_code != 200:
-                raise Exception(
-                    f"{self.__class__.__name__} status request {status_url} failed ({response.status_code}): {response.text}"
-                )
-            # check for readiness
-            if response.text == "Ready for duty!":
-                break
-            # check for timeout
-            time_elapsed = time.time() - start_time
-            logger.info(f"Reset still running after {time_elapsed:.0f} seconds...")
-            if time_elapsed > timeout:
-                raise Exception(
-                    f"Reset still running after {time_elapsed} seconds (> {timeout}), aborting."
-                )
-            # wait a bit before next retry
-            time.sleep(retry_after)
+        else:
+            # reset the instance
+            reset_url = f"{base_url}/reset"
+            status_url = f"{base_url}/status"
+
+            logger.info(
+                f"Initiating {self.__class__.__name__} instance reset on URL {reset_url}. Should take between 200 - 500 seconds to restart."
+            )
+
+            # trigger instance reset
+            response = requests.get(reset_url)
+            match response.status_code:
+                case 200:
+                    logger.info(f"Reset started.")
+                case 418:
+                    logger.warning("Reset was already running.")
+                case _:
+                    raise Exception(
+                        f"{self.__class__.__name__} reset request {reset_url} failed ({response.status_code}): {response.text}"
+                    )
+
+            # wait until reset complete
+            retry_after = 20  # 20 seconds wait between status checks
+            timeout = 10 * 60  # 10 minutes timeout
+            start_time = time.time()
+            while True:
+                # request instance status
+                response = requests.get(status_url)
+                # check for server error
+                if response.status_code != 200:
+                    raise Exception(
+                        f"{self.__class__.__name__} status request {status_url} failed ({response.status_code}): {response.text}"
+                    )
+                # check for readiness
+                if response.text == "Ready for duty!":
+                    break
+                # check for timeout
+                time_elapsed = time.time() - start_time
+                logger.info(f"Reset still running after {time_elapsed:.0f} seconds...")
+                if time_elapsed > timeout:
+                    raise Exception(
+                        f"Reset still running after {time_elapsed} seconds (> {timeout}), aborting."
+                    )
+                # wait a bit before next retry
+                time.sleep(retry_after)
 
         # warm-start the instance (navigate to every domain)
         retries_left = 3
