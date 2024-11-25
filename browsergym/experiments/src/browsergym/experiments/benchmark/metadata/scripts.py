@@ -68,10 +68,10 @@ def print_metadata_visualwebarena():
             "task_name",
             "requires_reset",
             "sites",
-            "eval_types",
             "reasoning_difficulty",
             "visual_difficulty",
             "overall_difficulty",
+            "eval_types",
         )
     ]
 
