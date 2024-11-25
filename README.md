@@ -9,9 +9,12 @@
 [🌟 Contributors](#-contributors) -
 [📝 Citation](#-citing-this-work)
 
+[![pypi](https://badge.fury.io/py/browsergym.svg)](https://pypi.org/project/browsergym/)
 [![PyPI - License](https://img.shields.io/pypi/l/browsergym?style=flat-square)]([https://opensource.org/licenses/MIT](http://www.apache.org/licenses/LICENSE-2.0))
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/browsergym-core?style=flat-square)](https://pypistats.org/packages/browsergym-core)
 [![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
+[![Code Format](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml)
+[![Tests](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml)
 
 </div>
 
