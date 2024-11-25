@@ -2,12 +2,12 @@
 
 # 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
 
-[🛠️ Setup](#%EF%B8%8F-setup) -
-[🏋 Usage](#-usage) -
-[💻 Demo](#-demo) -
-[🌐 Ecosystem](#-ecosystem) -
-[🌟 Contributors](#-contributors) -
-[📝 Citation](#-citing-this-work)
+🛠️ [Setup](#%EF%B8%8F-setup) -
+🏋 [Usage](#-usage) -
+💻 [Demo](#-demo) -
+🌐 [Ecosystem](#-ecosystem) -
+🌟 [Contributors](#-contributors) -
+📝 [Citation](#-citing-this-work)
 
 [![pypi](https://badge.fury.io/py/browsergym.svg)](https://pypi.org/project/browsergym/)
 [![PyPI - License](https://img.shields.io/pypi/l/browsergym?style=flat-square)]([https://opensource.org/licenses/MIT](http://www.apache.org/licenses/LICENSE-2.0))
