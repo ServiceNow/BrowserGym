@@ -167,12 +167,16 @@ print("\n".join(env_ids))
 
 ## 💻 Demo
 
-If you want to experiment with a demo agent in BrowserGym, follow these steps:
-
+If you want to experiment with a demo agent in BrowserGym, follow these steps
 ```sh
+# conda setup
 conda env create -f demo_agent/environment.yml
 conda activate demo_agent
-# or simply use `pip install -r demo_agent/requirements.txt`
+
+# or pip setup
+pip install -r demo_agent/requirements.txt
+
+# then download the browser for playwright
 playwright install chromium
 ```
 
@@ -205,10 +209,10 @@ python demo_agent/run_demo.py --help
 ## 🌐 Ecosystem
 
 - [AgentLab](https://github.com/ServiceNow/AgentLab): Seamlessly run agents on benchmarks, collect and analyse traces.
-- [WorkArena](https://github.com/ServiceNow/WorkArena): A benchmark for web agents on the ServiceNow platform.
+- [WorkArena(++)](https://github.com/ServiceNow/WorkArena): A benchmark for web agents on the ServiceNow platform.
 - [WebArena](https://github.com/web-arena-x/webarena): A benchmark of realistic web tasks on self-hosted domains.
 - [VisualWebArena](https://github.com/web-arena-x/visualwebarena): A benchmark of realistic visual web tasks on self-hosted domains.
-- [MiniWoB](https://miniwob.farama.org/): A collection of over 100 web tasks on synthetic web pages.
+- [MiniWoB(++)](https://miniwob.farama.org/): A collection of over 100 web tasks on synthetic web pages.
 - [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
 - [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
 
