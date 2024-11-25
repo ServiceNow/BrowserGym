@@ -64,12 +64,15 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
 
 ### 🏗️ Development setup
+
 To install browsergym locally for development, use the following commands:
 ```sh
-git clone https://github.com/ServiceNow/BrowserGym.git
+git clone git@github.com:ServiceNow/BrowserGym.git
 cd BrowserGym
 make install
 ```
+
+Contributions are welcome! 😊
 
 ## 🏋 Usage
 
