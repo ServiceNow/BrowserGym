@@ -152,6 +152,6 @@ tests/assistantbench/assistantbench-predictions-test.jsonl
 bg_wl_data/
 
 # webcanvas
-.vscode/*
+test_gpt.py
+temp_test.py
 results/
-tests/webcanvas/*
