@@ -16,6 +16,8 @@
 [![Code Format](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml)
 [![Tests](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml)
 
+A Gym Environment for Web Task Automation
+
 </div>
 
 > [!IMPORTANT]
