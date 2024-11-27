@@ -84,9 +84,9 @@ git clone https://github.com/Nid989/WorkArena
 pip install browsergym
 
 # Configure WorkArena environment variables
-export SNOW_INSTANCE_URL="https://dev280094.service-now.com"
-export SNOW_INSTANCE_UNAME="admin"
-export SNOW_INSTANCE_PWD="MCI1k/@Cvv1j"
+export SNOW_INSTANCE_URL='https://dev275589.service-now.com'
+export SNOW_INSTANCE_UNAME='admin'
+export SNOW_INSTANCE_PWD='3*cngSgWUI5%'
 
 # Initialize WorkArena
 workarena-install
