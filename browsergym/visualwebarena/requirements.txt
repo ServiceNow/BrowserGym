@@ -1,4 +1,4 @@
-browsergym-core==0.13.2
+browsergym-core==0.13.3
 browsergym-webarena
 libvisualwebarena==0.0.15
 requests
