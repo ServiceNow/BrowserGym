@@ -2,6 +2,8 @@
 
 ![BrowserGym banner](https://github.com/user-attachments/assets/4853f210-43ac-4107-a0d2-95c9c614dbe7)
 
+## 🌎💪 BrowserGym, a Gym environment for web task automation
+
 🛠️ [Setup](#%EF%B8%8F-setup) -
 🏋 [Usage](#-usage) -
 💻 [Demo](#-demo) -
@@ -15,8 +17,6 @@
 [![GitHub star chart](https://img.shields.io/github/stars/ServiceNow/BrowserGym?style=flat-square)](https://star-history.com/#ServiceNow/BrowserGym)
 [![Code Format](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml)
 [![Tests](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml)
-
-A Gym Environment for Web Task Automation
 
 ```python
 pip install browsergym
