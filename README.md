@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
+![BrowserGym banner](https://github.com/user-attachments/assets/4853f210-43ac-4107-a0d2-95c9c614dbe7)
 
 🛠️ [Setup](#%EF%B8%8F-setup) -
 🏋 [Usage](#-usage) -
