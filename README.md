@@ -18,14 +18,14 @@
 
 </div>
 
-```python
-pip install browsergym
-```
-
 > [!IMPORTANT]
 > 🚀 Check out [AgentLab](https://github.com/ServiceNow/AgentLab)✨ !
 >
 > A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks.
+
+```python
+pip install browsergym
+```
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
 
