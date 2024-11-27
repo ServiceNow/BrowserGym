@@ -58,7 +58,7 @@ NOTE: local setup related to `webarena` benchmark and `browsergym` environment
 
 ## 4. Local Setup
 
-### WebArena Setup
+### WebArena Setup (different folder)
 ```bash
 # Clone repositories
 git clone https://github.com/Nid989/webarena
@@ -71,7 +71,7 @@ cd environment_docker/webarena-homepage/
 flask run --host=0.0.0.0 --port=4399
 ```
 
-### WorkArena Setup
+### WorkArena Setup (different folder)
 ```bash
 # Create and activate new Python environment (recommended)
 python -m venv workarena-env
@@ -101,7 +101,7 @@ playwright install chromium
 pip install ext-requirements.txt
 ```
 
-## 5. Environment Configuration
+## 5. Environment Configuration (different folder)
 ```bash
 git clone https://github.com/ServiceNow/BrowserGym 
 
