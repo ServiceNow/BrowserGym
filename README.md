@@ -2,8 +2,6 @@
 
 ![BrowserGym banner](https://github.com/user-attachments/assets/4853f210-43ac-4107-a0d2-95c9c614dbe7)
 
-## 🌎💪 BrowserGym, a Gym environment for web task automation
-
 🛠️ [Setup](#%EF%B8%8F-setup) -
 🏋 [Usage](#-usage) -
 💻 [Demo](#-demo) -
