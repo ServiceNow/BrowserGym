@@ -244,7 +244,7 @@ class BrowserEnv(gym.Env, ABC):
         # create a new browser context for pages
         self.context = self.browser.new_context(
             no_viewport=True if self.resizeable_window else None,
-            viewport=viewport,
+            viewport=viewport if not self.resizeable_window else None,
             record_video_dir=(
                 Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
             ),
