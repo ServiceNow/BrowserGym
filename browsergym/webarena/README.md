@@ -37,8 +37,11 @@ export WA_WIKIPEDIA="$BASE_URL:8081/wikipedia_en_all_maxi_2022-05/A/User:The_oth
 export WA_MAP="$BASE_URL:443"
 export WA_HOMEPAGE="$BASE_URL:80"
 
-# if your webarena instances offers the FULL_RESET feature (optional)
+# if your webarena instance offers the FULL_RESET feature (optional)
 export WA_FULL_RESET="$BASE_URL:7565"
+
+# otherwise, be sure to NOT set WA_FULL_RESET, or set it to an empty string
+export WA_FULL_RESET=""
 ```
 
 4. Setup an OpenAI API key

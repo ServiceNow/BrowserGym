@@ -37,8 +37,11 @@ export VWA_REDDIT="$BASE_URL:8080"
 export VWA_WIKIPEDIA="$BASE_URL:8081"
 export VWA_HOMEPAGE="$BASE_URL:80"
 
-# if your webarena instances offers the FULL_RESET feature (optional)
+# if your webarena instance offers the FULL_RESET feature (optional)
 export VWA_FULL_RESET="$BASE_URL:7565"
+
+# otherwise, be sure to NOT set VWA_FULL_RESET, or set it to an empty string
+export VWA_FULL_RESET=""
 ```
 
 4. Setup an OpenAI API key
