@@ -15,16 +15,10 @@ from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
-from .observation import (
-    MarkingError,
-    _post_extract,
-    _pre_extract,
-    extract_dom_extra_properties,
-    extract_dom_snapshot,
-    extract_focused_element_bid,
-    extract_merged_axtree,
-    extract_screenshot,
-)
+from .observation import (MarkingError, _post_extract, _pre_extract,
+                          extract_dom_extra_properties, extract_dom_snapshot,
+                          extract_focused_element_bid, extract_merged_axtree,
+                          extract_mouse_position, extract_screenshot)
 from .spaces import AnyBox, AnyDict, Float, Unicode
 from .task import AbstractBrowserTask
 
@@ -581,6 +575,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
+            "mouse_position": extract_mouse_position(self.page),
         }
 
         return obs

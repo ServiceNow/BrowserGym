@@ -146,6 +146,22 @@ def extract_screenshot(page: playwright.sync_api.Page):
 
     return img
 
+def extract_mouse_position(page: playwright.sync_api.Page):
+    """
+    Extracts the mouse location on a Playwright page using a hacky JS code.
+
+    Args:
+        page: the playwright page of which to extract the mouse location.
+
+    Returns:
+        An array of the x and y coordinates of the mouse location.
+    """
+    page.evaluate("document.addEventListener('mousemove', event => {window.pageX = event.clientX; window.pageY = event.clientY})")
+    position = page.evaluate("""() => {
+    return [window.pageX, window.pageY];
+}""")
+    return position
+
 
 # we could handle more data items here if needed
 __BID_EXPR = r"([a-zA-Z0-9]+)"
