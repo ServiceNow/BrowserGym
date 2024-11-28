@@ -265,7 +265,7 @@ window.addEventListener("focus", () => {window.browsergym_page_activated();}, {c
 window.addEventListener("focusin", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("load", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("pageshow", () => {window.browsergym_page_activated();}, {capture: true});
-window.addEventListener("mousemove", () => {window.browsergym_page_activated();}, {capture: true});
+window.addEventListener("mousemove", (event) => {window.browsergym_page_activated(); window.pageX = event.clientX; window.pageY = event.clientY;}, {capture: true});
 window.addEventListener("mouseup", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("mousedown", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("wheel", () => {window.browsergym_page_activated();}, {capture: true});

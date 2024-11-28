@@ -156,7 +156,6 @@ def extract_mouse_position(page: playwright.sync_api.Page):
     Returns:
         An array of the x and y coordinates of the mouse location.
     """
-    page.evaluate("document.addEventListener('mousemove', event => {window.pageX = event.clientX; window.pageY = event.clientY})")
     position = page.evaluate("""() => {
     return [window.pageX, window.pageY];
 }""")
