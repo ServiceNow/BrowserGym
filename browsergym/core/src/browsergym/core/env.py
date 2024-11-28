@@ -151,6 +151,9 @@ class BrowserEnv(gym.Env, ABC):
                     shape=(-1, -1, 3),
                     dtype=np.uint8,
                 ),  # swapped axes (height, width, RGB)
+                "mouse_position": gym.spaces.Sequence(
+                    Float()
+                ),
                 "dom_object": AnyDict(),
                 "axtree_object": AnyDict(),
                 "extra_element_properties": AnyDict(),

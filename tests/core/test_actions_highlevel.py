@@ -12,7 +12,8 @@ from pyparsing.exceptions import ParseException
 # register openended gym environments
 import browsergym.core
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.parsers import NamedArgument, highlevel_action_parser
+from browsergym.core.action.parsers import (NamedArgument,
+                                            highlevel_action_parser)
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from browsergym.utils.obs import flatten_dom_to_str
 
@@ -1141,6 +1142,7 @@ mouse_up({repr(x)}, {repr(y)})
 
     obs, reward, term, trunc, info = env.step(action)
     checkbox = get_checkbox_elem(obs)
+    assert obs['mouse_position'] == [x, y]
 
     # box not checked
     assert not obs["last_action_error"]
