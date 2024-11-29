@@ -6,6 +6,7 @@
 🏋 [Usage](#-usage) -
 💻 [Demo](#-demo) -
 🌐 [Ecosystem](#-ecosystem) -
+🚀 [AgentLab](https://github.com/ServiceNow/AgentLab) -
 🌟 [Contributors](#-contributors) -
 📝 [Citation](#-citing-this-work)
 
@@ -22,9 +23,12 @@ pip install browsergym
 
 </div>
 
-> [!IMPORTANT]
+> [!WARNING]
+> BrowserGym is meant to provide an open, easy-to-use and extensible framework to accelerate the field of web agent research.
+> It is not meant to be a consumer product. Use with caution!
+
+> [!TIP]
 > 🚀 Check out [AgentLab](https://github.com/ServiceNow/AgentLab)✨ !
->
 > A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks.
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
