@@ -122,9 +122,9 @@ export HOMEPAGE="http://10.15.29.154:4399"  # Update with your local host
 # OR
 
 # Option 2: For WorkArena benchmark
-export SNOW_INSTANCE_URL="https://dev280094.service-now.com"
-export SNOW_INSTANCE_UNAME="admin"
-export SNOW_INSTANCE_PWD="MCI1k/@Cvv1j"
+export SNOW_INSTANCE_URL='https://dev275589.service-now.com'
+export SNOW_INSTANCE_UNAME='admin'
+export SNOW_INSTANCE_PWD='3*cngSgWUI5%'
 ```
 
 ## 6. Run Demo 
