@@ -58,6 +58,17 @@ NOTE: local setup related to `webarena` benchmark and `browsergym` environment
 
 ## 4. Local Setup
 
+### Pyenv Setup
+```bash
+# Install pyenv
+brew install pyenv
+
+# Install Python 3.10.x
+pyenv install 3.12.7
+pyenv virtualenv 3.12.7 browsergym_env
+pyenv activate browsergym_env
+```
+
 ### WebArena Setup (different folder)
 ```bash
 # Clone repositories
@@ -89,21 +100,23 @@ export SNOW_INSTANCE_UNAME='admin'
 export SNOW_INSTANCE_PWD='3*cngSgWUI5%'
 
 # Initialize WorkArena
-workarena-install
+workarena-install # (no need to run this again)
 ```
 
 ### Common Dependencies
 ```bash
-# Install Python dependencies
-pip uninstall playwright
-pip install playwright==1.47.0
+# Install Python dependencies 
+pip install browsergym
+# pip uninstall playwright
+# pip install playwright==1.47.0
 playwright install chromium
-pip install ext-requirements.txt
+pip install ext-requirements.txt 
 ```
 
 ## 5. Environment Configuration (different folder)
 ```bash
-git clone https://github.com/ServiceNow/BrowserGym 
+# git clone https://github.com/ServiceNow/BrowserGym # (official one)
+git clone https://github.com/Nid989/BrowserGym.git 
 
 # API Keys
 export OPENAI_API_KEY="your-key-here"
