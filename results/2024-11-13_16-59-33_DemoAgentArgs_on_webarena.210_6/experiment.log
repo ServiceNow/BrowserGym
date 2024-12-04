@@ -1,0 +1,54 @@
+2024-11-13 16:59:33,110 - 74915 - browsergym.experiments.loop - INFO - Running experiment DemoAgentArgs_on_webarena.210_6 in:
+  results/2024-11-13_16-59-33_DemoAgentArgs_on_webarena.210_6
+2024-11-13 17:00:03,276 - 74915 - browsergym.experiments.loop - WARNING - Exception uncaught by agent or environment in task webarena.210.
+TimeoutError:
+Page.goto: Timeout 10000ms exceeded.
+Call log:
+navigating to "http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7780/admin", waiting until "load"
+
+Traceback (most recent call last):
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 224, in run
+    step_info.from_reset(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 415, in from_reset
+    self.obs, env_info = env.reset(seed=seed)
+                         ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 146, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 400, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/core/env.py", line 292, in reset
+    task_goal, task_info = self.task.setup(page=self.page)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/webarena/task.py", line 106, in setup
+    self.webarena_instance.ui_login(site=site, page=page)
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/webarena/instance.py", line 183, in ui_login
+    page.goto(url)
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 8843, in goto
+    self._sync(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/_impl/_page.py", line 524, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 145, in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 59, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 514, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.goto: Timeout 10000ms exceeded.
+Call log:
+navigating to "http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7780/admin", waiting until "load"
+
+
+2024-11-13 17:00:03,281 - 74915 - browsergym.experiments.loop - INFO - Saving summary info.

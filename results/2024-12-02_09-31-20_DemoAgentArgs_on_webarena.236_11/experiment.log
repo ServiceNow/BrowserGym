@@ -1,0 +1,50 @@
+2024-12-02 09:31:21,021 - 24319 - browsergym.experiments.loop - INFO - Running experiment DemoAgentArgs_on_webarena.236_11 in:
+  results/2024-12-02_09-31-20_DemoAgentArgs_on_webarena.236_11
+2024-12-02 09:31:21,835 - 24319 - browsergym.experiments.loop - WARNING - Exception uncaught by agent or environment in task webarena.236.
+AssertionError:
+Environment variable WA_SHOPPING missing.
+Please set the following environment variables to use WebArena through BrowserGym:
+WA_SHOPPING
+WA_SHOPPING_ADMIN
+WA_REDDIT
+WA_GITLAB
+WA_WIKIPEDIA
+WA_MAP
+WA_HOMEPAGE
+Traceback (most recent call last):
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 224, in run
+    step_info.from_reset(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 415, in from_reset
+    self.obs, env_info = env.reset(seed=seed)
+                         ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 146, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 400, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/core/env.py", line 193, in reset
+    self.task = self.task_entrypoint(seed=seed, **self.task_kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/webarena/task.py", line 39, in __init__
+    self.webarena_instance = WebArenaInstance()
+                             ^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/webarena/instance.py", line 28, in __init__
+    assert append_wa(key) in os.environ, (
+AssertionError: Environment variable WA_SHOPPING missing.
+Please set the following environment variables to use WebArena through BrowserGym:
+WA_SHOPPING
+WA_SHOPPING_ADMIN
+WA_REDDIT
+WA_GITLAB
+WA_WIKIPEDIA
+WA_MAP
+WA_HOMEPAGE
+
+2024-12-02 09:31:21,836 - 24319 - browsergym.experiments.loop - INFO - Saving summary info.

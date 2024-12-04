@@ -1,0 +1,49 @@
+2024-11-21 19:30:17,270 - 15077 - browsergym.experiments.loop - INFO - Running experiment DemoAgentArgs_on_workarena.servicenow.dashboard-retrieve-catalog-and-max-order-apple-macbook-pro15-l2_16 in:
+  results/2024-11-21_19-30-17_DemoAgentArgs_on_workarena.servicenow.dashboard-retrieve-catalog-and-max-order-apple-macbook-pro15-l2_16
+2024-11-21 19:30:19,085 - 15077 - browsergym.experiments.loop - WARNING - Exception uncaught by agent or environment in task workarena.servicenow.dashboard-retrieve-catalog-and-max-order-apple-macbook-pro15-l2.
+RuntimeError:
+ServiceNow instance is hibernating. Please navigate to https://dev280094.service-now.com wake it up.
+Traceback (most recent call last):
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 224, in run
+    step_info.from_reset(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/experiments/loop.py", line 415, in from_reset
+    self.obs, env_info = env.reset(seed=seed)
+                         ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 146, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 400, in reset
+    return super().reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/gymnasium/core.py", line 328, in reset
+    return self.env.reset(seed=seed, options=options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/core/env.py", line 193, in reset
+    self.task = self.task_entrypoint(seed=seed, **self.task_kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 4, in __init__
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/compositional/dash_do_catalog.py", line 761, in __init__
+    super().__init__(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/compositional/dash_do_catalog.py", line 737, in __init__
+    super().__init__(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/compositional/dash_do_base.py", line 814, in __init__
+    super().__init__(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/compositional/dash_do_base.py", line 65, in __init__
+    super().__init__(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/compositional/base.py", line 52, in __init__
+    super().__init__(
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/tasks/base.py", line 66, in __init__
+    self.instance = instance if instance is not None else SNowInstance()
+                                                          ^^^^^^^^^^^^^^
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/instance.py", line 57, in __init__
+    self.check_status()
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/instance.py", line 65, in check_status
+    self._check_is_hibernating()
+  File "/Users/nidhirbhavsar/.pyenv/versions/browsergym_dev_env/lib/python3.12/site-packages/browsergym/workarena/instance.py", line 76, in _check_is_hibernating
+    raise RuntimeError(
+RuntimeError: ServiceNow instance is hibernating. Please navigate to https://dev280094.service-now.com wake it up.
+
+2024-11-21 19:30:19,087 - 15077 - browsergym.experiments.loop - INFO - Saving summary info.

@@ -1,0 +1,922 @@
+2024-11-14 10:42:37,589 - 6882 - browsergym.experiments.loop - INFO - Running experiment DemoAgentArgs_on_webarena.100_32 in:
+  results/2024-11-14_10-42-37_DemoAgentArgs_on_webarena.100_32
+2024-11-14 10:42:54,812 - 6882 - agent - INFO - # Instructions
+
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal
+
+Where is the nearest Starbucks to Carnegie Mellon, and what is the walking distance to it?
+# Currently open tabs
+
+Tab 0 (active tab)
+  Title: OpenStreetMap
+  URL: http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108
+
+# Current page Accessibility Tree
+
+RootWebArea 'OpenStreetMap', focused, url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108'
+	[44] banner ''
+		[45] heading 'OpenStreetMap logo OpenStreetMap'
+			[46] link 'OpenStreetMap logo OpenStreetMap', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108'
+				[49] image 'OpenStreetMap logo', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/osm_logo-4afddaae0230a5a46687fdc751ed256dfdccde144118cb02a7d7960f207a4b92.svg'
+				StaticText ''
+		[51] navigation ''
+			[95] link 'Edit', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/edit#map=7/42.896/-75.108'
+			[96] button ''
+			[102] link 'History', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/history#map=7/42.896/-75.108'
+			[103] link 'Export', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/export#map=7/42.896/-75.108'
+		[104] navigation ''
+			[105] list ''
+				[106] listitem ''
+					[107] link 'GPS Traces', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/traces'
+				[108] listitem ''
+					[109] link 'User Diaries', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/diary'
+				[110] listitem ''
+					[111] link 'Communities', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/communities'
+				[112] listitem ''
+					[113] link 'Copyright', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+				[114] listitem ''
+					[115] link 'Help', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/help'
+				[116] listitem ''
+					[117] link 'About', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/about'
+			[134] link 'Log In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/login?referer=%2F#map=7/42.896/-75.108'
+			[135] link 'Sign Up', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/user/new'
+	[144] link 'Where is this?', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[145] textbox 'Search', focused
+	[147] button 'Go'
+	[149] link 'Find directions between two points', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/directions'
+		[150] image '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/directions-b08069e78ff09f082d27a7434b49685efa647060cf51a71d74074ad350e3fd66.png'
+	[187] heading 'Welcome to OpenStreetMap!'
+	[189] button 'Close'
+	[191] paragraph ''
+		StaticText 'OpenStreetMap is a map of the world, created by people like you and free to use under an open license.'
+	[192] paragraph ''
+		StaticText 'Hosting is supported by'
+		[193] link 'UCL', url='https://www.ucl.ac.uk/'
+		StaticText ','
+		[194] link 'Fastly', url='https://www.fastly.com/'
+		StaticText ','
+		[195] link 'Bytemark Hosting', url='https://www.bytemark.co.uk/'
+		StaticText ', and other'
+		[196] link 'partners', url='https://hardware.openstreetmap.org/thanks/'
+		StaticText '.'
+	[199] link 'Learn More', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/about'
+	[201] link 'Start Mapping', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/user/new'
+	[360] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/46.png'
+	[361] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/46.png'
+	[362] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/47.png'
+	[363] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/47.png'
+	[364] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/45.png'
+	[365] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/45.png'
+	[366] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/46.png'
+	[367] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/46.png'
+	[368] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/47.png'
+	[369] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/47.png'
+	[370] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/48.png'
+	[371] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/48.png'
+	[372] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/45.png'
+	[373] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/45.png'
+	[374] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/48.png'
+	[375] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/48.png'
+	[376] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/46.png'
+	[377] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/46.png'
+	[378] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/47.png'
+	[379] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/47.png'
+	[380] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/45.png'
+	[381] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/45.png'
+	[382] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/48.png'
+	[383] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/48.png'
+	[394] link 'Zoom In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[396] link 'Zoom Out', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[399] button 'Show My Location'
+	[402] link 'Layers', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[405] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[408] link 'Share', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[411] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[414] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	StaticText '50 km'
+	StaticText '50 mi'
+	StaticText '©'
+	[422] link 'OpenStreetMap contributors', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+	StaticText '♥'
+	[423] link 'Make a Donation', url='https://donate.openstreetmap.org/'
+	StaticText '.'
+	[424] link 'Website and API terms', url='https://wiki.osmfoundation.org/wiki/Terms_of_Use'
+
+
+# Action Space
+
+
+20 different types of actions are available.
+
+noop(wait_ms: float = 1000)
+    Examples:
+        noop()
+
+        noop(500)
+
+send_msg_to_user(text: str)
+    Examples:
+        send_msg_to_user('Based on the results of my search, the city was built in 1751.')
+
+tab_close()
+    Examples:
+        tab_close()
+
+tab_focus(index: int)
+    Examples:
+        tab_focus(2)
+
+new_tab()
+    Examples:
+        new_tab()
+
+go_back()
+    Examples:
+        go_back()
+
+go_forward()
+    Examples:
+        go_forward()
+
+goto(url: str)
+    Examples:
+        goto('http://www.example.com')
+
+scroll(delta_x: float, delta_y: float)
+    Examples:
+        scroll(0, 200)
+
+        scroll(-50.2, -100.5)
+
+fill(bid: str, value: str)
+    Examples:
+        fill('237', 'example value')
+
+        fill('45', 'multi-line\nexample')
+
+        fill('a12', 'example with "quotes"')
+
+select_option(bid: str, options: str | list[str])
+    Examples:
+        select_option('a48', 'blue')
+
+        select_option('c48', ['red', 'green', 'blue'])
+
+click(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        click('a51')
+
+        click('b22', button='right')
+
+        click('48', button='middle', modifiers=['Shift'])
+
+dblclick(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        dblclick('12')
+
+        dblclick('ca42', button='right')
+
+        dblclick('178', button='middle', modifiers=['Shift'])
+
+hover(bid: str)
+    Examples:
+        hover('b8')
+
+press(bid: str, key_comb: str)
+    Examples:
+        press('88', 'Backspace')
+
+        press('a26', 'ControlOrMeta+a')
+
+        press('a61', 'Meta+Shift+t')
+
+focus(bid: str)
+    Examples:
+        focus('b455')
+
+clear(bid: str)
+    Examples:
+        clear('996')
+
+drag_and_drop(from_bid: str, to_bid: str)
+    Examples:
+        drag_and_drop('56', '498')
+
+upload_file(bid: str, file: str | list[str])
+    Examples:
+        upload_file('572', 'my_receipt.pdf')
+
+        upload_file('63', ['/home/bob/Documents/image.jpg', '/home/bob/Documents/file.zip'])
+
+report_infeasible(reason: str)
+    Examples:
+        report_infeasible('I cannot follow these instructions because there is no email field in this form.')
+
+Only a single action can be provided at once. Example:
+fill('a12', 'example with "quotes"')
+
+
+Here are examples of actions with chain-of-thought reasoning:
+
+I now need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.
+```click("12")```
+
+I found the information requested by the user, I will send it to the chat.
+```send_msg_to_user("The price for a 15\" laptop is 1499 USD.")```
+
+
+# Next action
+
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action.
+
+2024-11-14 10:43:00,576 - 6882 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-11-14 10:43:01,049 - 6882 - browsergym.experiments.loop - INFO - action:
+To find the nearest Starbucks to Carnegie Mellon and determine the walking distance, I need to perform a search on the OpenStreetMap page. The search box is already focused, so I will fill it with the query "Starbucks near Carnegie Mellon University" and then click the "Go" button to execute the search. 
+
+Let's proceed with filling the search box with the query. 
+
+```fill('145', 'Starbucks near Carnegie Mellon University')```
+
+2024-11-14 10:43:08,397 - 6882 - agent - INFO - # Instructions
+
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal
+
+Where is the nearest Starbucks to Carnegie Mellon, and what is the walking distance to it?
+# Currently open tabs
+
+Tab 0 (active tab)
+  Title: OpenStreetMap
+  URL: http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108
+
+# Current page Accessibility Tree
+
+RootWebArea 'OpenStreetMap', focused, url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108'
+	[44] banner ''
+		[45] heading 'OpenStreetMap logo OpenStreetMap'
+			[46] link 'OpenStreetMap logo OpenStreetMap', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-75.108'
+				[49] image 'OpenStreetMap logo', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/osm_logo-4afddaae0230a5a46687fdc751ed256dfdccde144118cb02a7d7960f207a4b92.svg'
+				StaticText ''
+		[51] navigation ''
+			[95] link 'Edit', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/edit#map=7/42.896/-75.108'
+			[96] button ''
+			[102] link 'History', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/history#map=7/42.896/-75.108'
+			[103] link 'Export', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/export#map=7/42.896/-75.108'
+		[104] navigation ''
+			[105] list ''
+				[106] listitem ''
+					[107] link 'GPS Traces', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/traces'
+				[108] listitem ''
+					[109] link 'User Diaries', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/diary'
+				[110] listitem ''
+					[111] link 'Communities', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/communities'
+				[112] listitem ''
+					[113] link 'Copyright', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+				[114] listitem ''
+					[115] link 'Help', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/help'
+				[116] listitem ''
+					[117] link 'About', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/about'
+			[134] link 'Log In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/login?referer=%2F#map=7/42.896/-75.108'
+			[135] link 'Sign Up', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/user/new'
+	[145] textbox 'Search' value='Starbucks near Carnegie Mellon University', focused
+		StaticText 'Starbucks near Carnegie Mellon University'
+	[147] button 'Go'
+	[149] link 'Find directions between two points', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/directions'
+		[150] image '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/directions-b08069e78ff09f082d27a7434b49685efa647060cf51a71d74074ad350e3fd66.png'
+	[187] heading 'Welcome to OpenStreetMap!'
+	[189] button 'Close'
+	[191] paragraph ''
+		StaticText 'OpenStreetMap is a map of the world, created by people like you and free to use under an open license.'
+	[192] paragraph ''
+		StaticText 'Hosting is supported by'
+		[193] link 'UCL', url='https://www.ucl.ac.uk/'
+		StaticText ','
+		[194] link 'Fastly', url='https://www.fastly.com/'
+		StaticText ','
+		[195] link 'Bytemark Hosting', url='https://www.bytemark.co.uk/'
+		StaticText ', and other'
+		[196] link 'partners', url='https://hardware.openstreetmap.org/thanks/'
+		StaticText '.'
+	[199] link 'Learn More', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/about'
+	[201] link 'Start Mapping', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/user/new'
+	[360] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/46.png'
+	[361] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/46.png'
+	[362] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/47.png'
+	[363] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/47.png'
+	[364] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/45.png'
+	[365] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/45.png'
+	[366] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/46.png'
+	[367] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/46.png'
+	[368] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/47.png'
+	[369] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/47.png'
+	[370] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/48.png'
+	[371] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/48.png'
+	[372] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/45.png'
+	[373] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/45.png'
+	[374] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/48.png'
+	[375] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/48.png'
+	[376] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/46.png'
+	[377] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/46.png'
+	[378] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/47.png'
+	[379] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/47.png'
+	[380] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/45.png'
+	[381] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/45.png'
+	[382] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/48.png'
+	[383] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/48.png'
+	[394] link 'Zoom In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[396] link 'Zoom Out', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[399] button 'Show My Location'
+	[402] link 'Layers', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[405] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[408] link 'Share', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[411] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	[414] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#'
+	StaticText '50 km'
+	StaticText '50 mi'
+	StaticText '©'
+	[422] link 'OpenStreetMap contributors', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+	StaticText '♥'
+	[423] link 'Make a Donation', url='https://donate.openstreetmap.org/'
+	StaticText '.'
+	[424] link 'Website and API terms', url='https://wiki.osmfoundation.org/wiki/Terms_of_Use'
+
+
+# Action Space
+
+
+20 different types of actions are available.
+
+noop(wait_ms: float = 1000)
+    Examples:
+        noop()
+
+        noop(500)
+
+send_msg_to_user(text: str)
+    Examples:
+        send_msg_to_user('Based on the results of my search, the city was built in 1751.')
+
+tab_close()
+    Examples:
+        tab_close()
+
+tab_focus(index: int)
+    Examples:
+        tab_focus(2)
+
+new_tab()
+    Examples:
+        new_tab()
+
+go_back()
+    Examples:
+        go_back()
+
+go_forward()
+    Examples:
+        go_forward()
+
+goto(url: str)
+    Examples:
+        goto('http://www.example.com')
+
+scroll(delta_x: float, delta_y: float)
+    Examples:
+        scroll(0, 200)
+
+        scroll(-50.2, -100.5)
+
+fill(bid: str, value: str)
+    Examples:
+        fill('237', 'example value')
+
+        fill('45', 'multi-line\nexample')
+
+        fill('a12', 'example with "quotes"')
+
+select_option(bid: str, options: str | list[str])
+    Examples:
+        select_option('a48', 'blue')
+
+        select_option('c48', ['red', 'green', 'blue'])
+
+click(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        click('a51')
+
+        click('b22', button='right')
+
+        click('48', button='middle', modifiers=['Shift'])
+
+dblclick(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        dblclick('12')
+
+        dblclick('ca42', button='right')
+
+        dblclick('178', button='middle', modifiers=['Shift'])
+
+hover(bid: str)
+    Examples:
+        hover('b8')
+
+press(bid: str, key_comb: str)
+    Examples:
+        press('88', 'Backspace')
+
+        press('a26', 'ControlOrMeta+a')
+
+        press('a61', 'Meta+Shift+t')
+
+focus(bid: str)
+    Examples:
+        focus('b455')
+
+clear(bid: str)
+    Examples:
+        clear('996')
+
+drag_and_drop(from_bid: str, to_bid: str)
+    Examples:
+        drag_and_drop('56', '498')
+
+upload_file(bid: str, file: str | list[str])
+    Examples:
+        upload_file('572', 'my_receipt.pdf')
+
+        upload_file('63', ['/home/bob/Documents/image.jpg', '/home/bob/Documents/file.zip'])
+
+report_infeasible(reason: str)
+    Examples:
+        report_infeasible('I cannot follow these instructions because there is no email field in this form.')
+
+Only a single action can be provided at once. Example:
+fill('a12', 'example with "quotes"')
+
+
+Here are examples of actions with chain-of-thought reasoning:
+
+I now need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.
+```click("12")```
+
+I found the information requested by the user, I will send it to the chat.
+```send_msg_to_user("The price for a 15\" laptop is 1499 USD.")```
+
+
+# History of past actions
+
+
+To find the nearest Starbucks to Carnegie Mellon and determine the walking distance, I need to perform a search on the OpenStreetMap page. The search box is already focused, so I will fill it with the query "Starbucks near Carnegie Mellon University" and then click the "Go" button to execute the search. 
+
+Let's proceed with filling the search box with the query. 
+
+```fill('145', 'Starbucks near Carnegie Mellon University')```
+
+# Next action
+
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action.
+
+2024-11-14 10:43:10,079 - 6882 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-11-14 10:43:10,476 - 6882 - browsergym.experiments.loop - INFO - action:
+The search box is already filled with the query "Starbucks near Carnegie Mellon University," and the "Go" button is available to execute the search. The next logical step is to click the "Go" button to perform the search and find the nearest Starbucks location.
+
+```click('147')```
+
+2024-11-14 10:43:15,858 - 6882 - agent - INFO - # Instructions
+
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal
+
+Where is the nearest Starbucks to Carnegie Mellon, and what is the walking distance to it?
+# Currently open tabs
+
+Tab 0 (active tab)
+  Title: Starbucks near Carnegie Mellon University | OpenStreetMap
+  URL: http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#map=7/42.896/-73.180
+
+# Current page Accessibility Tree
+
+RootWebArea 'Starbucks near Carnegie Mellon University | OpenStreetMap', focused, url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#map=7/42.896/-73.180'
+	[44] banner ''
+		[45] heading 'OpenStreetMap logo OpenStreetMap'
+			[46] link 'OpenStreetMap logo OpenStreetMap', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/#map=7/42.896/-73.180'
+				[49] image 'OpenStreetMap logo', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/osm_logo-4afddaae0230a5a46687fdc751ed256dfdccde144118cb02a7d7960f207a4b92.svg'
+				StaticText ''
+		[51] navigation ''
+			[95] link 'Edit', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/edit#map=7/42.896/-73.180'
+			[96] button ''
+			[102] link 'History', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/history#map=7/42.896/-73.180'
+			[103] link 'Export', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/export#map=7/42.896/-73.180'
+		[104] navigation ''
+			[105] list ''
+				[106] listitem ''
+					[107] link 'GPS Traces', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/traces'
+				[108] listitem ''
+					[109] link 'User Diaries', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/diary'
+				[110] listitem ''
+					[111] link 'Communities', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/communities'
+				[112] listitem ''
+					[113] link 'Copyright', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+				[114] listitem ''
+					[115] link 'Help', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/help'
+				[116] listitem ''
+					[117] link 'About', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/about'
+			[134] link 'Log In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/login?referer=%2F#map=7/42.896/-73.180'
+			[135] link 'Sign Up', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/user/new'
+	[145] textbox 'Search' value='Starbucks near Carnegie Mellon University'
+		StaticText 'Starbucks near Carnegie Mellon University'
+	[147] button 'Go', focused
+	[149] link 'Find directions between two points', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/directions'
+		[150] image '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/assets/directions-b08069e78ff09f082d27a7434b49685efa647060cf51a71d74074ad350e3fd66.png'
+	[441] heading 'Search Results'
+	[443] button 'Close'
+	[444] heading 'Results from OpenStreetMap Nominatim'
+		[445] link 'OpenStreetMap Nominatim', url='https://nominatim.openstreetmap.org/'
+	[447] list ''
+		[448] listitem ''
+			StaticText 'No results found'
+	[360] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/46.png'
+	[361] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/46.png'
+	[362] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/47.png'
+	[363] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/47.png'
+	[364] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/45.png'
+	[365] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/45.png'
+	[366] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/46.png'
+	[367] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/46.png'
+	[368] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/47.png'
+	[369] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/47.png'
+	[370] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/36/48.png'
+	[371] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/37/48.png'
+	[372] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/45.png'
+	[373] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/45.png'
+	[374] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/35/48.png'
+	[375] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/38/48.png'
+	[376] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/46.png'
+	[377] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/46.png'
+	[378] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/47.png'
+	[379] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/47.png'
+	[380] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/45.png'
+	[381] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/45.png'
+	[382] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/34/48.png'
+	[383] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/39/48.png'
+	[449] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/40/46.png'
+	[450] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/40/47.png'
+	[451] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/40/45.png'
+	[452] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/40/48.png'
+	[453] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/41/46.png'
+	[454] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/41/47.png'
+	[455] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/41/45.png'
+	[456] image '', url='http://ogma.lti.cs.cmu.edu:8080/tile/7/41/48.png'
+	[394] link 'Zoom In', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[396] link 'Zoom Out', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[399] button 'Show My Location'
+	[402] link 'Layers', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[405] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[408] link 'Share', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[411] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	[414] link '', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#'
+	StaticText '50 km'
+	StaticText '50 mi'
+	StaticText '©'
+	[422] link 'OpenStreetMap contributors', url='http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/copyright'
+	StaticText '♥'
+	[423] link 'Make a Donation', url='https://donate.openstreetmap.org/'
+	StaticText '.'
+	[424] link 'Website and API terms', url='https://wiki.osmfoundation.org/wiki/Terms_of_Use'
+
+
+# Action Space
+
+
+20 different types of actions are available.
+
+noop(wait_ms: float = 1000)
+    Examples:
+        noop()
+
+        noop(500)
+
+send_msg_to_user(text: str)
+    Examples:
+        send_msg_to_user('Based on the results of my search, the city was built in 1751.')
+
+tab_close()
+    Examples:
+        tab_close()
+
+tab_focus(index: int)
+    Examples:
+        tab_focus(2)
+
+new_tab()
+    Examples:
+        new_tab()
+
+go_back()
+    Examples:
+        go_back()
+
+go_forward()
+    Examples:
+        go_forward()
+
+goto(url: str)
+    Examples:
+        goto('http://www.example.com')
+
+scroll(delta_x: float, delta_y: float)
+    Examples:
+        scroll(0, 200)
+
+        scroll(-50.2, -100.5)
+
+fill(bid: str, value: str)
+    Examples:
+        fill('237', 'example value')
+
+        fill('45', 'multi-line\nexample')
+
+        fill('a12', 'example with "quotes"')
+
+select_option(bid: str, options: str | list[str])
+    Examples:
+        select_option('a48', 'blue')
+
+        select_option('c48', ['red', 'green', 'blue'])
+
+click(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        click('a51')
+
+        click('b22', button='right')
+
+        click('48', button='middle', modifiers=['Shift'])
+
+dblclick(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        dblclick('12')
+
+        dblclick('ca42', button='right')
+
+        dblclick('178', button='middle', modifiers=['Shift'])
+
+hover(bid: str)
+    Examples:
+        hover('b8')
+
+press(bid: str, key_comb: str)
+    Examples:
+        press('88', 'Backspace')
+
+        press('a26', 'ControlOrMeta+a')
+
+        press('a61', 'Meta+Shift+t')
+
+focus(bid: str)
+    Examples:
+        focus('b455')
+
+clear(bid: str)
+    Examples:
+        clear('996')
+
+drag_and_drop(from_bid: str, to_bid: str)
+    Examples:
+        drag_and_drop('56', '498')
+
+upload_file(bid: str, file: str | list[str])
+    Examples:
+        upload_file('572', 'my_receipt.pdf')
+
+        upload_file('63', ['/home/bob/Documents/image.jpg', '/home/bob/Documents/file.zip'])
+
+report_infeasible(reason: str)
+    Examples:
+        report_infeasible('I cannot follow these instructions because there is no email field in this form.')
+
+Only a single action can be provided at once. Example:
+fill('a12', 'example with "quotes"')
+
+
+Here are examples of actions with chain-of-thought reasoning:
+
+I now need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.
+```click("12")```
+
+I found the information requested by the user, I will send it to the chat.
+```send_msg_to_user("The price for a 15\" laptop is 1499 USD.")```
+
+
+# History of past actions
+
+
+To find the nearest Starbucks to Carnegie Mellon and determine the walking distance, I need to perform a search on the OpenStreetMap page. The search box is already focused, so I will fill it with the query "Starbucks near Carnegie Mellon University" and then click the "Go" button to execute the search. 
+
+Let's proceed with filling the search box with the query. 
+
+```fill('145', 'Starbucks near Carnegie Mellon University')```
+
+
+The search box is already filled with the query "Starbucks near Carnegie Mellon University," and the "Go" button is available to execute the search. The next logical step is to click the "Go" button to perform the search and find the nearest Starbucks location.
+
+```click('147')```
+
+# Next action
+
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action.
+
+2024-11-14 10:43:17,899 - 6882 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-11-14 10:43:18,259 - 6882 - browsergym.experiments.loop - INFO - action:
+The search for "Starbucks near Carnegie Mellon University" on the OpenStreetMap page returned "No results found." This indicates that the search did not yield any Starbucks locations near Carnegie Mellon University. To find the nearest Starbucks and the walking distance, I should try a different approach. 
+
+I will open a new tab and perform a search using a different service, such as Google Maps, which is more likely to have comprehensive data on Starbucks locations and walking distances.
+
+```new_tab()```
+
+2024-11-14 10:43:19,079 - 6882 - agent - INFO - # Instructions
+
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal
+
+Where is the nearest Starbucks to Carnegie Mellon, and what is the walking distance to it?
+# Currently open tabs
+
+Tab 0
+  Title: Starbucks near Carnegie Mellon University | OpenStreetMap
+  URL: http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000/search?query=Starbucks%20near%20Carnegie%20Mellon%20University#map=7/42.896/-73.180
+
+Tab 1 (active tab)
+  Title: 
+  URL: about:blank
+
+# Current page Accessibility Tree
+
+RootWebArea '', focused, url='about:blank'
+
+
+# Action Space
+
+
+20 different types of actions are available.
+
+noop(wait_ms: float = 1000)
+    Examples:
+        noop()
+
+        noop(500)
+
+send_msg_to_user(text: str)
+    Examples:
+        send_msg_to_user('Based on the results of my search, the city was built in 1751.')
+
+tab_close()
+    Examples:
+        tab_close()
+
+tab_focus(index: int)
+    Examples:
+        tab_focus(2)
+
+new_tab()
+    Examples:
+        new_tab()
+
+go_back()
+    Examples:
+        go_back()
+
+go_forward()
+    Examples:
+        go_forward()
+
+goto(url: str)
+    Examples:
+        goto('http://www.example.com')
+
+scroll(delta_x: float, delta_y: float)
+    Examples:
+        scroll(0, 200)
+
+        scroll(-50.2, -100.5)
+
+fill(bid: str, value: str)
+    Examples:
+        fill('237', 'example value')
+
+        fill('45', 'multi-line\nexample')
+
+        fill('a12', 'example with "quotes"')
+
+select_option(bid: str, options: str | list[str])
+    Examples:
+        select_option('a48', 'blue')
+
+        select_option('c48', ['red', 'green', 'blue'])
+
+click(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        click('a51')
+
+        click('b22', button='right')
+
+        click('48', button='middle', modifiers=['Shift'])
+
+dblclick(bid: str, button: Literal['left', 'middle', 'right'] = 'left', modifiers: list[typing.Literal['Alt', 'Control', 'ControlOrMeta', 'Meta', 'Shift']] = [])
+    Examples:
+        dblclick('12')
+
+        dblclick('ca42', button='right')
+
+        dblclick('178', button='middle', modifiers=['Shift'])
+
+hover(bid: str)
+    Examples:
+        hover('b8')
+
+press(bid: str, key_comb: str)
+    Examples:
+        press('88', 'Backspace')
+
+        press('a26', 'ControlOrMeta+a')
+
+        press('a61', 'Meta+Shift+t')
+
+focus(bid: str)
+    Examples:
+        focus('b455')
+
+clear(bid: str)
+    Examples:
+        clear('996')
+
+drag_and_drop(from_bid: str, to_bid: str)
+    Examples:
+        drag_and_drop('56', '498')
+
+upload_file(bid: str, file: str | list[str])
+    Examples:
+        upload_file('572', 'my_receipt.pdf')
+
+        upload_file('63', ['/home/bob/Documents/image.jpg', '/home/bob/Documents/file.zip'])
+
+report_infeasible(reason: str)
+    Examples:
+        report_infeasible('I cannot follow these instructions because there is no email field in this form.')
+
+Only a single action can be provided at once. Example:
+fill('a12', 'example with "quotes"')
+
+
+Here are examples of actions with chain-of-thought reasoning:
+
+I now need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.
+```click("12")```
+
+I found the information requested by the user, I will send it to the chat.
+```send_msg_to_user("The price for a 15\" laptop is 1499 USD.")```
+
+
+# History of past actions
+
+
+To find the nearest Starbucks to Carnegie Mellon and determine the walking distance, I need to perform a search on the OpenStreetMap page. The search box is already focused, so I will fill it with the query "Starbucks near Carnegie Mellon University" and then click the "Go" button to execute the search. 
+
+Let's proceed with filling the search box with the query. 
+
+```fill('145', 'Starbucks near Carnegie Mellon University')```
+
+
+The search box is already filled with the query "Starbucks near Carnegie Mellon University," and the "Go" button is available to execute the search. The next logical step is to click the "Go" button to perform the search and find the nearest Starbucks location.
+
+```click('147')```
+
+
+The search for "Starbucks near Carnegie Mellon University" on the OpenStreetMap page returned "No results found." This indicates that the search did not yield any Starbucks locations near Carnegie Mellon University. To find the nearest Starbucks and the walking distance, I should try a different approach. 
+
+I will open a new tab and perform a search using a different service, such as Google Maps, which is more likely to have comprehensive data on Starbucks locations and walking distances.
+
+```new_tab()```
+
+# Next action
+
+You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action.
+
+2024-11-14 10:43:20,866 - 6882 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-11-14 10:43:20,987 - 6882 - browsergym.experiments.loop - INFO - action:
+Since the new tab is currently blank, I should navigate to a service that can provide information about Starbucks locations and walking distances. Google Maps is a reliable option for this purpose. I will go to the Google Maps website to search for the nearest Starbucks to Carnegie Mellon University and determine the walking distance.
+
+```goto('https://www.google.com/maps')```
+
