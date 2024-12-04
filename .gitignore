@@ -141,7 +141,7 @@ tmp.py
 .vscode/**
 
 # demo and results
-results/
+# results/
 
 .vscode/launch.json
 
