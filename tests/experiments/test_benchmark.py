@@ -1,5 +1,6 @@
 import dataclasses
 import os
+import random
 import re
 import tempfile
 
@@ -92,15 +93,25 @@ def test_benchmark_subset():
     assert dict_1 == dict_2
 
 
-def test_benchmark_subset_from_ratio():
+def test_benchmark_subset_from_task_ratio():
     benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
 
-    benchmark_subset = benchmark.subset_from_ratio(ratio=0.5, seed=1)
+    # Store initial random state
+    initial_state = random.getstate()
+
+    benchmark_subset = benchmark.subset_from_task_ratio(ratio=0.5, seed=1)
     assert len(benchmark_subset.env_args_list) == 812 // 2
     assert benchmark_subset.name == "webarena[ratio=0.5, seed=1]"
 
-    benchmark_subset_1 = benchmark_subset.subset_from_ratio(ratio=0.5, seed=1)
-    benchmark_subset_2 = benchmark_subset.subset_from_ratio(ratio=0.5, seed=2)
+    # Verify global random state hasn't changed
+    assert random.getstate() == initial_state
+
+    benchmark_subset_1 = benchmark_subset.subset_from_task_ratio(ratio=0.5, seed=1)
+    benchmark_subset_2 = benchmark_subset.subset_from_task_ratio(ratio=0.5, seed=2)
+
+    # Verify global random state still hasn't changed
+    assert random.getstate() == initial_state
+
     # Check the task lists are different
     assert not np.all(
         [

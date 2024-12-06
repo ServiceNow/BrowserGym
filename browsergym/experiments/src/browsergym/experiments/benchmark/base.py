@@ -139,11 +139,11 @@ class Benchmark(DataClassJsonMixin):
             task_metadata=self.task_metadata,
         )
 
-    def subset_from_ratio(self, ratio, seed):
+    def subset_from_task_ratio(self, ratio, seed):
         """Get a random subset of the tasks given a ratio and seed."""
-        random.seed(seed)
-        task_names = [env_args.task_name for env_args in self.env_args_list]
-        random.shuffle(task_names)
+        rng = random.Random(seed)
+        task_names = list(set([env_args.task_name for env_args in self.env_args_list]))
+        rng.shuffle(task_names)
         num_tasks = int(len(task_names) * ratio)
         task_name_subset = task_names[:num_tasks]
 
