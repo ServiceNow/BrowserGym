@@ -92,6 +92,33 @@ def test_benchmark_subset():
     assert dict_1 == dict_2
 
 
+def test_benchmark_subset_from_ratio():
+    benchmark: Benchmark = DEFAULT_BENCHMARKS["webarena"]()
+
+    benchmark_subset = benchmark.subset_from_ratio(ratio=0.5, seed=1)
+    assert len(benchmark_subset.env_args_list) == 812 // 2
+    assert benchmark_subset.name == "webarena[ratio=0.5, seed=1]"
+
+    benchmark_subset_1 = benchmark_subset.subset_from_ratio(ratio=0.5, seed=1)
+    benchmark_subset_2 = benchmark_subset.subset_from_ratio(ratio=0.5, seed=2)
+    # Check the task lists are different
+    assert not np.all(
+        [
+            env_args.task_name == env_args_2.task_name
+            for env_args, env_args_2 in zip(
+                benchmark_subset_1.env_args_list, benchmark_subset_2.env_args_list
+            )
+        ]
+    )
+
+    dict_1 = benchmark_subset_1.to_dict()
+    dict_1.pop("name")
+    dict_2 = benchmark_subset_2.to_dict()
+    dict_2.pop("name")
+    assert len(dict_1["env_args_list"]) == len(dict_2["env_args_list"])
+    assert dict_1 != dict_2
+
+
 def test_prepare_backend_miniwob():
     MINIWOB_URL = os.environ["MINIWOB_URL"]
     try:

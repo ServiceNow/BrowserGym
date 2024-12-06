@@ -1,5 +1,6 @@
 import fnmatch
 import logging
+import random
 import typing
 from dataclasses import dataclass, field
 from typing import Literal, Optional
@@ -126,6 +127,28 @@ class Benchmark(DataClassJsonMixin):
         # return the sub benchmark
         return Benchmark(
             name=f"{self.name}[{column}=/{regexp}/]",
+            high_level_action_set_args=self.high_level_action_set_args,
+            is_multi_tab=self.is_multi_tab,
+            supports_parallel_seeds=self.supports_parallel_seeds,
+            backends=self.backends,
+            env_args_list=[
+                env_args
+                for env_args in self.env_args_list
+                if env_args.task_name in task_name_subset
+            ],
+            task_metadata=self.task_metadata,
+        )
+
+    def subset_from_ratio(self, ratio, seed):
+        """Get a random subset of the tasks given a ratio and seed."""
+        random.seed(seed)
+        task_names = [env_args.task_name for env_args in self.env_args_list]
+        random.shuffle(task_names)
+        num_tasks = int(len(task_names) * ratio)
+        task_name_subset = task_names[:num_tasks]
+
+        return Benchmark(
+            name=f"{self.name}[ratio={ratio}, seed={seed}]",
             high_level_action_set_args=self.high_level_action_set_args,
             is_multi_tab=self.is_multi_tab,
             supports_parallel_seeds=self.supports_parallel_seeds,
