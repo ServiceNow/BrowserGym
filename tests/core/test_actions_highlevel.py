@@ -1142,7 +1142,7 @@ mouse_up({repr(x)}, {repr(y)})
 
     obs, reward, term, trunc, info = env.step(action)
     checkbox = get_checkbox_elem(obs)
-    assert obs['mouse_position'] == [x, y]
+    assert obs['mouse_position'] == (x, y)
 
     # box not checked
     assert not obs["last_action_error"]

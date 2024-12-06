@@ -159,7 +159,7 @@ def extract_mouse_position(page: playwright.sync_api.Page):
     position = page.evaluate("""() => {
     return [window.pageX, window.pageY];
 }""")
-    return position
+    return (position[0], position[1])
 
 
 # we could handle more data items here if needed
