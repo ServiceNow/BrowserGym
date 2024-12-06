@@ -27,14 +27,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: Apache Software License",
 ]
-version="0.13.2"
+version="0.13.3"
 dependencies = [
-    "browsergym-core==0.13.2",
-    "browsergym-miniwob==0.13.2",
-    "browsergym-webarena==0.13.2",
-    "browsergym-visualwebarena==0.13.2",
-    "browsergym-assistantbench==0.13.2",
-    "browsergym-experiments==0.13.2",
+    "browsergym-core==0.13.3",
+    "browsergym-miniwob==0.13.3",
+    "browsergym-webarena==0.13.3",
+    "browsergym-visualwebarena==0.13.3",
+    "browsergym-assistantbench==0.13.3",
+    "browsergym-experiments==0.13.3",
     "browsergym-workarena>=0.4.1",
     "weblinx-browsergym>=0.0.1dev14",
 ]

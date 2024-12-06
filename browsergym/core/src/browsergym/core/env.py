@@ -244,7 +244,7 @@ class BrowserEnv(gym.Env, ABC):
         # create a new browser context for pages
         self.context = self.browser.new_context(
             no_viewport=True if self.resizeable_window else None,
-            viewport=viewport,
+            viewport=viewport if not self.resizeable_window else None,
             record_video_dir=(
                 Path(self.record_video_dir) / "task_video" if self.record_video_dir else None
             ),
@@ -549,7 +549,7 @@ document.addEventListener("visibilitychange", () => {
                     or "Cannot read properties of undefined" in err_msg
                 ):
                     logger.warning(
-                        f"An error occured while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
+                        f"An error occurred while extracting the dom and axtree. Retrying ({retries_left}/{EXTRACT_OBS_MAX_TRIES} tries left).\n{repr(e)}"
                     )
                     # post-extract cleanup (ARIA attributes)
                     _post_extract(self.page)

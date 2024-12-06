@@ -1,11 +1,12 @@
 <div align="center">
 
-# 🌎💪 BrowserGym: a Gym Environment for Web Task Automation
+![BrowserGym banner](https://github.com/user-attachments/assets/4853f210-43ac-4107-a0d2-95c9c614dbe7)
 
 🛠️ [Setup](#%EF%B8%8F-setup) -
 🏋 [Usage](#-usage) -
 💻 [Demo](#-demo) -
 🌐 [Ecosystem](#-ecosystem) -
+🚀 [AgentLab](https://github.com/ServiceNow/AgentLab) -
 🌟 [Contributors](#-contributors) -
 📝 [Citation](#-citing-this-work)
 
@@ -16,15 +17,23 @@
 [![Code Format](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml)
 [![Tests](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml)
 
-</div>
-
 ```python
 pip install browsergym
 ```
 
-_Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)._
+</div>
+
+> [!WARNING]
+> BrowserGym is meant to provide an open, easy-to-use and extensible framework to accelerate the field of web agent research.
+> It is not meant to be a consumer product. Use with caution!
+
+> [!TIP]
+> 🚀 Check out [AgentLab](https://github.com/ServiceNow/AgentLab)✨ !
+> A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks.
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
+
+_Example of a GPT4-V agent executing openended tasks (top row, chat interactive), as well as WebArena and WorkArena tasks (bottom row)._
 
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)

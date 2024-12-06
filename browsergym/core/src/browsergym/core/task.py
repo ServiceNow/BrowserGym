@@ -12,9 +12,8 @@ class AbstractBrowserTask(ABC):
     """
 
     @classmethod
-    @abstractmethod
     def get_task_id(cls):
-        pass
+        raise NotImplementedError
 
     def __init__(self, seed: int) -> None:
         # initiate a random number generator
