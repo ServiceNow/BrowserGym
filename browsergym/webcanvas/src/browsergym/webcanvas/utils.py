@@ -118,21 +118,7 @@ def step_evaluate(page: Page, evaluate_steps=[], input_path=None, element_value=
     return evaluate_steps, match_result
 
 
-def step_event_evaluate(page, evaluate_steps, task_events, target_value):
-
-    def check_event_by_selector(events, selector):
-        for event in events:
-            if event and event["selector"] == selector:
-                if event["status"]:
-                    return 1, event
-        return 0, None
-
-    def check_event_by_element_value(events, element_value):
-        for event in events:
-            if event and event["target_value"] == element_value:
-                if event["status"]:
-                    return 1, event
-        return 0, None
+def step_event_evaluate(page, evaluate_steps, event):
 
     step_score = 0
     match_result = []
@@ -150,54 +136,23 @@ def step_event_evaluate(page, evaluate_steps, task_events, target_value):
                     page.url, evaluate["reference_answer"], evaluate["key"])
 
             elif match_function == "element_path_exactly_match":
-                score, event = check_event_by_selector(
-                    task_events, evaluate["reference_answer"])
+                score = ElementEvaluator.path_exact_match(
+                    event["selector"], evaluate["reference_answer"], evaluate["method"], page)
 
             elif match_function == "element_path_included_match":
                 pass
 
             elif match_function == "element_value_exactly_match":
-                input_netloc = get_netloc(page.url)
-                if "path" in evaluate.keys():
-                    path_score, event = check_event_by_selector(
-                        task_events, evaluate["path"])
-                    if path_score == 0:
-                        score = 0
-                    else:
-                        score = ElementEvaluator.element_value_exact_match(
-                            event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
-                        # print("score:",score)
-                else:
-                    score, _ = check_event_by_element_value(
-                        task_events, evaluate["reference_answer"])
+                score = ElementEvaluator.element_value_exact_match(
+                    event["target_value"], evaluate["reference_answer"])
 
             elif match_function == "element_value_included_match":
-                input_netloc = get_netloc(page.url)
-                if "path" in evaluate.keys():
-                    path_score, event = check_event_by_selector(
-                        task_events, evaluate["path"])
-                    if path_score == 0:
-                        score = 0
-                    else:
-                        score = ElementEvaluator.element_value_include_match(
-                            event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
-                else:
-                    score, _ = check_event_by_element_value(
-                        task_events, evaluate["reference_answer"])
+                score = ElementEvaluator.element_value_include_match(
+                    event["target_value"], evaluate["reference_answer"])
 
             elif match_function == "element_value_semantic_match":
-                input_netloc = get_netloc(page.url)
-                if "path" in evaluate.keys():
-                    path_score, event = check_event_by_selector(
-                        task_events, evaluate["path"])
-                    if path_score == 0:
-                        score = 0
-                    else:
-                        score = ElementEvaluator.element_value_semantic_match(
-                            event["target_value"], evaluate["reference_answer"], input_netloc, evaluate["netloc"])
-                else:
-                    score, _ = check_event_by_element_value(
-                        task_events, evaluate["reference_answer"])
+                score = ElementEvaluator.element_value_semantic_match(
+                    event["target_value"], evaluate["reference_answer"])
 
             evaluate["score"] = max(evaluate["score"], score)
         if evaluate["score"] >= 1:

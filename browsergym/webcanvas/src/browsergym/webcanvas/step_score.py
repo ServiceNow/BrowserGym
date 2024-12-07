@@ -97,13 +97,9 @@ class ElementEvaluator(StepEvaluator):
         return int(is_same_element)
 
     @ staticmethod
-    def path_exact_match(input_answer, reference_answer, method, page, input_netloc, reference_netloc):
+    def path_exact_match(input_answer, reference_answer, method, page):
         score = 0
         if method == "xpath":
-            if reference_netloc != input_netloc:
-                # print("reference_netloc:", reference_netloc,
-                #       "input_netloc:", input_netloc)
-                return 0
             try:
                 html_content = page.content()
                 tree = html.fromstring(html_content)
@@ -127,8 +123,6 @@ class ElementEvaluator(StepEvaluator):
             else:
                 score = 0
         elif method == "selector":
-            if reference_netloc != input_netloc:
-                return 0
             try:
                 input_element = input_answer
                 reference_element = page.locator(reference_answer)
@@ -158,8 +152,6 @@ class ElementEvaluator(StepEvaluator):
                         pass
             except:
                 score = 0
-        # result_score = MatchFunction.include_match(
-        #     input_answer, reference_answer)
         return score
 
     @ staticmethod
@@ -170,31 +162,22 @@ class ElementEvaluator(StepEvaluator):
         return result_score
 
     @ staticmethod
-    def element_value_exact_match(input_answer, reference_answer, input_netloc, reference_netloc):
-        # if reference_netloc != input_netloc:
-        #     # print("reference_netloc:", reference_netloc,
-        #     #       "input_netloc:", input_netloc)
-        #     return 0
+    def element_value_exact_match(input_answer, reference_answer):
+        # TODO fuzzy check if the input_answer is on the same page as the reference_answer
         result_score = MatchFunction.exact_match(
             input_answer, reference_answer)
         return result_score
 
     @ staticmethod
-    def element_value_include_match(input_answer, reference_answer, input_netloc, reference_netloc):
-        # if reference_netloc != input_netloc:
-        #     # print("reference_netloc:", reference_netloc,
-        #     #       "input_netloc:", input_netloc)
-        #     return 0
+    def element_value_include_match(input_answer, reference_answer):
+        # TODO fuzzy check if the input_answer is on the same page as the reference_answer
         result_score = MatchFunction.include_match(
             input_answer, reference_answer)
         return result_score
 
     @ staticmethod
-    def element_value_semantic_match(input_answer, semantic_method, input_netloc, reference_netloc=0):
-        # if reference_netloc != input_netloc:
-        #     # print("reference_netloc:", reference_netloc,
-        #     #       "input_netloc:", input_netloc)
-        #     return 0
+    def element_value_semantic_match(input_answer, semantic_method):
+        # TODO fuzzy check if the input_answer is on the same page as the reference_answer
         if len(input_answer) == 0:
             return 0
         result_score = MatchFunction.semantic_match(

@@ -1,6 +1,6 @@
 [
     {
-        "index": "_cuWObkg3Zm5lhrV5BVro",
+        "index": 0,
         "task": "Find the store location and hours of the closest Gamestop to zip code 90028 and set as home store on gamestop",
         "reference_task_length": 8,
         "evaluation": [
@@ -20,11 +20,10 @@
                     "url": "https://www.gamestop.com/search/?store=2630"
                 }
             }
-        ],
-        "time": "2024-05-23 06:33:52.510"
+        ]
     },
     {
-        "index": "_pzJRzGpq38uVD09zuz2g",
+        "index": 1,
         "task": "Compare available plans for the AeroAPI on flightaware",
         "reference_task_length": 4,
         "evaluation": [
@@ -52,11 +51,10 @@
                     "url": "https://www.flightaware.com/commercial/aeroapi/#compare-plans-section"
                 }
             }
-        ],
-        "time": "2024-05-26 06:31:01.887"
+        ]
     },
     {
-        "index": "0_XlVnFegKhb539-hHKIA",
+        "index": 2,
         "task": "Give a 10 rating to The Terminator II: Judgement Day on imdb",
         "reference_task_length": 8,
         "evaluation": [
@@ -103,11 +101,10 @@
                     "url": "https://www.imdb.com/title/tt0103064/?ref_=nv_sr_srsg_0_tt_8_nm_0_q_terminato"
                 }
             }
-        ],
-        "time": "2024-05-21 05:17:38.413"
+        ]
     },
     {
-        "index": "0Bes-kjPvso3mgjPsaQIJ",
+        "index": 3,
         "task": "Check the status of train S92 for any disruptions on new.mta.info.",
         "reference_task_length": 6,
         "evaluation": [
@@ -135,11 +132,10 @@
                     "url": "https://new.mta.info/alerts?selectedRoutes=MTA%3AS92&selectedDate=3%2F20%2F2024"
                 }
             }
-        ],
-        "time": "2024-03-12 08:41:48.689"
+        ]
     },
     {
-        "index": "2OEKICou9EWm4Bs6N9Ei3",
+        "index": 4,
         "task": "Check the status of your iPhone repair on apple.",
         "reference_task_length": 5,
         "evaluation": [
@@ -167,11 +163,10 @@
                     "url": "https://support.apple.com/my-support"
                 }
             }
-        ],
-        "time": "2024-03-25 03:06:23.379"
+        ]
     },
     {
-        "index": "2rjwRPMba7SmRlyZRNa2m",
+        "index": 5,
         "task": "Open the page with a overview about the submission of releases on discogs",
         "reference_task_length": 6,
         "evaluation": [
@@ -191,11 +186,10 @@
                     "url": "https://support.discogs.com/hc/en-us/articles/360004016474-Overview-Of-Submission-Guidelines-For-Releases"
                 }
             }
-        ],
-        "time": "2024-05-20 05:56:13.543"
+        ]
     },
     {
-        "index": "3gpqgwl1AQZz5p2FTjHd-",
+        "index": 6,
         "task": "View the latest job openings in safety with a salary above 100k per annum, check the details, and apply on mbta.",
         "reference_task_length": 16,
         "evaluation": [
@@ -265,11 +259,10 @@
                     "url": "https://www.governmentjobs.com/careers/mbta"
                 }
             }
-        ],
-        "time": "2024-03-25 02:51:40.381"
+        ]
     },
     {
-        "index": "3RLzqsxoItEoOZlm3dwjy",
+        "index": 7,
         "task": "Add a e-gift card to bag of $100 for recipient John and email address abc@test.com from buckeye.foobar@gmail.com with message gift card on underarmour",
         "reference_task_length": 15,
         "evaluation": [
@@ -343,11 +336,10 @@
                     "url": "https://www.underarmour.com/en-us/gift-card-landing/"
                 }
             }
-        ],
-        "time": "2024-05-20 05:25:05.480"
+        ]
     },
     {
-        "index": "45plKpA3GwhP5bEqIL9Bx",
+        "index": 8,
         "task": "Find a person by address Nice st - 1234, Good, FL on yellowpages",
         "reference_task_length": 12,
         "evaluation": [
@@ -391,11 +383,10 @@
                     "url": "https://people.yellowpages.com/whitepages/address?street=Nice+st+-+1234&city=Good&state=FL"
                 }
             }
-        ],
-        "time": "2024-05-26 05:22:56.687"
+        ]
     },
     {
-        "index": "5Jfpi0joLf_6AVRX8mN9R",
+        "index": 9,
         "task": "Check my AMC gift card balance with gift card number 87654321 and pin number 9753 on amctheatres.",
         "reference_task_length": 8,
         "evaluation": [
@@ -450,11 +441,10 @@
                     "url": "https://www.amctheatres.com/showtimes/all/2024-03-25/default/all?utm_source=google&utm_medium=paidsearch&utm_campaign=OnlineTicketing2023&kclid=bc667845-5652-4d22-b01f-539c6d69db0e&gad_source=1"
                 }
             }
-        ],
-        "time": "2024-03-25 06:53:38.530"
+        ]
     },
     {
-        "index": "5okIgoVRM4WfLCb0vND2y",
+        "index": 10,
         "task": "Get the lowest priced women's plus size one piece swimsuit in color black with customer rating of atleat 5 on kohls",
         "reference_task_length": 13,
         "evaluation": [
@@ -522,11 +512,10 @@
                     "url": "https://www.kohls.com/catalog/5-womens-black-plus-onepiece-swimsuits-swimsuits-clothing.jsp?CN=TopRated:5+Gender:Womens+Color:Black+SizeRange:Plus+Product:One-Piece%20Swimsuits+Category:Swimsuits+Department:Clothing&S=4&PPP=48&pfm=internal%20campaign%20visual%20nav%20refine&kls_sbp=87660515555844928264416369496642981542"
                 }
             }
-        ],
-        "time": "2024-05-24 09:57:01.066"
+        ]
     },
     {
-        "index": "7Y6RH7SlTXZZmPaQ4ydVj",
+        "index": 11,
         "task": "Find discussions of community and open one with most replies on flightaware.",
         "reference_task_length": 6,
         "evaluation": [
@@ -563,11 +552,10 @@
                     "url": "https://discussions.flightaware.com/top"
                 }
             }
-        ],
-        "time": "2024-03-23 07:41:02.232"
+        ]
     },
     {
-        "index": "8S0fsID6FFG6MB4t93eOH",
+        "index": 12,
         "task": "Find a 2022 Tesla Model 3 on carmax",
         "reference_task_length": 10,
         "evaluation": [
@@ -595,11 +583,10 @@
                     "url": "https://www.carmax.com/cars/tesla/model-3?year=2022"
                 }
             }
-        ],
-        "time": "2024-05-24 07:30:22.531"
+        ]
     },
     {
-        "index": "A-M0rQCsPu_r9xWt-eqYv",
+        "index": 13,
         "task": "Get the report from the final environmental impact statement for the Jamaica Bus Depot expansion on new.mta.info",
         "reference_task_length": 10,
         "evaluation": [
@@ -637,11 +624,10 @@
                     "url": "https://new.mta.info/project/jamaica-bus-depot-expansion"
                 }
             }
-        ],
-        "time": "2024-05-28 06:54:52.796"
+        ]
     },
     {
-        "index": "aEu9zp3GWZb9SVw0PN_2c",
+        "index": 14,
         "task": "Search for the lowest millage used Honda Crosstour 2012 to 2013 near 49102 less than $25000 on cargurus.",
         "reference_task_length": 17,
         "evaluation": [
@@ -732,11 +718,10 @@
                     "url": "https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?sourceContext=carGurusHomePageModel&entitySelectingHelper.selectedEntity=d2184&zip=49102"
                 }
             }
-        ],
-        "time": "2024-03-24 12:49:24.093"
+        ]
     },
     {
-        "index": "AjnXnl3STIls1uc49TDze",
+        "index": 15,
         "task": "Browse men's winter coats in size large that is on clearance on kohls.",
         "reference_task_length": 8,
         "evaluation": [
@@ -772,11 +757,10 @@
                     "url": "https://www.kohls.com/search/clearance.jsp?CN=Promotions:Clearance+Size:L&BL=y&search=mens%20winter%20coat&S=1&PPP=48&pfm=search%20refine&kls_sbp=59288101756704364110307077102020115511"
                 }
             }
-        ],
-        "time": "2024-03-27 10:48:21.173"
+        ]
     },
     {
-        "index": "AomPMCHZ6Yf7mH_TxyI7e",
+        "index": 16,
         "task": "Find a walkthrough for the game \"The Legend of Zelda: Breath of the Wild\" on ign.",
         "reference_task_length": 6,
         "evaluation": [
@@ -804,11 +788,10 @@
                     "url": "https://www.ign.com/wikis/the-legend-of-zelda-breath-of-the-wild/Walkthrough"
                 }
             }
-        ],
-        "time": "2024-03-25 05:37:54.561"
+        ]
     },
     {
-        "index": "apsmDjkuV6iGvfQ9-YkP0",
+        "index": 17,
         "task": "Find an editor's choice review with a score of 10 in the boardgame category on ign",
         "reference_task_length": 8,
         "evaluation": [
@@ -838,10 +821,9 @@
                 }
             },
             {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
+                "match_function_name": "element_value_exactly_match",
                 "content": {
-                    "reference_answer": "#scoreRange >option:nth-child(2)",
+                    "reference_answer": "10,10",
                     "netloc": "ign",
                     "url": "https://www.ign.com/editors-choice"
                 }
@@ -856,19 +838,17 @@
                 }
             },
             {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
+                "match_function_name": "element_value_exactly_match",
                 "content": {
-                    "reference_answer": "#genre >option:nth-child(5)",
+                    "reference_answer": "board",
                     "netloc": "ign",
                     "url": "https://www.ign.com/editors-choice"
                 }
             }
-        ],
-        "time": "2024-05-24 07:12:38.613"
+        ]
     },
     {
-        "index": "asuczSfk4bCf7OwPA_oVx",
+        "index": 18,
         "task": "Sign up for a REI Co-Op membership on rei.",
         "reference_task_length": 3,
         "evaluation": [
@@ -897,11 +877,10 @@
                     "url": "https://www.rei.com/membership"
                 }
             }
-        ],
-        "time": "2024-03-25 06:29:17.908"
+        ]
     },
     {
-        "index": "Atgpzhx4geR9YvP8u6AZb",
+        "index": 19,
         "task": "Find the weight of baggage allowance for economy class on qatarairways",
         "reference_task_length": 4,
         "evaluation": [
@@ -930,11 +909,10 @@
                     "url": "https://www.qatarairways.com/en-us/baggage/allowance.html?iid=ALL67670750"
                 }
             }
-        ],
-        "time": "2024-05-26 05:38:21.691"
+        ]
     },
     {
-        "index": "b18Xcyxl8sjXTUQ-Jbtmj",
+        "index": 20,
         "task": "Find flights going from Indira Gandhi to Los Cabos on flightaware",
         "reference_task_length": 10,
         "evaluation": [
@@ -962,11 +940,10 @@
                     "url": "https://www.flightaware.com/live/findflight?origin=VIDP&destination=MMSD"
                 }
             }
-        ],
-        "time": "2024-05-26 06:38:34.537"
+        ]
     },
     {
-        "index": "BABEHOxbn8rQAoskKTM0y",
+        "index": 21,
         "task": "Tell me information about what identification I need to bring on my trip on amtrak",
         "reference_task_length": 6,
         "evaluation": [
@@ -1002,11 +979,10 @@
                     "url": "https://www.amtrak.com/planning-booking/tickets-id-safety-security/passenger-identification.html"
                 }
             }
-        ],
-        "time": "2024-05-26 04:30:36.977"
+        ]
     },
     {
-        "index": "bfAcQB3vTsCJPNxt7ZEm4",
+        "index": 22,
         "task": "Browse used Audi cars made before 2015 and sort by lowest price on kbb",
         "reference_task_length": 8,
         "evaluation": [
@@ -1042,11 +1018,10 @@
                     "url": "https://www.kbb.com/car-finder/?intent=used&manufacturers=audi&years=1992-2015&sort=priceasc"
                 }
             }
-        ],
-        "time": "2024-05-26 05:55:12.822"
+        ]
     },
     {
-        "index": "BITQL_mGoz9vud1fvryyv",
+        "index": 23,
         "task": "Show crazy credits for the movie \" Prometheus\" on imdb",
         "reference_task_length": 6,
         "evaluation": [
@@ -1074,12 +1049,11 @@
                     "url": "https://www.imdb.com/title/tt1446714/crazycredits/?tab=cz&ref_=tt_trv_cc"
                 }
             }
-        ],
-        "time": "2024-05-24 07:48:53.384"
+        ]
     },
     {
-        "index": "Bvywj9SzJD5eYeZrtYY3m",
-        "task": "Add the first wireless headphones to your cart with a budget of $100 or less, that has an active noise-cancelling feature on amazon",
+        "index": 24,
+        "task": "Go to Amazon and add the first wireless headphones to your cart with a budget of $100 or less, that has an active noise-cancelling feature.",
         "reference_task_length": 8,
         "evaluation": [
             {
@@ -1119,15 +1093,14 @@
                 "match_function_name": "url_included_match",
                 "content": {
                     "key": "rh",
-                    "reference_answer": "p_n_feature_two_browse-bin:23746030011",
+                    "reference_answer": "n:21514463011,p_n_feature_two_browse-bin:23746030011",
                     "url": "https://www.amazon.com/s?k=wireless+headphones&rh=n%3A172282%2Cp_36%3A-10000%2Cp_n_feature_two_browse-bin%3A23746030011&dc&ds=v1%3AJ8iOECT4r4taWN1uZiq%2BUlDjD4Nhpo6GPIbBN5RxVAk&crid=3B1DV9AE18GHL&qid=1716877974&rnid=23746028011&sprefix=wireless+headphones%2Caps%2C737&ref=sr_nr_p_n_feature_two_browse-bin_1"
                 }
             }
-        ],
-        "time": "2024-05-28 06:41:02.718"
+        ]
     },
     {
-        "index": "C-ptYrbhcyNGw6WYcT3B5",
+        "index": 25,
         "task": "Find Playstation 5 digital edition on gamestop.",
         "reference_task_length": 6,
         "evaluation": [
@@ -1147,11 +1120,10 @@
                     "url": "https://www.gamestop.com/search/?q=playstation+5+digital+edition&lang=default&start=0&sz=20"
                 }
             }
-        ],
-        "time": "2024-03-25 06:32:48.505"
+        ]
     },
     {
-        "index": "CAzoBWdWNepFOwGf6cv0O",
+        "index": 26,
         "task": "Browse Marriott Bonvoy credit cards on marriott",
         "reference_task_length": 4,
         "evaluation": [
@@ -1179,11 +1151,10 @@
                     "url": "https://www.marriott.com/credit-cards.mi"
                 }
             }
-        ],
-        "time": "2024-05-26 04:24:43.810"
+        ]
     },
     {
-        "index": "CnJfZVtxvcwIDMj9zkugH",
+        "index": 27,
         "task": "Show me the list of Men's Blazers, Black, Size M on uniqlo.",
         "reference_task_length": 11,
         "evaluation": [
@@ -1227,11 +1198,10 @@
                     "url": "https://www.uniqlo.com/us/en/men/outerwear-and-blazers/blazers?path=%2C%2C23380&colorCodes=COL09&sizeCodes=SMA004&categoryId=23380"
                 }
             }
-        ],
-        "time": "2024-03-27 09:16:35.460"
+        ]
     },
     {
-        "index": "CPdTwa57mKJJiZPQg2542",
+        "index": 28,
         "task": "Add formula 1 to my followed sports on foxsports",
         "reference_task_length": 7,
         "evaluation": [
@@ -1260,11 +1230,10 @@
                     "url": "https://www.foxsports.com/motor/formula-1"
                 }
             }
-        ],
-        "time": "2024-05-20 05:29:37.672"
+        ]
     },
     {
-        "index": "cPEujNGfZgLT2rbtuKPOt",
+        "index": 29,
         "task": "Show me the options for a roundtrip leaving from las vegas on flexile dates on the interactive map on united",
         "reference_task_length": 12,
         "evaluation": [
@@ -1273,7 +1242,7 @@
                 "content": {
                     "key": "",
                     "reference_answer": "united.",
-                    "url": "https://www.united.com/en/us/destination-map"
+                    "url": "https://www.united.com/en/us"
                 }
             },
             {
@@ -1347,11 +1316,10 @@
                     "url": "https://www.united.com/en/us/destination-map"
                 }
             }
-        ],
-        "time": "2024-05-22 04:45:08.380"
+        ]
     },
     {
-        "index": "cplcsXZ5GetOqRKBt5LBn",
+        "index": 30,
         "task": "Download the e-receipt with the last name Smith and confirmation number X123456989 on budget",
         "reference_task_length": 8,
         "evaluation": [
@@ -1398,11 +1366,10 @@
                     "url": "https://www.budget.com/en/reservation/get-e-receipt"
                 }
             }
-        ],
-        "time": "2024-05-22 05:15:26.367"
+        ]
     },
     {
-        "index": "d2Csfs3T6ABluicCuLwRP",
+        "index": 31,
         "task": "show the Life Jackets priced between $100 and $200 on cabelas",
         "reference_task_length": 6,
         "evaluation": [
@@ -1430,11 +1397,10 @@
                     "url": "https://www.cabelas.com/l/life-jackets#nf-offerprice=100..200"
                 }
             }
-        ],
-        "time": "2024-05-26 04:13:32.518"
+        ]
     },
     {
-        "index": "DAabNkqk7gX0dHEcC0sbd",
+        "index": 32,
         "task": "Find 32\" Curved monitor and add the third one to the wish list on newegg",
         "reference_task_length": 7,
         "evaluation": [
@@ -1463,11 +1429,10 @@
                     "url": "https://www.newegg.com/p/pl?d=32%22+curved+monitor"
                 }
             }
-        ],
-        "time": "2024-05-20 04:55:02.771"
+        ]
     },
     {
-        "index": "Dc_JXmrltb5LgK9HyhVQb",
+        "index": 33,
         "task": "Find the list of all neighborhood maps for Brooklyn on new.mta.info",
         "reference_task_length": 5,
         "evaluation": [
@@ -1495,11 +1460,10 @@
                     "url": "https://new.mta.info/maps/subway/mta-neighborhood-maps/brooklyn"
                 }
             }
-        ],
-        "time": "2024-03-22 09:48:12.838"
+        ]
     },
     {
-        "index": "DE1P2PSPtO3jAAudlH0v-",
+        "index": 34,
         "task": "Find me the deals available for the Great escape park on sixflags",
         "reference_task_length": 7,
         "evaluation": [
@@ -1527,11 +1491,10 @@
                     "url": "https://www.sixflags.com/greatescape/store/tickets"
                 }
             }
-        ],
-        "time": "2024-05-24 09:04:10.474"
+        ]
     },
     {
-        "index": "dIFny0pY8Wf8KdKs1kkbM",
+        "index": 35,
         "task": "Find the movie Donnie Darko and show its complete cast on imdb",
         "reference_task_length": 6,
         "evaluation": [
@@ -1559,11 +1522,10 @@
                     "url": "https://www.imdb.com/title/tt0246578/fullcredits?ref_=tt_cl_sm"
                 }
             }
-        ],
-        "time": "2024-05-20 04:46:08.231"
+        ]
     },
     {
-        "index": "dRJJLjd2TAIfcOTO0kLth",
+        "index": 36,
         "task": "Get the most reviewed shopping store that accepts apple pay in Central New York on yelp.",
         "reference_task_length": 9,
         "evaluation": [
@@ -1607,11 +1569,10 @@
                     "url": "https://www.yelp.com/search?find_desc=Shopping&find_loc=Central+New+York%2C+NY&attrs=BusinessAcceptsApplePay&sortby=review_count"
                 }
             }
-        ],
-        "time": "2024-03-25 03:24:07.862"
+        ]
     },
     {
-        "index": "E2W7rMnlBIiT6lj0jJMIc",
+        "index": 37,
         "task": "Find me the cheapest external HD for an Xbox One on gamestop.",
         "reference_task_length": 13,
         "evaluation": [
@@ -1656,11 +1617,10 @@
                     "url": "https://www.gamestop.com/search/?prefn1=platform&prefv1=Xbox&q=external+HD&view=new&srule=price-low-to-high"
                 }
             }
-        ],
-        "time": "2024-03-22 09:20:59.469"
+        ]
     },
     {
-        "index": "ea-0F05c6v48IaE33APkX",
+        "index": 38,
         "task": "Search for job in Miami Florida in Human resources on target.",
         "reference_task_length": 14,
         "evaluation": [
@@ -1752,11 +1712,10 @@
                     "url": "https://jobs.target.com/search-jobs?acm=8355664&alrpm=ALL&ascf=[%7B%22key%22:%22ALL%22,%22value%22:%22%22%7D]"
                 }
             }
-        ],
-        "time": "2024-03-22 07:47:19.747"
+        ]
     },
     {
-        "index": "EI_bNWi0gUUGfjCILiyOS",
+        "index": 39,
         "task": "Show me products from Calvin Klein brand menswear list on kohls.",
         "reference_task_length": 6,
         "evaluation": [
@@ -1792,11 +1751,10 @@
                     "url": "https://www.kohls.com/catalog/mens-calvin-klein-clothing.jsp?CN=Gender:Mens+Brand:Calvin%20Klein+Department:Clothing&S=1&PPP=48&kls_sbp=59288101756704364110307077102020115511&pfm=internal%20campaign%20refine"
                 }
             }
-        ],
-        "time": "2024-03-25 05:47:19.199"
+        ]
     },
     {
-        "index": "eUCwvaIx2vbWFCxkmtjAg",
+        "index": 40,
         "task": "Contact the support service on spothero",
         "reference_task_length": 4,
         "evaluation": [
@@ -1816,11 +1774,10 @@
                     "url": "https://spothero.com/contact"
                 }
             }
-        ],
-        "time": "2024-05-21 06:04:06.098"
+        ]
     },
     {
-        "index": "ewpxEe7H6GHDo0pAWcMe2",
+        "index": 41,
         "task": "Find a flight from Dresden to anywhere under $100 on ryanair",
         "reference_task_length": 13,
         "evaluation": [
@@ -1856,11 +1813,10 @@
                     "url": "https://www.ryanair.com/us/en/cheap-flights/?from=DRS&out-from-date=2024-05-28&out-to-date=2025-05-28&budget=100"
                 }
             }
-        ],
-        "time": "2024-05-28 06:22:31.472"
+        ]
     },
     {
-        "index": "fc5FwBwnNV2kroxbDjyjX",
+        "index": 42,
         "task": "Look for hair salon in San Diego on yellowpages",
         "reference_task_length": 8,
         "evaluation": [
@@ -1888,11 +1844,10 @@
                     "url": "https://www.yellowpages.com/search?search_terms=hair+salon&geo_location_terms=San+Diego%2C+CA"
                 }
             }
-        ],
-        "time": "2024-05-24 07:55:10.003"
+        ]
     },
     {
-        "index": "FFwg7X2CgxQiCq-Sv3EWI",
+        "index": 43,
         "task": "Find the closest in-store Gamestop location within 50 miles of 21122 on gamestop.",
         "reference_task_length": 10,
         "evaluation": [
@@ -1967,11 +1922,10 @@
                     "url": "https://www.gamestop.com/search/?store=3878"
                 }
             }
-        ],
-        "time": "2024-03-25 06:13:44.816"
+        ]
     },
     {
-        "index": "FGXMZ7VQ7uquu8fdSHSBp",
+        "index": 44,
         "task": "Find information about what I should do when I lose an item on a bus on us.megabus",
         "reference_task_length": 3,
         "evaluation": [
@@ -2000,11 +1954,10 @@
                     "url": "https://us.megabus.com/help"
                 }
             }
-        ],
-        "time": "2024-05-26 06:02:13.109"
+        ]
     },
     {
-        "index": "FtCFJNz4WhhewmINgVRu5",
+        "index": 45,
         "task": "Select a E-Gift card and add to cart with Best Wishes as a message. Send it to James Smith with email abc@abc.com on rei",
         "reference_task_length": 18,
         "evaluation": [
@@ -2069,11 +2022,10 @@
                     "url": "https://www.rei.com/gift-card/purchase"
                 }
             }
-        ],
-        "time": "2024-05-22 04:30:06.572"
+        ]
     },
     {
-        "index": "fuEsXYy-LGfFLHqNw9zWt",
+        "index": 46,
         "task": "Add a front load washing machine under $800 to the cart on menards.",
         "reference_task_length": 8,
         "evaluation": [
@@ -2109,11 +2061,10 @@
                     "url": "https://www.menards.com/main/search.html?search=front+load+washing+machine&priceMax_facet=800"
                 }
             }
-        ],
-        "time": "2024-03-23 07:22:59.969"
+        ]
     },
     {
-        "index": "G2jfRmIvoXCBKtoUcNUSd",
+        "index": 47,
         "task": "Search for a full-time job in sales in Springfield and apply for the most recent job on carmax",
         "reference_task_length": 14,
         "evaluation": [
@@ -2186,11 +2137,10 @@
                     "url": "https://careers.carmax.com/us/en/search-results"
                 }
             }
-        ],
-        "time": "2024-05-21 17:29:20.909"
+        ]
     },
     {
-        "index": "hMW3NU6H4U1avWsKmMj0y",
+        "index": 48,
         "task": "Browse coffee makers that are rated 5 stars on kohls",
         "reference_task_length": 7,
         "evaluation": [
@@ -2218,11 +2168,10 @@
                     "url": "https://www.kohls.com/search/5.jsp?CN=TopRated:5&search=coffee%20maker&S=1&PPP=48&kls_sbp=87660515555844928264416369496642981542&pfm=search%20refine"
                 }
             }
-        ],
-        "time": "2024-05-26 04:58:15.747"
+        ]
     },
     {
-        "index": "iBh1tZmxZGScFoDu6AcwB",
+        "index": 49,
         "task": "Browse spider-man toys for kids and sort by lowest price on kohls",
         "reference_task_length": 8,
         "evaluation": [
@@ -2258,70 +2207,10 @@
                     "url": "https://www.kohls.com/search/kids.jsp?CN=AgeAppropriate:Kids&search=spiderman%20toys&kls_sbp=87660515555844928264416369496642981542&pfm=search%20refine&PPP=48&S=4&sks=true"
                 }
             }
-        ],
-        "time": "2024-05-20 05:01:18.502"
+        ]
     },
     {
-        "index": "idxs7XdOs-DEu_l7d5gDu",
-        "task": "Find a store in Tempe, Arizona,  make it my store, and then visit the store page and see whats happening in store on ikea.",
-        "reference_task_length": 10,
-        "evaluation": [
-            {
-                "match_function_name": "url_included_match",
-                "content": {
-                    "key": "",
-                    "reference_answer": "ikea.",
-                    "url": "https://www.ikea.com/"
-                }
-            },
-            {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
-                "content": {
-                    "reference_answer": "#google-maps-store-select ",
-                    "netloc": "ikea",
-                    "url": "https://www.ikea.com/us/en/stores/"
-                }
-            },
-            {
-                "match_function_name": "url_included_match",
-                "content": {
-                    "key": "",
-                    "reference_answer": "stores/",
-                    "url": "https://www.ikea.com/us/en/stores/"
-                }
-            },
-            {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
-                "content": {
-                    "reference_answer": "#google-maps-store-select >option:nth-child(2)",
-                    "netloc": "ikea",
-                    "url": "https://www.ikea.com/us/en/stores/"
-                }
-            },
-            {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
-                "content": {
-                    "reference_answer": ".localstore-buttons__container >button:nth-child(2)>span:nth-child(1)",
-                    "netloc": "ikea",
-                    "url": "https://www.ikea.com/us/en/stores/"
-                }
-            },
-            {
-                "match_function_name": "url_included_match",
-                "content": {
-                    "key": "",
-                    "reference_answer": "/events/ikea-tempe-az/",
-                    "url": "https://www.ikea.com/us/en/stores/events/ikea-tempe-az/"
-                }
-            }
-        ],
-        "time": "2024-03-12 09:30:55.599"
-    },
-    {
-        "index": "IfHzHm-U83FzDKIGXVBPB",
+        "index": 50,
         "task": "Set the first recommended song on the homepage as a current obsession on last.fm",
         "reference_task_length": 4,
         "evaluation": [
@@ -2360,11 +2249,10 @@
                     "url": "https://www.last.fm/"
                 }
             }
-        ],
-        "time": "2024-03-25 06:07:45.480"
+        ]
     },
     {
-        "index": "Im8n7iG6o0643zl_qS95X",
+        "index": 51,
         "task": "Browse the page with event planning tips on eventbrite",
         "reference_task_length": 5,
         "evaluation": [
@@ -2384,11 +2272,10 @@
                     "url": "https://www.eventbrite.com/blog/category/event-planning/"
                 }
             }
-        ],
-        "time": "2024-05-28 03:30:06.935"
+        ]
     },
     {
-        "index": "IQds4ENVIZXE_5c4KUNIM",
+        "index": 52,
         "task": "What are the family rides available at frontier city? on sixflags",
         "reference_task_length": 7,
         "evaluation": [
@@ -2416,11 +2303,68 @@
                     "url": "https://www.sixflags.com/frontiercity/things-to-do/rides/family-rides#family-ride"
                 }
             }
-        ],
-        "time": "2024-05-24 07:08:01.654"
+        ]
     },
     {
-        "index": "jfjr1xGSPsucAuuUEBwCR",
+        "index": 53,
+        "task": "Find a store in Tempe, Arizona,  make it my store, and then visit the store page and see whats happening in store on ikea.",
+        "reference_task_length": 10,
+        "evaluation": [
+            {
+                "match_function_name": "url_included_match",
+                "content": {
+                    "key": "",
+                    "reference_answer": "ikea.",
+                    "url": "https://www.ikea.com/"
+                }
+            },
+            {
+                "match_function_name": "url_included_match",
+                "content": {
+                    "key": "",
+                    "reference_answer": "/stores",
+                    "url": "https://www.ikea.com/us/en/stores/"
+                }
+            },
+            {
+                "match_function_name": "element_path_exactly_match",
+                "method": "selector",
+                "content": {
+                    "reference_answer": "#google-maps-store-select ",
+                    "netloc": "ikea",
+                    "url": "https://www.ikea.com/us/en/stores/"
+                }
+            },
+            {
+                "match_function_name": "element_path_exactly_match",
+                "method": "selector",
+                "content": {
+                    "reference_answer": "#google-maps-store-select >option:nth-child(3)",
+                    "netloc": "ikea",
+                    "url": "https://www.ikea.com/us/en/stores/"
+                }
+            },
+            {
+                "match_function_name": "element_path_exactly_match",
+                "method": "selector",
+                "content": {
+                    "reference_answer": ".localstore-buttons__container >button:nth-child(2)>span:nth-child(1)",
+                    "netloc": "ikea",
+                    "url": "https://www.ikea.com/us/en/stores/"
+                }
+            },
+            {
+                "match_function_name": "url_included_match",
+                "content": {
+                    "key": "",
+                    "reference_answer": "events/ikea-tempe-az/",
+                    "url": "https://www.ikea.com/us/en/stores/events/ikea-tempe-az/"
+                }
+            }
+        ]
+    },
+    {
+        "index": 54,
         "task": "Add to my wish list the highest rated activity in Amsterdam on viator",
         "reference_task_length": 6,
         "evaluation": [
@@ -2457,11 +2401,10 @@
                     "url": "https://www.viator.com/Amsterdam/d525-ttd?sortType=rating"
                 }
             }
-        ],
-        "time": "2024-05-20 04:41:01.489"
+        ]
     },
     {
-        "index": "jIAFDj4vUn97eopTKyLVB",
+        "index": 55,
         "task": "Check the current standings for MLS on foxsports",
         "reference_task_length": 4,
         "evaluation": [
@@ -2489,12 +2432,11 @@
                     "url": "https://www.foxsports.com/soccer/mls/standings"
                 }
             }
-        ],
-        "time": "2024-05-22 05:00:23.740"
+        ]
     },
     {
-        "index": "jxEtZVxPTK_fFF7x3Qw7h",
-        "task": "Find the statistics of the player Cristiano Ronaldo for the national team of Portugal in all the world cups.",
+        "index": 56,
+        "task": "Find the statistics of the player Cristiano Ronaldo for the national team of Portugal in all the world cups in espn.com.",
         "reference_task_length": 10,
         "evaluation": [
             {
@@ -2529,11 +2471,10 @@
                     "url": "https://www.espn.com/soccer/player/stats/_/id/22774/team/482/type/fifa.world"
                 }
             }
-        ],
-        "time": "2024-03-24 12:33:53.575"
+        ]
     },
     {
-        "index": "jYlUoyfeTB1iPEyIUY1zc",
+        "index": 57,
         "task": "Show schedule for East Boston Ferry outbound Lewis Wharf and Long Wharf (North) stop on mbta",
         "reference_task_length": 9,
         "evaluation": [
@@ -2569,11 +2510,10 @@
                     "url": "https://www.mbta.com/schedules/Boat-EastBoston/line?schedule_finder%5Bdirection_id%5D=0&schedule_finder%5Borigin%5D=Boat-Long"
                 }
             }
-        ],
-        "time": "2024-05-27 03:27:02.166"
+        ]
     },
     {
-        "index": "Ka0lgX3cJ7lKD1Wm7SbUI",
+        "index": 58,
         "task": "Find technical specs for the latest Macbook Air on apple",
         "reference_task_length": 4,
         "evaluation": [
@@ -2601,11 +2541,10 @@
                     "url": "https://www.apple.com/macbook-air/specs/"
                 }
             }
-        ],
-        "time": "2024-05-21 06:01:26.315"
+        ]
     },
     {
-        "index": "kJrcFAx5Wmx2ectYN5vt7",
+        "index": 59,
         "task": "Find out what popular events are being held this weekend in the category performing and visual arts near Chester, UK on eventbrite",
         "reference_task_length": 10,
         "evaluation": [
@@ -2649,11 +2588,10 @@
                     "url": "https://www.eventbrite.com/d/united-kingdom--chester/arts--events--this-weekend/?page=1"
                 }
             }
-        ],
-        "time": "2024-03-28 03:26:17.468"
+        ]
     },
     {
-        "index": "kpgHV45mGv1RTSDhyp9Da",
+        "index": 60,
         "task": "Find the last game of the season for the Toronto Raptors on sports.yahoo.",
         "reference_task_length": 5,
         "evaluation": [
@@ -2693,16 +2631,15 @@
                 "match_function_name": "element_path_exactly_match",
                 "method": "selector",
                 "content": {
-                    "reference_answer": "#Col2-7-TeamSchedule-Proxy >div:nth-child(1)>div:nth-child(2)>div:nth-child(4)>div:nth-child(1)>div:nth-child(2)>a:nth-child(1)>div:nth-child(2)",
+                    "reference_answer": "#Col2-5-TeamSchedule-Proxy > div > div > div:nth-child(4) > div",
                     "netloc": "sports",
                     "url": "https://sports.yahoo.com/nba/teams/toronto/"
                 }
             }
-        ],
-        "time": "2024-03-25 03:00:26.772"
+        ]
     },
     {
-        "index": "kYgJp5lpek_m7MOQiyrgO",
+        "index": 61,
         "task": "Find solutions for Airport and fill the contact form with message to \"Send Brochure\". Contact information John Smith. Email: abc@abc.com. Phone #: 88889999 on flightaware",
         "reference_task_length": 18,
         "evaluation": [
@@ -2776,11 +2713,10 @@
                     "url": "https://industry.flightaware.com/airports"
                 }
             }
-        ],
-        "time": "2024-05-27 03:37:36.450"
+        ]
     },
     {
-        "index": "L5MT6CydayMS3Fz4GEPEk",
+        "index": 62,
         "task": "Find Toyota Corolla from the year 2018 to 2023 in red color on carmax.",
         "reference_task_length": 13,
         "evaluation": [
@@ -2824,12 +2760,11 @@
                     "url": "https://www.carmax.com/cars/toyota/corolla/corolla-cross/corolla-cross-hybrid/corolla-hatchback/corolla-hybrid/corolla-im/red?year=2018-2023"
                 }
             }
-        ],
-        "time": "2024-03-25 06:18:12.062"
+        ]
     },
     {
-        "index": "l730hRXeN7jXAoonQC9IY",
-        "task": "Find the current NFL standings for the AFC East division and go to the page of which team is in first place on nfl.",
+        "index": 63,
+        "task": "Go to nfl.com and find the current NFL standings for the AFC East division and go to the page of which team is in first place.",
         "reference_task_length": 4,
         "evaluation": [
             {
@@ -2857,11 +2792,10 @@
                     "url": "https://www.nfl.com/standings/"
                 }
             }
-        ],
-        "time": "2024-03-23 07:14:46.033"
+        ]
     },
     {
-        "index": "ll6ksU97ZFOPlu5wY7kEE",
+        "index": 64,
         "task": "Check the national cafe menu on amtrak",
         "reference_task_length": 6,
         "evaluation": [
@@ -2906,11 +2840,10 @@
                     "url": "https://www.amtrak.com/onboard/meals-dining/cafe-car.html"
                 }
             }
-        ],
-        "time": "2024-03-24 12:24:44.634"
+        ]
     },
     {
-        "index": "LPKoeVVlIW8fdc7yB428V",
+        "index": 65,
         "task": "View all of the Most Popular TV on rottentomatoes.",
         "reference_task_length": 3,
         "evaluation": [
@@ -2930,11 +2863,10 @@
                     "url": "https://www.rottentomatoes.com/browse/tv_series_browse/sort:popular"
                 }
             }
-        ],
-        "time": "2024-03-23 08:15:33.298"
+        ]
     },
     {
-        "index": "mg_XYywJFY2zB_ESXajdY",
+        "index": 66,
         "task": "Compare Apple watches and  learn more about the ultra version on apple",
         "reference_task_length": 4,
         "evaluation": [
@@ -2954,11 +2886,10 @@
                     "url": "https://www.apple.com/watch/compare/"
                 }
             }
-        ],
-        "time": "2024-05-26 05:03:19.513"
+        ]
     },
     {
-        "index": "mpwaLSXFnPbo0DPo9Bybk",
+        "index": 67,
         "task": "Search for the playlists \"Pop Workout mix\" and filtered by tag #Dance & edm on soundcloud.",
         "reference_task_length": 7,
         "evaluation": [
@@ -2994,11 +2925,10 @@
                     "url": "https://soundcloud.com/search/sets?q=pop%20workout%20mix&filter.genre=dance%20%26%20edm"
                 }
             }
-        ],
-        "time": "2024-03-23 08:20:25.855"
+        ]
     },
     {
-        "index": "n5PRoGseX0FMADP6ksDd8",
+        "index": 68,
         "task": "Check in with confirmation number 10987654 for my flight with last name Lewis on united.",
         "reference_task_length": 7,
         "evaluation": [
@@ -3046,11 +2976,10 @@
                     "url": "https://www.united.com/en/gb"
                 }
             }
-        ],
-        "time": "2024-03-22 09:11:47.361"
+        ]
     },
     {
-        "index": "NIl5RrMRtKKn0UTcJOMND",
+        "index": 69,
         "task": "Check balance of gift card no. 1234567 with pin 0001 on marriott",
         "reference_task_length": 10,
         "evaluation": [
@@ -3105,11 +3034,10 @@
                     "url": "https://gifts.marriott.com/check-balance/"
                 }
             }
-        ],
-        "time": "2024-03-25 06:01:59.182"
+        ]
     },
     {
-        "index": "nxgeQF2vUcHpMBs7inZ3I",
+        "index": 70,
         "task": "Search Cantonese food near Chicago, IL that are open now and priced $$ on yelp",
         "reference_task_length": 9,
         "evaluation": [
@@ -3153,11 +3081,10 @@
                     "url": "https://www.yelp.com/search?find_desc=Cantonese+food&find_loc=Chicago%2C+IL&attrs=RestaurantsPriceRange2.2&open_now=724"
                 }
             }
-        ],
-        "time": "2024-05-27 04:06:48.866"
+        ]
     },
     {
-        "index": "nYUIGaNMtV6sxuJhv_b2S",
+        "index": 71,
         "task": "Get the frozen vegan cheese pizza between 5 to 10 usd on target.",
         "reference_task_length": 17,
         "evaluation": [
@@ -3201,11 +3128,10 @@
                     "url": "https://www.target.com/c/frozen-pizza-foods-grocery/-/N-5xsz4Zal25lfgbks1Z76zjqZgulk4?moveTo=product-list-grid"
                 }
             }
-        ],
-        "time": "2024-03-25 06:49:05.838"
+        ]
     },
     {
-        "index": "p5Rh2uknkoIwgRqseo6wB",
+        "index": 72,
         "task": "Find bluetooth vertical mouse with most reviews and add two to my shopping cart on newegg.",
         "reference_task_length": 9,
         "evaluation": [
@@ -3251,11 +3177,10 @@
                     "url": "https://www.newegg.com/kensington-k72356us/p/0TP-001D-00518"
                 }
             }
-        ],
-        "time": "2024-03-23 07:52:30.488"
+        ]
     },
     {
-        "index": "Peid7WPQJoMdIBjhIKOwP",
+        "index": 73,
         "task": "Find the page with instructions on how to return orders online on uniqlo",
         "reference_task_length": 6,
         "evaluation": [
@@ -3268,15 +3193,6 @@
                 }
             },
             {
-                "match_function_name": "element_path_exactly_match",
-                "method": "selector",
-                "content": {
-                    "reference_answer": ".Navigation.-top.Lead_Body >span:nth-child(1)>li:nth-child(6)>.Navigation_Link.-single.js-Track ",
-                    "netloc": "faq-us",
-                    "url": "https://faq-us.uniqlo.com/articles/en_US/FAQ/Returns-and-Exchanges/?l=en_US&c=category_uq_us%3AUQ_C1_7&fs=Search&pn=1"
-                }
-            },
-            {
                 "match_function_name": "url_included_match",
                 "content": {
                     "key": "",
@@ -3284,11 +3200,10 @@
                     "url": "https://faq-us.uniqlo.com/articles/en_US/FAQ/Returns-and-Exchanges/?l=en_US&c=category_uq_us%3AUQ_C1_7&fs=Search&pn=1"
                 }
             }
-        ],
-        "time": "2024-05-26 04:20:24.764"
+        ]
     },
     {
-        "index": "pzgRb65Q_C-IqoATH6QCe",
+        "index": 74,
         "task": "Find the weekly ad for the store closest to zip code 82718 on menards",
         "reference_task_length": 8,
         "evaluation": [
@@ -3324,11 +3239,10 @@
                     "url": "https://www.menards.com/main/flyerselectstore.html"
                 }
             }
-        ],
-        "time": "2024-03-27 11:58:37.236"
+        ]
     },
     {
-        "index": "QiIBNsu__PJ_wBbTxAzvf",
+        "index": 75,
         "task": "Add a Swivel vacuum under $150 to my cart on menards.",
         "reference_task_length": 8,
         "evaluation": [
@@ -3365,11 +3279,10 @@
                     "url": "https://www.menards.com/main/search.html?search=swivel+vacuum&priceMax_facet=150"
                 }
             }
-        ],
-        "time": "2024-03-25 05:42:00.048"
+        ]
     },
     {
-        "index": "QrK41w5BG8GFDYzNHA0yn",
+        "index": 76,
         "task": "What are the food festivals happening in Colorado This weekend? on eventbrite",
         "reference_task_length": 9,
         "evaluation": [
@@ -3405,11 +3318,10 @@
                     "url": "https://www.eventbrite.com/d/united-states--colorado/food-festival/"
                 }
             }
-        ],
-        "time": "2024-05-24 09:09:40.399"
+        ]
     },
     {
-        "index": "qwx9Eadt7js7dG6ixaUPU",
+        "index": 77,
         "task": "Explore the trending playlists,filter by tag #Electronics, play the first playlist and like it on soundcloud",
         "reference_task_length": 9,
         "evaluation": [
@@ -3463,11 +3375,10 @@
                     "url": "https://soundcloud.com/search/sets?q=trending%20playlists&filter.genre=electronic"
                 }
             }
-        ],
-        "time": "2024-05-21 04:58:40.524"
+        ]
     },
     {
-        "index": "rEHHIcDi9AMBMK1DDXpbN",
+        "index": 78,
         "task": "Browse through the Las Vegas city guide and find message services nearest to Henderson, the service provider should have a BBB rating of A+ on yellowpages",
         "reference_task_length": 11,
         "evaluation": [
@@ -3503,11 +3414,10 @@
                     "url": "https://www.yellowpages.com/las-vegas-nv/massage-therapists?refinements=bbb_grade_display%3A1&refinements=neighborhood%3AHenderson"
                 }
             }
-        ],
-        "time": "2024-05-27 03:49:51.803"
+        ]
     },
     {
-        "index": "rG7Bw2NN2bQ7CRchbMrAq",
+        "index": 79,
         "task": "Add The Wire to the watchlist on tvguide",
         "reference_task_length": 6,
         "evaluation": [
@@ -3536,11 +3446,10 @@
                     "url": "https://www.tvguide.com/"
                 }
             }
-        ],
-        "time": "2024-05-20 05:18:22.420"
+        ]
     },
     {
-        "index": "RtYZe1pcgX6-TGZAmhyf6",
+        "index": 80,
         "task": "Find 5 star rated saltwater rods on cabelas.",
         "reference_task_length": 6,
         "evaluation": [
@@ -3568,11 +3477,10 @@
                     "url": "https://www.cabelas.com/l/saltwater-rods#f-bvratings=5%20Stars"
                 }
             }
-        ],
-        "time": "2024-03-22 07:22:39.119"
+        ]
     },
     {
-        "index": "rUyFGVLAMz748JXIqLlqE",
+        "index": 81,
         "task": "Add Pro Display XDR with nano texture to bag with all the accessories on apple",
         "reference_task_length": 9,
         "evaluation": [
@@ -3644,11 +3552,10 @@
                     "url": "https://www.apple.com/shop/buy-mac/pro-display-xdr/nano-glass"
                 }
             }
-        ],
-        "time": "2024-05-21 17:50:41.841"
+        ]
     },
     {
-        "index": "sPw15prlAwsXoQo8Pwikg",
+        "index": 82,
         "task": "Find a list of Tours that contain visits to the Louvre rated 5 stars on viator",
         "reference_task_length": 5,
         "evaluation": [
@@ -3686,11 +3593,10 @@
                     "url": "https://www.viator.com/Paris-attractions/Louvre/d479-a73#experiences"
                 }
             }
-        ],
-        "time": "2024-05-22 05:09:24.469"
+        ]
     },
     {
-        "index": "SxYhvlAHYqr92CmFHyHhq",
+        "index": 83,
         "task": "Browse the list of top 250 movies and add the first one to my watchlist on imdb",
         "reference_task_length": 6,
         "evaluation": [
@@ -3728,11 +3634,10 @@
                     "url": "https://www.imdb.com/chart/top/?ref_=nv_mv_250"
                 }
             }
-        ],
-        "time": "2024-05-20 04:49:26.511"
+        ]
     },
     {
-        "index": "szKuTh5WSKAHTrt6oCi1i",
+        "index": 84,
         "task": "Find thrill rides in Six Flags Great America, Chicago, IL on sixflags",
         "reference_task_length": 7,
         "evaluation": [
@@ -3760,11 +3665,10 @@
                     "url": "https://www.sixflags.com/greatamerica/things-to-do/rides/thrill-rides#thrill-ride"
                 }
             }
-        ],
-        "time": "2024-05-24 08:18:13.156"
+        ]
     },
     {
-        "index": "SzZoAslJMjCSQ2YU0B437",
+        "index": 85,
         "task": "Show me a list of electronic music dvds in very good condition on discogs",
         "reference_task_length": 6,
         "evaluation": [
@@ -3800,11 +3704,10 @@
                     "url": "https://www.discogs.com/sell/list?genre=Electronic&format=DVD&condition=Very+Good+%28VG%29"
                 }
             }
-        ],
-        "time": "2024-05-26 04:39:08.672"
+        ]
     },
     {
-        "index": "T-PlxYqdEO-9Qq_oiUNKI",
+        "index": 86,
         "task": "Find a walkthrough guide for Assassin's Creed Valhalla on ign",
         "reference_task_length": 6,
         "evaluation": [
@@ -3832,11 +3735,10 @@
                     "url": "https://www.ign.com/"
                 }
             }
-        ],
-        "time": "2024-05-26 04:28:05.637"
+        ]
     },
     {
-        "index": "TExb4W23ACyVIzZA-rTlw",
+        "index": 87,
         "task": "Find more films from the director of Smile on tvguide",
         "reference_task_length": 7,
         "evaluation": [
@@ -3856,11 +3758,10 @@
                     "url": "https://www.tvguide.com/celebrities/parker-finn/3060049350/"
                 }
             }
-        ],
-        "time": "2024-05-20 05:47:01.289"
+        ]
     },
     {
-        "index": "TfvF4IF2gNH53xipCdh4W",
+        "index": 88,
         "task": "Find help page about buying tickets on seatgeek",
         "reference_task_length": 4,
         "evaluation": [
@@ -3880,11 +3781,10 @@
                     "url": "https://seatgeek.com/help/articles/8985521334291-Buying-Tickets"
                 }
             }
-        ],
-        "time": "2024-05-23 06:19:32.799"
+        ]
     },
     {
-        "index": "ThXZAFmqlj6jJb6QyJ2fG",
+        "index": 89,
         "task": "Tell me more about the Adirondack route on amtrak.",
         "reference_task_length": 5,
         "evaluation": [
@@ -3912,35 +3812,10 @@
                     "url": "https://www.amtrak.com/routes/adirondack-train.html"
                 }
             }
-        ],
-        "time": "2024-03-25 06:22:08.019"
+        ]
     },
     {
-        "index": "TIanz2U5iPllmhS5vXucP",
-        "task": "Open the baggage fee calculator on united",
-        "reference_task_length": 5,
-        "evaluation": [
-            {
-                "match_function_name": "url_included_match",
-                "content": {
-                    "key": "",
-                    "reference_answer": "united.",
-                    "url": "https://www.united.com/en/us"
-                }
-            },
-            {
-                "match_function_name": "url_included_match",
-                "content": {
-                    "key": "",
-                    "reference_answer": "/baggage-calculator",
-                    "url": "https://www.united.com/en/us/baggage-calculator/any-flights"
-                }
-            }
-        ],
-        "time": "2024-05-26 05:16:41.406"
-    },
-    {
-        "index": "TPEK67bCB000EObLJJumy",
+        "index": 90,
         "task": "Show me the best city tours on nyc",
         "reference_task_length": 3,
         "evaluation": [
@@ -3960,11 +3835,10 @@
                     "url": "https://www.nyc.com/guided_tours/"
                 }
             }
-        ],
-        "time": "2024-05-24 09:28:31.350"
+        ]
     },
     {
-        "index": "U7s1xvWgJRv5pCkwrSVyZ",
+        "index": 91,
         "task": "Find the team schedule of the Brooklyn Nets on espn",
         "reference_task_length": 4,
         "evaluation": [
@@ -3992,11 +3866,10 @@
                     "url": "https://www.espn.com/nba/team/schedule/_/name/bkn/brooklyn-nets"
                 }
             }
-        ],
-        "time": "2024-05-26 07:08:21.889"
+        ]
     },
     {
-        "index": "Ud2nnGYfINKcnIz7xXeUK",
+        "index": 92,
         "task": "Browse used Mercedes cars made between 2004 to 2012 and sort by highest price on kbb",
         "reference_task_length": 11,
         "evaluation": [
@@ -4032,11 +3905,10 @@
                     "url": "https://www.kbb.com/car-finder/?intent=used&manufacturers=mercedesbenz&years=2004-2012&sort=pricedesc"
                 }
             }
-        ],
-        "time": "2024-05-26 05:50:37.604"
+        ]
     },
     {
-        "index": "UnxkVMof0YIvazXZb8Fc8",
+        "index": 93,
         "task": "Show me the scores for the 2019 super bowl on nfl",
         "reference_task_length": 7,
         "evaluation": [
@@ -4072,11 +3944,10 @@
                     "url": "https://www.nfl.com/scores/"
                 }
             }
-        ],
-        "time": "2024-05-26 05:08:15.217"
+        ]
     },
     {
-        "index": "v5stCvJH8fYQhg1gqTxc8",
+        "index": 94,
         "task": "Book the cheapest parking spot near Bradley Airport on spothero",
         "reference_task_length": 9,
         "evaluation": [
@@ -4132,11 +4003,10 @@
                     "url": "https://spothero.com/airport-parking/12793/34-old-county-rd?starts=2024-03-13T12%3A00&ends=2024-03-17T12%3A00&airport=true"
                 }
             }
-        ],
-        "time": "2024-03-12 07:02:45.009"
+        ]
     },
     {
-        "index": "vwfgl1oxzBZBfxdogAWpU",
+        "index": 95,
         "task": "Browse hot deals near zip code 10019 on koa",
         "reference_task_length": 7,
         "evaluation": [
@@ -4164,11 +4034,10 @@
                     "url": "https://koa.com/hot-deals/?q=10019"
                 }
             }
-        ],
-        "time": "2024-05-26 06:51:00.521"
+        ]
     },
     {
-        "index": "wi4SWrbpRBBQkq5cR9bmD",
+        "index": 96,
         "task": "Create a new list called Bathroom Remodeling on menards",
         "reference_task_length": 8,
         "evaluation": [
@@ -4215,11 +4084,10 @@
                     "url": "https://www.menards.com/main/myLists.html"
                 }
             }
-        ],
-        "time": "2024-05-26 04:46:30.702"
+        ]
     },
     {
-        "index": "y8kmCn6l3G18O6GS5LC0A",
+        "index": 97,
         "task": "Find the most popular movies and showcase those with the highest IMDb ratings on imdb",
         "reference_task_length": 6,
         "evaluation": [
@@ -4247,11 +4115,10 @@
                     "url": "https://www.imdb.com/chart/moviemeter/?ref_=nv_mv_mpm&sort=release_date%2Cdesc"
                 }
             }
-        ],
-        "time": "2024-05-21 17:43:25.182"
+        ]
     },
     {
-        "index": "yCHsGNiD35HdNUekfL8hI",
+        "index": 98,
         "task": "Show list of popular businesses in Cleveland on yellowpages.",
         "reference_task_length": 5,
         "evaluation": [
@@ -4279,11 +4146,33 @@
                     "url": "https://www.yellowpages.com/cleveland-oh/business-listings/1"
                 }
             }
-        ],
-        "time": "2024-03-27 11:22:22.644"
+        ]
     },
     {
-        "index": "zbG_TK-AU6U-xiYf9QOZo",
+        "index": 99,
+        "task": "Open the baggage fee calculator on united",
+        "reference_task_length": 6,
+        "evaluation": [
+            {
+                "match_function_name": "url_included_match",
+                "content": {
+                    "key": "",
+                    "reference_answer": "united.",
+                    "url": "https://www.united.com/en/us/"
+                }
+            },
+            {
+                "match_function_name": "url_included_match",
+                "content": {
+                    "key": "",
+                    "reference_answer": "/checked-bag-fee-calculator/",
+                    "url": "https://www.united.com/en/us/checked-bag-fee-calculator/any-flights"
+                }
+            }
+        ]
+    },
+    {
+        "index": 100,
         "task": "See Nissan and Honda cars for sale near Kentwood, MI 49512 on carmax",
         "reference_task_length": 12,
         "evaluation": [
@@ -4364,11 +4253,10 @@
                     "url": "https://www.carmax.com/cars/honda/nissan"
                 }
             }
-        ],
-        "time": "2024-03-27 09:21:52.246"
+        ]
     },
     {
-        "index": "ZCpbMXedfNMd1FSMAJ1sP",
+        "index": 101,
         "task": "Browse the clearance section and filter for women's dresses in size small on kohls.",
         "reference_task_length": 8,
         "evaluation": [
@@ -4420,11 +4308,10 @@
                     "url": "https://www.kohls.com/catalog/clearance-womens-dresses-clothing.jsp?CN=Promotions:Clearance+Gender:Womens+Category:Dresses+Department:Clothing&icid=wmnsclearance-VN-dresses&pfm=undefined&kls_sbp=59288101756704364110307077102020115511"
                 }
             }
-        ],
-        "time": "2024-03-23 08:12:48.582"
+        ]
     },
     {
-        "index": "zSPmWOxOb0SYdHkC_ubJb",
+        "index": 102,
         "task": "Find the schedule for upcoming MLB games for the New York Yankees on foxsports",
         "reference_task_length": 5,
         "evaluation": [
@@ -4460,12 +4347,11 @@
                     "url": "https://www.foxsports.com/mlb/new-york-yankees-team-schedule"
                 }
             }
-        ],
-        "time": "2024-05-26 06:27:22.800"
+        ]
     },
     {
-        "index": "ZZF9RoepyS1ZVAW3RD5k8",
-        "task": "What are the upcoming soccer events on ESPN2? on espn",
+        "index": 103,
+        "task": "What are the upcoming soccer events on ESPN2 on espn",
         "reference_task_length": 8,
         "evaluation": [
             {
@@ -4500,7 +4386,6 @@
                     "url": "https://www.espn.com/watch/schedule/"
                 }
             }
-        ],
-        "time": "2024-05-26 07:02:13.859"
+        ]
     }
 ]
