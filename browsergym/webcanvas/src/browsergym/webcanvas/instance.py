@@ -115,9 +115,9 @@ class WebCanvasInstance:
         return evaluate_steps, step_score_rate, match_result, task_finished
 
     @staticmethod
-    def evaluate_events(page, evaluate_steps, task_events, target_value, reference_evaluate_steps):
+    def evaluate_events(page, evaluate_steps, task_events, reference_evaluate_steps):
         evaluate_steps, match_result = step_event_evaluate(page=page, evaluate_steps=evaluate_steps,
-                                                           task_events=task_events, target_value=target_value)
+                                                           event=task_events)
         total_step_score = 0
         for evaluate in evaluate_steps:
             total_step_score += evaluate["score"]
