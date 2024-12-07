@@ -255,12 +255,17 @@ class BrowserEnv(gym.Env, ABC):
         # set default timeout
         self.context.set_default_timeout(timeout)
 
-        # hack: keep track of the active page with a javascript callback
+        # hack: keep track of the active page and mouse position with javascript callbacks
         # there is no concept of active page in playwright
         # https://github.com/microsoft/playwright/issues/2603
         self.context.expose_binding(
             "browsergym_page_activated", lambda source: self._activate_page_from_js(source["page"])
         )
+        self.context.expose_binding(
+            "browsergym_mouse_moved", lambda source: self._update_mouse_position_from_js(source)
+        )
+        # Initialize mouse position tracking
+        self.last_mouse_position = None
         self.context.add_init_script(
             r"""
 window.browsergym_page_activated();
@@ -268,7 +273,13 @@ window.addEventListener("focus", () => {window.browsergym_page_activated();}, {c
 window.addEventListener("focusin", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("load", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("pageshow", () => {window.browsergym_page_activated();}, {capture: true});
-window.addEventListener("mousemove", (event) => {window.browsergym_page_activated(); window.pageX = event.clientX; window.pageY = event.clientY;}, {capture: true});
+window.addEventListener("mousemove", (event) => {
+    window.browsergym_page_activated();
+    window.browsergym_mouse_moved({
+        x: event.clientX,
+        y: event.clientY
+    });
+}, {capture: true});
 window.addEventListener("mouseup", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("mousedown", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("wheel", () => {window.browsergym_page_activated();}, {capture: true});
@@ -481,6 +492,25 @@ document.addEventListener("visibilitychange", () => {
                     frame.wait_for_load_state("domcontentloaded", timeout=3000)
                 except playwright.sync_api.Error:
                     pass
+
+    def _update_mouse_position_from_js(self, source):
+        page = source["page"]
+        x = source["x"]
+        y = source["y"]
+        logger.debug(f"_update_mouse_position_from_js called, page={str(page)}, x={x}, y={y}")
+        
+        if not page.context == self.context:
+            raise RuntimeError(
+                f"Unexpected: mouse event from a page that belongs to a different browser context ({page})."
+            )
+        
+        # Store the mouse position along with the page that received the event
+        self.last_mouse_position = {
+            "page": page,
+            "x": x,
+            "y": y,
+            "timestamp": time.time()
+        }
 
     def _activate_page_from_js(self, page: playwright.sync_api.Page):
         logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
