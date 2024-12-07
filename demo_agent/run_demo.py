@@ -118,7 +118,6 @@ https://github.com/ServiceNow/AgentLab"""
     # loading and printing results
     exp_result = get_exp_result(exp_args.exp_dir)
     exp_record = exp_result.get_exp_record()
-
     for key, val in exp_record.items():
         print(f"{key}: {val}")
 
