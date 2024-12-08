@@ -612,10 +612,7 @@ document.addEventListener("visibilitychange", () => {
 
     def _event_listener(self):
         """Add universal event listener"""
-        # # First expose the handle_event function
-        # self.context.expose_function("handleEvent", 
-        #     lambda selector, event_type, element_info: self._handle_event(selector, event_type, element_info))
-        logger.info("Setting up event listeners...")  # Add debug log
+        logger.info("Setting up event listeners...")
         try:
             # Then set up event listeners
             self.page.evaluate("""
@@ -677,7 +674,6 @@ document.addEventListener("visibilitychange", () => {
                     });
                 }
             """)
-            logger.info("Event listeners setup completed")
         except Exception as e:
             logger.error(f"Failed to setup event listeners: {str(e)}")
 
