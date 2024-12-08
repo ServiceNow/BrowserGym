@@ -59,6 +59,7 @@ pip install browsergym-webarena  # core + webarena
 pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
+pip install browsergym-webcanvas # core + webcanvas
 pip install weblinx-browsergym  # core + weblinx
 ```
 
@@ -169,14 +170,28 @@ print("\n".join(env_ids))
 AssistantBench
 ```python
 import gymnasium as gym
-import browsergym.workarena  # register assistantbench tasks as gym environments
+import browsergym.assistantbench  # register assistantbench tasks as gym environments
 
 # start an assistantbench task
 env = gym.make("browsergym/assistantbench.validation.3")
 ...
 
 # list all the available assistantbench tasks
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/assistantbench")]
+print("\n".join(env_ids))
+```
+
+WebCanvas
+```python
+import gymnasium as gym
+import browsergym.webcanvas  # register webcanvas tasks as gym environments
+
+# start a webcanvas task
+env = gym.make("browsergym/webcanvas.mind2web-live.0")
+...
+
+# list all the available webcanvas tasks
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/webcanvas")]
 print("\n".join(env_ids))
 ```
 
@@ -213,6 +228,9 @@ python demo_agent/run_demo.py --task_name webarena.4
 
 # visualwebarena
 python demo_agent/run_demo.py --task_name visualwebarena.398
+
+# webcanvas
+python demo_agent/run_demo.py --task_name webcanvas.mind2web-live.0
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more!
@@ -230,6 +248,7 @@ python demo_agent/run_demo.py --help
 - [MiniWoB(++)](https://miniwob.farama.org/): A collection of over 100 web tasks on synthetic web pages.
 - [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
 - [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
+- [WebCanvas](https://github.com/iMeanAI/WebCanvas): Benchmarks of web tasks on live websites with key-node in progress evaluation.
 
 ## 🌟 Contributors
 
