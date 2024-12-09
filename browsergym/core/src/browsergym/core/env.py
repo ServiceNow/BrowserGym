@@ -1,4 +1,5 @@
 import copy
+import json
 import logging
 import re
 import time
@@ -264,6 +265,14 @@ class BrowserEnv(gym.Env, ABC):
         self.context.expose_binding(
             "browsergym_page_activated", lambda source: self._activate_page_from_js(source["page"])
         )
+
+        self.context.expose_binding(
+            "handleEvent",
+            lambda selector, event_type, element_text: self._handle_event(
+                selector, event_type, element_text
+            ),
+        )
+
         self.context.add_init_script(
             r"""
 window.browsergym_page_activated();
@@ -373,6 +382,9 @@ document.addEventListener("visibilitychange", () => {
 
     def step(self, action: str) -> tuple:
 
+        # Setup event listener after page is create
+        self._event_listener()
+
         self.last_action = action
 
         info = {}
@@ -389,6 +401,10 @@ document.addEventListener("visibilitychange", () => {
                 raise ValueError(f"Forbidden value: {reason} is not a string")
             self.chat.add_message(role="infeasible", msg=reason)
             self.infeasible_message_received = True
+
+        if hasattr(self.task, "webcanvas"):
+            logger.debug(f"Initiating  webcanvas task event listen")
+            self._event_listener()
 
         # try to execute the action
         logger.debug(f"Executing action")
@@ -414,7 +430,8 @@ document.addEventListener("visibilitychange", () => {
 
         # wait a bit (for the JavaScript callback to set the active page)
         time.sleep(0.5)  # wait for JS events to be fired (half a second)
-        self.context.cookies()  # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
+        # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
+        self.context.cookies()
 
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
@@ -428,9 +445,11 @@ document.addEventListener("visibilitychange", () => {
         self._wait_for_user_message()
         logger.debug(f"User message done")
 
+        # if not hasattr(self.task, 'webcanvas'):
         logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, task_info = self._task_validate()
+        logger.info(f"WebCanvas task validation result:\n{self.task.evaluate_result}")
         info["task_info"] = task_info
         logger.debug(f"Task validation done")
 
@@ -455,8 +474,9 @@ document.addEventListener("visibilitychange", () => {
         prev_active_page = self.page
         prev_page_history = self.page_history.copy()
         # call validate
-        reward, done, user_message, info = self.task.validate(self.page, self.chat.messages)
-
+        reward, done, user_message, info = self.task.validate(
+            self.page, self.chat.messages, self.last_action
+        )
         # safety fix, in case validate() did mess up the active page and/or page history
         if prev_active_page != self.page or prev_page_history != self.page_history:
             logger.debug(
@@ -498,7 +518,8 @@ document.addEventListener("visibilitychange", () => {
                 page
             )  # move page to the end of dictionnary
         else:
-            self.page_history[page] = None  # add page to the end of dictionnary
+            # add page to the end of dictionnary
+            self.page_history[page] = None
 
         self.page = page
 
@@ -584,3 +605,103 @@ document.addEventListener("visibilitychange", () => {
         }
 
         return obs
+
+    def _event_listener(self):
+        """Add universal event listener"""
+        # # First expose the handle_event function
+        # self.context.expose_function("handleEvent",
+        #     lambda selector, event_type, element_info: self._handle_event(selector, event_type, element_info))
+        logger.info("Setting up event listeners...")  # Add debug log
+        try:
+            # Then set up event listeners
+            self.page.evaluate(
+                """
+                () => {
+                    const allEvents = [
+                        'click', 'input', 'change', 'keydown', 'keyup',
+                        'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+                    ];
+
+                    function getElementSelector(element) {
+                        if (!element) return null;
+                        // Try to get unique selector for the element
+                        try {
+                            let path = [];
+                            while (element && element.nodeType === Node.ELEMENT_NODE) {
+                                let selector = element.nodeName.toLowerCase();
+                                if (element.id) {
+                                    selector += '#' + element.id;
+                                    path.unshift(selector);
+                                    break;
+                                } else {
+                                    let sibling = element;
+                                    let nth = 1;
+                                    while (sibling.previousElementSibling) {
+                                        sibling = sibling.previousElementSibling;
+                                        if (sibling.nodeName === element.nodeName) nth++;
+                                    }
+                                    if (nth > 1) selector += `:nth-child(${nth})`;
+                                }
+                                path.unshift(selector);
+                                element = element.parentNode;
+                            }
+                            return path.join(' > ');
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+
+                    function getElementInfo(element) {
+                        return {
+                            textContent: element.textContent || '',
+                            value: element.value || '',
+                            tagName: element.tagName.toLowerCase()
+                        };
+                    }
+
+                    allEvents.forEach(eventType => {
+                        document.addEventListener(eventType, (event) => {
+                            const element = event.target;
+                            const selector = getElementSelector(element);
+                            const elementInfo = getElementInfo(element);
+
+                            window.handleEvent(
+                                selector,
+                                eventType,
+                                JSON.stringify(elementInfo)
+                            );
+                        }, true);
+                    });
+                }
+            """
+            )
+            logger.info("Event listeners setup completed")
+        except Exception as e:
+            logger.error(f"Failed to setup event listeners: {str(e)}")
+
+    def _handle_event(self, selector, event_type, element_info_str):
+        """
+        Handle DOM events by updating task events
+        """
+        try:
+            element_info = json.loads(element_info_str)
+            logger.info(
+                f"Event received - selector: {selector}, type: {event_type}, info: {element_info}"
+            )
+
+            # Create current event
+            current_event = {
+                "selector": selector,
+                "status": True,
+                "target_value": element_info.get("value") or element_info.get("textContent", ""),
+                "event_type": event_type,
+            }
+
+            # Update task events
+            if hasattr(self.task, "update_events"):
+                self.task.update_events([current_event])
+
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse element info: {element_info_str}")
+        except Exception as e:
+            logger.error(f"Error handling event: {str(e)}")
