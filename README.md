@@ -29,7 +29,7 @@ pip install browsergym
 
 > [!TIP]
 > 🚀 Check out [AgentLab](https://github.com/ServiceNow/AgentLab)✨ !
-> A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks.
+> A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks. See more information in the [BrowserGym ecosystem paper](https://arxiv.org/abs/2412.05467)!
 
 https://github.com/ServiceNow/BrowserGym/assets/26232819/e0bfc788-cc8e-44f1-b8c3-0d1114108b85
 
