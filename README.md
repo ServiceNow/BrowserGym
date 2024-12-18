@@ -8,6 +8,7 @@
 🌐 [Ecosystem](#-ecosystem) -
 🚀 [AgentLab](https://github.com/ServiceNow/AgentLab) -
 🌟 [Contributors](#-contributors) -
+📄 [Paper](https://arxiv.org/abs/2412.05467) -
 📝 [Citation](#-citing-this-work)
 
 [![pypi](https://badge.fury.io/py/browsergym.svg)](https://pypi.org/project/browsergym/)
