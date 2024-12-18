@@ -23,8 +23,8 @@ from dataclasses_json import DataClassJsonMixin
 from PIL import Image
 from tqdm import tqdm
 
-from browsergym.core.chat import Chat
 from browsergym.core.action.parsers import highlevel_action_parser
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -935,6 +935,8 @@ def _get_env_name(task_name: str):
         import browsergym.assistantbench
     elif task_name.startswith("weblinx"):
         import weblinx_browsergym
+    elif task_name.startswith("webcanvas"):
+        import browsergym.webcanvas
 
     return f"browsergym/{task_name}"
 

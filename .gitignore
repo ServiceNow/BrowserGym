@@ -143,10 +143,8 @@ tmp.py
 # demo and results
 results/
 
-.vscode/launch.json
-
-# assistantbench
-tests/assistantbench/assistantbench-predictions-test.jsonl
-
 # weblinx
 bg_wl_data/
+
+# webcanvas
+tests/webcanvas/*

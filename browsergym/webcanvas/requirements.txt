@@ -1,0 +1,3 @@
+browsergym-core==0.13.3
+openai
+lxml
