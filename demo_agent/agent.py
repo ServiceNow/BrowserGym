@@ -1,9 +1,11 @@
 import base64
+import uuid
 import dataclasses
 import io
 import logging
 import os, getpass
-
+import pickle
+from datetime import datetime
 import numpy as np
 from typing import List
 import openai
@@ -77,6 +79,8 @@ class DemoAgent(Agent):
         self.use_html = use_html
         self.use_axtree = use_axtree
         self.use_screenshot = use_screenshot
+        if not hasattr(self, 'trace_id'):
+            self.trace_id = str(uuid.uuid4())
 
         if not (use_html or use_axtree):
             raise ValueError(f"Either use_html or use_axtree must be set to True.")
@@ -99,15 +103,47 @@ class DemoAgent(Agent):
     def call_openai(
         self, messages: List[dict], model: str = "gpt-4o-mini", temperature: float = 0.0
     ) -> str:
-        return self.openai_client.chat.completions.create(
+        model_info = {
+        "model_info": {
+            "model_name": model,
+            "temperature": temperature,
+            }
+        }
+        response = self.openai_client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=temperature,
         )
 
+        return response, model_info
+
+    def save_observation(self, obs: dict, prefix: str = "obs") -> str:
+        """Save observation to pickle file.
+        
+        Args:
+            obs: Observation dictionary to save
+            prefix: Prefix for the filename
+            
+        Returns:
+            str: Path to saved pickle file
+        """
+        # Create obs_outputs directory if it doesn't exist
+        os.makedirs("obs_outputs", exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pickle_filename = f"{prefix}_{timestamp}.pkl"
+        pickle_path = os.path.join("obs_outputs", pickle_filename)
+        
+        with open(pickle_path, 'wb') as f:
+            pickle.dump(obs, f)
+        
+        return pickle_path
+
     def get_action(self, obs: dict) -> tuple[str, dict]:
         system_msgs = []
         user_msgs = []
+
+        self.save_observation(obs)
 
         if self.chat_mode:
             system_msgs.append(
@@ -339,7 +375,7 @@ You will now think step by step and produce your next best action. Reflect on yo
         logger.info(full_prompt_txt)
 
         # query OpenAI model
-        response = self.call_openai(
+        response, model_info = self.call_openai(
             model=self.model_name,
             messages=[
                 {"role": "system", "content": system_msgs},
@@ -350,7 +386,7 @@ You will now think step by step and produce your next best action. Reflect on yo
 
         self.action_history.append(action)
 
-        return action, {}
+        return action, {**model_info, "trace_id": self.trace_id}
 
 
 @dataclasses.dataclass
