@@ -43,6 +43,7 @@ class GenericWebCanvasTask(AbstractBrowserTask):
             "target_value": None,
             "event_type": None
         }
+        self.event_page = None  # Store the page where the event occurred
 
         if task_id is None:
             raise ValueError(
@@ -74,9 +75,18 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         raise NotImplementedError
 
     def setup(self, page: playwright.sync_api.Page, start_url: str = None) -> tuple[str, dict]:
+        # Save the page reference
+        self.page = page
+        
+        # Ensure event listeners are set up
+        self._ensure_event_listeners(page)
+
+        # Initialize task configuration
         self.goal, _, _, reference_evaluate_steps = self.task_configs
         self.evaluation_step = reference_evaluate_steps
         self.reference_evaluate_steps = reference_evaluate_steps
+        
+        # Navigate to start URL
         start_url = start_url if start_url else self.start_url
         page.goto(start_url, timeout=30000)
         return self.goal, {}
@@ -96,8 +106,11 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         self,
         page: playwright.sync_api.Page,
         chat_messages: list[str],
-        action: str = ""
-    ) -> Tuple[float, bool, str, dict]:
+        action: dict,
+    ) -> Tuple[float, bool, Optional[str], dict]:
+
+        self._ensure_event_listeners(page)
+        
         reward, done, msg, info = 0, False, "", {}
 
         for message in chat_messages:
@@ -110,26 +123,40 @@ class GenericWebCanvasTask(AbstractBrowserTask):
         step_action_info["time_step"] = self.time_step
         step_action_info["evaluation"] = []
 
-        actions = WebCanvasInstance.parse_bid_from_action(action)
-        if len(actions) > 0:
-            for action_type, bid, target_value in actions:
-                self.evaluation_step, self.step_score_rate, self.match_result, self.task_finished = WebCanvasInstance.evaluate_events(
-                    page, self.evaluation_step, self.current_event, self.reference_evaluate_steps)
+        # Use event_page for evaluation if available, otherwise use current page
+        evaluation_page = self.event_page if self.event_page else page
 
-                step_action_info["evaluation"].append(
-                    {
-                        "action_type": action_type,
-                        "bid": bid,
-                        "target_value": target_value,
-                        "step_score_rate": self.step_score_rate,
-                        "match_result": self.match_result,
-                        "task_status": self.task_finished
-                    }
-                )
-                if self.task_finished:
-                    done = True
-                    break
+        # Check if selector can be located
+        can_locate = self._can_locate_selector(evaluation_page, self.current_event["selector"])
+        logger.info(f"Selector '{self.current_event['selector']}' can{'' if can_locate else 'not'} be located on page")
+        
+        self.evaluation_step, self.step_score_rate, self.match_result, self.task_finished = WebCanvasInstance.evaluate_events(
+            evaluation_page, self.evaluation_step, self.current_event, self.reference_evaluate_steps)
+
+        # Reset event_page after evaluation
+        self.event_page = None
+
+        step_action_info["evaluation"].append(
+            {
+                "step_score_rate": self.step_score_rate,
+                "match_result": self.match_result,
+                "task_status": self.task_finished
+            }
+        )
+        
+        if self.task_finished:
+            done = True
+        
         self.trace_info.append(step_action_info)
+        
+        # Add validation result logging
+        logger.info("=== Validation Results ===")
+        logger.info(f"Step Score Rate: {self.step_score_rate}")
+        logger.info(f"Match Result: {self.match_result}")
+        logger.info(f"Task Status: {'Completed' if self.task_finished else 'In Progress'}")
+        logger.info(f"Current Time Step: {self.time_step}")
+        logger.info("========================")
+        
         return reward, done, msg, info
 
     # https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/action/utils.py
@@ -178,7 +205,137 @@ class GenericWebCanvasTask(AbstractBrowserTask):
     def events(self):
         return self.task_events
 
-    def update_events(self, agent_event):
-        """Store the most recent event"""
-        if agent_event and len(agent_event) > 0:
-            self.current_event = agent_event[0]
+    def _handle_event(self, selector, event_type, element_info_str, page):
+        """
+        Handle DOM events by updating task events
+        """
+        try:
+            # Store the page directly
+            self.event_page = page
+            element_info = json.loads(element_info_str)
+            
+            # Create current event
+            current_event = {
+                "selector": selector,
+                "status": True,
+                "target_value": element_info.get("value") or element_info.get("textContent", "") or "",
+                "event_type": event_type
+            }
+            
+            # Update current event
+            self.current_event = current_event
+            logger.info(f"Event captured on page: {self.event_page.url}")
+            logger.info(f"Current event updated: {current_event}")
+            
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse element info: {element_info_str}")
+        except Exception as e:
+            logger.error(f"Error handling event: {str(e)}")
+
+    def _ensure_event_listeners(self, page: playwright.sync_api.Page):
+        """
+        Ensures that event listeners are properly set up on the page.
+        Checks for existing handlers before setting up new ones to avoid duplicates.
+        """
+        try:
+            # Check if handleEvent is already bound
+            handle_event_exists = page.evaluate("""
+                () => typeof window.handleEvent === 'function'
+            """)
+            
+            if not handle_event_exists:
+                page.context.expose_binding(
+                    "handleEvent",
+                    lambda source, selector, event_type, element_info: self._handle_event(
+                        selector, event_type, element_info, page
+                    )
+                )
+            
+            # Set up DOM event listeners if not already initialized
+            page.evaluate("""
+                () => {
+                    if (window._eventListenersInitialized) return;
+                    
+                    const allEvents = [
+                        'click', 'input', 'change', 'keydown', 'keyup',
+                        'mouseover', 'mouseout', 'mousedown', 'mouseup', 'focus', 'blur'
+                    ];
+                    
+                    function getElementSelector(element) {
+                        if (!element) return null;
+                        try {
+                            let path = [];
+                            while (element && element.nodeType === Node.ELEMENT_NODE) {
+                                let selector = element.nodeName.toLowerCase();
+                                if (element.id) {
+                                    selector += '#' + element.id;
+                                    path.unshift(selector);
+                                    break;
+                                } else {
+                                    let sibling = element;
+                                    let nth = 1;
+                                    while (sibling.previousElementSibling) {
+                                        sibling = sibling.previousElementSibling;
+                                        if (sibling.nodeName === element.nodeName) nth++;
+                                    }
+                                    if (nth > 1) selector += `:nth-child(${nth})`;
+                                }
+                                path.unshift(selector);
+                                element = element.parentNode;
+                            }
+                            return path.join(' > ');
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+                    
+                    function getElementInfo(element) {
+                        return {
+                            textContent: element.textContent || '',
+                            value: element.value || '',
+                            tagName: element.tagName.toLowerCase()
+                        };
+                    }
+                    
+                    allEvents.forEach(eventType => {
+                        document.addEventListener(eventType, (event) => {
+                            const element = event.target;
+                            const selector = getElementSelector(element);
+                            const elementInfo = getElementInfo(element);
+                            
+                            window.handleEvent(
+                                selector,
+                                eventType,
+                                JSON.stringify(elementInfo)
+                            );
+                        }, true);
+                    });
+                    
+                    window._eventListenersInitialized = true;
+                }
+            """)
+        except Exception as e:
+            logger.error(f"Failed to ensure event listeners: {str(e)}")
+            raise
+
+    def _can_locate_selector(self, page: playwright.sync_api.Page, selector: str) -> bool:
+        """
+        Test if a selector can be located on the given page
+        Returns True if the selector can be found, False otherwise
+        """
+        try:
+            # Try to locate the element using the selector
+            result = page.evaluate("""
+                (selector) => {
+                    try {
+                        const element = document.querySelector(selector);
+                        return element !== null;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+            """, selector)
+            return result
+        except Exception as e:
+            logger.error(f"Error checking selector '{selector}': {str(e)}")
+            return False
