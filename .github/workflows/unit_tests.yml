@@ -81,6 +81,9 @@ jobs:
           directory: "${{ github.workspace }}/miniwob-plusplus/miniwob/html"
           port: 8080
 
+      - name: Pre-download tokenizer ressources (for WebArena)
+        run: python -c "import nltk; nltk.download('punkt_tab')"
+
       - name: Run AgentLab Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
