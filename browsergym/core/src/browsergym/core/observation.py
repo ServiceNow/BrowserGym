@@ -568,4 +568,8 @@ def extract_focused_element_bid(page: playwright.sync_api.Page):
     except playwright.sync_api.TimeoutError:
         focused_bid = ""
 
+    # convert null / None to empty string
+    if not focused_bid:
+        focused_bid = ""
+
     return focused_bid
