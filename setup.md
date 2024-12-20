@@ -118,6 +118,12 @@ python demo_agent/run_demo.py \
 
 Run multiple experiments in batch using the provided shell script:
 
+First, make the script executable:
+
+```bash
+chmod +x run_experiments.sh
+```
+
 ```bash
 # Basic usage with default settings
 ./run_experiments.sh
@@ -157,10 +163,10 @@ The script includes the following predefined tasks:
 
 ### Experiment Analysis
 
-The run_experiments.sh script automatically generates trace-log files, but if running experiments manually, you'll need to generate them separately using the analyze_experiment.py script.
+The run_experiments.sh script automatically generates trace-log files, but if running experiments manually, you'll need to generate them separately using the trace_formatter.py script.
 
 ```bash
-python experiments/logging/analyze_experiment.py --results_dir "./results"
+python experiments/logging/trace_formatter.py --results_dir "./results"
 ```
 
 These trace-log files will be saved in the results directory as `experiment_log.md`.

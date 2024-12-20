@@ -1,14 +1,19 @@
+from pathlib import Path
 import logging
 import re
-from pathlib import Path
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from browsergym.experiments.loop import ExpResult
 from browsergym.core.action.highlevel import HighLevelActionSet
-from accessibility_path_finder import parse_accessibility_tree, get_path_to_bid
-from action_extractor import extract_action
+from pathfinder import parse_accessibility_tree, get_path_to_bid
+from utils import (
+    extract_action, 
+    extract_datetime_from_exp_dir, 
+    extract_bids_from_action,
+    log_metadata
+)
+from templates import get_system_message_template, get_next_action_template
 
 @dataclass
 class PastAction:
@@ -110,39 +115,6 @@ class PastActionTracker:
         
         return "".join(formatted_text)
 
-def extract_bids_from_action(action: str) -> List[Tuple[str, str]]:
-    """
-    Extract bids from action with their context labels.
-    Returns list of tuples: (bid, label)
-    """
-    # Handle drag_and_drop specially
-    drag_drop_match = re.match(r"drag_and_drop\('([a-zA-Z0-9]+)',\s*'([a-zA-Z0-9]+)'", action)
-    if drag_drop_match:
-        return [
-            (drag_drop_match.group(1), "Source Element"),
-            (drag_drop_match.group(2), "Target Element")
-        ]
-    
-    # Handle single bid actions
-    single_bid_patterns = [
-        (r"fill\('([a-zA-Z0-9]+)'", "Input Element"),
-        (r"select_option\('([a-zA-Z0-9]+)'", "Select Element"),
-        (r"click\('([a-zA-Z0-9]+)'", "Clicked Element"),
-        (r"dblclick\('([a-zA-Z0-9]+)'", "Double-clicked Element"),
-        (r"hover\('([a-zA-Z0-9]+)'", "Hovered Element"),
-        (r"press\('([a-zA-Z0-9]+)'", "Pressed Element"),
-        (r"focus\('([a-zA-Z0-9]+)'", "Focused Element"),
-        (r"clear\('([a-zA-Z0-9]+)'", "Cleared Element"),
-        (r"upload_file\('([a-zA-Z0-9]+)'", "Upload Element"),
-    ]
-    
-    for pattern, label in single_bid_patterns:
-        match = re.search(pattern, action)
-        if match:
-            return [(match.group(1), label)]
-    
-    return []
-
 def setup_logger(debug_mode: bool = False):
     """
     Set up logger with appropriate logging levels and handlers.
@@ -169,70 +141,6 @@ def setup_logger(debug_mode: bool = False):
     logger.addHandler(console_handler)
     
     return logger
-
-def log_metadata(logger, steps_info):
-    """Log metadata about StepInfo attributes and observation keys."""
-    if not steps_info:
-        return
-        
-    first_step = steps_info[0]
-    
-    logger.debug("\nAvailable attributes in StepInfo:")
-    logger.debug("="*50)
-    for attr in vars(first_step):
-        logger.debug(f"- {attr}: {type(getattr(first_step, attr))}")
-        
-    if first_step.obs:
-        logger.debug("\nAvailable keys in observation:")
-        logger.debug("="*50)
-        for key in first_step.obs.keys():
-            logger.debug(f"- {key}: {type(first_step.obs[key])}")
-            
-    logger.debug("="*50 + "\n")
-
-def get_system_message_template(chat_mode: bool) -> str:
-    """Get the appropriate system message template based on chat mode."""
-    if chat_mode:
-        return """\
-# Instructions
-
-You are a UI Assistant, your goal is to help the user perform tasks using a web browser. You can
-communicate with the user via a chat, to which the user gives you instructions and to which you
-can send back messages. You have access to a web browser that both you and the user can see,
-and with which only you can interact via specific commands.
-
-Review the instructions from the user, the current state of the page and all other information
-to find the best possible next action to accomplish your goal. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions."""
-    else:
-        return """\
-# Instructions
-
-Review the current state of the page and all other information to find the best
-possible next action to accomplish your goal. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions."""
-
-def get_next_action_template() -> str:
-    """Get the next action prompt template."""
-    return """\
-# Next action
-
-You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action."""
-
-def extract_datetime_from_exp_dir(exp_dir: str | Path) -> datetime:
-    """Extract datetime from experiment directory name.
-    
-    Args:
-        exp_dir: Path to experiment directory (e.g. "2024-02-14_15-30-45_agent_on_task_123")
-        
-    Returns:
-        datetime object
-    """
-    exp_dir = str(exp_dir)  # Convert Path to string if needed
-    dir_name = Path(exp_dir).name  # Get just the directory name
-    date_str = dir_name.split('_', 2)[:2]  # Split on _ and take first two parts
-    datetime_str = '_'.join(date_str)  # Rejoin with _ to get "YYYY-MM-DD_HH-MM-SS"
-    return datetime.strptime(datetime_str, "%Y-%m-%d_%H-%M-%S")
 
 def log_experiment_details(exp_dir: str | Path, debug_mode: bool = False):
     """

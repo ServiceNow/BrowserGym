@@ -109,7 +109,7 @@ done
 
 # Generate analysis after all runs are complete
 echo "Generating experiment analysis..."
-python3 experiments/logging/analyze_experiment.py --results_dir "$RESULTS_DIR"
+python3 experiments/logging/trace_formatter.py --results_dir "$RESULTS_DIR"
 
 echo "All experiments and analysis complete!" 
 
