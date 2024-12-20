@@ -248,8 +248,9 @@ def log_experiment_details(exp_dir: str | Path, debug_mode: bool = False):
         # Load experiment results
         logger.info(f"Loading experiment from: {exp_dir}")
         exp_result = ExpResult(exp_dir)
+
         steps_info = exp_result.steps_info
-        
+
         # Create action tracker
         tracker = PastActionTracker()
         

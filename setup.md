@@ -1,153 +1,166 @@
-# WebArena Project Setup Documentation
+# BrowserGym WorkArena Setup Guide
 
-## Prerequisites
+This guide provides step-by-step instructions for setting up and running BrowserGym WorkArena experiments.
 
-- Access to AWS EC2 instance
-- Python environment (3.10+)
-- Docker installed locally
-- OpenAI and LangChain API keys
-- webarena-server-kp.pem file (will be provided separately)
+## Table of Contents
+- [Environment Setup](#environment-setup)
+- [Repository Setup](#repository-setup)
+- [Dependencies Installation](#dependencies-installation)
+- [Environment Variables](#environment-variables)
+- [Listing Experiments](#listing-experiments)
+- [Running Experiments](#running-experiments)
 
-## 1. EC2 Instance Connection 
+## Environment Setup
+
+### Setting up pyenv virtualenv
+
 ```bash
-# SSH into EC2 instance using provided .pem file
-ssh -i webarena-server-kp.pem ubuntu@18.223.217.129
-```
-
-NOTE: The following 2 steps should be executed under the EC2 `webarena_server`.
-
-## 2. Start WebArena Services
-```bash
-# Start Docker containers
-docker start gitlab
-docker start shopping
-docker start shopping_admin
-docker start forum
-docker start kiwix33
-
-# Start OpenStreetMap service
-cd /home/ubuntu/openstreetmap-website/
-docker compose start
-
-# Wait ~1 minute for services to initialize
-```
-
-## 3. Configure Service URLs (Required for WebArena)
-
-### Configure Shopping Service
-```bash
-docker exec shopping /var/www/magento2/bin/magento setup:store-config:set --base-url="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7770"
-docker exec shopping mysql -u magentouser -pMyPassword magentodb -e  'UPDATE core_config_data SET value="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7770/" WHERE path = "web/secure/base_url";'
-
-# Configure Admin Settings
-docker exec shopping_admin php /var/www/magento2/bin/magento config:set admin/security/password_is_forced 0
-docker exec shopping_admin php /var/www/magento2/bin/magento config:set admin/security/password_lifetime 0
-docker exec shopping /var/www/magento2/bin/magento cache:flush
-
-# Configure Shopping Admin Service
-docker exec shopping_admin /var/www/magento2/bin/magento setup:store-config:set --base-url="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7780"
-docker exec shopping_admin mysql -u magentouser -pMyPassword magentodb -e  'UPDATE core_config_data SET value="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7780/" WHERE path = "web/secure/base_url";'
-docker exec shopping_admin /var/www/magento2/bin/magento cache:flush
-
-# Configure GitLab
-docker exec gitlab sed -i "s|^external_url.*|external_url 'http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:8023'|" /etc/gitlab/gitlab.rb
-docker exec gitlab gitlab-ctl reconfigure
-```
-
-NOTE: local setup related to `webarena` benchmark and `browsergym` environment
-
-## 4. Local Setup
-
-### Pyenv Setup
-```bash
-# Install pyenv
-brew install pyenv
-
-# Install Python 3.10.x
+# Install Python 3.12.7 if not already installed
 pyenv install 3.12.7
+
+# Create a new virtualenv
 pyenv virtualenv 3.12.7 browsergym_env
+
+# Activate the environment
 pyenv activate browsergym_env
 ```
 
-### WebArena Setup (different folder)
-```bash
-# Clone repositories
-git clone https://github.com/Nid989/webarena
+## Repository Setup
 
-# Setup Homepage
-YOUR_ACTUAL_HOSTNAME="ec2-18-223-217-129.us-east-2.compute.amazonaws.com"
-YOUR_ACTUAL_HOSTNAME=${YOUR_ACTUAL_HOSTNAME%/}
-perl -pi -e "s|<your-server-hostname>|${YOUR_ACTUAL_HOSTNAME}|g" environment_docker/webarena-homepage/templates/index.html
-cd environment_docker/webarena-homepage/
-flask run --host=0.0.0.0 --port=4399
+Clone the BrowserGym repository:
+
+```bash
+git clone https://github.com/Nid989/BrowserGym.git
+cd BrowserGym
 ```
 
-### WorkArena Setup (different folder)
+## Dependencies Installation
+
+Install required packages and setup playwright:
+
 ```bash
-# Create and activate new Python environment (recommended)
-python -m venv workarena-env
-source workarena-env/bin/activate  # On Windows use: workarena-env\Scripts\activate
-
-# Clone WorkArena repository
-git clone https://github.com/Nid989/WorkArena
-
 # Install BrowserGym
 pip install browsergym
 
-# Configure WorkArena environment variables
-export SNOW_INSTANCE_URL='https://dev275589.service-now.com'
-export SNOW_INSTANCE_UNAME='admin'
-export SNOW_INSTANCE_PWD='3*cngSgWUI5%'
+# Reinstall specific playwright version
+pip uninstall playwright -y
+pip install playwright==1.47.0
 
-# Initialize WorkArena
-workarena-install # (no need to run this again)
-```
-
-### Common Dependencies
-```bash
-# Install Python dependencies 
-pip install browsergym
-# pip uninstall playwright
-# pip install playwright==1.47.0
+# Install Chromium for playwright
 playwright install chromium
-pip install ext-requirements.txt 
+
+# Install additional requirements
+pip install -r ext-requirements.txt
 ```
 
-## 5. Environment Configuration (different folder)
+## Environment Variables
+
+Configure the necessary environment variables for WorkArena and OpenAI:
+
 ```bash
-# git clone https://github.com/ServiceNow/BrowserGym # (official one)
-git clone https://github.com/Nid989/BrowserGym.git 
+# ServiceNow Instance Credentials
+export SNOW_INSTANCE_URL="your-servicenow-instance-url"
+export SNOW_INSTANCE_UNAME="your-servicenow-instance-username"
+export SNOW_INSTANCE_PWD="your-servicenow-instance-password"
 
-# API Keys
-export OPENAI_API_KEY="your-key-here"
-
-# Choose ONE of the following configurations based on your benchmark:
-
-# Option 1: For WebArena benchmark
-export SHOPPING="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7770"
-export SHOPPING_ADMIN="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:7780/admin"
-export REDDIT="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:9999"
-export GITLAB="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:8023"
-export MAP="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:3000"
-export WIKIPEDIA="http://ec2-18-223-217-129.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-export HOMEPAGE="http://10.15.29.154:4399"  # Update with your local host
-
-# OR
-
-# Option 2: For WorkArena benchmark
-export SNOW_INSTANCE_URL='https://dev275589.service-now.com'
-export SNOW_INSTANCE_UNAME='admin'
-export SNOW_INSTANCE_PWD='3*cngSgWUI5%'
+# OpenAI API Key
+export OPENAI_API_KEY="your-openai-api-key"
 ```
 
-## 6. Run Demo 
+## Listing Experiments
+
+You can list available tasks using the `list_tasks.py` script. Here are the available options:
+
 ```bash
-# Run WebArena demo agent
-python3 demo_agent/run_demo.py --model_name=gpt-4o --task_name=webarena.196 
-
-# Run WorkArena demo agent
-python3 demo_agent/run_demo.py --model_name=gpt-4o --task_name=workarena.servicenow.order-ipad-pro
-
-# Run agent with LangGraph and LangSmith tracing
-python3 agents/langgraph_demo_agent/run_demo.py --model_name=gpt-4o --task_name=webarena.196
+python list_tasks.py --benchmark [benchmark_name] --level [level]
 ```
+
+### Arguments:
+
+- `--benchmark`: Choose from:
+  - `workarena`
+  - `miniwob`
+  - `webarena`
+  - `visualwebarena`
+  - `assistantbench`
+  
+- `--level` (WorkArena only): Filter tasks by level
+  - `l1`: level 1 tasks
+  - `l2`: level 2 tasks
+  - `l3`: level 3 tasks
+
+Example:
+```bash
+# List all WorkArena tasks
+python list_tasks.py --benchmark workarena
+
+# List L1 WorkArena tasks only
+python list_tasks.py --benchmark workarena --level l1
+```
+
+## Running Experiments
+
+### Method 1: Using run_demo.py
+
+Run individual experiments with custom configurations:
+
+```bash
+python demo_agent/run_demo.py \
+    --task_name "workarena.servicenow.order-standard-laptop" \
+    --model_name "gpt-4o" \
+    --visual_effects true \
+    --use_html false \
+    --use_axtree true \
+    --use_screenshot false
+```
+
+### Method 2: Using run_experiments.sh
+
+Run multiple experiments in batch using the provided shell script:
+
+```bash
+# Basic usage with default settings
+./run_experiments.sh
+
+# Custom configuration
+./run_experiments.sh \
+    --model-name "gpt-4o" \
+    --runs 5 \
+    --visual true \
+    --html false \
+    --axtree true \
+    --screenshot false
+```
+
+#### Script Options:
+
+- `-m, --model-name`: Specify the model name (default: gpt-4o)
+- `-r, --runs`: Number of experiment runs (default: 1)
+- `-v, --visual`: Enable visual effects (default: true)
+- `-h, --html`: Use HTML in observations (default: false)
+- `-a, --axtree`: Use AXTree in observations (default: true)
+- `-s, --screenshot`: Include screenshots (default: false)
+- `--help`: Display help message
+
+### Available WorkArena Tasks (for run_experiments.sh)
+
+The script includes the following predefined tasks:
+- workarena.servicenow.order-apple-mac-book-pro15
+- workarena.servicenow.order-apple-watch
+- workarena.servicenow.order-developer-laptop
+- workarena.servicenow.order-development-laptop-p-c
+- workarena.servicenow.order-ipad-mini
+- workarena.servicenow.order-ipad-pro
+- workarena.servicenow.order-loaner-laptop
+- workarena.servicenow.order-sales-laptop
+- workarena.servicenow.order-standard-laptop
+
+### Experiment Analysis
+
+The run_experiments.sh script automatically generates trace-log files, but if running experiments manually, you'll need to generate them separately using the analyze_experiment.py script.
+
+```bash
+python experiments/logging/analyze_experiment.py --results_dir "./results"
+```
+
+These trace-log files will be saved in the results directory as `experiment_log.md`.

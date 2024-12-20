@@ -12,10 +12,16 @@ def setup_parser() -> argparse.ArgumentParser:
         default='workarena',
         help='The benchmark to list tasks from'
     )
+    parser.add_argument(
+        '--level',
+        type=str,
+        choices=['l1', 'l2', 'l3'],
+        help='Filter tasks by level (only for workarena)'
+    )
     return parser
 
 
-def get_tasks(benchmark: str) -> List[str]:
+def get_tasks(benchmark: str, level: str = None) -> List[str]:
     # Import the appropriate benchmark module
     if benchmark == 'workarena':
         import browsergym.workarena
@@ -30,7 +36,19 @@ def get_tasks(benchmark: str) -> List[str]:
     
     # Get all tasks for the specified benchmark
     prefix = f"browsergym/{benchmark}"
-    return [id for id in gym.envs.registry.keys() if id.startswith(prefix)]
+    tasks = [id for id in gym.envs.registry.keys() if id.startswith(prefix)]
+    
+    # Filter tasks by level if benchmark is workarena
+    if benchmark == 'workarena' and level:
+        match level:
+            case 'l1':
+                tasks = [task for task in tasks if not (task.endswith('l2') or task.endswith('l3'))]
+            case 'l2':
+                tasks = [task for task in tasks if task.endswith('l2')]
+            case 'l3':
+                tasks = [task for task in tasks if task.endswith('l3')]
+    
+    return tasks
 
 
 def print_tasks(tasks: List[str]) -> None:
@@ -49,7 +67,7 @@ def main():
     args = parser.parse_args()
     
     try:
-        tasks = get_tasks(args.benchmark)
+        tasks = get_tasks(args.benchmark, args.level)
         print_tasks(tasks)
     except ImportError:
         print(f"Error: Could not import browsergym.{args.benchmark}")
