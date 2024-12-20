@@ -555,14 +555,21 @@ def extract_focused_element_bid(page: playwright.sync_api.Page):
     # this playwright code will dive through iFrames
     frame = page
     focused_bid = ""
-    while frame:
-        focused_element = frame.evaluate_handle(
-            extract_focused_element_with_bid_script, BID_ATTR
-        ).as_element()
-        if focused_element:
-            frame = focused_element.content_frame()
-            focused_bid = focused_element.get_attribute(BID_ATTR)
-        else:
-            frame = None
+    try:
+        while frame:
+            focused_element = frame.evaluate_handle(
+                extract_focused_element_with_bid_script, BID_ATTR
+            ).as_element()
+            if focused_element:
+                frame = focused_element.content_frame()
+                focused_bid = focused_element.get_attribute(BID_ATTR)
+            else:
+                frame = None
+    except playwright.sync_api.TimeoutError:
+        focused_bid = ""
+
+    # convert null / None to empty string
+    if not focused_bid:
+        focused_bid = ""
 
     return focused_bid
