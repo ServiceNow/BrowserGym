@@ -318,7 +318,7 @@ if __name__ == "__main__":
     
     if args.exp_dir:
         # Process single experiment directory
-        log_experiment_details(args.exp_dir, debug_mode=args.debug)
+        log_experiment_details(Path(args.exp_dir), debug_mode=args.debug)
     else:
         # Process all experiment directories under results_dir
         results_dir = Path(args.results_dir)
