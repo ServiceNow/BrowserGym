@@ -1,26 +1,27 @@
 import base64
-import uuid
+import uuid 
 import dataclasses
 import io
 import logging
 import os, getpass
-import pickle
-from datetime import datetime
+
 import numpy as np
-from typing import List
-import openai
 from PIL import Image
-from langsmith.run_helpers import traceable
+from IPython.display import display
+from IPython.display import Image as IPythonImage
+from typing import Dict, List, Optional
+
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_openai import ChatOpenAI
+from langgraph.graph import START, END, StateGraph, MessagesState
+from langgraph.prebuilt import tools_condition, ToolNode
 
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.python import PythonActionSet
 from browsergym.experiments import AbstractAgentArgs, Agent
 from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
 
 logger = logging.getLogger(__name__)
 
-
-# set the environment variables incl. OPENAI_API_KEY, and LANGCHAIN_API_KEY (for tracing pruposes).
 def _set_env(var: str):
     if not os.environ.get(var):
         os.environ[var] = getpass.getpass(f"{var}: ")
@@ -28,8 +29,7 @@ def _set_env(var: str):
 _set_env("OPENAI_API_KEY")
 _set_env("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_PROJECT"] = "browsergym_dev" 
-
+os.environ["LANGCHAIN_PROJECT"] = "browsergym"
 
 def image_to_jpg_base64_url(image: np.ndarray | Image.Image):
     """Convert a numpy array to a base64 encoded image url."""
@@ -45,9 +45,9 @@ def image_to_jpg_base64_url(image: np.ndarray | Image.Image):
 
     return f"data:image/jpeg;base64,{image_base64}"
 
-
+# TODO: rename the class to something more meaningful.
 class DemoAgent(Agent):
-    """A basic agent using OpenAI API, to demonstrate BrowserGym's functionalities."""
+    """A agent using langgraph to utilize BrowserGym's functionalities."""
 
     def obs_preprocessor(self, obs: dict) -> dict:
 
@@ -63,7 +63,7 @@ class DemoAgent(Agent):
             "axtree_txt": flatten_axtree_to_str(obs["axtree_object"]),
             "pruned_html": prune_html(flatten_dom_to_str(obs["dom_object"])),
         }
-
+    
     def __init__(
         self,
         model_name: str,
@@ -79,73 +79,54 @@ class DemoAgent(Agent):
         self.use_html = use_html
         self.use_axtree = use_axtree
         self.use_screenshot = use_screenshot
-        
+
+        self.model_info = {
+            "model_info": {
+                "model_name": model_name,
+                "temperature": 0.0,
+            }
+        }
+
         if not hasattr(self, 'trace_id'):
             self.trace_id = str(uuid.uuid4())
 
         if not (use_html or use_axtree):
             raise ValueError(f"Either use_html or use_axtree must be set to True.")
-
-        self.openai_client = openai.OpenAI()
-
+        
         self.action_set = HighLevelActionSet(
-            subsets=["chat", "tab", "nav", "bid", "infeas"],  # define a subset of the action space
-            # subsets=["chat", "bid", "coord", "infeas"] # allow the agent to also use x,y coordinates
-            strict=False,  # less strict on the parsing of the actions
-            multiaction=False,  # does not enable the agent to take multiple actions at once
-            demo_mode=demo_mode,  # add visual effects
-        )
-        # use this instead to allow the agent to directly use Python code
-        # self.action_set = PythonActionSet())
-
-        self.action_history = []
-
-    @traceable(run_type="llm")
-    def call_openai(
-        self, messages: List[dict], model: str = "gpt-4o-mini", temperature: float = 0.0
-    ) -> str:
-        model_info = {
-        "model_info": {
-            "model_name": model,
-            "temperature": temperature,
-            }
-        }
-        response = self.openai_client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
+            subsets=["chat", "tab", "nav", "bid", "infeas"], # define a subset of action space
+            # subsets=["chat", "bid", "coord", "infeas"], # allow the agent to also use x, y coordinates
+            strict=False, # less strict on the parsing of the actions
+            multiaction=False, # does not enable the agent to take multiple actions at once
+            demo_mode=demo_mode, # add visual effects
         )
 
-        return response, model_info
+        self.action_history = [] 
 
-    def save_observation(self, obs: dict, prefix: str = "obs") -> str:
-        """Save observation to pickle file.
+    def _create_workflow(self):
+        workflow = StateGraph(MessagesState)
         
-        Args:
-            obs: Observation dictionary to save
-            prefix: Prefix for the filename
-            
-        Returns:
-            str: Path to saved pickle file
-        """
-        # Create obs_outputs directory if it doesn't exist
-        os.makedirs("obs_outputs", exist_ok=True)
-        
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        pickle_filename = f"{prefix}_{timestamp}.pkl"
-        pickle_path = os.path.join("obs_outputs", pickle_filename)
-        
-        with open(pickle_path, 'wb') as f:
-            pickle.dump(obs, f)
-        
-        return pickle_path
+        # define necessary nodes 
+        workflow.add_node("predict", self._predict)
 
-    def get_action(self, obs: dict) -> tuple[str, dict]:
+        # add edges connecting defined nodes and start/end nodes
+        workflow.add_edge(START, "predict")
+        workflow.add_edge("predict", END)
+
+        # compile graph 
+        graph = workflow.compile()
+
+        return graph
+
+    def _predict(self, state: MessagesState) -> MessagesState:
+        llm = ChatOpenAI(model=self.model_name, temperature=0.0)
+        response = llm.invoke(state['messages'])
+        return {'messages': [response]}
+
+    def _build_context(self, obs):
+        
         system_msgs = []
         user_msgs = []
-
-        # DEBUG: save observation to pickle file
-        # self.save_observation(obs)
 
         if self.chat_mode:
             system_msgs.append(
@@ -376,25 +357,33 @@ You will now think step by step and produce your next best action. Reflect on yo
         full_prompt_txt = "\n".join(prompt_text_strings)
         logger.info(full_prompt_txt)
 
-        # query OpenAI model
-        response, model_info = self.call_openai(
-            model=self.model_name,
-            messages=[
-                {"role": "system", "content": system_msgs},
-                {"role": "user", "content": user_msgs},
-            ],
-        )
-        action = response.choices[0].message.content
+        return [SystemMessage(content=system_msgs), HumanMessage(content=user_msgs)]
 
+    def get_action(self, obs: dict) -> tuple[str, dict]:
+
+        # initialize BrowsergymState with obs 
+        initial_state = MessagesState(messages=self._build_context(obs))
+
+        # create and run the graph
+        graph = self._create_workflow()
+        display(IPythonImage(graph.get_graph().draw_mermaid_png()))
+        response = graph.invoke(initial_state)
+
+        # get the predicted action
+        action = response["messages"][-1].content
+        
+        # update action history
         self.action_history.append(action)
 
-        return action, {**model_info, "trace_id": self.trace_id}
+        for message in response["messages"]:
+            message.pretty_print()
 
+        return action, {**self.model_info, "trace_id": self.trace_id}
 
 @dataclasses.dataclass
 class DemoAgentArgs(AbstractAgentArgs):
     """
-    This class is meant to store the arguments that define the agent.
+    This class is meant to store the arguments that define the agent. 
 
     By isolating them in a dataclass, this ensures serialization without storing
     internal states of the agent.
@@ -414,5 +403,5 @@ class DemoAgentArgs(AbstractAgentArgs):
             demo_mode=self.demo_mode,
             use_html=self.use_html,
             use_axtree=self.use_axtree,
-            use_screenshot=self.use_screenshot,
+            use_screenshot=self.use_screenshot
         )
