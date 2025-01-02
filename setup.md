@@ -58,14 +58,22 @@ pip install -r ext-requirements.txt
 Configure the necessary environment variables for WorkArena and OpenAI:
 
 ```bash
-# ServiceNow Instance Credentials
-export SNOW_INSTANCE_URL="your-servicenow-instance-url"
-export SNOW_INSTANCE_UNAME="your-servicenow-instance-username"
-export SNOW_INSTANCE_PWD="your-servicenow-instance-password"
+# ServiceNow Instance Credentials # must be started by Nidhir first
+export SNOW_INSTANCE_URL="https://dev282647.service-now.com" 
+export SNOW_INSTANCE_UNAME="admin" 
+export SNOW_INSTANCE_PWD="Aj%0uO^J3Ryb"
 
 # OpenAI API Key
 export OPENAI_API_KEY="your-openai-api-key"
+
+# LangSmith Tracing
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+export LANGCHAIN_API_KEY="your-langsmith-key"
+export LANGCHAIN_PROJECT="WorkArena"
 ```
+
+
 
 ## Listing Experiments
 
