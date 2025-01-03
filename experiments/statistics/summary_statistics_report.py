@@ -58,6 +58,8 @@ import csv
 from datetime import datetime
 from collections import defaultdict
 
+
+
 # Utility function to load summary_info.json
 def load_summary_info(exp_dir: Path) -> Dict:
     summary_path = exp_dir / "summary_info.json"
@@ -83,6 +85,26 @@ def write_section(md, title: str, headers: List[str], rows: List[List[str]]):
     md.write(f"\n## {title}\n")
     write_table(md, headers, rows)
 
+# Function to parse experiment metadata
+def parse_experiment_metadata(exp_dir: Path) -> Dict:
+    experiment_name = exp_dir.name
+    match = re.match(r"(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})_DemoAgentArgs_on_workarena.servicenow.(.*)_(\d+)", experiment_name)
+    if not match:
+        return {}
+
+    start_datetime_str = f"{match.group(1)} {match.group(2).replace('-', ':')}"
+    start_datetime = datetime.strptime(start_datetime_str, "%Y-%m-%d %H:%M:%S")
+    summary_info_path = exp_dir / "summary_info.json"
+    end_datetime = datetime.fromtimestamp(summary_info_path.stat().st_mtime)
+    elapsed_seconds = (end_datetime - start_datetime).total_seconds()
+
+    return {
+        "start_datetime_str": start_datetime_str,
+        "elapsed_seconds": elapsed_seconds,
+        "task_name": match.group(3),
+        "instance": int(match.group(4))
+    }
+
 # Generate summary statistics
 def generate_summary_statistics(exp_dirs: List[Path]) -> Dict[str, Dict]:
     summary = {
@@ -94,39 +116,42 @@ def generate_summary_statistics(exp_dirs: List[Path]) -> Dict[str, Dict]:
         "elapsed_time": {"total": 0, "successful": 0, "failed": 0},
         "error_logs": {"total": 0, "successful": 0, "failed": 0},
         "experiments": {},
-        "tasks": defaultdict(lambda: {"total_runs": 0, "successful_runs": 0, "failed_runs": 0, "steps": 0, "tokens": 0, "elapsed_time": 0, "error_logs": 0})
+        "tasks": defaultdict(lambda: {
+            "total_runs": 0, "successful_runs": 0, "failed_runs": 0,
+            "steps": {"total": 0, "successful": 0, "failed": 0},
+            "tokens": {"total": 0, "successful": 0, "failed": 0},
+            "elapsed_time": {"total": 0, "successful": 0, "failed": 0},
+            "error_logs": {"total": 0, "successful": 0, "failed": 0}
+        })
     }
 
     for idx, exp_dir in enumerate(sorted(exp_dirs, key=lambda d: d.name), start=1):
+        metadata = parse_experiment_metadata(exp_dir)
+        if not metadata:
+            continue
+
         summary_info = load_summary_info(exp_dir)
         if not summary_info:
             continue
 
         experiment_name = exp_dir.name
-        match = re.match(r"(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})_DemoAgentArgs_on_workarena.servicenow.(.*)_(\d+)", experiment_name)
-        if not match:
-            continue
-
-        start_datetime_str = f"{match.group(1)} {match.group(2).replace('-', ':')}"
-        start_datetime = datetime.strptime(start_datetime_str, "%Y-%m-%d %H:%M:%S")
-        summary_info_path = exp_dir / "summary_info.json"
-        end_datetime = datetime.fromtimestamp(summary_info_path.stat().st_mtime)
-        elapsed_seconds = (end_datetime - start_datetime).total_seconds()
-
-        task_name = match.group(3)
-        instance = int(match.group(4))
-
         cum_reward = summary_info.get("cum_reward", 0)
         is_success = cum_reward == 1
+        n_steps = summary_info.get("n_steps", 0)
+        n_tokens = summary_info.get("stats.cum_n_token_pruned_html", 0)
+        has_error = 1 if summary_info.get("err_msg") else 0
+
+        task_name = metadata["task_name"]
+        instance = metadata["instance"]
 
         summary["experiments"][experiment_name] = {
             "index": idx,
-            "date_time": start_datetime_str,
+            "date_time": metadata["start_datetime_str"],
             "task": task_name,
             "instance": instance,
-            "n_steps": summary_info.get("n_steps", 0),
-            "tokens_pruned_html": summary_info.get("stats.cum_n_token_pruned_html", 0),
-            "elapsed_time": elapsed_seconds,
+            "n_steps": n_steps,
+            "tokens_pruned_html": n_tokens,
+            "elapsed_time": metadata["elapsed_seconds"],
             "agent_processing_time": summary_info.get("stats.cum_agent_elapsed", 0),
             "cum_reward": cum_reward,
         }
@@ -136,36 +161,32 @@ def generate_summary_statistics(exp_dirs: List[Path]) -> Dict[str, Dict]:
 
         task_metrics = summary["tasks"][task_name]
 
-        n_steps = summary_info.get("n_steps", 0)
-        n_tokens = summary_info.get("stats.cum_n_token_pruned_html", 0)
-        has_error = 1 if summary_info.get("err_msg") else 0
-
         if is_success:
             summary["successful_runs"] += 1
             task_metrics["successful_runs"] += 1
             summary["steps"]["successful"] += n_steps
             summary["tokens"]["successful"] += n_tokens
-            summary["elapsed_time"]["successful"] += elapsed_seconds
+            summary["elapsed_time"]["successful"] += metadata["elapsed_seconds"]
             summary["error_logs"]["successful"] += has_error
-            task_metrics["steps"] += n_steps
-            task_metrics["tokens"] += n_tokens
-            task_metrics["elapsed_time"] += elapsed_seconds
-            task_metrics["error_logs"] += has_error
+            task_metrics["steps"]["successful"] += n_steps
+            task_metrics["tokens"]["successful"] += n_tokens
+            task_metrics["elapsed_time"]["successful"] += metadata["elapsed_seconds"]
+            task_metrics["error_logs"]["successful"] += has_error
         else:
             summary["failed_runs"] += 1
             task_metrics["failed_runs"] += 1
             summary["steps"]["failed"] += n_steps
             summary["tokens"]["failed"] += n_tokens
-            summary["elapsed_time"]["failed"] += elapsed_seconds
+            summary["elapsed_time"]["failed"] += metadata["elapsed_seconds"]
             summary["error_logs"]["failed"] += has_error
-            task_metrics["steps"] += n_steps
-            task_metrics["tokens"] += n_tokens
-            task_metrics["elapsed_time"] += elapsed_seconds
-            task_metrics["error_logs"] += has_error
+            task_metrics["steps"]["failed"] += n_steps
+            task_metrics["tokens"]["failed"] += n_tokens
+            task_metrics["elapsed_time"]["failed"] += metadata["elapsed_seconds"]
+            task_metrics["error_logs"]["failed"] += has_error
 
         summary["steps"]["total"] += n_steps
         summary["tokens"]["total"] += n_tokens
-        summary["elapsed_time"]["total"] += elapsed_seconds
+        summary["elapsed_time"]["total"] += metadata["elapsed_seconds"]
         summary["error_logs"]["total"] += has_error
 
     return summary
@@ -174,8 +195,8 @@ def generate_summary_statistics(exp_dirs: List[Path]) -> Dict[str, Dict]:
 def save_summary(summary: Dict, results_dir: Path):
     last_experiment_time = max(exp_dir.name for exp_dir in results_dir.iterdir() if re.match(r"\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}", exp_dir.name))
     timestamp = last_experiment_time.replace("_", " ").replace("-", ":", 1).replace("-", ":", 1)
-    markdown_file = results_dir / f"{timestamp} summary report.md"
-    csv_file = results_dir / f"{timestamp} summary report.csv"
+    markdown_file = results_dir / f"{timestamp[:10]} summary report.md"
+    csv_file = results_dir / f"{timestamp[:10]} summary report.csv"
 
     with open(markdown_file, "w") as md:
         md.write("# Experiment Summary Report\n")
@@ -199,14 +220,21 @@ def save_summary(summary: Dict, results_dir: Path):
         ]
         write_section(md, "Overall Summary", ["Metric", "Total", "Successful", "Failed"], overall_rows)
 
+        # Overview table for tasks
+        task_overview_rows = [
+            [task, format_number(stats['total_runs']), format_number(stats['successful_runs']), format_number(stats['failed_runs'])]
+            for task, stats in summary["tasks"].items()
+        ]
+        write_section(md, "Task Overview", ["Task", "Total Runs", "Successful Runs", "Failed Runs"], task_overview_rows)
+
         # Task grouped summary
         for task, stats in summary["tasks"].items():
             task_rows = [
                 ["Runs", format_number(stats['total_runs']), format_number(stats['successful_runs']), format_number(stats['failed_runs'])],
-                ["Steps", format_number(stats['steps']), "-", "-"],
-                ["Tokens", format_number(stats['tokens']), "-", "-"],
-                ["Elapsed Time (s)", format_number(stats['elapsed_time']), "-", "-"],
-                ["Error Logs", format_number(stats['error_logs']), "-", "-"]
+                ["Steps", format_number(stats['steps']['total']), format_number(stats['steps']['successful']), format_number(stats['steps']['failed'])],
+                ["Tokens", format_number(stats['tokens']['total']), format_number(stats['tokens']['successful']), format_number(stats['tokens']['failed'])],
+                ["Elapsed Time (s)", format_number(stats['elapsed_time']['total']), format_number(stats['elapsed_time']['successful']), format_number(stats['elapsed_time']['failed'])],
+                ["Error Logs", format_number(stats['error_logs']['total']), format_number(stats['error_logs']['successful']), format_number(stats['error_logs']['failed'])]
             ]
             write_section(md, f"{task} Task Metrics", ["Metric", "Total", "Successful", "Failed"], task_rows)
 
@@ -223,7 +251,8 @@ def save_summary(summary: Dict, results_dir: Path):
     print(f"Markdown summary saved to {markdown_file}")
     print(f"CSV summary saved to {csv_file}")
 
-if __name__ == "__main__":
+# Main function to run the script
+def main():
     parser = argparse.ArgumentParser(description="Analyze experiment results and generate a summary report.")
     parser.add_argument("results_dir", type=str, nargs="?", default=".", help="Path to the results directory containing experiment subdirectories.")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode logging for more detailed output.")
@@ -244,3 +273,6 @@ if __name__ == "__main__":
 
     summary = generate_summary_statistics(exp_dirs)
     save_summary(summary, results_dir)
+
+if __name__ == "__main__":
+    main()
