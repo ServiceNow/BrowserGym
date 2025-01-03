@@ -2,7 +2,7 @@
 
 # Default values
 MODEL_NAME="gpt-4o-2024-08-06"
-TOTAL_RUNS=25
+TOTAL_RUNS=2
 VISUAL_EFFECTS=true
 USE_HTML=false
 USE_AXTREE=true
@@ -110,6 +110,10 @@ done
 # Generate analysis after all runs are complete
 echo "Generating experiment analysis..."
 uv run --env-file .env experiments/logging/trace_formatter.py --results_dir "$RESULTS_DIR"
+
+# generating summary statistics
+echo "Generating summary statistics..."
+uv run --env-file .env experiments/statistics/summary_statistics_report.py "$RESULTS_DIR"
 
 echo "All experiments and analysis complete!"
 
