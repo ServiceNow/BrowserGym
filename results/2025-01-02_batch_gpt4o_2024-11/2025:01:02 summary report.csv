@@ -1,0 +1,6 @@
+Index;Date & Time;Task;Instance;Steps;Tokens (Pruned HTML);Time Elapsed (s);Agent Time (s);Success;Folder Name
+1;2025-01-02 10:55:04;order-apple-mac-book-pro15;3;21;2,923,797;271.22;61.36;No;2025-01-02_10-55-04_DemoAgentArgs_on_workarena.servicenow.order-apple-mac-book-pro15_3 Apple.com
+2;2025-01-02 11:00:06;order-apple-watch;21;8;842,792;106.25;20.55;No;2025-01-02_11-00-06_DemoAgentArgs_on_workarena.servicenow.order-apple-watch_21 Apple.com
+3;2025-01-02 11:02:23;order-loaner-laptop;5;10;267,993;120.06;19.10;Yes;2025-01-02_11-02-23_DemoAgentArgs_on_workarena.servicenow.order-loaner-laptop_5
+4;2025-01-02 11:04:54;order-sales-laptop;29;15;400,169;146.17;28.72;Yes;2025-01-02_11-04-54_DemoAgentArgs_on_workarena.servicenow.order-sales-laptop_29
+5;2025-01-02 11:07:51;order-sales-laptop;32;39;3,109,202;578.49;108.01;No;2025-01-02_11-07-51_DemoAgentArgs_on_workarena.servicenow.order-sales-laptop_32 BestBuy.com

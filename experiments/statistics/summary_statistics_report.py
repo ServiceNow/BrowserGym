@@ -195,8 +195,8 @@ def generate_summary_statistics(exp_dirs: List[Path]) -> Dict[str, Dict]:
 def save_summary(summary: Dict, results_dir: Path):
     last_experiment_time = max(exp_dir.name for exp_dir in results_dir.iterdir() if re.match(r"\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}", exp_dir.name))
     timestamp = last_experiment_time.replace("_", " ").replace("-", ":", 1).replace("-", ":", 1)
-    markdown_file = results_dir / f"{timestamp[:10]} summary report.md"
-    csv_file = results_dir / f"{timestamp[:10]} summary report.csv"
+    markdown_file = results_dir / f"{timestamp[0:4]}-{timestamp[5:7]}-{timestamp[8:10]} summary statistics.md"
+    csv_file = results_dir / f"{timestamp[0:4]}-{timestamp[5:7]}-{timestamp[8:10]} summary statistics.csv"
 
     with open(markdown_file, "w") as md:
         md.write("# Experiment Summary Report\n")

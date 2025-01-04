@@ -2,7 +2,7 @@
 
 # Default values
 MODEL_NAME="gpt-4o-2024-08-06"
-TOTAL_RUNS=2
+TOTAL_RUNS=100
 VISUAL_EFFECTS=true
 USE_HTML=false
 USE_AXTREE=true

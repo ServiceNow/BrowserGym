@@ -1,0 +1,10 @@
+Index;Date & Time;Task;Instance;Steps;Tokens (Pruned HTML);Time Elapsed (s);Agent Time (s);Success;Folder Name
+1;2025-01-03 17:04:45;order-development-laptop-p-c;18;8;223,247;109.29;20.57;No;2025-01-03_17-04-45_DemoAgentArgs_on_workarena.servicenow.order-development-laptop-p-c_18
+2;2025-01-03 17:07:05;order-apple-mac-book-pro15;7;22;2,829,492;297.11;106.32;No;2025-01-03_17-07-05_DemoAgentArgs_on_workarena.servicenow.order-apple-mac-book-pro15_7
+3;2025-01-03 21:28:39;order-ipad-pro;25;100;14,704,347;1041.00;439.91;No;2025-01-03_21-28-39_DemoAgentArgs_on_workarena.servicenow.order-ipad-pro_25
+4;2025-01-03 21:46:31;order-sales-laptop;29;12;349,701;137.00;36.27;Yes;2025-01-03_21-46-31_DemoAgentArgs_on_workarena.servicenow.order-sales-laptop_29
+5;2025-01-03 21:49:19;order-ipad-pro;16;21;578,140;201.00;56.16;No;2025-01-03_21-49-19_DemoAgentArgs_on_workarena.servicenow.order-ipad-pro_16
+6;2025-01-03 21:53:11;order-apple-watch;11;4;116,996;66.00;10.32;Yes;2025-01-03_21-53-11_DemoAgentArgs_on_workarena.servicenow.order-apple-watch_11
+7;2025-01-03 21:54:48;order-apple-mac-book-pro15;22;51;11,521,217;734.00;412.46;No;2025-01-03_21-54-48_DemoAgentArgs_on_workarena.servicenow.order-apple-mac-book-pro15_22
+8;2025-01-03 22:07:03;order-loaner-laptop;25;4;110,699;68.00;14.23;Yes;2025-01-03_22-07-03_DemoAgentArgs_on_workarena.servicenow.order-loaner-laptop_25
+9;2025-01-03 22:08:42;order-ipad-mini;23;4;124,383;68.00;9.78;Yes;2025-01-03_22-08-42_DemoAgentArgs_on_workarena.servicenow.order-ipad-mini_23
