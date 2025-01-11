@@ -626,31 +626,6 @@ def mouse_upload_file(x: float, y: float, file: str | list[str]):
     file_chooser.set_files(file)
 
 
-def download_file(bid: str, save_path: str):
-    """
-    Click an element to trigger a file download and save it to a specified path.
-
-    Parameters:
-        bid (str): The identifier of the element to click.
-        save_path (str): The full path where the downloaded file should be saved.
-
-    Examples:
-        download_file("572", "/path/to/save/receipt.pdf")
-    """
-    elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-
-    # Listen for the download event
-    with page.expect_download() as download_info:
-        elem.click(timeout=500)  # Click the element to start the download
-
-    download = download_info.value
-    # Save the downloaded file to the specified path
-    download.save_as(save_path)
-
-    print(f"File downloaded and saved at {save_path}")
-
-
 def download_file(bid: str, download_path: str = "downloads/"):
     """
     Initiates a download, updates the user on the progress, and notifies on completion.
