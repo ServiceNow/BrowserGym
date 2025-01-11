@@ -38,6 +38,7 @@ from .functions import (  # check,; uncheck,
     tab_close,
     tab_focus,
     upload_file,
+    download_file,
 )
 from .parsers import action_docstring_parser, highlevel_action_parser
 
@@ -59,6 +60,7 @@ ACTION_SUBSETS = {
         clear,
         drag_and_drop,
         upload_file,
+        download_file,
     ],
     "coord": [
         scroll,
