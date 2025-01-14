@@ -327,7 +327,7 @@ You will now think step by step and produce your next best action. Reflect on yo
                 {"role": "user", "content": user_msgs},
             ],
         )
-        action = extract_code_blocks(response.choices[0].message.content)
+        action = extract_code_blocks(response.choices[0].message.content)[1]
 
         self.action_history.append(action)
 
