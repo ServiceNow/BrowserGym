@@ -260,7 +260,7 @@ def massage_task_within_subprocess(
             outcome_queue.put(outcome)
 
     queue = mp.Queue()
-    process = mp.Process(target=run_massage, args=queue)
+    process = mp.Process(target=run_massage, args=(queue,))
     process.start()
     process.join(timeout=timeout)
 
