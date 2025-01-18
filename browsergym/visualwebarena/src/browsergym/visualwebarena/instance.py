@@ -1,16 +1,24 @@
-import playwright.sync_api
+import logging
 import os
-import requests
+
+import playwright.sync_api
+
+# we inherit some code base from webarena to avoid too much duplication
+from browsergym.webarena.instance import WebArenaInstance
+
+logger = logging.getLogger(__name__)
 
 
 ENV_VARS = ("SHOPPING", "REDDIT", "WIKIPEDIA", "HOMEPAGE", "CLASSIFIEDS", "CLASSIFIEDS_RESET_TOKEN")
 
 
-class VisualWebArenaInstance:
+class VisualWebArenaInstance(WebArenaInstance):
     """
     Utility class to access a WebArena instance.
 
     """
+
+    RESET_URL_VAR = "VWA_FULL_RESET"  # used by full_reset()
 
     def __init__(
         self,
@@ -30,12 +38,12 @@ class VisualWebArenaInstance:
         # import webarena on instantiation
         from visualwebarena.browser_env.env_config import (
             ACCOUNTS,
+            CLASSIFIEDS,
+            CLASSIFIEDS_RESET_TOKEN,
+            HOMEPAGE,
             REDDIT,
             SHOPPING,
             WIKIPEDIA,
-            HOMEPAGE,
-            CLASSIFIEDS,
-            CLASSIFIEDS_RESET_TOKEN,
         )
 
         self.urls = {
@@ -49,32 +57,15 @@ class VisualWebArenaInstance:
 
         self.credentials = ACCOUNTS
 
-    def check_status(self):
-        """
-        Check the status of the instance. Raises an error if the instance is not ready to be used.
-
-        """
-        self._check_is_reachable()
-
-    def _check_is_reachable(self):
-        """
-        Test that every website is reachable.
-
-        """
-        for site, url in self.urls.items():
-            try:
-                requests.get(url, timeout=5000)  # 5 secs
-            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-                raise RuntimeError(
-                    f'VisualWebArena site "{site}" ({url}) is not reacheable. Please check the URL.'
-                )
-
     def ui_login(self, site: str, page: playwright.sync_api.Page):
         """
         Should only be called once per site (expects user to be logged out).
         """
 
         url = self.urls[site]
+
+        # open a new page (tab) to perform the login
+        page = page.context.new_page()
 
         match site:
             case "reddit":
@@ -107,3 +98,6 @@ class VisualWebArenaInstance:
 
             case _:
                 raise ValueError
+
+        # release login page
+        page.close()

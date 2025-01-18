@@ -1,10 +1,12 @@
 # these are placeholders
 # all these symbols will be available in browsergym actions
-import playwright.sync_api
 from typing import Literal
+
+import playwright.sync_api
 
 from .utils import (
     add_demo_mode_effects,
+    call_fun,
     get_elem_by_bid,
     highlight_by_box,
     smooth_move_visual_cursor_to,
@@ -66,17 +68,16 @@ def fill(bid: str, value: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    if demo_mode != "off":
-        elem.clear()
-        delay = max(2000 / len(value), 10)
-        elem.type(value, delay=delay)
-    if retry_with_force:
-        try:
-            elem.fill(value, timeout=500)
-        except Exception as e:
-            elem.fill(value, force=True, timeout=500)
-    else:
-        elem.fill(value, timeout=500)
+
+    def do(force: bool):
+        if demo_mode != "off":
+            delay = max(2000 / len(value), 10)
+            elem.clear(force=force, timeout=500)
+            elem.type(value, delay=delay, timeout=0)  # no timeout
+        else:
+            elem.fill(value, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-check
@@ -89,13 +90,11 @@ def check(bid: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.check(timeout=500)
-        except Exception as e:
-            elem.check(force=True, timeout=500)
-    else:
-        elem.check(timeout=500)
+
+    def do(force: bool):
+        elem.check(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-uncheck
@@ -108,13 +107,11 @@ def uncheck(bid: str):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.uncheck(timeout=500)
-        except Exception as e:
-            elem.uncheck(force=True, timeout=500)
-    else:
-        elem.uncheck(timeout=500)
+
+    def do(force: bool):
+        elem.uncheck(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/docs/input#select-options
@@ -129,20 +126,18 @@ def select_option(bid: str, options: str | list[str]):
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
-    if retry_with_force:
-        try:
-            elem.select_option(options, timeout=500)
-        except Exception as e:
-            elem.select_option(options, force=True, timeout=500)
-    else:
-        elem.select_option(options, timeout=500)
+
+    def do(force: bool):
+        elem.select_option(options, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-click
 def click(
     bid: str,
     button: Literal["left", "middle", "right"] = "left",
-    modifiers: list[Literal["Alt", "Control", "Meta", "Shift"]] = [],
+    modifiers: list[Literal["Alt", "Control", "ControlOrMeta", "Meta", "Shift"]] = [],
 ):
     """
     Click an element.
@@ -154,20 +149,18 @@ def click(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.click(button=button, modifiers=modifiers, timeout=500)
-        except Exception as e:
-            elem.click(button=button, modifiers=modifiers, force=True, timeout=500)
-    else:
-        elem.click(button=button, modifiers=modifiers, timeout=500)
+
+    def do(force: bool):
+        elem.click(button=button, modifiers=modifiers, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-dblclick
 def dblclick(
     bid: str,
     button: Literal["left", "middle", "right"] = "left",
-    modifiers: list[Literal["Alt", "Control", "Meta", "Shift"]] = [],
+    modifiers: list[Literal["Alt", "Control", "ControlOrMeta", "Meta", "Shift"]] = [],
 ):
     """
     Double click an element.
@@ -179,13 +172,11 @@ def dblclick(
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
-    if retry_with_force:
-        try:
-            elem.dblclick(button=button, modifiers=modifiers, timeout=500)
-        except Exception as e:
-            elem.dblclick(button=button, modifiers=modifiers, force=True, timeout=500)
-    else:
-        elem.dblclick(button=button, modifiers=modifiers, timeout=500)
+
+    def do(force: bool):
+        elem.click(button=button, modifiers=modifiers, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/api/class-locator#locator-hover
@@ -197,18 +188,14 @@ def hover(bid: str):
         hover('b8')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
-    if demo_mode != "off":
-        box = elem.bounding_box()
-        if box:
-            center_x, center_y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-            smooth_move_visual_cursor_to(page, center_x, center_y)
-    if retry_with_force:
-        try:
-            elem.hover(timeout=500)
-        except Exception as e:
-            elem.hover(force=True, timeout=500)
-    else:
-        elem.hover(timeout=500)
+    add_demo_mode_effects(
+        page, elem, bid, demo_mode=demo_mode, move_cursor=True, highlight_box=False
+    )
+
+    def do(force: bool):
+        elem.hover(force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
 
 
 # https://playwright.dev/python/docs/input#keys-and-shortcuts
@@ -221,11 +208,12 @@ def press(bid: str, key_comb: str):
     ArrowRight, ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc. You can
     alternatively specify a single character you'd like to produce such as "a"
     or "#". Following modification shortcuts are also supported: Shift, Control,
-    Alt, Meta.
+    Alt, Meta, ShiftLeft, ControlOrMeta. ControlOrMeta resolves to Control on
+    Windows and Linux and to Meta on macOS.
 
     Examples:
         press('88', 'Backspace')
-        press('a26', 'Control+a')
+        press('a26', 'ControlOrMeta+a')
         press('a61', 'Meta+Shift+t')
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
@@ -405,11 +393,12 @@ def keyboard_press(key: str):
     ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc. You can
     alternatively specify a single character you'd like to produce such
     as "a" or "#". Following modification shortcuts are also supported:
-    Shift, Control, Alt, Meta.
+    Shift, Control, Alt, Meta, ShiftLeft, ControlOrMeta. ControlOrMeta
+    resolves to Control on Windows and Linux and to Meta on macOS.
 
     Examples:
         keyboard_press('Backspace')
-        keyboard_press('Control+a')
+        keyboard_press('ControlOrMeta+a')
         keyboard_press('Meta+Shift+t')
         page.keyboard.press("PageDown")
     """
@@ -461,7 +450,7 @@ def keyboard_type(text: str):
     Examples:
         keyboard_type('Hello world!')
     """
-    if demo_mode:
+    if demo_mode != "off":
         delay = max(2000 / len(text), 10)
     else:
         delay = None
@@ -527,7 +516,15 @@ def new_tab():
     # set the new page as the active page
     page = page.context.new_page()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/api/class-page#page-close
@@ -548,7 +545,15 @@ def tab_close():
     else:
         page = context.new_page()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/api/class-page#page-bring-to-front
@@ -561,8 +566,17 @@ def tab_focus(index: int):
     """
     global page  # set the focused page as the active page
     page = page.context.pages[index]
+    page.bring_to_front()
     # trigger the callback that sets this page as active in browsergym
-    page.locate("html").dispatch_event("pageshow")
+    page.evaluate(
+        """\
+const event = new Event('pageshow', {
+    bubbles: true,  // Whether the event bubbles up through the DOM or not
+    cancelable: false  // Whether the event can be canceled
+});
+window.dispatchEvent(event);
+"""
+    )
 
 
 # https://playwright.dev/python/docs/input#upload-files

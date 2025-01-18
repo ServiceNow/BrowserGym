@@ -1,9 +1,11 @@
 TASK_IDS = range(910)
 
 # import visualwebarena
+# import importlib.resources
+# import json
 # all_configs_str = importlib.resources.files(visualwebarena).joinpath("test_raw.json").read_text()
 # all_configs = json.loads(all_configs_str)
-# task_ids_with_reset = [task["task_id"] for task in x if task["require_reset"] == True]
+# task_ids_with_reset = [task["task_id"] for task in all_configs if task["require_reset"] == True]
 TASK_IDS_WITH_RESET = [
     4,
     5,

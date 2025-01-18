@@ -1,22 +1,20 @@
 import ast
-import bs4
-import gymnasium as gym
 import os
 import pathlib
 import platform
-import pytest
 import re
 
+import bs4
+import gymnasium as gym
+import pytest
 from pyparsing.exceptions import ParseException
 
 # register openended gym environments
 import browsergym.core
-
-from browsergym.utils.obs import flatten_dom_to_str
 from browsergym.core.action.highlevel import HighLevelActionSet
-from browsergym.core.action.parsers import highlevel_action_parser, NamedArgument
+from browsergym.core.action.parsers import NamedArgument, highlevel_action_parser
 from browsergym.core.constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
-
+from browsergym.utils.obs import flatten_dom_to_str
 
 _IS_MAC_OS = platform.system() == "Darwin"
 
@@ -407,7 +405,7 @@ click("4", "aa", "bb")
     obs, reward, term, trunc, info = env.step(action)
 
     # error
-    assert obs["last_action_error"] == "Error: modifiers: expected array, got string"
+    assert obs["last_action_error"] == "Error: Locator.click: modifiers: expected array, got string"
 
     # invalid action args (not enough)
     action = f"""\
@@ -1035,300 +1033,53 @@ def test_scroll():
     env.close()
 
 
-# def test_meta_action():
-#     env = BrowserEnv(
-#         task_entrypoint=OpenEndedTask,
-#         task_kwargs={"start_url": TEXT_INPUT_URL},
-#         headless=__HEADLESS__,
-#     )
-#     obs, info = env.reset()
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     fname = soup.find("input", attrs={"id": "fname"})
-#     lname = soup.find("input", attrs={"id": "lname"})
-
-#     # elementary action
-#     action = json.dumps({"action_type": "click", "x": 0, "y": 0})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert not obs["last_action_error"]
-
-#     # list of actions
-#     action = json.dumps(
-#         [{"action_type": "click", "x": 0, "y": 0}, {"action_type": "click", "x": 0, "y": 0}]
-#     )
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert not obs["last_action_error"]
-
-#     # invalid action type
-#     action = json.dumps({"action_type": "clickk", "x": 0, "y": 0})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-#     assert "Invalid" in obs["error_logs"]
-
-#     # missing action type
-#     action = json.dumps({"x": 0, "y": 0})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-#     assert "Missing" in obs["error_logs"]
-
-#     # not JSON
-#     action = action_mapping.to_playwright_code("NOT_JSON"
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-#     assert "JSONDecodeError" in obs["error_logs"]
-
-#     # empty action list
-#     action = json.dumps([])
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-#     assert "Empty" in obs["error_logs"]
-
-
-# def test_input_type_number():
-#     env = BrowserEnv(
-#         task_entrypoint=GuessNumberTask,
-#         headless=__HEADLESS__,
-#     )
-#     obs, info = env.reset()
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     input_elem = soup.find("input", attrs={"type": "number"})
-#     input_bid = input_elem.get(BID_ATTR)
-#     input_value = input_elem.get("value")
-
-#     # type using bid
-#     action = json.dumps(
-#         {
-#             "action_type": "type",
-#             BID_ATTR: input_bid,
-#             "text": "6",
-#         }
-#     )
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     input_elem = soup.find("input", attrs={"type": "number"})
-#     input_bid = input_elem.get(BID_ATTR)
-#     input_value = input_elem.get("value")
-
-#     assert input_value == "6"
-
-#     action = json.dumps(
-#         {
-#             "action_type": "type",
-#             BID_ATTR: input_bid,
-#             "text": "7",
-#         }
-#     )
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     input_elem = soup.find("input", attrs={"type": "number"})
-#     input_bid = input_elem.get(BID_ATTR)
-#     input_value = input_elem.get("value")
-
-#     assert input_value == "7"
-
-
-# def test_auto_complete():
-#     env = BrowserEnv(
-#         task_entrypoint=BookFlightTask,
-#         headless=__HEADLESS__,
-#     )
-#     obs, info = env.reset()
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-
-#     # type using bid
-#     action = json.dumps(
-#         {
-#             "action_type": "type",
-#             BID_ATTR: "20",
-#             "text": "OGG",
-#         }
-#     )
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     # find element with bid="33"
-#     element = soup.find("ul", attrs={BID_ATTR: "33"})
-#     # extre the list li as python list
-#     # list_li = element.find_all("li")
-#     # assert len(list_li) > 0
-#     # assert list_li[0].text == "Kahului, HI - Island of Maui, (OGG)"
-
-
-# def test_clear_success():
-#     env = BrowserEnv(
-#         task_entrypoint=OpenEndedTask,
-#         task_kwargs={"start_url": TEXT_INPUT_URL},
-#         headless=__HEADLESS__,
-#     )
-#     obs, info = env.reset()
-
-#     fname_element = env.driver.find_element(By.CSS_SELECTOR, value="input[id='fname']")
-#     fname_element.send_keys("Christian")
-
-#     # clear using bid
-#     action = json.dumps(
-#         {
-#             "action_type": "clear",
-#             BID_ATTR: fname_element.get_attribute(BID_ATTR),
-#         }
-#     )
-
-#     assert fname_element.get_attribute("value") == "Christian"
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     assert not obs["last_action_error"]
-#     assert fname_element.get_attribute("value") == ""
-
-#     fname_element.send_keys("Christian")
-#     # clear using bid
-#     action = json.dumps({"action_type": "clear", BID_ATTR: fname_element.get_attribute(BID_ATTR)})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     assert not obs["last_action_error"]
-#     assert fname_element.get_attribute("value") == ""
-
-#     fname_element.send_keys("Christian")
-#     # clear using css selector
-#     action = json.dumps({"action_type": "clear", "css_selector": "input[id='fname']"})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     assert not obs["last_action_error"]
-#     assert fname_element.get_attribute("value") == ""
-
-#     fname_element.send_keys("Christian")
-
-#     x, y = re.search(
-#         r"\[" + fname_element.get_attribute(BID_ATTR) + r"\] \(([-+]?[0-9\.]+), ([-+]?[0-9\.]+)\)",
-#         obs["accessibility_tree"],
-#     ).groups()
-
-#     # type at x, y coordinates
-#     action = json.dumps({"action_type": "clear", "x": x, "y": y})
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     assert not obs["last_action_error"]
-#     assert fname_element.get_attribute("value") == ""
-
-#     fname_element.send_keys("Christian")
-
-#     # clear in currently focused element
-#     action = json.dumps({"action_type": "clear"})
-#     obs, reward, terminated, truncated, info = env.step(action)
-#     assert not obs["last_action_error"]
-#     assert fname_element.get_attribute("value") == ""
-
-#     # de-focus (click 0, 0), then type text
-#     action = json.dumps({"action_type": "clear", "x": 0, "y": 0})
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert not obs["last_action_error"]
-
-
-# def test_clear_error():
-#     """In this test, we try to build a ClearAction but we use invalid args, and we check that the action fails when executed in the environment"""
-#     env = BrowserEnv(
-#         task_entrypoint=OpenEndedTask,
-#         task_kwargs={"start_url": TEXT_INPUT_URL},
-#         headless=__HEADLESS__,
-#     )
-#     obs, info = env.reset()
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     fname = soup.find("input", attrs={"id": "fname"})
-#     lname = soup.find("input", attrs={"id": "lname"})
-
-#     ################ 1. invalid args : both css_selector and bid mentionned ################
-#     action = json.dumps(
-#         {
-#             "action_type": "clear",
-#             BID_ATTR: fname.get(BID_ATTR),
-#             "css_selector": "input[id='fname']",
-#         }
-#     )
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     fname = soup.find("input", attrs={"id": "fname"})
-#     lname = soup.find("input", attrs={"id": "lname"})
-
-#     x, y = re.search(
-#         r"\[" + lname.get(BID_ATTR) + r"\] \(([-+]?[0-9\.]+), ([-+]?[0-9\.]+)\)",
-#         obs["accessibility_tree"],
-#     ).groups()
-
-#     ################ 2. invalid args : both bid and position mentionned ################
-
-#     action = json.dumps(
-#         {
-#             "action_type": "clear",
-#             BID_ATTR: lname.get(BID_ATTR),
-#             "x": x,
-#             "y": y,
-#         }
-#     )
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-
-#     soup = bs4.BeautifulSoup(obs["html"], "lxml")
-#     fname = soup.find("input", attrs={"id": "fname"})
-#     lname = soup.find("input", attrs={"id": "lname"})
-
-#     x, y = re.search(
-#         r"\[" + lname.get(BID_ATTR) + r"\] \(([-+]?[0-9\.]+), ([-+]?[0-9\.]+)\)",
-#         obs["accessibility_tree"],
-#     ).groups()
-
-#     ################ 3. invalid args : both css_selector and position mentionned ################
-
-#     action = json.dumps(
-#         {
-#             "action_type": "clear",
-#             "css_selector": "input[id='lname']",
-#             "x": x,
-#             "y": y,
-#         }
-#     )
-
-#     obs, reward, terminated, truncated, info = env.step(action)
-
-#     assert obs["last_action_error"]
-
-
-@pytest.mark.skip(reason="Not implemented yet")
-def test_tab_focus():
-    # TODO
-    pass
-
-
-@pytest.mark.skip(reason="Not implemented yet")
-def test_new_tab():
-    # TODO
-    pass
-
-
-@pytest.mark.skip(reason="Not implemented yet")
-def test_tab_close():
-    # TODO
-    pass
+def test_tab_actions():
+    action_set = HighLevelActionSet(subsets=["tab", "nav"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": CHECKBOX_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+    obs, info = env.reset()
+    assert not obs["last_action_error"]
+    assert len(obs["open_pages_urls"]) == 1
+    assert len(obs["open_pages_titles"]) == 1
+    assert obs["active_page_index"] == 0
+    assert obs["open_pages_urls"][obs["active_page_index"][0]] == obs["url"]
+
+    obs, reward, terminated, truncated, info = env.step("new_tab()")
+    assert not obs["last_action_error"]
+    assert len(obs["open_pages_urls"]) == 2
+    assert len(obs["open_pages_titles"]) == 2
+    assert obs["active_page_index"] == 1
+    assert obs["open_pages_urls"][obs["active_page_index"][0]] == obs["url"]
+
+    obs, reward, terminated, truncated, info = env.step(f"goto({repr(TEXTBOX_URL)})")
+    assert not obs["last_action_error"]
+    assert len(obs["open_pages_urls"]) == 2
+    assert len(obs["open_pages_titles"]) == 2
+    assert obs["active_page_index"] == 1
+    assert obs["open_pages_urls"][obs["active_page_index"][0]] == obs["url"]
+
+    obs, reward, terminated, truncated, info = env.step("tab_focus(0)")
+    assert not obs["last_action_error"]
+    assert len(obs["open_pages_urls"]) == 2
+    assert len(obs["open_pages_titles"]) == 2
+    assert obs["active_page_index"] == 0
+    assert obs["open_pages_urls"][obs["active_page_index"][0]] == obs["url"]
+
+    obs, reward, terminated, truncated, info = env.step("tab_close()")
+    assert not obs["last_action_error"]
+    assert len(obs["open_pages_urls"]) == 1
+    assert len(obs["open_pages_titles"]) == 1
+    assert obs["active_page_index"] == 0
+    assert obs["open_pages_urls"][obs["active_page_index"][0]] == obs["url"]
+
+    env.close()
 
 
 def test_mouse_down_up():

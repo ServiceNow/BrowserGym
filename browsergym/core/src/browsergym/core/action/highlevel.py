@@ -1,94 +1,251 @@
 import inspect
 import random
-
+import typing
 from dataclasses import dataclass
-from typing import Literal, Optional
 
 from . import utils
 from .base import AbstractActionSet
-from .functions import (
-    noop,
-    send_msg_to_user,
-    report_infeasible,
-    fill,
-    # check,
-    # uncheck,
-    select_option,
+from .functions import (  # check,; uncheck,
+    clear,
     click,
     dblclick,
-    hover,
-    press,
-    focus,
-    clear,
     drag_and_drop,
-    upload_file,
-    scroll,
-    mouse_move,
-    mouse_up,
-    mouse_down,
-    mouse_click,
-    mouse_dblclick,
-    mouse_drag_and_drop,
-    mouse_upload_file,
-    keyboard_down,
-    keyboard_up,
-    keyboard_press,
-    keyboard_type,
-    keyboard_insert_text,
-    tab_close,
-    tab_focus,
-    new_tab,
+    fill,
+    focus,
     go_back,
     go_forward,
     goto,
-)
-from .parsers import highlevel_action_parser, action_docstring_parser
-
-
-CHAT_ACTIONS = [send_msg_to_user]
-
-INFEAS_ACTIONS = [report_infeasible]
-
-BID_ACTIONS = [
-    scroll,
-    fill,
-    # These are not really needed and might pollute the action space, doing more harm than good
-    # check,
-    # uncheck,
-    select_option,
-    click,
-    dblclick,
     hover,
-    press,
-    focus,
-    clear,
-    drag_and_drop,
-    upload_file,
-]
-
-COORD_ACTIONS = [
-    scroll,
-    mouse_move,
-    mouse_up,
-    mouse_down,
-    mouse_click,
-    mouse_dblclick,
-    mouse_drag_and_drop,
-    mouse_upload_file,
     keyboard_down,
-    keyboard_up,
+    keyboard_insert_text,
     keyboard_press,
     keyboard_type,
-    keyboard_insert_text,
-]
-
-NAV_ACTIONS = [go_back, go_forward, goto]
-
-TAB_ACTIONS = [
+    keyboard_up,
+    mouse_click,
+    mouse_dblclick,
+    mouse_down,
+    mouse_drag_and_drop,
+    mouse_move,
+    mouse_up,
+    mouse_upload_file,
+    new_tab,
+    noop,
+    press,
+    report_infeasible,
+    scroll,
+    select_option,
+    send_msg_to_user,
     tab_close,
     tab_focus,
-    new_tab,
-]
+    upload_file,
+)
+from .parsers import action_docstring_parser, highlevel_action_parser
+
+ACTION_SUBSETS = {
+    "chat": [send_msg_to_user],
+    "infeas": [report_infeasible],
+    "bid": [
+        scroll,
+        fill,
+        # These are not really needed and might pollute the action space, doing more harm than good
+        # check,
+        # uncheck,
+        select_option,
+        click,
+        dblclick,
+        hover,
+        press,
+        focus,
+        clear,
+        drag_and_drop,
+        upload_file,
+    ],
+    "coord": [
+        scroll,
+        mouse_move,
+        mouse_up,
+        mouse_down,
+        mouse_click,
+        mouse_dblclick,
+        mouse_drag_and_drop,
+        mouse_upload_file,
+        keyboard_down,
+        keyboard_up,
+        keyboard_press,
+        keyboard_type,
+        keyboard_insert_text,
+    ],
+    "nav": [go_back, go_forward, goto],
+    "tab": [
+        tab_close,
+        tab_focus,
+        new_tab,
+    ],
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L122
+    "miniwob_all": [
+        mouse_move,  #     MOVE_COORDS
+        mouse_click,  #    CLICK_COORDS
+        mouse_dblclick,  # DBLCLICK_COORDS
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        click,  #          CLICK_ELEMENT
+        keyboard_press,  # PRESS_KEY
+        keyboard_type,  #  TYPE_TEX (and substitute for TYPE_FIELD()
+        fill,  #           FOCUS_ELEMENT_AND_TYPE_TEXT (and substitute for FOCUS_ELEMENT_AND_TYPE_FIELD)
+    ],
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L142
+    "miniwob_shi17": [
+        mouse_click,  #    CLICK_COORDS
+        mouse_dblclick,  # DBLCLICK_COORDS
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        keyboard_press,  # PRESS_KEY
+    ],
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L160
+    "miniwob_liu18": [
+        click,  # CLICK_ELEMENT
+        fill,  #  substitute for FOCUS_ELEMENT_AND_TYPE_FIELD
+    ],
+    # adapted from MiniWoB repo
+    # https://github.com/Farama-Foundation/miniwob-plusplus/blob/1bab0dffe34e92cc1049fe9443542029bf7e44a9/miniwob/action.py#L173
+    "miniwob_humphreys22": [
+        mouse_move,  #     MOVE_COORDS
+        mouse_click,  #    CLICK_COORDS
+        mouse_dblclick,  # DBLCLICK_COORDS
+        mouse_down,  #     MOUSEDOWN_COORDS
+        mouse_up,  #       MOUSEUP_COORDS
+        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        keyboard_press,  # PRESS_KEY
+        keyboard_type,  #  substitute for TYPE_FIELD
+    ],
+    # from the webarena paper
+    # https://arxiv.org/abs/2307.13854
+    # from the webarena source code
+    # https://github.com/web-arena-x/webarena/blob/e31c190c9b43f63e5724322b847e00249300df40/browser_env/actions.py#L240
+    # from the webarena default prompt
+    # https://github.com/web-arena-x/webarena/blob/e31c190c9b43f63e5724322b847e00249300df40/agent/prompts/raw/p_cot_id_actree_2s.py#L13
+    "webarena": [
+        #                   #     code      |      paper       |      prompt
+        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
+        #                     MOUSE_CLICK   |                  |
+        #                     KEYBOARD_TYPE |                  |
+        #                     MOUSE_HOVER   |                  |
+        click,  #             CLICK         | click(elem)      | click [id]
+        fill,  #              TYPE          | type(elem, text) | type [id] [content]
+        hover,  #             HOVER         | hover(elem)      | hover [id]
+        tab_focus,  #         PAGE_FOCUS    | tab_focus(index) | tab_focus [tab_index]
+        new_tab,  #           NEW_TAB       | new_tab()        | new_tab
+        go_back,  #           GO_BACK       | go_back()        | go_back
+        go_forward,  #        GO_FORWARD    | go_forward()     | go_forward
+        goto,  #              GOTO_URL      | goto(url)        | goto [url]
+        tab_close,  #         PAGE_CLOSE    | tab_close()      | close_tab
+        #                     CHECK         |                  |
+        select_option,  #     SELECT_OPTION |                  |
+        send_msg_to_user,  #  STOP          | stop(answer)     | stop [answer]
+        report_infeasible,  ## explicit unachievable action, equivalent STOP "N/A"
+    ],
+    # from the visualwebarena paper
+    # https://arxiv.org/abs/2401.13649
+    # from the visualwebarena source code
+    # https://github.com/web-arena-x/visualwebarena/blob/15890922c97a8694e366fde2d7de8dbd1ff63fb5/browser_env/actions.py#L311-L343
+    # from the visualwebarena default prompt
+    # https://github.com/web-arena-x/visualwebarena/blob/15890922c97a8694e366fde2d7de8dbd1ff63fb5/agent/prompts/jsons/p_cot_id_actree_3s.json#L2
+    "visualwebarena": [
+        #                   #     code      |      paper       |      prompt
+        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
+        #                     MOUSE_CLICK   |                  |
+        #                     KEYBOARD_TYPE |                  |
+        #                     MOUSE_HOVER   |                  |
+        click,  #             CLICK         | click(elem)      | click [id]
+        fill,  #              TYPE          | type(elem, text) | type [id] [content]
+        hover,  #             HOVER         | hover(elem)      | hover [id]
+        tab_focus,  #         PAGE_FOCUS    | tab_focus(index) | tab_focus [tab_index]
+        new_tab,  #           NEW_TAB       | new_tab()        | new_tab
+        go_back,  #           GO_BACK       | go_back()        | go_back
+        go_forward,  #        GO_FORWARD    | go_forward()     | go_forward
+        goto,  #              GOTO_URL      | goto(url)        | goto [url]
+        tab_close,  #         PAGE_CLOSE    | tab_close()      | close_tab
+        #                     CHECK         |                  |
+        select_option,  #     SELECT_OPTION |                  |
+        send_msg_to_user,  #  STOP          | stop(answer)     | stop [answer]
+        #                     CLEAR         |                  |
+        upload_file,  #       UPLOAD        |                  |
+        report_infeasible,  ## explicit unachievable action, equivalent STOP "N/A"
+    ],
+    # from workarena paper
+    # https://arxiv.org/abs/2403.07718
+    "workarena": [
+        scroll,
+        fill,
+        select_option,
+        click,
+        dblclick,
+        hover,
+        press,
+        focus,
+        clear,
+        drag_and_drop,
+        send_msg_to_user,
+    ],
+    # from workarena++ paper
+    # https://arxiv.org/abs/2407.05291
+    "workarena++": [
+        scroll,
+        fill,
+        select_option,
+        click,
+        dblclick,
+        hover,
+        press,
+        focus,
+        clear,
+        drag_and_drop,
+        tab_focus,
+        new_tab,
+        tab_close,
+        go_back,
+        go_forward,
+        goto,
+        send_msg_to_user,
+        report_infeasible,
+    ],
+    # from weblinx_browsergym
+    # https://github.com/McGill-NLP/agentlab-weblinx-mvp/blob/a91b6d19870c5187d252e70a2e2013511cc6f1d2/weblinx_browsergym/__init__.py#L274-L286
+    "weblinx": [
+        send_msg_to_user,  # say(speaker="assistant", utterance=[str]) -> send_msg_to_user(text=[str])
+        click,  # click(uid=[element id]) -> click(bid=[element id])
+        hover,  # hover(uid=[element id]) -> hover(bid=[element id])
+        fill,  # textinput(uid=[element id], value=[str]) -> fill(bid=[element id], value=[str])
+        # change(uid=[element], value=[str]) -> ❌
+        goto,  # load(url=[link]) -> goto(url=[link])
+        # submit(uid=[element]) -> click(bid=[element id])
+        scroll,  # scroll(x=[int x],y=[int y]) -> scroll(delta_x=[int x], delta_y=[int y])
+        # copy(uid=[element],text=[str]) -> ❌
+        # paste(uid=[element],text=[str]) -> ❌
+        new_tab,  # tabcreate() -> new_tab()
+        tab_close,  # tabremove(target=[tabId]) -> tab_close()
+        tab_focus,  # tabswitch(origin=[origin tabId],target=[target tabId]) -> tab_focus(index=[target tabid])
+    ],
+    # from assistantbench paper
+    # https://arxiv.org/abs/2407.15711
+    "assistantbench": [
+        scroll,  # SCROLL
+        fill,  # TYPE
+        select_option,  # SELECT
+        click,  # CLICK
+        press,  # PRESS ENTER
+        go_back,  # GOBACK
+        goto,  # GOTO, SEARCH
+        send_msg_to_user,  # TERMINATE
+    ],
+}
 
 
 @dataclass
@@ -101,20 +258,40 @@ class HighLevelAction:
 
 class HighLevelActionSet(AbstractActionSet):
 
-    ActionSubset = Literal["chat", "infeas", "bid", "coord", "nav", "tab", "custom"]
+    # static class variables
+    ActionSubset = typing.Literal[
+        "chat",
+        "infeas",
+        "bid",
+        "coord",
+        "nav",
+        "tab",
+        "miniwob_all",
+        "miniwob_shi17",
+        "miniwob_liu18",
+        "miniwob_humphreys22",
+        "webarena",
+        "visualwebarena",
+        "workarena",
+        "workarena++",
+        "weblinx",
+        "assistantbench",
+        "custom",
+    ]
+    DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]
 
     def __init__(
         self,
-        subsets: Optional[ActionSubset | list[ActionSubset]] = [
+        subsets: typing.Optional[ActionSubset | list[ActionSubset]] = [
             "chat",
             "infeas",
             "bid",
             "nav",
             "tab",
         ],
-        custom_actions: Optional[list[callable]] = None,
+        custom_actions: typing.Optional[list[callable]] = None,
         multiaction: bool = True,
-        demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = "off",
+        demo_mode: typing.Optional[DemoMode] = None,
         strict: bool = False,
         retry_with_force: bool = False,
     ):
@@ -134,27 +311,16 @@ class HighLevelActionSet(AbstractActionSet):
         # add actions from specified action sets
         if subsets:
             for subset in subsets:
-                match subset:
-                    case "chat":
-                        allowed_actions.extend(CHAT_ACTIONS)
-                    case "infeas":
-                        allowed_actions.extend(INFEAS_ACTIONS)
-                    case "bid":
-                        allowed_actions.extend(BID_ACTIONS)
-                    case "coord":
-                        allowed_actions.extend(COORD_ACTIONS)
-                    case "nav":
-                        allowed_actions.extend(NAV_ACTIONS)
-                    case "tab":
-                        allowed_actions.extend(TAB_ACTIONS)
-                    case "custom":
-                        if not custom_actions:
-                            raise ValueError(
-                                "'custom' is in 'action_subsets' but 'custom_actions' is empty."
-                            )
-                        allowed_actions.extend(custom_actions)
-                    case _:
-                        raise ValueError(f"Unknown high-level action subspace: {subset}")
+                if subset in ACTION_SUBSETS:
+                    allowed_actions.extend(ACTION_SUBSETS[subset])
+                elif subset == "custom":
+                    if not custom_actions:
+                        raise ValueError(
+                            "'custom' is in 'action_subsets' but 'custom_actions' is empty."
+                        )
+                    allowed_actions.extend(custom_actions)
+                else:
+                    raise ValueError(f"Unknown high-level action subspace: {subset}")
 
         # like set() but preserves order
         # https://stackoverflow.com/questions/1653970/does-python-have-an-ordered-set
@@ -171,10 +337,14 @@ from typing import Literal
 
 
 """
-        # include demo_mode and retry_with_force flags
+        # set demo_mode and retry_with_force flags
         self.python_includes += f"""\
 demo_mode={repr(demo_mode)}
 retry_with_force={repr(retry_with_force)}
+
+if demo_mode is None:
+    demo_mode = "default" if DEMO_MODE else "off"
+
 """
 
         # include utility functions
@@ -343,3 +513,10 @@ Only a single action can be provided at once."""
 
         # return the constructed python code
         return python_code
+
+
+# consistency checks
+assert "custom" not in ACTION_SUBSETS
+assert set(typing.get_args(HighLevelActionSet.ActionSubset)) == set(
+    list(ACTION_SUBSETS.keys()) + ["custom"]
+)

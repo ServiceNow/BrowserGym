@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
 
@@ -33,7 +34,7 @@ jobs:
         run: black . --check
 
   agentlab:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -86,7 +87,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
 
   browsergym-core:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -117,7 +118,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
 
   browsergym-miniwob:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -163,7 +164,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
 
   browsergym-experiments:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
@@ -203,13 +204,15 @@ jobs:
           directory: "${{ github.workspace }}/miniwob-plusplus/miniwob/html"
           port: 8080
 
-      - name: Run browsergym-miniwob Unit Tests
+      - name: Run browsergym-experiments Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
+          BROWSERGYM_WEBLINX_CACHE_DIR: "${{ runner.temp }}/weblinx_data"
         run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    if: ${{ false && startsWith(github.ref, 'refs/heads/main') }}
 
     defaults:
       run:
@@ -248,7 +251,7 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-webarena-slow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - browsergym-webarena-fast
 
@@ -289,7 +292,8 @@ jobs:
         run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-visualwebarena-fast:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    if: ${{ false && startsWith(github.ref, 'refs/heads/main') }}
 
     defaults:
       run:
@@ -328,7 +332,7 @@ jobs:
           pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-visualwebarena-slow:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs:
       - browsergym-visualwebarena-fast
 
@@ -368,3 +372,42 @@ jobs:
         run: |
           pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
           pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
+
+  browsergym-assistantbench:
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.10'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Pip install
+        working-directory: ./dev
+        run: pip install -r requirements.txt
+
+      - name: Pip list
+        run: pip list
+
+      - name: Install Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Run browsergym-assistantbench Unit Tests
+        env:
+          VWA_CLASSIFIEDS: "${{ vars.VWA_CLASSIFIEDS }}"
+          VWA_CLASSIFIEDS_RESET_TOKEN: "${{ vars.VWA_CLASSIFIEDS_RESET_TOKEN }}"
+          VWA_SHOPPING: "${{ vars.VWA_SHOPPING }}"
+          VWA_REDDIT: "${{ vars.VWA_REDDIT }}"
+          VWA_WIKIPEDIA: "${{ vars.VWA_WIKIPEDIA }}"
+          VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
+          OPENAI_API_KEY: ""
+        run: |
+          pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench

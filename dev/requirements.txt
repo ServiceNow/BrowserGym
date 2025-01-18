@@ -10,3 +10,6 @@ tenacity
 -e ../browsergym/webarena # local package
 -e ../browsergym/visualwebarena # local package
 -e ../browsergym/experiments # local package
+-e ../browsergym/assistantbench # local package
+browsergym-workarena
+weblinx_browsergym

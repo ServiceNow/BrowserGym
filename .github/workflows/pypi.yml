@@ -7,7 +7,7 @@ on: [push, workflow_dispatch]
 jobs:
     build:
       name: Build
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
 
       steps:
       - uses: actions/checkout@v4
@@ -32,6 +32,9 @@ jobs:
       - name: Build a binary wheel and a source tarball (browsergym-webarena)
         run: python3 -m build browsergym/visualwebarena/ --outdir dist/
 
+      - name: Build a binary wheel and a source tarball (browsergym-assistantbench)
+        run: python3 -m build browsergym/assistantbench/ --outdir dist/
+
       - name: Build a binary wheel and a source tarball (browsergym-experiments)
         run: python3 -m build browsergym/experiments/ --outdir dist/
 
@@ -49,7 +52,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
       needs:
         - build
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
       environment: pypi
       permissions:
         id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -68,7 +71,7 @@ jobs:
       name: Sign packages with Sigstore and upload them to GitHub Release
       needs:
       - publish-to-pypi
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
 
       permissions:
         contents: write  # IMPORTANT: mandatory for making GitHub Releases
