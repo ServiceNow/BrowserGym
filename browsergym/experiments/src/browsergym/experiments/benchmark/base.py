@@ -137,9 +137,12 @@ class Benchmark(DataClassJsonMixin):
         if not task_list:
             raise ValueError("Task list cannot be empty")
 
+        # Convert task_list to set for more efficient lookups
+        task_set = set(task_list)
+
         # Validate that all requested tasks exist in the original benchmark
         existing_tasks = {env_args.task_name for env_args in self.env_args_list}
-        invalid_tasks = set(task_list) - existing_tasks
+        invalid_tasks = task_set - existing_tasks
         if invalid_tasks:
             raise ValueError(f"The following tasks do not exist in the benchmark: {invalid_tasks}")
 
@@ -154,7 +157,7 @@ class Benchmark(DataClassJsonMixin):
             supports_parallel_seeds=self.supports_parallel_seeds,
             backends=self.backends,
             env_args_list=[
-                env_args for env_args in self.env_args_list if env_args.task_name in task_list
+                env_args for env_args in self.env_args_list if env_args.task_name in task_set
             ],
             task_metadata=self.task_metadata,
         )
