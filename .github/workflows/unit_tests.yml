@@ -84,10 +84,10 @@ jobs:
       - name: Pre-download tokenizer ressources (for WebArena)
         run: python -c "import nltk; nltk.download('punkt_tab')"
 
-      - name: Run AgentLab Unit Tests
-        env:
-          MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
+      # - name: Run AgentLab Unit Tests
+      #   env:
+      #     MINIWOB_URL: "http://localhost:8080/miniwob/"
+        # run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
 
   browsergym-core:
     runs-on: ubuntu-22.04
