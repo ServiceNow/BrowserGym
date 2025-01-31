@@ -10,7 +10,7 @@ You have two options to setup your webarena instance:
  - option 1: follow the official [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)
  - option 2: use our [unofficial setup scripts](https://github.com/gasse/webarena-setup/tree/main/webarena)
 
-We recommend **option 2** as it allows you to easily customize the ports of each webarena domain, and offers a reset functionality that allwos browsergym to trigger a full instance reset remotely.
+We recommend **option 2** as it allows you to easily customize the ports of each webarena domain, and offers a reset functionality that allows browsergym to trigger a full instance reset remotely.
 
 ## Setup
 
