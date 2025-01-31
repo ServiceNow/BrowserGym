@@ -671,4 +671,11 @@ class BrowserEnvEnhanced(BrowserEnv):
                 return true;
             }}
         """
-        self.page.evaluate(self.injection_script, self.replacements)
+        replacements = self.get_new_replacements()
+        self.page.evaluate(self.injection_script, replacements)
+
+    def get_new_replacements(self):
+        return [
+            "test",
+            "test2",
+        ]
