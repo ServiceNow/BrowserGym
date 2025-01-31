@@ -584,3 +584,91 @@ document.addEventListener("visibilitychange", () => {
         }
 
         return obs
+
+
+class BrowserEnvEnhanced(BrowserEnv):
+    def __init__(
+        self,
+        # task-related arguments
+        task_entrypoint: type[AbstractBrowserTask],
+        task_kwargs: dict = {},
+        viewport: Optional[dict] = None,  # will override the task's viewport
+        slow_mo: Optional[int] = None,  # will override the task's slow_mo
+        timeout: Optional[int] = None,  # will override the task's timeout
+        locale: Optional[str] = None,  # will override the task's locale
+        timezone_id: Optional[str] = None,  # will override the task's timezone_id
+        tags_to_mark: Literal["all", "standard_html"] = "standard_html",
+        # interactive / debugging arguments
+        headless: bool = True,
+        wait_for_user_message: bool = False,
+        terminate_on_infeasible: bool = True,
+        resizeable_window: bool = False,
+        record_video_dir: Optional[str] = None,
+        pw_chromium_kwargs: dict = {},
+        pw_context_kwargs: dict = {},
+        # agent-related arguments
+        action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+    ):
+        super().__init__(
+            task_entrypoint=task_entrypoint,
+            task_kwargs=task_kwargs,
+            viewport=viewport,
+            slow_mo=slow_mo,
+            timeout=timeout,
+            locale=locale,
+            timezone_id=timezone_id,
+            tags_to_mark=tags_to_mark,
+            headless=headless,
+            wait_for_user_message=wait_for_user_message,
+            terminate_on_infeasible=terminate_on_infeasible,
+            resizeable_window=resizeable_window,
+            record_video_dir=record_video_dir,
+            pw_chromium_kwargs=pw_chromium_kwargs,
+            pw_context_kwargs=pw_context_kwargs,
+            action_mapping=action_mapping,
+        )
+        self.replacements = [
+            "test",
+            "test2",
+        ]
+
+    def reset(self, seed=None, *args, **kwargs):
+        obs, info = super().reset(seed=seed, *args, **kwargs)
+        self.alter_env()
+        obs = self._get_obs()
+
+        return obs, info
+
+    def step(self, action: str):
+        obs, reward, done, truncated, info = super().step(action)
+        self.alter_env()
+        obs = self._get_obs()
+
+        successful_change = self.successful_change(obs)
+
+        if successful_change:
+            reward = 0
+            done = True
+            if not info:
+                info = {"success": True}
+
+        return obs, reward, done, truncated, info
+
+    def alter_env(self):
+        content_selector = "div[id$='-comment-rtjson-content']"
+        self.injection_script = f"""
+            (replacements) => {{
+                // If flag is already set, do nothing
+
+                // Replace content
+                const elements = document.querySelectorAll("{content_selector}");
+                replacements.forEach((newText, index) => {{
+                    // Only process if we have a corresponding element
+                    if (index < elements.length && newText !== null) {{
+                        elements[index].textContent = newText;
+                    }}
+                }});
+                return true;
+            }}
+        """
+        self.page.evaluate(self.injection_script, self.replacements)

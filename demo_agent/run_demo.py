@@ -2,6 +2,8 @@ import argparse
 
 # locally defined agent
 from agent import DemoAgentArgs
+import sys
+
 
 # browsergym experiments utils
 from browsergym.experiments import EnvArgs, ExpArgs, get_exp_result
@@ -23,7 +25,7 @@ def parse_args():
     parser.add_argument(
         "--model_name",
         type=str,
-        default="gpt-4o-mini",
+        default="gpt-4o",
         help="OpenAI model name.",
     )
     parser.add_argument(
@@ -35,7 +37,7 @@ def parse_args():
     parser.add_argument(
         "--start_url",
         type=str,
-        default="https://www.google.com",
+        default="https://www.reddit.com/r/AdvancedRunning/comments/1ie1ozg/312_marathoner_looking_for_help_in_preparing_for/",
         help="Starting URL (only for the openended task).",
     )
     parser.add_argument(

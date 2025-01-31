@@ -3,7 +3,7 @@ from typing import Type
 
 import gymnasium as gym
 
-from .env import BrowserEnv
+from .env import BrowserEnvEnhanced
 from .task import AbstractBrowserTask
 
 
@@ -67,7 +67,7 @@ def register_task(
 
     gym.register(
         id=f"browsergym/{id}",
-        entry_point=lambda *env_args, **env_kwargs: BrowserEnv(
+        entry_point=lambda *env_args, **env_kwargs: BrowserEnvEnhanced(
             task_entrypoint, *env_args, **env_kwargs
         ),
         nondeterministic=nondeterministic,

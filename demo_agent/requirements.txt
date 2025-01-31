@@ -1,2 +1,3 @@
 browsergym
+-e ../browsergym/core
 openai
