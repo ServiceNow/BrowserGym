@@ -1,5 +1,7 @@
 # these are placeholders
 # all these symbols will be available in browsergym actions
+import os
+import time
 from typing import Literal
 
 import playwright.sync_api
@@ -622,3 +624,41 @@ def mouse_upload_file(x: float, y: float, file: str | list[str]):
 
     file_chooser = fc_info.value
     file_chooser.set_files(file)
+
+
+def download_file(bid: str, download_path: str = "downloads/"):
+    """
+    Initiates a download, updates the user on the progress, and notifies on completion.
+
+    Args:
+        bid (str): The ID of the element to click to initiate the download.
+        download_path (str): The directory where the downloaded file will be saved.
+    """
+    # Ensure the download directory exists
+    if not os.path.exists(download_path):
+        os.makedirs(download_path)
+
+    # Initiate the download process
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=True)
+
+    print("Starting download...")
+
+    with page.expect_download() as download_info:
+        elem.click(timeout=500)
+
+    download = download_info.value
+    file_path = os.path.join(download_path, download.suggested_filename)
+
+    # Monitor the download progress
+    start_time = time.time()
+    while not download.is_done():
+        time.sleep(1)
+        elapsed_time = time.time() - start_time
+        print(f"Downloading... Elapsed time: {int(elapsed_time)} seconds")
+
+    # Save the file to the specified path
+    download.save_as(file_path)
+
+    # Notify the user about download completion
+    print(f"Download completed: {file_path}")
