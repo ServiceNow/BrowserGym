@@ -622,3 +622,16 @@ def mouse_upload_file(x: float, y: float, file: str | list[str]):
 
     file_chooser = fc_info.value
     file_chooser.set_files(file)
+
+def get_element_html(bid: str):
+    """
+    Returns the HTML of an element identified by its bid.
+
+    Examples:
+        get_element_html('123')
+    """
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    if elem:
+        send_msg_to_user("HTML:\n" + elem.inner_html())
+    else:
+        send_msg_to_user("The element with bid " + bid + " does not exist")
