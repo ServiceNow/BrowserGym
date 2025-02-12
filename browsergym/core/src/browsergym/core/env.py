@@ -384,6 +384,11 @@ document.addEventListener("visibilitychange", () => {
                 raise ValueError(f"Forbidden value: {text} is not a string")
             self.chat.add_message(role="assistant", msg=text)
 
+        def add_observation(obs: dict):
+            if not isinstance(obs, dict):
+                raise ValueError(f"Forbidden value: {obj} is not a dict")
+            self.obs = obs
+
         def report_infeasible_instructions(reason: str):
             if not isinstance(reason, str):
                 raise ValueError(f"Forbidden value: {reason} is not a string")
@@ -401,6 +406,7 @@ document.addEventListener("visibilitychange", () => {
                 code,
                 self.page,
                 send_message_to_user=send_message_to_user,
+                add_observation=add_observation,
                 report_infeasible_instructions=report_infeasible_instructions,
             )
             self.last_action_error = ""
