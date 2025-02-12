@@ -76,6 +76,7 @@ class BrowserEnv(gym.Env, ABC):
         pw_context_kwargs: dict = {},
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+        obs: dict = None,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -397,6 +398,7 @@ document.addEventListener("visibilitychange", () => {
 
         # try to execute the action
         logger.debug(f"Executing action")
+        self.obs = None
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -444,8 +446,11 @@ document.addEventListener("visibilitychange", () => {
         if user_message:
             self.chat.add_message(role="user", msg=user_message)
 
-        # extract observation (generic)
-        obs = self._get_obs()
+        if self.obs:
+            obs = self.obs
+        else:
+            # extract observation (generic)
+            obs = self._get_obs()
         logger.debug(f"Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
