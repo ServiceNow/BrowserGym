@@ -38,6 +38,7 @@ def execute_python_code(
     code: str,
     page: playwright.sync_api.Page,
     send_message_to_user: callable,
+    add_observation: callable,
     report_infeasible_instructions: callable,
 ):
     """
@@ -56,6 +57,7 @@ def execute_python_code(
     globals = {
         "page": page,
         "send_message_to_user": send_message_to_user,
+        "add_observation": add_observation,
         "report_infeasible_instructions": report_infeasible_instructions,
         "DEMO_MODE": get_global_demo_mode(),
     }
