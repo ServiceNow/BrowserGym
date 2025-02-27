@@ -237,15 +237,15 @@ class BrowserEnv(gym.Env, ABC):
         browser_args = []
         if self.resizeable_window:
             browser_args.append(f"--window-size={viewport['width']},{viewport['height']}")
-        browser_args.extend(self.pw_chromium_kwargs.get('args', []))
+        browser_args.extend(self.pw_chromium_kwargs.get("args", []))
         pw_chromium_kwargs = dict()
         pw_chromium_kwargs.update(self.pw_chromium_kwargs)
-        if 'args' in pw_chromium_kwargs:
-            pw_chromium_kwargs.pop('args')
+        if "args" in pw_chromium_kwargs:
+            pw_chromium_kwargs.pop("args")
 
         # create a new browser
-        if 'user_data_dir' in pw_chromium_kwargs:
-            user_data_dir = pw_chromium_kwargs.pop('user_data_dir')
+        if "user_data_dir" in pw_chromium_kwargs:
+            user_data_dir = pw_chromium_kwargs.pop("user_data_dir")
             self.context = pw.chromium.launch_persistent_context(
                 user_data_dir,
                 headless=self.headless,
