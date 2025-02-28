@@ -1,0 +1,2 @@
+browsergym-core==0.13.3
+python-dotenv==1.0.1
