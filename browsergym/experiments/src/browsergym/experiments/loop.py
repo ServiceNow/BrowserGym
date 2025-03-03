@@ -463,7 +463,7 @@ class ExpArgs:
                     e = KeyboardInterrupt("Early termination??")
                     err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
                 logger.info(f"Saving summary info.")
-                self._save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
+                self.save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
@@ -509,8 +509,8 @@ class ExpArgs:
         root_logger = logging.getLogger()
         root_logger.removeHandler(self.logging_file_handler)
 
-    @staticmethod
-    def _save_summary_info(
+    def save_summary_info(
+        self,
         episode_info: list[StepInfo],
         exp_dir,
         err_msg,
