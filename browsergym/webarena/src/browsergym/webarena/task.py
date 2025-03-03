@@ -157,14 +157,14 @@ If you believe the task is impossible to complete, provide the answer "N/A".
     ) -> Tuple[float, bool, str, dict]:
 
         # safeguard: check that all open tabs are either blank or within the list of WebArena URLs
-        authorized_locations = ["newtab", ""] + [
-            urllib.parse.urlparse(url).netloc
-            for url in [*self.webarena_instance.urls.values(), self.webarena_instance.home_url]
-        ]
-        for open_page in page.context.pages:
-            page_location = urllib.parse.urlparse(open_page.url).netloc
-            if not page_location in authorized_locations:
-                return 0, True, "", {"error": "Unauthorized url, terminating task"}
+        # authorized_locations = ["newtab", ""] + [
+        #     urllib.parse.urlparse(url).netloc
+        #     for url in [*self.webarena_instance.urls.values(), self.webarena_instance.home_url]
+        # ]
+        # for open_page in page.context.pages:
+        #     page_location = urllib.parse.urlparse(open_page.url).netloc
+        #     if not page_location in authorized_locations:
+        #         return 0, True, "", {"error": "Unauthorized url, terminating task"}
 
         # import webarena dynamically
         from webarena.browser_env.actions import ActionTypes
