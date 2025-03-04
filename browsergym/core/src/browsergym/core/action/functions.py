@@ -14,6 +14,7 @@ from .utils import (
 
 page: playwright.sync_api.Page = None
 send_message_to_user: callable = None
+add_observation: callable = None
 report_infeasible_instructions: callable = None
 demo_mode: Literal["off", "default", "all_blue", "only_visible_elements"] = None
 retry_with_force: bool = False
@@ -33,6 +34,8 @@ def send_msg_to_user(text: str):
     """
     send_message_to_user(text)
 
+def add_observation(obs: dict):
+    pass
 
 def report_infeasible(reason: str):
     """
@@ -622,3 +625,26 @@ def mouse_upload_file(x: float, y: float, file: str | list[str]):
 
     file_chooser = fc_info.value
     file_chooser.set_files(file)
+
+def get_element_html(bid: str):
+    """
+    Returns the HTML of an element identified by its bid.
+
+    Examples:
+        get_element_html('123')
+    """
+    elem = get_elem_by_bid(page, bid, demo_mode != "off")
+    if elem:
+        outer_html_content = elem.evaluate('elem => elem.outerHTML')
+        #send_msg_to_user(f"The HTML of the element with bid {bid} is:\n--- START ---\n" + outer_html_content + "\n--- END ---\n")
+        add_observation({
+            "type": "generic",
+            "html": outer_html_content,
+            "bid": bid,
+        })
+    else:
+        #send_msg_to_user("The element with bid " + bid + " does not exist")
+        add_observation({
+            "type": "generic",
+            "error": f"The element with bid {bid} doesn't exist"
+        })
