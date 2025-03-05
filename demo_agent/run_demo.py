@@ -1,4 +1,5 @@
 import argparse
+import gymnasium as gym
 
 # locally defined agent
 from agent import DemoAgentArgs
@@ -29,13 +30,13 @@ def parse_args():
     parser.add_argument(
         "--task_name",
         type=str,
-        default="openended",
+        default="browsergym/webcanvas.mind2web-live.1",
         help="Name of the Browsergym task to run. If 'openended', you need to specify a 'start_url'",
     )
     parser.add_argument(
         "--start_url",
         type=str,
-        default="https://www.google.com",
+        default="https://www.google.com/",
         help="Starting URL (only for the openended task).",
     )
     parser.add_argument(
@@ -102,6 +103,8 @@ https://github.com/ServiceNow/AgentLab"""
         env_args.wait_for_user_message = True
         env_args.task_kwargs = {"start_url": args.start_url}
 
+    print(args.task_name)
+
     # setting up the experiment
     exp_args = ExpArgs(
         env_args=env_args,
@@ -115,7 +118,6 @@ https://github.com/ServiceNow/AgentLab"""
     # loading and printing results
     exp_result = get_exp_result(exp_args.exp_dir)
     exp_record = exp_result.get_exp_record()
-
     for key, val in exp_record.items():
         print(f"{key}: {val}")
 
