@@ -30,9 +30,9 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         all_configs_str = (
             importlib.resources.files(subtaskbench).joinpath(task_config_path).read_text()
         )
-        # all avail ports
-        # orbot-web-replay - 3000
-        # localhost:3000
+        # TODO: rotate between all available ports
+
+        
         all_configs = json.loads(all_configs_str)
         self.task_config = all_configs[task_id]
 
