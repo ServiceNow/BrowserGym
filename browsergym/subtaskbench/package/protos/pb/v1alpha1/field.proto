@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message TextField {
+    Type type = 1;
+
+    enum Type {
+        TYPE_UNSPECIFIED = 0;
+        // corresponds to <input type="text">
+        TEXT = 1;
+        // corresponds to <input type="number">
+        NUMBER = 2;
+        // corresponds to <input type="date"> or equivalent elements
+        DATE = 3;
+        // the field contains a monetary value, which may include currency information.
+        MONEY = 4;
+    }
+}
+
+message BoolField {
+}
+
+message SelectField {
+    repeated Option options = 1;
+    message Option {
+        string name = 1;
+        string value = 2;
+    }
+
+    // whether the field accepts multiple values
+    bool multi = 2;
+}
+
+// Similar to google.cloud.documentai.v1.Document.Entity.NormalizedValue. However,
+// we'd like to move away from DocumentAI protos in general to have more flexibility.
+message NormalizedValue {
+    // Represents a whole or partial calendar date, such as a birthday. The time of
+    // day and time zone are either specified elsewhere or are insignificant. The
+    // date is relative to the Gregorian Calendar. This can represent one of the
+    // following:
+    //
+    // * A full date, with non-zero year, month, and day values
+    // * A month and day value, with a zero year, such as an anniversary
+    // * A year on its own, with zero month and day values
+    // * A year and month value, with a zero day, such as a credit card expiration
+    //   date
+    //
+    // NOTE: this is copied from google.type.Date
+    message Date {
+        // Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+        // a year.
+        int32 year = 1;
+
+        // Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+        // month and day.
+        int32 month = 2;
+
+        // Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+        // to specify a year by itself or a year and month where the day isn't
+        // significant.
+        int32 day = 3;
+    }
+
+    // Represents an amount of money with its currency type.
+    // NOTE: this is copied from google.type.Money
+    message Money {
+        // The three-letter currency code defined in ISO 4217.
+        string currency_code = 1;
+
+        // The whole units of the amount.
+        // For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+        int64 units = 2;
+
+        // Number of nano (10^-9) units of the amount.
+        // The value must be between -999,999,999 and +999,999,999 inclusive.
+        // If `units` is positive, `nanos` must be positive or zero.
+        // If `units` is zero, `nanos` can be positive, zero, or negative.
+        // If `units` is negative, `nanos` must be negative or zero.
+        // For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
+        int32 nanos = 3;
+    }
+
+    oneof structured_value {
+        Date date_value = 2;
+        Money money_value = 3;
+    }
+
+    // Optional. An optional field to store a normalized string.
+    // For some entity types, one of respective `structured_value` fields may
+    // also be populated. Also not all the types of `structured_value` will be
+    // normalized. For example, some processors may not generate float
+    // or int normalized text by default.
+    //
+    // Below are sample formats mapped to structured values.
+    // - Money/Currency type (`money_value`) is in the ISO 4217 text format.
+    // - Date type (`date_value`) is in the ISO 8601 text format.
+    // - Datetime type (`datetime_value`) is in the ISO 8601 text format.
+    string text = 1;
+}
+
+// Defines a form field, which can include both the field schema and value.
+// For fields with multiple values, each of them corresponds to a separate FormField.
+message Field {
+    string name = 1;
+
+    // Leave it empty if `unique_id` is not relevant to your use case.
+    string unique_id = 9;
+
+    oneof type {
+        // for text field, we'd try to normalize the extracted value if type is specified
+        TextField text = 2;
+        BoolField bool = 3;
+        SelectField select = 4;
+    }
+
+    Value value = 5;
+    message Value {
+        oneof kind {
+            string text = 1;
+            // if the field type is enum, the value is set to the option value.
+            string option_value = 2;
+        }
+    }
+
+    // Parsed and normalized entity value.
+    NormalizedValue normalized_value = 6;
+
+    // Optional. Confidence of field value.
+    float confidence = 7;
+
+    // Optional. Allows defining nested fields.
+    repeated Field children = 8;
+}
+
+// FieldGroup represents structured data in a key-value representation.
+// It can be from either a HTML form, or a single row from a data table.
+// For the rows in a table, we can represent row values using keys from header
+// rows (and use integer column index if header row is not present).
+message FieldGroup {
+    repeated Field fields = 1;
+}

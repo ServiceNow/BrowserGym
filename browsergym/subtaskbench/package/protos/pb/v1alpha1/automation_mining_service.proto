@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Orby Web API - Automation Mining Service";
+    version: "v1alpha1";
+  };
+};
+
+service AutomationMining {
+  rpc GenerateActivityGraph (GenerateActivityGraphRequest) 
+  returns (GenerateActivityGraphResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/automation_mining/generate_activity_graph"
+      body: "*"
+    };
+  }
+}
+
+message GenerateActivityGraphRequest {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end = 2;
+}
+
+message GenerateActivityGraphResponse {
+  bytes activity_graph = 1;
+  // An IANA published MIME type (also referred to as media type). For more
+  // information, see
+  // https://www.iana.org/assignments/media-types/media-types.xhtml.
+  string mime_type = 2;
+  // DOT: https://graphviz.org/doc/info/lang.html
+  string dot_source = 3;
+}

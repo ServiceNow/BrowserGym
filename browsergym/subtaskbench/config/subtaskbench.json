@@ -1,0 +1,50 @@
+[
+    {
+        "task_id": 0,
+        "env": {
+            "warc_file_path": "./data/svelte_gantt.wacz",
+            "start_url": "https://docs.svar.dev/svelte/gantt/samples/"
+        },
+        "goal": "Create a new task in the gantt chart.",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[data-testid=\"DueDate\"]').textContent.endsWith('21')"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": 1,
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/"
+        },
+        "goal": "Select ",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[data-testid=\"DueDate\"]').textContent.endsWith('21')"
+                }
+            ]
+        }
+    },    
+    {
+        "task_id": 2,
+        "env": {
+            "warc_file_path": "./data/alaska_flight_booking.wacz",
+            "start_url": "https://www.alaskaair.com/search/?A=1&C=0&L=0&O=JFK&D=SFO&OD=2025-02-18&DD=2025-02-18&RT=true&errorRedirect=true"
+        },
+        "goal": "Select March 12 2026 as the departing date and April 4 2026 as the returning date",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[data-testid=\"DueDate\"]').textContent.endsWith('21')"
+                }
+            ]
+        }
+    }
+]

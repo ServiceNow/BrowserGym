@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "pb/v1alpha1/suggestion.proto";
+import "pb/v1alpha1/task.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "grpc/gateway/protoc_gen_openapiv2/options/annotations.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Orby Web API - Suggestions Service";
+    version: "v1alpha1";
+  };
+};
+
+service Suggestions {
+  // Lists open suggestions ordered by descending confidence. If valid_page token is provided, it
+  // returns either suggestions whose confidence score is equal or small than the last suggestion
+  // returned in previous request, or new suggetions whose confidence score is higher than last
+  // suggestion and generated after previous request. 
+  rpc ListSuggestions(ListSuggestionsRequest) returns (ListSuggestionsResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/users/{parent}/suggestions"
+    };
+  }
+
+  // Support updating steps, status, complete_time, ready_time, create_time, tags
+  rpc UpdateSuggestion(UpdateSuggestionRequest) returns (UpdateSuggestionResponse) {
+    option (google.api.http) = {
+        patch: "/v1alpha1/{suggestion.name=users/*/suggestions/*}"
+        body: "suggestion"
+    };
+  }
+
+  rpc BatchUpdateSuggestions(BatchUpdateSuggestionsRequest) returns (BatchUpdateSuggestionsResponse) {
+    option (google.api.http) = {
+        post: "/v1alpha1/users/{parent}/suggestions:batchUpdate"
+        body: "*"
+    };
+  }
+
+  // Generates statistical summaries for completed suggestions.
+  rpc SummarizeSuggestions (SummarizeSuggestionsRequest) returns (SummarizeSuggestionsResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/{parent=users/*}/suggestions:summarize"
+    };
+  }
+
+  // Suggesstion details for a perticular suggestion
+  rpc GetSuggestion(GetSuggestionRequest) returns (Suggestion) {
+    option (google.api.http) = {
+        get: "/v1alpha1/{name=users/*/suggestions/*}"
+    };
+  }
+
+  // Retrieve next steps for a preliminary suggestion, for example when finishing processing a
+  // preliminary execution suggestion step. 
+  //
+  // The request contains a suggestion which often includes client side updates caused by
+  // preliminary execution steps, e.g. email attachment content. Therefore the provided suggestion
+  // is used to update its server version first, calculate its next steps and return next steps.
+  //
+  // The response is the updated suggestion with its resource name and new steps only. Client side
+  // should merge these new steps into the client side suggestion copy, or call GetSuggestion()
+  // instead if client side copy is missing.
+  //
+  // There are two special response cases:
+  // 1. If an END STEP {"display_name": "End", "activity": "Activity_END" } is returned in the end of
+  // the new step list, it means server won't generate new steps for this suggestion.
+  // 2. If we are returning an error, it means the suggestion stays at its current step, either 
+  // because an END STEP is defined or its latest step is still incomplete.
+  rpc GetSuggestionNextSteps(GetSuggestionNextStepsRequest) returns (GetSuggestionNextStepsResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{suggestion.name=users/*/suggestions/*}:getNextSteps"
+      body: "suggestion"
+    };
+  }
+ }
+
+message ListSuggestionsRequest {
+  // Username, which is user's email.
+  string parent = 1;
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by descending confidence score.
+  int32 page_size = 2;
+  // Use this to continue the previous list requests.
+  // Its value should be same with previous response's next_page_token.
+  // Please reuse the same filter, while page_size can be different.
+  string page_token = 3;
+  // Supported filters: "confidence>=", "status=", "create_time=",
+  // "ready_time=", "complete_time=".
+  //
+  // Valid values for confidence filter are within (0, 1]: "confidence>=0.2"
+  //
+  // Valid values for status filter are: created, ready, accepted,
+  // rejected_incorrect, rejected_already_completed, status_unspecified. Set
+  // multiple status values with a dash (-) separator: "status=created",
+  // "status=accepted-rejected_incorrect" 
+  //
+  // Valid values for all time filters are %d[dwm]: "create_time=2m" means
+  // createtime within past two months.
+  // 
+  // Use comma to combine multiple filters: "confidence>0.4,status=created". 
+  string filter = 4;
+  // Use this to send only relevant data in response
+  // - If Field Mask is not send or is sent with empty paths then the result will contain
+  //    the complete object
+  // - Valid values for field mask are: task_name, confidence, status, create_time, complete_time,
+  //    time_saved, tags, task_resource_name, steps, performance, ready_time
+  // - Field mask will always contain `name` field. Please donot send it in Paths to avoid errors.
+  google.protobuf.FieldMask field_mask = 5;
+}
+
+message ListSuggestionsResponse {
+  // Ordered by descending confidence score.
+  repeated Suggestion suggestions = 1;
+  // If the value is "", it means no further results for the request.
+  string next_page_token = 2;
+  // Total available suggestion size.
+  // Note it is NOT the remaining available suggestion size after the current response.
+  int32 total_size = 3;
+}
+
+message UpdateSuggestionRequest {
+  Suggestion suggestion = 1;
+  // Support steps, status, complete_time, ready_time, create_time, and tags;
+  // for example "status,tags" means only the status and tags fields will be
+  // updated to the input value.
+  //   - Although tags is a repeated field, it will be overriden by the input
+  //     instead of combined.
+  //   - If status is changed to CREATED/ACCEPTED/READY but the corresponding
+  //     time is not provided, will update the corresponding time with current
+  //     time.
+  // If field_mask is empty, all updatble fields will be updated in the request
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+message UpdateSuggestionResponse {
+  // The updated suggestions.
+  Suggestion suggestion = 1;
+}
+
+message BatchUpdateSuggestionsRequest {
+  // Username, which is user's email.
+  string parent = 1;
+
+  // Can only update suggestion status, completeTime, and tags now.
+  // Below default field_mask  is used if field_mask is not set inside individual request
+  // A maximum of 100 suggestions can be modified in a batch.
+  repeated UpdateSuggestionRequest requests = 2;
+
+  // Default field mask for all suggestions. Can be overriden by individual request.
+  google.protobuf.FieldMask field_mask = 3;
+}
+
+message BatchUpdateSuggestionsResponse {
+  // Suggestions updated.
+  repeated Suggestion suggestions = 1;
+  // Suggestions failed to be updated
+  repeated MissedSuggestion missed_suggestions = 2;
+}
+
+message MissedSuggestion {
+  Suggestion suggestion = 1;
+  string error_msg = 2;
+}
+
+message SummarizeSuggestionsRequest {
+  // Parent resource ID, format: users/{username}.
+  string parent = 1;
+  // Supports time filter now: format regex is \d+[dwm], which means XX
+  // days/weeks/months. For example, "2w" means past two weeks.
+  // Default value is two weeks if this field is not provided.
+  string filter = 2;
+  // if no time zone provided in the request then we will consider 
+  // the PST time zone, America/Los_Angeles
+  string location = 3;
+}
+
+message SummarizeSuggestionsResponse{
+  // Accumulated number of effective tasks in chronological order.
+  // If day1 has completed 5 suggestions from 2 tasks (A, B), and day2
+  // completed 10 suggestions from 3 tasks (A, C, D) including 2 new tasks C &
+  // D, the value will be [2,4].
+  repeated int32 accumulated_effective_task_sizes = 1;
+  // Accumulated number of hours saved in chronological order.
+  // If day1 saves 5.6 hours and day2 saves 3.8 hours, the value will be
+  // [5.6, 9.4].
+  repeated float accumulated_time_saved_hours = 2;
+  // Effective tasks ordered by most recent accuracy.
+  repeated Task effective_tasks = 3;
+
+  // Accumulated number of suggestion in chronological order.
+  // If day1 has completed 5 suggestions  and day2
+  // completed 10 suggestions , the value will be [5,10].
+  repeated int32 accumulated_count_of_suggestions = 4;
+}
+
+message GetSuggestionRequest {
+  // Name of the Suggestion
+  string name = 1;
+  // Use this to send only relevant data in response
+  // - If Field Mask is not send or is sent with empty paths then the result will contain
+  //    the complete object
+  // - Valid values for field mask are: task_name, confidence, status, create_time, complete_time,
+  //    time_saved, tags, task_resource_name, steps, performance, ready_time
+  // - Field mask will always contain `name` field. Please donot send it in Paths to avoid errors.
+  google.protobuf.FieldMask field_mask = 5;
+}
+
+message GetSuggestionNextStepsRequest {
+  Suggestion suggestion = 1;
+}
+
+message GetSuggestionNextStepsResponse {
+  Suggestion suggestion = 1;
+}

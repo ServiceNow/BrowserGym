@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message DataRetentionPolicy {
+  bool enabled = 1;
+  // how many days we keep PII data of executions in our system.
+  // after this period, PII data of executions which are in a final state
+  // (completed/rejected/failed) will be deleted and won't be restorable.
+  // special value 0 means keep data forever.
+  int32 retention_days = 2 [(buf.validate.field).int32.gte = 0];
+}

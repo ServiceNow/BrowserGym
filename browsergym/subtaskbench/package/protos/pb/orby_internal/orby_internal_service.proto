@@ -1,0 +1,361 @@
+syntax = "proto3";
+
+package pb.orby_internal;
+
+import "buf/validate/validate.proto";
+import "common/announcement.proto";
+import "common/hyperparameter.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "pb/v1alpha1/organization.proto";
+import "pb/v1alpha1/organization_service.proto";
+import "pb/v1alpha2/workflows_service.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/internal_app";
+
+service OrbyInternalService {
+  rpc ListOrganizations (ListOrganizationsRequest) 
+    returns (ListOrganizationsResponse) {}
+  rpc ListHyperparameters (ListHyperparametersRequest) 
+    returns (ListHyperparametersResponse) {}
+  rpc ListWorkflowsForOrganization (ListWorkflowsForOrganizationRequest) 
+    returns (ListWorkflowsForOrganizationResponse) {}
+  rpc GenerateBillingReport (GenerateBillingReportRequest) 
+    returns (GenerateBillingReportResponse) {}
+  rpc GetPredictionAnalysis (GetPredictionAnalysisRequest) 
+    returns (GetPredictionAnalysisResponse) {}
+  rpc CreateHyperparameter (CreateHyperparameterRequest) 
+    returns (CreateHyperparameterResponse) {}
+  rpc UpdateHyperparameter (UpdateHyperparameterRequest) 
+    returns (UpdateHyperparameterResponse) {}
+  // Creates a user with a role of ROLE_INTERNAL_USER in ory
+  rpc CreateUser (CreateUserRequest) 
+    returns (CreateUserResponse) {}
+  // Updates an exisitng user role in ory
+  rpc UpdateUser (UpdateUserRequest)
+    returns (UpdateUserResponse) {}
+  // List all users that have emails ending with `@orby.ai`
+  rpc ListUsers (ListUsersRequest) 
+    returns (ListUsersResponse) {}
+  rpc GetUserPermissions (GetUserPermissionsRequest)
+    returns (GetUserPermissionsResponse) {}
+  rpc UpdateWorkflowInInternalApp (v1alpha2.UpdateWorkflowRequest)
+    returns (v1alpha2.Workflow) {}
+  rpc UpdateOrganizationInInternalApp (v1alpha1.UpdateOrganizationRequest)
+    returns (v1alpha1.Organization) {}
+  rpc GetHyperparameter (GetHyperparameterRequest)
+    returns (GetHyperparameterResponse) {}
+
+  // announcement management
+  rpc ListAnnouncements (ListAnnouncementsRequest)
+    returns (ListAnnouncementsResponse) {}
+  rpc GetAnnouncement (GetAnnouncementRequest)
+      returns (GetAnnouncementResponse) {}
+  rpc CreateAnnouncement (CreateAnnouncementRequest)
+    returns (CreateAnnouncementResponse) {}
+  rpc UpdateAnnouncement (UpdateAnnouncementRequest)
+    returns (UpdateAnnouncementResponse) {}
+  rpc DeleteAnnouncement (DeleteAnnouncementRequest)
+    returns (google.protobuf.Empty) {}
+  rpc UploadAnnouncementImage (UploadAnnouncementImageRequest)
+    returns (UploadAnnouncementImageResponse) {}
+}
+
+message CreateUserRequest {
+  oneof user {
+    // user_id same as the _id stored in mongoDB users collection
+    string user_id = 1;
+    // Email address of the user as stored in mongoDB users collection
+    string email = 2;
+  }
+}
+
+message CreateUserResponse {
+  // user_id same as the _id stored in mongoDB users collection
+  string user_id = 1;
+  Role role = 2;
+}
+
+message UpdateUserRequest {
+  oneof user {
+    // user_id same as the _id stored in mongoDB users collection
+    string user_id = 1;
+    // Email address of the user as stored in mongoDB users collection
+    string email = 5;
+  }
+  Role role = 2;
+  // Organization name: organizations/{organization_id}
+  string organization_resource_name = 3;
+  // Workflow name: workflows/{workflow_id}
+  string workflow_resource_name = 4;
+}
+
+enum Role {
+  // Internal user role
+  ROLE_UNSPECIFIED = 0;
+  // Allowed to access the internal app
+  ROLE_INTERNAL_USER = 1;
+  // Allowed to access the internal app and manage billing
+  ROLE_INTERNAL_BILLING_MANAGER = 2;
+  // Allowed to access the internal app, manage billing and manage users
+  ROLE_INTERNAL_ADMIN = 3;
+  // Note: This is not configured on the user, it's configured at 
+  // the workflow/organisation namespace 
+  // in Ory allowing them to download respecive data.
+  ROLE_INTERNAL_REVIEWER = 4;
+}
+
+message UpdateUserResponse {
+  // Format: users/{user_id}
+  // user_id same as the userId stored in mongoDB
+  string user_id = 1;
+  Role role = 2;
+}
+
+message ListOrganizationsRequest {
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by ascending Organization display name.
+  int32 page_size = 1;
+  // The page number starts from 1.
+  int32 page_number = 2;
+  // Supported filter: display_name_prefix={SEARCH_KEY}
+  string filter = 3;
+}
+
+message ListOrganizationsResponse {
+  repeated v1alpha1.Organization organizations = 1;
+  // Total available Organizations size.
+  // Note it is NOT the remaining available Organizations 
+  // size after the current response.
+  int32 total_size = 2;
+}
+
+
+message ListHyperparametersRequest {
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by ascending Hyperparameter resource name.
+  int32 page_size = 1;
+  // The page number starts from 1.
+  int32 page_number = 2;
+  // Supported filter: display_name_prefix={SEARCH_KEY}
+  string filter = 3;
+}
+
+message ListHyperparametersResponse {
+  repeated common.Hyperparameter hyperparameters = 1;
+  // Total available Hyperparameter size.
+  // Note it is NOT the remaining available Hyperparameter 
+  // size after the current response.
+  int32 total_size = 2;
+}
+
+message GenerateBillingReportRequest {
+  // Organization name: organizations/{organization_id}
+  string organization_name = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message GenerateBillingReportResponse {
+  string start_date = 1;
+  string end_date = 2;
+  string organization_display_name = 3;
+  string invoice_number = 4;
+  int32 total_tasks = 5;
+  int32 total_billed_tasks = 6;
+  repeated GenerateBillingWorkflowData workflow_data = 7;
+} 
+
+message GenerateBillingWorkflowData {
+  string workflow_display_name = 1;
+  int32 total_pages = 2;
+  double amount_per_page = 3;
+  double total_amount = 4;
+}
+
+message GetPredictionAnalysisRequest {
+  // Each workflow name: workflows/{workflow_id}
+  repeated string workflow_names = 1;
+  
+  // The start and end date are optional. If not provided,
+  // the default gives the analysis for all the workflows.
+
+  // The start timestamp for the analysis.
+  google.protobuf.Timestamp start_date = 2;
+  // The end timestamp for the analysis.
+  google.protobuf.Timestamp end_date = 3;
+
+  // Organization id passed to check for single tenant organization.
+  string organization_id = 4;
+}
+
+message GetPredictionAnalysisResponse {
+  message WorkflowAnalysis {
+    // Workflow name: workflows/{workflow_id}
+    string workflow_name = 1;
+    // The generated CSV analysis report's gcs file path
+    string report_gcs_uri = 2;
+  }
+  repeated WorkflowAnalysis analysis = 1;
+}
+
+message ListWorkflowsForOrganizationRequest {
+  // Organization name: organizations/{organization_id}
+  string organization_name = 1;
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by ascending Workflow display name.
+  int32 page_size = 2;
+  // The page number starts from 1.
+  int32 page_number = 3;
+  // Supported filter: display_name_prefix={SEARCH_KEY}
+  string filter = 4;
+}
+
+message ListWorkflowsForOrganizationResponse {
+  repeated v1alpha2.Workflow workflows = 1;
+  // Total available Workflows size.
+  // Note it is NOT the remaining available Workflows 
+  // size after the current response.
+  int32 total_size = 2;
+}
+
+message CreateHyperparameterRequest {
+  // The hyperparameter to be created.
+  common.Hyperparameter hyperparameter = 1;
+}
+
+message CreateHyperparameterResponse {
+  // Newly created hyperparameter name: hyperparameters/{hyperparameter_id}
+  string hyperparameter_name = 1;
+}
+
+message UpdateHyperparameterRequest {
+  // The hyperparameter to be updated.
+  common.Hyperparameter hyperparameter = 1;
+}
+
+message UpdateHyperparameterResponse {
+  // The updated hyperparameter
+  common.Hyperparameter hyperparameter = 1;
+}
+
+message GetHyperparameterRequest {
+  // Hyperparameter name: hyperparameters/{hyperparameter_id}
+  string hyperparameter_name = 1;
+}
+
+message GetHyperparameterResponse {
+  common.Hyperparameter hyperparameter = 1;
+}
+
+message ListUsersRequest {
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by ascending User email.
+  int32 page_size = 1;
+  // The page number starts from 1.
+  int32 page_number = 2;
+  // Supported filter: email_prefix={SEARCH_KEY}
+  string filter = 3;
+}
+
+message ListUsersResponse {
+  repeated UserWithPrivilageLevel users = 1;
+  // Total available Users size.
+  // Note it is NOT the remaining available Users 
+  // size after the current response.
+  int32 total_size = 2;
+}
+
+message UserWithPrivilageLevel {
+  string user_id = 1;
+  string email = 2;
+  // Highest internal role assigned to the user. 
+  // Will be nil if the user is not assigned any role.
+  Role role = 3;
+}
+
+message GetUserPermissionsRequest {
+  // User resource name: users/{user_id}
+  string user_resource_name = 1;
+}
+
+message GetUserPermissionsResponse {
+  // Permissions that user has access to.
+  repeated string permitted_actions = 1;
+}
+
+// AnnouncementImage will be used in the markdown editor for URL transformation.
+message AnnouncementImage {
+  // url represents the original image GCS URL
+  string url = 1;
+  // signed_url represents the transformed url, which will be used to display
+  // the image in the markdown preview panel.
+  string signed_url = 2;
+}
+
+message Announcement {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  string display_name = 2 [(buf.validate.field).string.min_len = 1];
+  string description = 3;
+  common.AnnouncementType type = 4 [(buf.validate.field).enum = { in: [1] }];
+  common.AnnouncementContentMarkdown header = 5 [(buf.validate.field).required = true];
+  repeated common.AnnouncementContentBlock content_blocks = 6 [(buf.validate.field).repeated.min_items = 1];
+  bool is_active = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message ListAnnouncementsRequest {
+  int32 page_size = 1 [(buf.validate.field).int32 = {gte: 1, lte: 20}];
+  int32 page_number = 2 [(buf.validate.field).int32 = {gte: 1}];
+}
+
+message ListAnnouncementsResponse {
+  repeated Announcement announcements = 1;
+  int32 total_size = 2;
+}
+
+message GetAnnouncementRequest {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  // is_preview represents whether the response will process markdown content. 
+  // If true, the response will replace image gcs URLs with signed URLs.
+  bool is_preview = 2;
+}
+
+message GetAnnouncementResponse {
+  Announcement announcement = 1;
+  // images that uploaded to announcement, will be used in markdown or html
+  // tags, can be used in both header and content blocks
+  repeated AnnouncementImage images = 2;
+}
+
+message CreateAnnouncementRequest {
+  Announcement announcement = 1 [(buf.validate.field).required = true];
+}
+
+message CreateAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message UpdateAnnouncementRequest {
+  Announcement announcement = 1 [(buf.validate.field).required = true];
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+message UpdateAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message DeleteAnnouncementRequest {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message UploadAnnouncementImageRequest {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  bytes image_content = 2 [(buf.validate.field).bytes = {min_len: 1, max_len: 5242880}];
+}
+
+message UploadAnnouncementImageResponse {
+  AnnouncementImage image = 1;
+}

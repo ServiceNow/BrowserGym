@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+
+import "common/data_query_params.proto";
+import "google/protobuf/timestamp.proto";
+import "pb/v1alpha2/connector.proto";
+import "pb/v1alpha2/execution_steps.proto";
+import "pb/v1alpha2/tasks_service.proto";
+import "pb/v1alpha2/workflows_service.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+service WorkflowExecutions {
+  rpc ListWorkflowExecutions(ListWorkflowExecutionsRequest) 
+    returns (ListWorkflowExecutionsResponse) {}
+  rpc GetBlockedWorkflowExecutionStatistics(GetBlockedWorkflowExecutionStatisticsRequest) 
+    returns (GetBlockedWorkflowExecutionStatisticsResponse) {}
+  rpc GetWorkflowExecution(GetWorkflowExecutionRequest) 
+    returns (WorkflowExecution) {}
+}
+
+message ListWorkflowExecutionsRequest {
+  // The parent resource name where the Execution was created. 
+  // Currently, we dont query from its separate collection.
+  // format: "organizations/{ORGANIZATION_ID}"
+  string parent = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+  ListWorkflowExecutionFilter filter = 4;
+  // The order of fields will effect the sorting order.
+  // Supported fields: display_name, workflow_display_name, status, last_updated_time
+  repeated common.SortField sort = 5;
+}
+
+message ListWorkflowExecutionFilter {
+  string name_prefix = 1;
+  repeated WorkflowExecution.Status statuses = 2;
+  repeated string workflow_resource_names = 3;
+  int64 last_update_time_lt = 4;
+  int64 last_update_time_gt = 5;
+}
+
+message ListWorkflowExecutionsResponse {
+  repeated WorkflowExecution executions = 1;
+  // Total available workflow executions size.
+  int32 total_size = 2;
+}
+
+// Note: The message from message queue and task from 
+// v1alpha2Task collection will be projected to this message.
+// As currently we dont maintain separate collection for executions.
+message WorkflowExecution {
+  // Resource name for the Workflow Execution resource.
+  // Format: workflows/{WID}/tasks/{TID} or message/{TID}
+  // Since we query from message and task collection it has two formats.
+  string name = 1;
+  string display_name = 2;
+  string workflow_display_name = 3;
+  // Id of the organization the workflow belongs to. Format: organizations/{ID}
+  string organization_resource_name = 4;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    SCHEDULED = 1; // Waiting for the execution to start.
+    BLOCKED = 2;
+    EXECUTING = 3; // Execution is in progress.
+    PENDING_REVIEW = 4;
+    COMPLETED = 5;
+    FAILED = 6;
+    CANCELLED = 7;
+  }
+  // The time the Execution was started.
+  google.protobuf.Timestamp create_time = 5;
+  // The time the Execution was ended.
+  google.protobuf.Timestamp last_updated_time = 6;
+  Status status = 7;
+  repeated Review reviews = 8;
+  // The user who created the Execution. This is the email of the user.
+  string creator = 9;
+  Workflow.Mode workflow_mode_when_created = 10;
+  repeated ExecutionStep steps = 11;
+  // The connectors that were triggered by this workflow.
+  repeated Connector connectors_triggered = 12;
+  // The error message if the execution failed.
+  string error_message = 13;
+  // The location where the trigger happened. 
+  string trigger_location = 14;
+  // The resource name of the workflow.
+  // format: "workflows/{WID}"
+  string workflow_resource_name = 15;
+  Task.OBSOLETE_REASON obsolete_reason = 16;
+
+  // Whether this task can be retried manually.
+  // currently only some system declined tasks can be retried and task's
+  // raw file should not be deleted.
+  bool retryable = 17;
+}
+
+message GetBlockedWorkflowExecutionStatisticsRequest {
+  // The parent resource name where the Execution was created.
+  // format: "organizations/{ORGANIZATION_ID}"
+  string parent = 1;
+}
+
+message GetBlockedWorkflowExecutionStatisticsResponse {
+  // The number of blocked workflow executions.
+  int32 blocked_workflow_executions_count = 1;
+
+  // The resoure name of workflows which has blocked executions.
+  // This can be used to filter pending tasks to review.
+  repeated string blocked_workflow_resource_names = 2;
+}
+
+message GetWorkflowExecutionRequest {
+  // The resource name of the Workflow Execution.
+  // Format: workflows/{WID}/tasks/{TID} or message/{TID}
+  string name = 1;
+  // The parent resource name where the Execution was created. 
+  // format: "organizations/{ORGANIZATION_ID}"
+  string parent = 2;
+}

@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+
+import "common/user_profile.proto"; 
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+service Dashboard {
+  rpc GetDashboardStats(GetDashboardStatsRequest) 
+    returns (stream GetDashboardStatsResponse) {}
+}
+
+message GetDashboardStatsRequest {
+  // this must be set since stats belong to a particular organization.
+  // Organization resource name. Format: organizations/{ID}
+  string org_resource_name = 1;
+  // Supported filter: "workflow_resource_names=workflows/{workflowId},
+  // user_resource_names=users/{userId},start_date={date},end_date={date},
+  // workflow_type={extraction|classification},time_offset={offset}"
+  // valid values for start_date and end_date filters are in the Unix timestamp 1706592027,
+  // multiple workflow and username values filter with a dash (-) separator,
+  // providing workflow_type will fetch all the workflows of that type i.e Extraction or Classification,
+  // no need to set workflow_resource_names if all the workflows of that type are selected.
+  // Using union to handle combinations of workflow_resource_names and workflow_type.
+  // eg. "workflow_resource_names=workflows/65404f99ed26dc3f3f1ea934-workflows/653ba877f6af227a3a47d2c5"
+  // time_offset is hours to offset the time from UTC, eg time_offset=-7 for PST and time_offset=5.5 for IST.
+  string filter = 2;
+}
+
+message TaskSummaryStats {
+  // total hours saved
+  float total_hours_saved = 1;
+  // total Orby's accuracy
+  float total_accuracy = 2;
+}
+
+message TaskStatusStats {
+  // count of total tasks, which includes pending, error, completed and 
+  // declined tasks
+  int32 total_task_count = 1;
+  // count of total created tasks
+  int32 created_tasks_count = 2;
+  // count of total completed tasks
+  int32 completed_tasks_count = 3;
+  // count of total pending tasks
+  int32 pending_tasks_count = 4;
+  // count of total declined tasks
+  int32 declined_tasks_count = 5;
+  // count of tasks with error
+  int32 error_tasks_count = 6;
+}
+
+message ExecutionStats {
+  // Total number of filtered workflows
+  int32 total_workflows = 1;
+  
+  // Total number of executions across all filtered workflows
+  int32 total_executions = 2;
+  
+  // Number of completed executions
+  int32 completed_executions = 3;
+  
+  // Number of executions that need attention (i.e. blocked executions)
+  int32 needs_attention_executions = 4;
+  
+  // Number of executions with errors
+  int32 error_executions = 5;
+  
+  // Number of executions currently in progress
+  int32 in_progress_executions = 6;
+
+  // Number of workflows that need attention (i.e. blocked workflows)
+  int32 needs_attention_workflows = 7;
+}
+
+message TeamStats {
+  // total review time spent in minutes for completed tasks
+  float total_time_spent = 1;
+  
+  // average review time spent per task in minutes for completed tasks
+  float avg_time_per_task = 2;
+
+  // Total user count in the team
+  int32 total_user_count = 3;
+
+  // return recent users in the team by join date descending order 
+  // (e.g. recent 10 users)
+  repeated common.UserProfileInfo recent_user_profiles = 4;
+}
+
+message GetDashboardStatsResponse {
+  // we use oneof to handle sending 1 type of stat 
+  // for each major section of the dashboard.
+  // this is to avoid sending all the stats at once and
+  // this reduces the latency of the dashboard.
+  oneof stat {
+    TaskSummaryStats task_summary = 1 [deprecated = true];
+    TaskStatusStats task_status = 2;
+    AutomationStats automation_stats = 3;
+    AccuracyStats accuracy_stats = 4;
+    ExecutionStats execution_stats = 5; 
+    TeamStats team_stats = 6;
+  }
+}
+
+message AutomationStats {
+  // we show the stats for the past few days irrespective of the time filter.
+  // the last element will be the previous day's stats, the second last will 
+  // be the day before yesterday's stats and so on.
+  // we show the stats for the past 7 days for October 2024.
+  // This field is deprecated and will be removed in the future.
+  // Use successful_automation_counts instead.
+  repeated int32 daily_automations = 1 [deprecated = true];
+  int32 total_successful_executions = 2;
+  int32 total_documents_automated = 3;
+  // Total hours saved by automation in minutes
+  float total_hours_saved = 4;
+
+  message AutomationPeriodStat {
+    // Can represent either a date (YYYY-MM-DD) or a month (YYYY-MM).
+    // If the duration for which the stats are shown is more than a month,
+    // then the period will be a month, otherwise, it will be a date.
+    string period = 1;  
+    // The corresponding successful automation count for the period.
+    int32 count = 2;    
+  }
+
+  // The number of successful automations in the duration of the filter.
+  // We currently support showing the stats for upto 30 months.
+  repeated AutomationPeriodStat successful_automation_counts = 5;
+
+  message ExecutionSummary {
+    // The total number of executions executed
+    int32 total_executions = 1;
+    // The total number of executions that resulted in an error
+    int32 total_error_executions = 2;
+    // The total number of executions that were blocked
+    int32 total_blocked_executions = 3;
+  }
+
+  // The executions summary in the duration of the filter.
+  ExecutionSummary execution_summary = 6;
+}
+
+message AccuracyStats {
+  message WorkflowStat {
+    string workflow_display_name = 1;
+    float average_accuracy = 2;
+  }
+
+  float average_extraction_accuracy = 1;
+  float average_classification_accuracy = 2;
+
+  // This field will show the top workflows with the highest accuracy
+  // and the workflows will be sorted in descending order of accuracy.
+  repeated WorkflowStat workflow_stats = 3;
+}

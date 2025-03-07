@@ -1,0 +1,50 @@
+{
+    "name": "webpack-node-externals",
+    "version": "3.0.0",
+    "description": "Easily exclude node_modules in Webpack bundle",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/liady/webpack-node-externals.git"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "chai": "^3.5.0",
+        "eslint": "^7.7.0",
+        "eslint-plugin-import": "^2.22.0",
+        "mocha": "^2.5.3",
+        "mock-fs": "^4.12.0",
+        "ncp": "^2.0.0",
+        "webpack": "^4.44.1"
+    },
+    "scripts": {
+        "unit": "mocha --colors ./test/*.spec.js",
+        "unit-watch": "mocha --colors -w ./test/*.spec.js",
+        "test": "npm run unit-watch"
+    },
+    "keywords": [
+        "webpack",
+        "node_modules",
+        "node",
+        "bundle",
+        "externals"
+    ],
+    "author": {
+        "name": "Liad Yosef",
+        "url": "https://github.com/liady"
+    },
+    "files": [
+        "LICENSE",
+        "README.md",
+        "index.js",
+        "utils.js"
+    ],
+    "bugs": {
+        "url": "https://github.com/liady/webpack-node-externals/issues"
+    },
+    "engines": {
+        "node": ">=6"
+    },
+    "homepage": "https://github.com/liady/webpack-node-externals",
+    "license": "MIT"
+}

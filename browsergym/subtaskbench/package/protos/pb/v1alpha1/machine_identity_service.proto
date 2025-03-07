@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service MachineIdentityService {
+  
+  // WEB APP
+  // Create a new machine identity and generates an auth code for the first agent in the machine
+  rpc CreateMachine (CreateMachineRequest) returns (CreateMachineResponse) {}
+  // Disconnect an agent from the server and delete the agent from the machine it belongs to
+  rpc DeleteAgent (DeleteAgentRequest) returns (google.protobuf.Empty) {}
+  // Get a machine from the server
+  rpc GetMachine (GetMachineRequest) returns (GetMachineResponse) {}
+  // List all machines
+  rpc ListMachines (ListMachinesRequest) returns (ListMachinesResponse) {}
+  // Delete a machine from db and disconnects all associated agents and deletes them
+  rpc DeleteMachine (DeleteMachineRequest) returns (google.protobuf.Empty) {}
+
+  // TODO: Deprecate Register, RegenerateRegistrationLink, and Deregister
+  rpc RegisterMachine (RegisterMachineRequest) returns (RegisterMachineResponse) {} 
+  rpc DeregisterMachine (DeregisterMachineRequest) returns (google.protobuf.Empty) {}
+  rpc RegenerateRegistrationLink (RegenerateRegistrationLinkRequest) returns (RegenerateRegistrationLinkResponse) {}
+
+
+  // AGENTS
+  // This can be used to either generate an auth code for an existing agent or for a new agent
+  // This can either be an authenticated request by an existing agent to start the process to create a new agent on the same machine or an authenticated request from the web app to re authenticate an existing agent
+  rpc GenerateAuthCode (GenerateAuthCodeRequest) returns (GenerateAuthCodeResponse) {}
+
+  // Authenticates an agent and returns an access token for the agent
+  // This will be called by either a new agent to authenticate with the server for the first time or an existing agent to re authenticate with the server
+  rpc AuthenticateAgent (AuthenticateAgentRequest) returns (AuthenticateAgentResponse) {}
+
+}
+
+
+message CreateMachineRequest {
+  string machine_name = 1;
+}
+
+
+message CreateMachineResponse {
+  MachineIdentity machine_identity = 1;
+  // Link to register the machine:
+  // ex: https://web-app.orby.ai/auth?identity=<key>
+  // deprecated - Use auth_code and agent_id instead
+  string registration_link = 2 [deprecated = true];
+  // auth_code is the auth code for the first agent for this machine to use for generating access token
+  string auth_code = 3;
+  // agent_id is the id of the first agent for this machine
+  string agent_id = 4;
+}
+
+message DeleteAgentRequest {
+  // agent id of the agent to disconnect. This agent will also be removed from the machine it belongs to
+  string agent_id = 1;
+}
+
+message RegisterMachineRequest {
+  // registration token contains machine id in payload.UserId
+  string registration_token = 1;
+}
+
+message RegisterMachineResponse {
+ // access token payload to use for authentication
+ string token = 1;
+}
+
+message DeregisterMachineRequest {
+  // machine id of the machine to deregister
+  string machine_id = 1;
+}
+
+message ListMachinesRequest {
+  int32 page_number = 1;
+  int32 page_size = 2;
+}
+
+message ListMachinesResponse {
+  // list of machines
+  repeated MachineIdentity machines = 1;
+  // total number of machines for FE to render page numbers
+  int32 total_machines = 2;
+}
+
+message RegenerateRegistrationLinkRequest {
+  // machine id of the machine to regenerate registration link
+  string machine_id = 1;
+}
+
+message RegenerateRegistrationLinkResponse {
+  // registration link to register the machine
+  string registration_link = 1;
+}
+
+message DeleteMachineRequest {
+  // machine id of the machine to delete
+  string machine_id = 1;
+}
+
+message GetMachineRequest {
+  // machine id of the machine to get
+  string machine_id = 1;
+}
+
+message GetMachineResponse {
+  MachineIdentity machine_identity = 1;
+}
+
+message MachineIdentity {
+  // Unique id for machine
+  string machine_id = 1;
+  // Machine name is unique per org
+  string machine_name = 2;
+  // Stores the user that created the machine
+  string user_id = 3;
+  // The org that the machine belongs to
+  string org_id = 4;
+
+  enum RegistrationStatus {
+    REGISTRATION_STATUS_UNSPECIFIED = 0;
+    REGISTERED = 1;
+    UNREGISTERED = 2;
+    PENDING = 3;
+  }
+  // Registration status of the machine
+  RegistrationStatus registration_status = 5; 
+  // Workflows that the machine can execute
+  message AssociatedWorkflow {
+    string id = 1;
+    string name = 2;
+  }
+  repeated AssociatedWorkflow associated_workflows = 6;
+
+  // Websocket connections for this machine
+  // a machine can have multiple websocket connections (browser, windows app, etc)
+  message WebsocketConnection {
+    string connection_id = 1;
+    // Status of the websocket connection
+    enum WebsocketConnectionStatus {
+      WEBSOCKET_CONNECTION_STATUS_UNSPECIFIED = 0;
+      WEBSOCKET_CONNECTION_STATUS_CONNECTED = 1;
+      WEBSOCKET_CONNECTION_STATUS_DISCONNECTED = 2;
+    }
+    WebsocketConnectionStatus status = 2;
+    // web socket connection type (browser, windows app, etc)
+    enum WebsocketConnectionType {
+      WEBSOCKET_CONNECTION_TYPE_UNSPECIFIED = 0;
+      WEBSOCKET_CONNECTION_TYPE_BROWSER = 1;
+      WEBSOCKET_CONNECTION_TYPE_WINDOWS_APP = 2;
+    }
+    WebsocketConnectionType connection_type = 3;
+  }
+
+  // Agents for this machine
+  // a machine can have multiple agents (browser, windows app, etc)
+  message Agent {
+    string agent_id = 1;
+    // Status of the agent
+    enum Status {
+      STATUS_UNSPECIFIED = 0;
+      CONNECTED = 1;
+      DISCONNECTED = 2;
+      RECONNECTING = 3;
+      PENDING = 4;
+    }
+    Status status = 2;
+
+    // agent type (browser, windows app, etc)
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      BROWSER = 1;
+      WINDOWS_APP = 2;
+    }
+    Type type = 3;
+  }
+
+  repeated WebsocketConnection websocket_connections = 7 [deprecated = true]; 
+
+  repeated Agent agents = 8;
+
+
+}
+
+message GenerateAuthCodeRequest {
+  // if agent_id is not provided, we will read the machine id from the access token and generate an auth code for the machine
+  // If the agent_id is provided, the auth code will be generated for the existing agent.
+  string agent_id = 1;
+  // if machine_id is provided, a new agent will be created for the machine and an auth code will be generated for the new agent
+  // web app will call this method with machine_id to generate an auth code for a new agent
+  string machine_id = 2;
+}
+message GenerateAuthCodeResponse {
+  // auth code to use for generating access token
+  string auth_code = 1;
+  // agent_id of the agent that the auth code is generated for
+  string agent_id = 2;
+}
+
+message AuthenticateAgentRequest {
+  // id of the agent to authenticate
+  string id = 1;
+  // auth code to use for authenticating the agent
+  string auth_code = 2;
+  // agent type of the agent that is being authenticated (browser, windows app, etc)
+  MachineIdentity.Agent.Type agent_type = 3;
+}
+
+message AuthenticateAgentResponse {
+  // access token to use for making authenticated requests
+  string access_token = 1;
+  // expiration time of the access token
+  google.protobuf.Timestamp expiration = 2;
+
+  // contains info about the agent that is being authenticated for the agent to store
+  message AgentInfo {
+    string id = 1;
+    string machine_id = 2;
+    string machine_name = 3;
+  }
+  AgentInfo agent_info = 3;
+}

@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+import "google/type/timeofday.proto";
+import "google/type/date.proto";
+import "google/protobuf/timestamp.proto";
+
+package pb.v1alpha1;
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message Schedule {
+  string id = 1;
+  string org_id = 2;
+  string workflow_id = 3;
+  // Will be deprecated soon, please use new start_date field
+  google.protobuf.Timestamp start_time = 4 [deprecated = true];
+  // Will be deprecated soon, please use new end_date field
+  google.protobuf.Timestamp end_time = 5 [deprecated = true];
+
+  google.protobuf.Timestamp create_time = 6;
+  google.protobuf.Timestamp last_update_time = 7;
+
+  // Configurations for the schedule.  
+  ScheduleConfig config = 8;
+  // READ-ONLY Field: Next times at which schedule will run
+  repeated google.protobuf.Timestamp future_action_times = 9;
+  // Must be from one of the following TZ names:
+  // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  // E.g: US/Pacific
+  // Will default to UTC if not provided
+  string timezone_name = 10;
+
+  // Status of the schedule
+  enum ScheduleStatus {
+    SCHEDULE_STATUS_UNSPECIFIED = 0;
+    SCHEDULE_STATUS_ACTIVE = 1;
+    SCHEDULE_STATUS_PAUSED = 2;
+  }
+  // This field can be updated to pause/resume the schedule
+  ScheduleStatus status = 11;
+  google.type.Date start_date = 12;
+  google.type.Date end_date = 13;
+  // Days on which to skip schedule runs
+  // The overall skipped days are a union of the skip_days
+  // and days referenced by holiday_list
+  repeated google.type.Date skip_days = 14;
+  repeated string holiday_list_ids = 15;
+}
+
+message ScheduleConfig {
+  SchedulePattern schedule_pattern = 1;
+
+  // This interval is used for daily, weekly, and monthly schedules.
+  // It's the number of days, weeks, or months between each run.
+  int32 interval = 2; // e.g., every 2 days/weeks/months
+
+
+  message SchedulePattern {
+    // The schedules may run on multiple times for a pattern.
+    repeated google.type.TimeOfDay run_times = 1;
+    RecurrencePattern recurrence_pattern = 2;
+  }
+ 
+  message RecurrencePattern {
+    oneof pattern {
+      NoRecurrence no_recurrence = 1;
+      // Use this for daily schedules.   
+      DailyRecurrence daily_recurrence = 2;
+      // This pattern is used for weekly schedules.  
+      WeeklyRecurrence weekly_recurrence = 3;
+      // This pattern is used for monthly schedules.
+      MonthlyRecurrence monthly_recurrence = 4;
+    }
+
+    message NoRecurrence {}
+
+    message DailyRecurrence {
+      // We may add additional fields in the future.
+      // Ex. Include only business days
+    }
+
+    message WeeklyRecurrence {
+      // Different days of the week the schedule will run.
+      repeated DayOfWeek days_of_week = 1;
+    }
+
+    message MonthlyRecurrence {
+      // We may want to run the schedule in a different ways.
+      // It's either on a specific days or on a specific day of the week.
+      // Note: OneOf was not possible to use here since oneOf cannot contain repeatedOf elements
+      // This specifies the day of the month, e.g., 1st, 2nd, 3rd, etc.
+      int32 day_of_month = 1;
+      // Ex. Create a monthly schedule on the (first, second ... last) (Monday.... Sunday) of the month.
+      repeated DayOfWeekPattern day_of_week_pattern = 2;
+
+      message DayOfWeekPattern {
+        DayOfWeek day_of_week = 1;
+        WeekOfMonth week_of_month = 2;
+      }
+    }
+
+    enum DayOfWeek {
+      DAY_OF_WEEK_UNSPECIFIED = 0;
+      SUNDAY = 1;
+      MONDAY = 2;
+      TUESDAY = 3;
+      WEDNESDAY = 4;
+      THURSDAY = 5;
+      FRIDAY = 6;
+      SATURDAY = 7;
+    }
+  
+    enum WeekOfMonth {
+      WEEK_OF_MONTH_UNSPECIFIED = 0;
+      FIRST = 1;
+      SECOND = 2;
+      THIRD = 3;
+      FOURTH = 4;
+      LAST = 5;
+    }
+  }
+}

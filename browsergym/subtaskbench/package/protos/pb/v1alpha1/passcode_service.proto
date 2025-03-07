@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "pb/v1alpha1/orbot_action.proto";
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+service Passcode {
+  // The following methods are for SMS-based passcode
+  rpc ApplyPhoneNumber(ApplyPhoneNumberRequest) returns (ApplyPhoneNumberResponse) {}
+  rpc ListPhoneNumbers(ListPhoneNumbersRequest) returns (ListPhoneNumbersResponse) {}
+  rpc RemovePhoneNumber(RemovePhoneNumberRequest) returns (RemovePhoneNumberResponse) {}
+  rpc GetSmsAuthCode(GetSmsAuthCodeRequest) returns (GetSmsAuthCodeResponse) {}
+  rpc GetMFACode(GetMFACodeRequest) returns (GetMFACodeResponse) {}
+}
+
+message ApplyPhoneNumberRequest {}
+
+message ApplyPhoneNumberResponse {
+  string phone_number = 1;
+}
+
+message ListPhoneNumbersRequest {}
+
+message ListPhoneNumbersResponse {
+  repeated string phone_number = 1;
+}
+
+message RemovePhoneNumberRequest {
+  // Phone number should be in the E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phone_number = 1;
+}
+
+message RemovePhoneNumberResponse {}
+
+message GetSmsAuthCodeRequest {
+  // We'll check if the user/org owns the number on the server side.
+  // Phone number should be in the E.164 format: https://www.twilio.com/docs/glossary/what-e164
+  string phone_number = 1;
+}
+
+message GetSmsAuthCodeResponse {
+  enum GetSmsAuthCodeError {
+    GET_SMS_AUTH_CODE_ERROR_UNSPECIFIED = 0;
+    // the requested phone number isn't registered to the organization.
+    PHONE_NUMBER_NOT_FOUND = 1;
+    // the code isn't received within the time limit.
+    TIMEOUT = 2;
+  }
+
+  oneof response_type {
+    string code = 1;
+    GetSmsAuthCodeError error = 2;
+  }
+}
+
+message GetMFACodeRequest {
+  // specifies the method to generate mfa code
+  GetPasscodeAction mfa_auth_method = 1;
+}
+
+message GetMFACodeResponse {
+  enum GetMFACodeError {
+    GET_MFA_CODE_ERROR_UNSPECIFIED = 0;
+    // the requested phone number isn't registered to the organization.
+    PHONE_NUMBER_NOT_FOUND = 1;
+    // the requested secret value isn't registered to the organization.
+    SECRET_VALUE_NOT_FOUND = 2;
+    // error generating the MFA code.
+    GENERATE_MFA_CODE_ERROR = 3;
+    // the code isn't received within the time limit.
+    TIMEOUT = 4;
+  }
+  oneof response_type {
+    string code = 1;
+    GetMFACodeError error = 2;
+  }
+}

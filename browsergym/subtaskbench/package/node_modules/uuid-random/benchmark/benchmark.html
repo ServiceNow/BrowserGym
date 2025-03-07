@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <script src="node_modules/lodash/lodash.js"></script>
+    <script src="node_modules/benchmark/benchmark.js"></script>
+    <script src="../index.js"></script>
+  </head>
+
+  <body>
+    <script>
+      var suite = new Benchmark.Suite()
+      console.log('Starting benchmark...')
+      suite
+        .add('uuid-random', uuid)
+        .on('cycle', function (event) {
+          console.log(String(event.target))
+        })
+        .on('complete', function () {
+          console.log('Fastest is ' + this.filter('fastest').map('name'))
+        })
+        .run({ async: true })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "pb/v1alpha1/actionprocessing.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message GetSimilarExamplesRequest {
+  // Required. The task_id for which similar examples are requested
+  string task_id = 1;
+  // Optional. This is required for UI Automation tasks
+  string action_id = 2;
+  // Optional. Number of similar examples to return. Default is 100.
+  int32 num_examples = 3;
+  // Optional: ML can pick more examples that are more challenging. If this is
+  // not set, then we don't apply any filter for the confidence score.
+  float confidence_score_threshold = 4;
+  // Optional. If true, match schema details in examples
+  // with the schema details in the task
+  bool match_schema_details_in_examples = 5;
+
+  enum ExampleType {
+    EXAMPLE_TYPE_UNSPECIFIED = 0;
+    // examples regardless of whether human review is involved
+    EXAMPLE_TYPE_ALL = 1;
+    // examples that triggers the human review, regardless of 
+    // whether user confirms or rejects the prediction
+    EXAMPLE_TYPE_HUMAN_REVIEWED = 2;
+    // examples that triggers human review and the prediction was modified.
+    EXAMPLE_TYPE_HUMAN_MODIFIED = 3;
+  }
+  // Optional. Filter examples based on the type of examples. 
+  // Default is EXAMPLE_TYPE_ALL.
+  ExampleType example_type = 6;
+}
+
+message GetSimilarExamplesResponse {
+  repeated SimilarExample examples = 1;
+}
+
+message SimilarExample {
+  oneof example_type {
+    UiAutomationExample ui_automation_example = 1;
+    ApiAutomationExample api_automation_example = 2;
+  }
+}
+
+message UiAutomationExample {
+  // task_id for the example action
+  string task_id = 1;
+  // action_id for the example action
+  string action_id = 2;
+  ProcessSmartActionsRequest request = 3;
+  ProcessSmartActionsResponse response = 4;
+}
+
+message ApiAutomationExample {
+  string document_gcs_uri = 1;
+}

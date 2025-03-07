@@ -1,0 +1,249 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "google/protobuf/empty.proto";
+import "pb/v1alpha1/actionprocessing.proto";
+import "pb/v1alpha1/orbot_action.proto";
+import "pb/v1alpha1/element.proto";
+import "pb/v1alpha1/field.proto";
+import "pb/v1alpha1/document.proto";
+import "pb/v1alpha1/orbot_workflow.proto";
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message ClientToServerMessage {
+  // Unique Id for the message.
+  string message_id = 1;
+  // Id corresponding to message this message was triggered.
+  string correlation_id = 2;
+
+  // Below fields are used to identify the client.
+  // These fields are deprecated and will be removed in the future, we don't need them anymore.
+  string user_id = 3 [deprecated = true];
+  string connection_id = 4 [deprecated = true];
+
+  oneof message {
+    Heartbeat heartbeat = 5;
+    GetExecution get_execution = 6;
+    Ack ack = 7;
+
+    // Signal server to stop execution. Triggered when user clicks stop button on the side panel.
+    // Notably there is no message to manually start an execution.
+    // To manually start an execution, client should create a new execution object with the current connection id.
+    // Server will then send StartExecution message back to the same client to start the execution.
+    StopExecution stop_execution = 8;
+   
+    // Reports the result of an action executed on the client side in response to an ExecuteClientAction message.
+    // The result can be one of the following:
+    //
+    // 1. empty
+    //    - Action executed successfully with no return data
+    //    - Server proceeds to execute next action
+    //
+    // 2. action-specific results (form, list, element, document)
+    //    - Action executed successfully with return data
+    //    - Server processes the returned data and proceeds
+    //
+    // 3. error
+    //    - Action execution failed
+    //    - Server may either stop execution or retry the action
+    //
+    // 4. waiting_for_review
+    //    - Action requires human intervention
+    //    - Server pauses execution pending review
+    //    - Example flow:
+    //      a. Server sends ExecuteClientAction to client to click on an element
+    //      b. Client executes click action but cannot find the element → sends waiting_for_review
+    //      c. User helps locate element
+    //      d. Client sends empty result after user confirms
+    ReportActionResult report_action_result = 9;
+  }
+}
+
+message ServerToClientMessage {
+  // Unique Id for the message.
+  string message_id = 1;
+  // Id corresponding to message this message was triggered.
+  string correlation_id = 2;
+  oneof message {
+    StartExecution start_execution = 3;
+    
+    ResumeExecution resume_execution = 4;
+
+    // @deprecated - Use StartExecution instead
+    ExecuteWorkflow execute_workflow = 5 [deprecated = true];
+
+    StopExecution stop_execution = 7;
+    Ack ack = 6;
+    // Command to execute an action on the client
+    ExecuteClientAction execute_client_action = 8;
+    // Update the execution state to show in side panel
+    UpdateExecutionState update_execution_state = 9;
+  }
+}
+
+message Heartbeat {
+  int64 timestamp = 1;
+}
+
+message ExecuteWorkflow {
+  string workflow_id = 1;
+  string process_id = 2;
+  repeated WorkflowVariable workflow_variables = 3;
+}
+
+message GetExecution {
+  string org_id = 1;
+}
+
+message StartExecution {
+  string execution_id = 1;
+  string schedule_id = 2;
+  Workflow workflow = 3;
+  string process_id = 4;
+}
+
+message ResumeExecution {
+  string execution_id = 1;
+  SmartActionHITLResult result = 2;
+}
+
+message StopExecution {
+  string execution_id = 1;
+  enum Reason {
+    REASON_UNSPECIFIED = 0;
+    // If the parent execution was cancelled by the user, it may trigger all child execution to stop.
+    REASON_PARENT_CANCEL = 1;
+    // If the particular execution was cancelled by the user.
+    REASON_USER_CANCEL = 2;
+    // If the tab is closed by the user.
+    REASON_TAB_CLOSED = 3;
+    // Execution is completed
+    REASON_COMPLETED = 4;
+    // Execution is stopped due to an error.
+    REASON_ERROR = 5;
+  }
+  Reason reason = 2;
+
+  enum Severity {
+    SEVERITY_UNSPECIFIED = 0;
+    SEVERITY_ERROR = 1;
+    SEVERITY_WARNING = 2;
+    SEVERITY_INFO = 3;
+    SEVERITY_SUCCESS = 4;
+  }
+  
+  message AlertInfo {
+    Severity severity = 1;
+    string title = 2;
+    string message = 3;
+  }
+
+  // Message to display to the user.
+  AlertInfo alert_info = 3;
+  
+  enum Scope {
+    SCOPE_UNSPECIFIED = 0;
+    // Stop the current execution
+    SCOPE_SINGLE= 1;
+    // Stop all pending executions assigned to current connection
+    SCOPE_ALL = 2;
+  }
+  Scope scope = 4;
+}
+
+message Ack {
+  // Option message which can be passed.
+  string extra_message = 1; 
+}
+
+message PauseExecution {
+  string execution_id = 1;
+  // Review task id is included when server sends this message to client due to HITL.
+  // Client can use this task id to load smart action response for HITL on side panel.
+  string review_task_id = 2;
+}
+
+message ExecuteClientAction {
+  string execution_id = 1;
+  string action_id = 2;
+  // Expected to be transformed by the server to resolve all reference values before sending to client.
+  Action client_action = 3;
+  // Optional information for validating the client action executed successfully.
+  ActionValidation validation = 4;
+}
+
+message ActionValidation {
+  // Element locator required for the next action. We can use it to validate the client action executed successfully,
+  // and perform retries if needed.
+  ElementLocator look_ahead_locator = 1;
+}
+
+message ReportActionResult {
+  string execution_id = 1;
+  string action_id = 2;
+  // The UI state after the action is executed.
+  UiState ui_state = 3;
+  
+  oneof result {
+    ExecutionError error = 4;
+    WaitingForReview waiting_for_review = 5;
+    GetFormActionResult form = 6;
+    GetListActionResult list = 7; 
+    GetElementActionResult element = 8;
+    GetDocumentActionResult document = 9;
+    // For actions that don't return data
+    google.protobuf.Empty empty = 10;
+  }
+}
+
+message ExecutionError {
+  string internal_message = 1;
+  // Optional message to display to the user. If not provided, it will be considered as internal error,
+  // a generic error message will be displayed to the user.
+  string display_message = 2;
+}
+
+message WaitingForReview {
+  string message = 1;
+}
+
+message GetFormActionResult {
+  repeated Field fields = 1;
+}
+
+message GetListActionResult {
+  repeated ListItem items = 1;
+}
+
+message ListItem {
+  ElementLocator locator = 1;
+  repeated Field fields = 2;
+}
+
+message GetElementActionResult {
+  Element element = 1;
+}
+
+message GetDocumentActionResult {
+  Document document = 1;
+}
+
+message UpdateExecutionState {
+  string execution_id = 1;
+  repeated string executed_action_ids = 2;
+  repeated string executing_action_ids = 3;  
+  ExecutionStatus status = 4;
+}
+
+enum ExecutionStatus {
+  EXECUTION_STATUS_UNSPECIFIED = 0;
+  EXECUTION_STATUS_CREATED = 1;
+  EXECUTION_STATUS_EXECUTING = 2;
+  EXECUTION_STATUS_USER_STOP = 3;
+  EXECUTION_STATUS_WAITING_FOR_CONFIRMATION = 4;
+  EXECUTION_STATUS_WAITING_FOR_REVIEW = 5;
+  EXECUTION_STATUS_REVIEWED = 6;
+  EXECUTION_STATUS_COMPLETED = 7;
+  EXECUTION_STATUS_DESTROYED = 8;
+}

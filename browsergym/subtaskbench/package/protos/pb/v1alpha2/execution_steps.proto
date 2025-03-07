@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+
+import "automation_mining/automation_mining.proto";
+import "automation_mining/ontology/data_models.proto";
+import "pb/v1alpha1/performance.proto";
+import "application/application_params.proto";
+import "google/cloud/documentai/v1/document.proto";
+import "pb/v1alpha2/workflow_steps_params.proto";
+import "pb/v1alpha1/actionprocessing.proto";
+import "pb/v1alpha1/orbot_action.proto";
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+message ExecutionStep {
+  string display_name = 1;
+  v1alpha1.Performance performance = 2;
+  // Use document_uris instead of documents since we just need to store the uri of 
+  // the gcs file
+  // Note: This field is kept for backward compatibility. Use document_uris instead.
+  repeated google.cloud.documentai.v1.Document documents = 3;
+  repeated ExecutionStepOption options = 4;
+  automation_mining.Activity activity = 5;
+  oneof content {
+    automation_mining.ontology.Email email = 6;
+    automation_mining.ontology.File file = 7;
+  }
+  ExecutionStepMode mode = 8;
+  // Use original_document_uris instead of original_documents since we just need to store the uri of 
+  // the gcs file
+  // No Change in any document: empty array
+  // Change in some/all Documents: 
+  // - If Document is modified, store all the original entities only
+  // - If Document is not modified, store empty/nil object
+  // Note: This field is kept for backward compatibility. Use original_document_uris instead.
+  repeated google.cloud.documentai.v1.Document original_documents = 9;
+  // Wrapper storing prediction results, eg, from document classification
+  PredictionResult prediction_result = 10; 
+  // Stores the uri of the final documents
+  repeated string document_uris = 11;
+  // Stores the uri of the original documents if they are modified.
+  repeated string original_document_uris = 12;
+
+  // Stores the result of the execution step
+  ExecutionStepResult result = 13;
+
+  // Metadata related to the execution or the workflow.
+  message ActionMetadata {
+    string action_id = 1; // Unique identifier for the action in the workflow that created this review task.
+    // This field stores the indexes of the action in a loop, if applicable, since 
+    // some actions may have the same ID (for example, in a for loop).
+    // This field is repeated because the action can be in a nested loop.
+    // The first element in the array is the outermost index.
+    repeated int32 action_loop_indexes = 2; 
+  }
+  ActionMetadata action_metadata = 14;
+}
+
+message ExecutionStepResult {
+  // TODO: Move all the result inside the ExecutionStep into this message
+  oneof param {
+    v1alpha1.SmartActionHITLResult smart_action_result = 1;
+  }
+}
+
+message ExecutionStepOption {
+    string application = 1;
+    oneof param {
+      application.GmailParam gmail = 2; // Do not use: For backward compatibility, will be removed once all logic is migrated to EmailParam.
+      application.GDriveParam gdrive = 3;
+      application.GSheetsParam gsheets = 4;
+      DocClassificationParam classification = 5;
+      application.SFTPParam sftp = 6;
+      EntityExtractionParam entity_extraction = 7;
+      GenerateOutputParam generate_output_param = 8;   
+      // GSheetsParam will be deprecated in favor of 
+      // SpreadsheetParam in the future to have a more generic name
+      // to support other spreadsheet applications
+      application.SpreadsheetParam spreadsheet = 9;
+      application.EmailParam email = 10;
+      // This stores the actual request sent to the ML engine
+      v1alpha1.SmartAction smart_action = 11;
+      // create proceeding execution after review is done
+      ProceedingExecutionParam proceeding_execution = 12;
+    }
+}
+
+// the process to execute after the result is reviewed
+message ProceedingExecutionParam {
+  string workflow_id = 1;
+  string process_id = 2;
+  // we need to add smartActionResult to the variables when creating the task.
+  repeated v1alpha1.WorkflowVariable variables = 3;
+}
+
+message ExecutionStepMode {
+  // If true, payloads of this step will be rendered in a UI component when
+  // the suggestion needs human review.
+  bool review = 1;
+  // If true, this step has completed both server and client side work if any.
+  bool complete = 2;
+}
+
+message PredictionResult {
+  // Classification label signifying the document type of the document
+  // as predicted by the ml-engine's classification workflow
+  // Example categories: Amendment/SOW/SOWTNM etc
+  string classification_label = 1;
+  string original_classification_label = 2; // only filled if original prediction is modified by user
+  float confidence = 3; // confidence score  associated with the classification label 
+  // confidence score associated with the original classifcation label, if it is filled 
+  float original_confidence = 4;
+}

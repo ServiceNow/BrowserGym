@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "common/user_profile.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message ApiKey {
+  string id = 1;
+  string name = 2;
+  string raw_key = 3;
+  ApiKeyStatus status = 4;
+  google.protobuf.Timestamp created_time = 5;
+  optional string description = 6;
+  // custom expiration time for the api key, if empty, the api key will never expire
+  google.protobuf.Timestamp expiration_time = 7;
+  // the creator user profile for the api key
+  common.UserProfileInfo  creator = 8;
+  // the encrypted key for the api key
+  string encrypted_key = 9;
+  // the endpoints that can be performed by the api key.
+  // if empty, the api key will have all the access.
+  repeated ApiKeyPermission permissions = 10;
+  // the manageable workflows by the api key,
+  // if empty, the api key will have access to all workflows.
+  repeated string workflow_ids = 11;
+
+  enum ApiKeyStatus {
+    API_KEY_STATUS_UNSPECIFIED = 0;
+    API_KEY_STATUS_ACTIVE = 1;
+    API_KEY_STATUS_REVOKED = 2;
+  }
+}
+
+enum ApiKeyPermission {
+  API_KEY_PERMISSION_UNSPECIFIED = 0;
+  API_KEY_PERMISSION_EXECUTION_SERVICE_LIST_EXECUTIONS = 1;
+  API_KEY_PERMISSION_EXECUTION_SERVICE_GET_EXECUTION = 2;
+  API_KEY_PERMISSION_EXECUTION_SERVICE_DOWNLOAD_EXECUTION_RESULT = 3;
+  API_KEY_PERMISSION_EXECUTION_SERVICE_CREATE_EXECUTIONS = 4;
+}

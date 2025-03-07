@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message UiEvent {
+    oneof event_type {
+        Mouse mouse = 1;
+    }
+
+    message Mouse {
+        MouseButton button = 1;
+        MouseEventType event_type = 2;
+
+        // "viewport" (or "client") coordinate
+        // See https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_view/Coordinate_systems#viewport
+        int32 viewport_x = 3;
+        int32 viewport_y = 4;
+
+        enum MouseButton {
+            MOUSE_BUTTON_UNDEFINED = 0;
+            LEFT = 1;
+            MIDDLE = 2;
+            RIGHT = 3;
+        }
+
+        enum MouseEventType {
+            MOUSE_EVENT_TYPE_UNDEFINED = 0;
+            CLICK = 1;
+            DOUBLE_CLICK = 2;
+            MOUSE_UP = 3;
+            MOUSE_DOWN = 4;
+        }
+    }
+}

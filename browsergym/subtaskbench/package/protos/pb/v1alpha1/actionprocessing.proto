@@ -1,0 +1,545 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+import "pb/v1alpha1/field.proto";
+import "pb/v1alpha1/document.proto";
+import "common/hyperparameter.proto";
+
+// Extract fields from a document.
+// Currently only used in document processing.
+message ExtractFields {
+  // Deprecated: Use the `source` field instead.
+  repeated Field fields = 1 [deprecated=true];
+  Document document = 2 [deprecated=true];
+
+  string rule = 3;
+  ItemDocument source = 4;
+}
+
+// Extract fields from a document.
+message ExtractFieldsRequestUnified {
+  string rule = 1;
+  ExtractionDocument source = 2;
+}
+
+// Extracted fields from a document.
+message ExtractFieldsResult {
+  //new format to account for per-field confidence scores
+  message PerFieldResult {
+    Field extracted_field = 1;
+    // per-field confidence score
+    float confidence = 2;
+  }
+  repeated PerFieldResult results = 2;
+
+  // GCS file path for the DocumentAI document Protobuf binary file, which is
+  // used in the following places:
+  // 1. showing location for the extracted entities in the docprocessing HITL UI
+  // 2. used as the input format for the current few-shot learning pipline
+  //
+  // The file is generated on the ML side, gets persisted in a temporary ML GCS
+  // bucket. When it gets passed back on the server side, we would copy it to a
+  // permanent GCS location. We also update this field to the permanent GCS path
+  // before saving it to MongoDB and then get populated in ClickHouse. For ML
+  // few-shot learning, we query the ClickHouse and read the file from this
+  // updated field.
+  //
+  // NOTE that the extracted entities information are duplicated between this
+  // file and ExtractedFieldsResult.results. We need to make sure the information
+  // is in sync in two places:
+  // 1. when generating the protobuf files on the ML side.
+  // 2. when updating the fields on the HITL UI, we need to update both the
+  //    results field and the protobuf file.
+  // The main reasons we are duplicating the information are that we have more
+  // control over our Protobuf messages, and we may consider moving away from
+  // the DocumentAI messages in the future.
+  string docai_proto_path = 3;
+   
+  reserved 1;
+}
+
+// Extracted fields from a document.
+message ExtractFieldsResultUnified {
+  ExtractionDocument result = 1;
+}
+
+// Validate the values between form data and a document.
+// Currently only used in document processing.
+message ValidateFieldValues {
+  // Deprecated: Use the `source` and `target` fields instead.
+  Document document = 3 [deprecated=true];
+  repeated Field fields = 1 [deprecated=true];
+  
+  string rule = 2;
+  // Source is considered as the ground truth for the validation
+  // It may contain additional fields as extra context
+  Item source = 4;
+  // Target is the data to be validated
+  // It may contain additional fields as extra context
+  Item target = 5;
+  // List of field names to be validated
+  repeated string validate_fields = 6;
+}
+
+// Result of validation between form data and a document.
+message ValidateFieldValuesResult {
+  enum Status{
+    STATUS_UNSPECIFIED = 0;
+    MATCH = 1;
+    MISMATCH = 2;
+  }
+
+  message PerFieldResult {
+    Field extracted_field = 1;
+    Status status = 2;
+    // Text explaining why the extracted value does not match.
+    string explanation = 3;
+    // per-field confidence score
+    float confidence = 4;
+  }
+
+  repeated PerFieldResult results = 5;
+
+  // Keep the following global fields to be backward-compatible
+  // TODO: remove the fields after all installations are upgraded
+  Status status = 1;
+  float confidence = 2;
+  string explanation = 3;
+  repeated Field extracted_fields = 4;
+}
+
+// Flag the given keywords in documents and form fields.
+message FlagKeywords {
+  repeated string keywords = 1;
+  repeated FieldGroup field_groups = 2;
+  repeated Document documents = 3;
+  string rule = 4;
+}
+
+// Keywords flagged.
+message FlagKeywordsResult {
+  // For keywords detected in field groups, we return the per-field result
+  message FieldResult {
+    int32 field_group_index = 1;
+    int32 field_index = 2;
+    repeated string detected_keywords = 3;
+  }
+
+  // For keywords detected in a document, we return the per-page results.
+  message DocumentResult {
+    int32 document_index = 1;
+    int32 page_number = 2;  // 1-based index similar to DocAI
+    repeated string detected_keywords = 3;
+  }
+
+  message Result {
+    oneof result {
+      FieldResult field_result = 1;
+      DocumentResult document_result = 2;
+    }
+  }
+
+  repeated Result results = 2;
+
+  // TODO: remove it after all installations are upgraded
+  repeated string detected_keywords = 1;
+}
+
+// A single item can contain one or more (structured) field groups, and one or
+// more (unstructured) documents. The field groups can either represent one or
+// more HTML forms, or one or more rows in a data table.
+//
+// This aims to be a generic data structure that can be used in a wide range of
+// applications.
+//
+// For example, an expense item can have the following
+//   1. fields from user provided form
+//   2. fields provided by the credit card system
+//   3. user submitted receipt files
+// each of the them can contain some information about the expense, such as
+// merchant name, amount, some identifier etc.
+//
+// Another example is for purchasing order reconciliation, where an item can
+// contain a data table that contains line items and a optional PDF document
+// (such as receipt PDF).
+message Item {
+  // it can come from one or more forms, or rows from a single HTML table
+  repeated FieldGroup field_groups = 1;
+  repeated ItemDocument documents = 2;
+  repeated SmartActionRequestAndResult smart_action_records = 3;
+}
+
+// Set of entities. Some can be partially filled and some needed to be extracted 
+// from  the attached documents.
+message EnrichEntitiesRequest {
+  // Already extracted entities.
+  FieldGroup field_group = 1;
+
+
+  // List of documents and fields to extract in each. Different fields can come from 
+  // different documents.
+  repeated ExtractionDocument documents = 2;
+}
+
+
+// A supporting document for an item which contains metadata
+message ItemDocument {
+  Document document = 1;
+  // List of fields we expect to extract and use for reconciliation from document
+  repeated Field fields = 2;
+}
+
+// Represents a document unit as a whole, containing other related infrmation like 
+// the expected schema for extraction, and the extracted entities.
+message ExtractionDocument {
+  // The document to extract from.
+  Document document = 1;
+
+  // TODO: Add `Schema` once consensus is reached on the schema format.
+
+  // Extracted fields from the document.
+  FieldGroup field_group = 2;
+}
+
+message SmartActionRequestAndResult {
+  ProcessSmartActionsRequest request = 1;
+  SmartActionResult result = 2;
+}
+
+message FieldGroupMatch {
+  // depending on the use case, there might be 1:N mapping to N:1 mapping between
+  // source groups and target groups. For those cases, there would be N entries
+  // of the FiledGroupMatch, each with it's own confidence score.
+  message MatchedFieldGroup {
+    int32 source_index = 1;
+    int32 target_index = 2;
+
+    // optionally, we can update some fields on the source side for the match.
+    repeated Field source_field_updates = 3;
+
+    // indicate that we cannot generate field updates to match the target fields
+    // and human review is required. For the case of JLL, the field is set when
+    // we cannot generate the updates required to set the quantity filed by
+    // dividing amount by unit cost.
+    // Note: this field is independent from the matching confidence. i.e. we could
+    // have both high and low confidence of matching when this field is set.
+    string update_error = 4;
+  }
+
+  // Unmatched field group either on the source side on the target side.
+  message UnmatchedFieldGroup {
+    int32 index = 1;
+  }
+
+  oneof match_type {
+    MatchedFieldGroup match = 2;
+    UnmatchedFieldGroup unmatched_source = 3;
+    UnmatchedFieldGroup unmatched_target = 4;
+  }
+
+  float confidence = 5;
+  // natural language explanation for the match/unmatch prediction.
+  string explanation = 6;
+}
+
+// Represents a match (or mismatch) between a source field and a target field.
+message FieldMatch {
+  // Depending on the use case, there might be 1:N mapping to N:1 mapping between
+  // source groups and target groups. For those cases, there would be N entries
+  // of the FiledGroupMatch, each with its own confidence score.
+
+  // Unique identifier of the source field. Leave empty to indicate an unmatched
+  // target field.
+  string source_id = 1;
+
+  // Unique identifier of the target field. Leave empty to indicate an unmatched
+  // source field
+  string target_id = 2;
+
+
+  // Optional update to the source field to improve the match.
+  // To indicate no update, do not set this field i.e. leave it empty.
+  // To update the nested fields, set the nested fields in the update.
+  Field updated_source_field = 3;
+
+
+  // Indicates that automatic field updates failed and human review is needed 
+  // to match the target field. This is independent of the matching confidence. i.e.
+  // we could have both high and low confidence of matching when this field is set.
+  string update_error = 4;
+
+  // Confidence score for the match (or mismatch).
+  float confidence = 5;
+
+  // Natural language explanation for the match/unmatch prediction.
+  string explanation = 6;
+}
+
+
+// Detect duplicate line items.
+message DetectDuplicateLineItems {
+  repeated Item items = 1;
+  string rule = 2;
+}
+
+// Duplicate line items detected.
+message DetectDuplicateLineItemsResult {
+  // a duplicate group contains at least two row indices.
+  message DuplicateGroup {
+    // 0-based row indices from the given table
+    repeated int32 item_indices = 1;
+
+    // reason on why we think this is a duplicate
+    string explanation = 2;
+  }
+
+  // we may find zero or more duplicate groups from the table
+  repeated DuplicateGroup duplicates = 1;
+
+  // overall confidence score for all predicted duplicates
+  float confidence = 2;
+}
+
+// Generate some text given some context (FieldGroups or documents)
+// and a prompt.
+message GenerateText {
+  repeated Item items = 1;
+  string prompt = 2;
+}
+
+// AI generated text.
+message GenerateTextResult {
+  string generated_text = 1;
+  float confidence = 2;
+}
+
+message Classify {
+  // Predefined operations that have optimized implementation from the ML side.
+  // Each preset has its predefined prompt and preferred input format.
+  // If preset is defined, the prompt field is optional.
+  enum ClassifyPreset {
+    CLASSIFY_PRESET_UNSPECIFIED = 0;
+
+    // predict risk level for Google Concur expense auditing.
+    // - input: would be either expense form or list of expenses
+    // - output: binary prediction and confidence score can be interpreted as
+    //   risk level (higher confidence means higher risk)
+    GOOGLE_EXPENSE_RISK = 1;
+
+    // validate whether an expense document is a valid receipts/invoice.
+    // - input: a single PDF/image
+    // - output: binary prediction
+    GOOGLE_EXPENSE_DOCUMENT_VALIDATION = 2;
+  }
+
+  repeated Item items = 1;
+  string prompt = 2;
+  ClassifyPreset preset = 3;
+}
+
+message ClassifyResult {
+  enum BinaryPrediction {
+    UNSPECIFIED = 0;
+    NEGATIVE = 1;
+    POSITIVE = 2;
+  }
+
+  oneof prediction_type {
+    string category = 1;
+    BinaryPrediction binary = 4;
+  }
+
+  // ML confidence between 0 to 1.
+  float confidence = 2;
+  string explanation = 3;
+}
+ 
+
+// A common use case in accounting is to purchase order (PO) reconciliation, which
+// matches line items between PO against invoices. The result of this process
+// would be updating line items in PO and link invoice items to the corresponding
+// PO ones. We model those operations as taking in two data tables that contains
+// those line items (as two Items) and generates necessary data table updates as ItemUpdates.
+message ReconcileItems {
+  string rule = 2;
+  // List of fields to reconcile. If a field is included here, we consider it
+  // to be mutable and include it in UpdateFieldGroups.
+  repeated Field fields = 3;
+
+  // Reconciliation happens between two items:
+  // - source: mutable item that we'd like to update in order to match the target item
+  // - target: immutable item that we want to reconcile against.
+  // In the context of reconciliation between invoice and purchase order, we'd
+  // like to update the purchase order entries to match the ones in the invoice.
+  // Thus the invoice would target and purchase order would be the source.
+  Item source = 4;
+  Item target = 5;
+
+  reserved 1;
+}
+
+// Reconcile entities in source with entities in target.
+// A common use case in accounting is to purchase order (PO) reconciliation, which
+// matches line items between PO against invoices. The result of this process
+// would be updating line items in PO and link invoice items to the corresponding
+// PO ones. We model those operations as taking in two data tables that contains
+// those line items (as two Items) and generates necessary data table updates as ItemUpdates.
+message ReconcileItemsRequestUnified {
+  string rule = 1;
+  // List of fields to reconcile. If a field is included here, we consider it
+  // to be mutable and include it in UpdateFieldGroups.
+  FieldGroup schema = 2; 
+
+  // Reconciliation happens between two items:
+  // - source: mutable item that we'd like to update in order to match the target item
+  // - target: immutable item that we want to reconcile against.
+  // In the context of reconciliation between invoice and purchase order, we'd
+  // like to update the purchase order entries to match the ones in the invoice.
+  // Thus the invoice would target and purchase order would be the source.
+  EnrichEntitiesRequest source = 3;
+  EnrichEntitiesRequest target = 4;
+}
+
+message FieldGroupExtractedFields {
+  int32 field_group_index = 3;
+  repeated Field fields = 1;
+  float confidence = 2;
+}
+
+message ReconcileItemsResult {
+  // field group matches between source and target items
+  repeated FieldGroupMatch field_group_matches = 5;
+
+  repeated FieldGroupExtractedFields source_extracted_fields = 6;
+  repeated FieldGroupExtractedFields target_extracted_fields = 7;
+
+  reserved 1, 2, 3, 4;
+}
+
+message ReconcileItemsResultUnified {
+  // field group matches between source and target items
+  repeated FieldMatch field_matches = 1;
+  ExtractionDocument source_extracted_fields = 2;
+  ExtractionDocument target_extracted_fields = 3;
+}
+
+message SmartActionOptions {
+  // Set to true if the request is using the new smart action framework. See go/sa-framework-details for more details.
+  // This flag is used while we are migrating to new smart action framework. Deprecate this flag once the migration is complete.
+  bool is_new_smart_action_framework = 1;
+
+  // Set to true if the request and response is in legacy proto.
+  bool convert_legacy_proto = 2;
+}
+
+message ProcessSmartActionsRequest {
+  repeated SmartAction actions = 1;
+  // The corresponding Orbot execution that initiates this request, used for error tracing
+  string task_id = 2;
+  // The action that initiates this request, used for error tracing
+  string action_id = 3;
+  // Parameter used internally for DocAI API monitoring
+  bool bypass_docai_cache = 4;
+  // Parameter used internally for LLM API monitoring
+  bool bypass_llm_cache = 5;
+  // This field indicates the operation need to run async.
+  bool run_async = 6;
+  // The corresponding review task created by the frontend. 
+  // The backend will use this field to fill in output from ML.
+  string review_task_id = 7;
+
+  // Custom options for the request to be used by the OrbotML.
+  SmartActionOptions smart_action_options = 8;
+
+  // Right now ML needs to query ClickHouse directly to fetch few-shot examples.
+  // Since we store data in separate databases for organizations with single
+  // tenant setup, we need to pass down this information to the ML side. This is
+  // only temporary before we set up and migrate to using a proxy service on the
+  // server side which can handle single tenancy as well as better access control.
+  // NOTE: this field is populated on the server side before sending the request
+  // to the ML side via Temporal call.
+  // Sample values:
+  // - shared tenant: default
+  // - single tenant: dev_672a6c16aa7b2a6c12408fa7
+  // TODO: remove this once we migrate to the proxy service.
+  string clickhouse_database = 9;
+}
+
+message SmartAction {
+  oneof action_type {
+    ExtractFields extract_fields = 1;
+    ValidateFieldValues validate_field_values = 2;
+    FlagKeywords flag_keywords = 3;
+    DetectDuplicateLineItems detect_duplicate_line_items = 4;
+    ReconcileItems reconcile_line_items = 5;
+    GenerateText generate_text = 6;
+    Classify classify = 7;
+
+    // New unified protos for smart actions. These fields should have suffix "_unified".
+    // TODO: Deprecate the old protos once the migration is complete.
+    ExtractFieldsRequestUnified extract_fields_unified = 8;
+    ReconcileItemsRequestUnified reconcile_line_items_unified = 9;
+  }
+
+  common.Hyperparameter hyperparameter = 10;
+}
+
+message ProcessSmartActionsResponse {
+  repeated SmartActionResult results = 1;
+}
+
+message SmartActionResult {
+  oneof result_type {
+    ExtractFieldsResult extract_fields_result = 1;
+    ValidateFieldValuesResult validate_field_values_result = 2;
+    FlagKeywordsResult flag_keywords_result = 3;
+    DetectDuplicateLineItemsResult detect_duplicate_line_items_result = 4;
+    SmartActionError smart_action_error = 5;
+    ReconcileItemsResult reconcile_line_items_result = 6;
+    GenerateTextResult generate_text_result = 8;
+    ClassifyResult classify_result = 9;
+
+    // New unified protos for smart actions.
+    // TODO: Deprecate the old protos once the migration is complete.
+    ExtractFieldsResultUnified extract_fields_result_unified = 10;
+    ReconcileItemsResultUnified reconcile_line_items_result_unified = 11;
+  }
+
+  enum SmartActionError {
+    PROCESS_DOCUMENT_ERROR_TYPE_UNSPECIFIED = 0;
+    READABILITY_ERROR = 1;
+    // One of the PDF files in the request contains more pages than what we can support.
+    // Currently it's 15 due to DocAI's limit on synchronous OCR request.
+    PAGE_LIMIT_EXCEEDED_ERROR = 2;
+    UNKNOWN_ERROR = 3;
+  }
+
+  // for billing purpose
+  int32 num_processed_pages = 7;
+}
+
+// Used to construct examples of actions and their expected results together
+// for test cases and evaluation datasets.
+message SmartActionExample {
+  SmartAction action = 1;
+  SmartActionResult result = 2;
+  int32 id = 3;
+}
+
+// Group a set of SmartActionExamples with an optional name.
+message SmartActionExamples {
+  // identify the set of examples.
+  string name = 1;
+
+  repeated SmartActionExample examples = 2;
+}
+
+message SmartActionHITLResult {
+  SmartActionResult smart_action_result = 1; // It stores the original result from the ML if the user modifies the result
+  SmartActionResult corrected_smart_action_result = 2; // Response from the ML or after the user modifies the result
+  bool is_fallout = 3;
+  string fallout_reason = 4; 
+}

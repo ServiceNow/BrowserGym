@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "buf/validate/validate.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
+import "pb/v1alpha1/api_key.proto";
+import "pb/v1alpha1/organization.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+service Organizations {
+  // Allows user to register an organization 
+  rpc CreateOrganization (CreateOrganizationRequest) returns (Organization) {}
+  // Returns information about an organization
+  rpc GetOrganization (GetOrganizationRequest) returns (Organization) {}
+  // Updates the organization information
+  rpc UpdateOrganization (UpdateOrganizationRequest) returns (Organization) {}
+  // Delete the organization
+  rpc DeleteOrganization (DeleteOrganizationRequest) returns (google.protobuf.Empty) {}
+
+  rpc CreateApiKey (CreateApiKeyRequest) returns (CreateApiKeyResponse) {}
+
+  rpc UpdateApiKey (UpdateApiKeyRequest) returns (UpdateApiKeyResponse) {}
+
+  rpc ListApiKeys (ListApiKeysRequest) returns (ListApiKeysResponse) {}
+
+  rpc DeleteApiKey (DeleteApiKeyRequest) returns (google.protobuf.Empty) {}
+
+  rpc UpsertHolidayList (UpsertHolidayListRequest) returns (google.protobuf.Empty) {}
+
+  rpc GetHolidayList (GetHolidayListRequest) returns (HolidayList) {}
+
+  rpc ListHolidayLists (ListHolidayListsRequest) returns (ListHolidayListsResponse) {}
+
+  rpc DeleteHolidayList (DeleteHolidayListRequest) returns (google.protobuf.Empty) {}
+}
+
+message DeleteOrganizationRequest {
+  string name = 1;
+}
+
+message CreateOrganizationRequest {
+  Organization organization = 1;
+  // User to be created as password user, must not be existing user and
+  // needs to be an admin within the organization
+  OrganizationPasswordUser password_user = 2;
+}
+
+message GetOrganizationRequest {
+  string name = 1;
+}
+
+message OrganizationPasswordUser {
+  // The email provided here must be part of admin array in workflow
+  string email = 1;
+  // Password cannot be empty
+  string password = 2;
+}
+
+message UpdateOrganizationRequest {
+  Organization organization = 1;
+  // The fields that can be updated are: users, admins, creators, display_name, 
+  // workflow_template_types, saml_config, saml_config.is_activated, 
+  // saml_config.sign_request, saml_config.idp_metadata.signing_certificates, 
+  // saml_config.idp_metadata.sso_url, saml_config.idp_metadata.entity_id, 
+  // saml_config.idp_metadata.logout_url.
+  //
+  // The fields that can be updated from internal app are:  workflow_template_types, 
+  // hyperparameter_resource_name.
+  // 
+  // We provide a FieldMask to allow partial updates for idp_metadata because
+  // the client won't be able to send the complete existing data for idp_metadata
+  // since certificates are not sent to the client. We have a certificate check
+  // on the server side to validate the certificates inside idp_metadata.
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+message CreateApiKeyRequest {
+  string api_key_name = 1 [(buf.validate.field).string = {min_len: 1}];
+  // Optional description for the api key
+  optional string api_key_description = 2 [
+    (buf.validate.field).string = {min_len: 1},
+    (buf.validate.field).ignore_empty = true,
+    (google.api.field_behavior) = OPTIONAL
+  ];
+  // custom expiration time for the api key, if not provided, the api key will
+  // never expire
+  google.protobuf.Timestamp expiration_time = 3 [
+    (google.api.field_behavior) = OPTIONAL
+  ];
+
+  // the endpoints that can be performed by the api key.
+  // if none provided, the api key will have all the access.
+  repeated ApiKeyPermission permissions = 4 [
+    (google.api.field_behavior) = OPTIONAL
+  ];
+  // the manageable workflows by the api key,
+  // if none provided, the api key will have access to all workflows.
+  repeated string workflow_ids = 5 [
+    (google.api.field_behavior) = OPTIONAL
+  ];
+}
+
+message CreateApiKeyResponse {
+  string org_id = 1;
+  ApiKey api_key = 2;
+}
+
+message UpdateApiKeyRequest {
+  string api_key_id = 1;
+  // The fields that can be updated are: name, description,
+  // expiration_time, permissions, workflow_ids.
+  google.protobuf.FieldMask field_mask = 2;
+  string name = 3;
+  string description = 4;
+  // if empty, the api key will never expire
+  google.protobuf.Timestamp expiration_time = 5;
+  // if empty, the api key will have all the access.
+  repeated ApiKeyPermission permissions = 6;
+  // if empty, the api key will have access to all workflows.
+  repeated string workflow_ids = 7;
+}
+
+message UpdateApiKeyResponse {
+  ApiKey api_key = 1;
+}
+
+message ListApiKeysRequest {
+  int32 page_size = 1 [
+    (buf.validate.field).int32 = {gte: 1, lte: 20},
+    (buf.validate.field).ignore_empty = true
+  ];
+  int32 page_number = 2 [
+    (buf.validate.field).int32 = {gte: 1},
+    (buf.validate.field).ignore_empty = true
+  ];
+}
+
+message ListApiKeysResponse {
+  string org_id = 1;
+  repeated ApiKey api_keys = 2;
+  int32 total_size = 3;
+}
+
+message DeleteApiKeyRequest {
+  string api_key_id = 1;
+}
+
+message HolidayList {
+  // For creation, this field will be empty
+  string id = 1;
+  string name = 2;
+  repeated google.type.Date holidays = 3;
+}
+
+message UpsertHolidayListRequest {
+  repeated HolidayList holiday_list = 1;
+  bool override_duplicate = 2;
+}
+
+message GetHolidayListRequest {
+  string id = 1;
+}
+
+message ListHolidayListsRequest {
+  // Starts from 1
+  int32 page_number = 1;
+  // Can take values from [1,20]
+  int32 page_size = 2;
+}
+
+message ListHolidayListsResponse {
+  repeated HolidayList holiday_lists = 1;
+  int64 count = 2;
+}
+
+message DeleteHolidayListRequest {
+  string id = 1;
+}

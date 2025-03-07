@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/common";
+
+message UserProfileInfo {
+  string username = 1;
+  string full_name = 2;
+  string image_url = 3;
+}

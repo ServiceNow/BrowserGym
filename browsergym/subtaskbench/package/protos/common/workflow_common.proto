@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/common";
+
+// Enum to represent workflow template type
+enum WorkflowTemplateType {
+  WORKFLOW_TEMPLATE_TYPE_UNSPECIFIED = 0;
+  DRIVE_EXTRACTION = 1;
+  DRIVE_EXTRACTION_SHEET = 2;
+  DRIVE_CLASSIFICATION = 3;
+  DRIVE_CLASSIFICATION_SHEET = 4;
+  GMAIL_EXTRACTION_SHEET = 5;
+  SFTP_CLASSIFICATION = 6;
+  SFTP_CLASSIFICATION_SHEET = 7;
+  SFTP_EXTRACTION = 8;
+  SFTP_EXTRACTION_SHEET = 9;
+  OUTLOOK_EXTRACTION_EXCEL = 10;
+  SFTP_EXTRACTION_EXCEL = 11;
+  SFTP_CLASSIFICATION_EXCEL = 12;
+  FILE_EXTRACTION = 13;
+  FILE_CLASSIFICATION = 14;
+}

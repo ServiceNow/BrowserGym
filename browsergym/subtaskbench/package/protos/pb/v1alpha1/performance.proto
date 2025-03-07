@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "google/type/date.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+// To capture performance for various needs. 
+message Performance {
+  int32 true_positive = 1;
+  int32 true_negative = 2;
+  int32 false_positive = 3;
+  int32 false_negative = 4;
+  double precision = 5;
+  double recall =  6;
+  double micro_f1 = 7;
+  double macro_f1 = 8;
+  double accuracy = 9;
+  repeated TaskEntityMetrics task_entity_metrics = 10;
+}
+
+message DailyPerformance {
+  google.type.Date date = 1;
+  Performance performance = 2;
+}
+
+message TaskEntityMetrics {
+  string parent_entity_type = 1;
+  string child_entity_type = 2;
+  int32 true_positive = 3;
+  int32 true_negative = 4;
+  int32 false_negative = 5;
+  int32 false_positive = 6;
+  float pre_annotation_confidence_score = 7;
+}

@@ -1,0 +1,127 @@
+syntax = "proto3";
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+import "pb/v1alpha1/orbot_action.proto";
+
+message GenerateJsActionRequest {
+  string org_id = 1;
+  // Context of the current workflow
+  string workflow_context = 2;
+  string user_instruction = 3;
+
+  enum ReturnType {
+    RETURN_TYPE_UNSPECIFIED = 0;
+    STRING = 1;
+    BOOL = 2;
+  }
+  ReturnType expected_return_type = 4;
+
+  message FailedAttempt {
+    GenerateJsActionResponse result = 6;
+    string user_instruction = 1;
+
+    enum FailureType {
+      FAILURE_TYPE_UNSPECIFIED = 0;
+      SYNTAX_ERROR = 1;
+      INCORRECT_BEHAVIOR = 2;
+    }
+
+    FailureType failure_type = 2;
+    string failure_explanation = 3;
+  }
+  repeated FailedAttempt attempts = 5;
+}
+
+message GenerateJsActionResponse {
+  string generated_function = 1;
+
+  message QueryParameters {
+    float temperature = 2;
+    repeated string examples_used = 1;
+  }
+  QueryParameters query_parameters = 2;
+
+  enum GenerateJSFunctionError {
+    ERROR_TYPE_UNSPECIFIED = 0;
+    INTERNAL_ERROR = 1;
+    RATE_LIMIT_ERROR = 2;
+  }
+  GenerateJSFunctionError error = 3;
+}
+
+// These are only used in internal evaluation
+message GenerateJsActionExample {
+  GenerateJsActionRequest request = 1;
+  GenerateJsActionResponse response = 2;
+}
+
+message GenerateJsActionExamples {
+  // Name for the set of examples.
+  string name = 1;
+
+  repeated GenerateJsActionExample examples = 2;
+}
+
+message GenerateActionDescriptionRequest {
+  Action action = 1;
+
+  string action_js_code = 2;
+}
+
+message GenerateActionDescriptionResponse {
+  // description for the action
+  string description = 1;
+
+  enum GenerateDescriptionError {
+    ERROR_TYPE_UNSPECIFIED = 0;
+    INTERNAL_ERROR = 1;
+    RATE_LIMIT_ERROR = 2;
+  }
+  GenerateDescriptionError error = 2;
+
+  // Descriptions for each element that is operated on
+  repeated string element_descriptions = 3;
+}
+
+// populated on the server side if the MacroAction.login filed is present for
+// InferMacroActionStepRequest.action
+message LoginMacroActionOptions {
+  // The fields that the account has on our secret manager
+  // Populated by the server
+  repeated string field_names = 3;
+  // GetPasscodeAction contains all available MFA methods.
+  repeated GetPasscodeAction passcode_actions = 4;
+}
+
+message InferMacroActionStepRequest {
+  Action macro_action = 5;
+  MacroActionInferContext context = 6;
+
+  // additional information is populated on the server side based on the action.
+  oneof macro_action_option {
+    LoginMacroActionOptions login_macro_action_options = 3;
+  }
+
+  // Store information about previous actions executed.
+  // Add to this message as fields are needed for FM.
+  // To be populated by the server
+  message TrajectoryStep {
+    // The action that was executed
+    Action action = 1;
+    // Other things to add: information if Orbot errored out, etc.
+    MacroActionExecutionError error_type = 2;
+    string error_message = 3;
+  }
+  repeated TrajectoryStep prev_trajectory_steps = 2;
+
+  // Explicitly pass in the org_id before it's passed in via the cookie
+  string org_id = 4;
+
+  string execution_id = 7;
+}
+
+message InferMacroActionStepResponse {
+  MacroActionStep step = 4;
+}

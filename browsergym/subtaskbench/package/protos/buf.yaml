@@ -1,0 +1,45 @@
+version: v2
+lint:
+  use:
+    - STANDARD
+  except:
+    - ENUM_VALUE_PREFIX
+    - ENUM_ZERO_VALUE_SUFFIX
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+    - SERVICE_SUFFIX
+    - PACKAGE_VERSION_SUFFIX
+  ignore_only:
+    PACKAGE_SAME_GO_PACKAGE:
+      - google/api/annotations.proto
+      - google/api/field_behavior.proto
+      - google/api/http.proto
+      - google/api/httpbody.proto
+      - google/type/color.proto
+      - google/type/date.proto
+      - google/type/datetime.proto
+      - google/type/money.proto
+      - google/type/postal_address.proto
+      - google/type/timeofday.proto
+    # Ignore the following existing violations. We should gradually fix the issues.
+    PACKAGE_DIRECTORY_MATCH:
+      - fm_action_data/action_data.proto
+    PACKAGE_LOWER_SNAKE_CASE:
+      - fm_action_data/action_data.proto
+    ENUM_PASCAL_CASE:
+      - pb/v1alpha1/suggestion.proto
+      - pb/v1alpha2/tasks_service.proto
+      - pb/v1alpha2/workflows_service.proto
+    FIELD_LOWER_SNAKE_CASE:
+      - pb/v1alpha1/orbot_action.proto
+      - pb/v1alpha1/users_service.proto
+      - pb/v1alpha2/workflow_steps_params.proto
+      - pb/v1alpha2/workflows_service.proto
+      - application/application_params.proto
+      - fm_action_data/action_data.proto
+    ONEOF_LOWER_SNAKE_CASE:
+      - fm_action_data/action_data.proto
+      - pb/v1alpha1/orbot_action.proto
+    ENUM_NO_ALLOW_ALIAS:
+      - buf/validate/validate.proto

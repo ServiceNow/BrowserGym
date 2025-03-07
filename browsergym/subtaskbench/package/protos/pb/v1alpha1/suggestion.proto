@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "pb/v1alpha1/suggestion_step.proto";
+import "pb/v1alpha1/performance.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message Suggestion {
+    // Resource name for suggestion, in the format of users\/\*/suggestions/\*
+    string name = 1;
+    string task_name = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+    double confidence = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    enum STATUS {
+      STATUS_UNSPECIFIED = 0;
+      // A created suggestion that still waits for its preliminary steps to finish. It is not
+      // ready to execute any non-preliminary step and shouldn't be presented to users in any form.
+      CREATED  = 1;
+      ACCEPTED = 2;
+      REJECTED_INCORRECT = 3;
+      REJECTED_ALREADY_COMPLETED = 4;
+      // A suggestion that has finished its preliminary steps and is ready for non-preliminary
+      // setps like user review and actions on client side applications. 
+      READY = 5;
+      // A obsolete suggestion which doesn't finish all executions. 
+      // For example we delete an attachment-related suggestion if user has 
+      // downloaded the attachment before the suggestion is complete
+      OBSOLETE = 6;
+    }
+    STATUS status = 4;
+    google.protobuf.Timestamp create_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp complete_time = 6;
+    string time_saved = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated string tags = 8;
+    // Resource name for the task that generates this suggestion. Format is users\/\*/tasks/\*
+    string task_resource_name = 9;
+    // An ordered list of steps of this suggestion.
+    repeated SuggestionStep steps = 10;
+    // Suggestion performance metrics to be calculated once the suggestion is completed.
+    Performance performance = 11;
+    google.protobuf.Timestamp ready_time = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated string event_ids = 13;
+    //For default mode task, the field is always true, meaning all suggestions need review
+    //For auto pilot mode task, the field is always false, meaning no suggestion needs review
+    //For assisted mode, the field is false if suggestion confidence score >= task 
+    //confidence score threshold, otherwise true that means it need review.
+    bool human_review = 14;
+    // This field stores why the suggestion was marked obsolete
+    OBSOLETE_REASON obsolete_reason = 15;
+    google.protobuf.Timestamp obsolete_time = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+enum OBSOLETE_REASON {
+  OBSOLETE_REASON_UNSPECIFIED = 0;
+  LOW_DOCUMENT_CLASSIFICATION_SCORE = 1;
+  LARGE_DOCUMENT_SIZE = 2;
+  TASK_CONFIG_NOT_READY_FOR_SUGGESTION_CREATION = 3;
+  UNMATCHED_CLASSIFICATION = 4;
+}

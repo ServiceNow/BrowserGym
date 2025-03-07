@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message SAMLConfig {
+    string domain = 1 [deprecated = true];
+    repeated string domains = 6;
+    oneof config_type {
+        IdpMetadata idp_metadata = 2;
+        IdpMetadataXML idp_metadata_xml = 3;
+    }
+    bool sign_request = 4;
+    // If the SAMLConfig is activated, the SAMLConfig will be used.
+    // Initially, the SAMLConfig is not activated and will only be activated
+    // when the user has successfully tested the SAML connection.
+    bool is_activated = 5;
+    // List of email addresses to be excluded from SAML authentication, they will always be required to input password
+    repeated string excluded_emails = 7;
+}
+
+message IdpMetadata {
+    string sso_url = 1;
+    // There can be multiple signing certificates 
+    // which are provided by the IdP
+    repeated IdpMetadataNamedFile signing_certificates = 2;
+    string entity_id = 3;
+    string logout_url = 4;
+}
+
+message IdpMetadataXML {
+    oneof content {
+        string uri = 1;
+        IdpMetadataNamedFile xml = 2;
+    }
+}
+
+message IdpMetadataNamedFile {
+    string name = 1;
+    bytes content = 2;
+}

@@ -1,0 +1,34 @@
+// This is specific to Google contracts.
+// NOTE: This is a temporary arrangement and will be replaced by a more general solution.
+
+syntax = "proto3";
+
+package benchmark_dataset;
+
+import "benchmark_dataset/specification_tags.proto";
+
+enum GoogleSOWSectionTag {
+    UNSPECIFIED_SECTION = 0;
+
+    SECTION_OVERVIEW = 100;
+    SECTION_CONTRACTOR = 101;
+    SECTION_COMPANY = 102;
+    SECTION_SOW_TERM = 103;
+    SECTION_MAXIMUM_TOTAL_COST = 104;
+    SECTION_SERVICES_AND_DELIVERABLES = 105;
+    SECTION_PAYMENT = 106;
+    SECTION_CONTRACTORS_BACKGROUND_IP = 107;
+    SECTION_RESOURCES = 108;
+    SECTION_SPECIAL_TERMS = 109;
+    SECTION_SIGNATURES = 110;
+}
+
+message GoogleTagProperties {
+    GoogleSOWSectionTag tag = 1;
+    PossibleTagLayoutProperties layout_properties = 2;
+    TagAffectingDiversity affecting_diversity = 3;
+}
+
+message GoogleTagPropertiesConfig {
+    repeated GoogleTagProperties tag_properties = 1;
+}

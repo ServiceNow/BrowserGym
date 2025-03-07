@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+message DocClassificationParam {
+  // Set of labels which a document can be classified into
+  repeated string classification_labels = 1;
+}
+
+message EntityExtractionParam {
+  // Set the entities schema which needs to be extracted from the document
+  repeated string entities = 1;
+  // Value range [0, utils.FewShotExampleDocMaxSize]. When not at max
+  // value, example docs used in predictions need to be filtered
+  // againsted the mapping_columns field to handle schema changes, 
+  // e.g. removing deleted entity types and adding dummy values for
+  // added ones.            
+  //
+  // Whenever a task with the mapping_columns is completed, server
+  // will increase this value by 1 if and only if it is not at its max
+  // value.
+  //
+  // When a new workflow is created, server sets this value to the max
+  // value since entity filtering is not needed.
+  //
+  // When mapping_columns has an entity type change (excluding order
+  // change and changes to NotInDoc types), frontend please set this
+  // value to 0.
+  int32 exampleDocCount = 2;
+  // A map from entity type (string) to its EntityTypeSchema
+  map<string,  EntityTypeSchema > entity_type_schema_mapping = 3;
+
+  // all the above fields are outdated, please use the following field only.
+  // Note: [Bhavesh] plans to run a script to update all the existing workflows.
+  repeated EntityDetails entities_details = 4;
+}
+
+message EntityDetails {
+  string entity_type = 1;
+  EntityDataType normalization_type = 2;
+  repeated EntityDetails properties = 3;
+}
+
+message EntityTypeSchema {
+  // The entity normalization type
+  EntityDataType normalization_type = 1;
+}
+
+enum EntityDataType {
+  // Enum listing the supported data types for entity normalization
+  ENTITY_TYPE_UNSPECIFIED = 0;  // Default value if none is specified.
+  ENTITY_TYPE_MONEY = 1;
+  ENTITY_TYPE_DATE = 2;
+  ENTITY_TYPE_INTEGER = 3;
+  ENTITY_TYPE_FLOAT = 4;
+  ENTITY_TYPE_TEXT = 5;
+  ENTITY_TYPE_NESTED = 6;
+  ENTITY_TYPE_ANNOTATION = 7;
+  // CHOICE represents multiple options group for a single entity type
+  ENTITY_TYPE_CHOICE = 8;
+  // CHOICE_OPTION represents a single option for a CHOICE entity type
+  ENTITY_TYPE_CHOICE_OPTION = 9;
+}
+
+message GenerateOutputParam {
+  enum ActionType {
+    ACTION_TYPE_UNSPECIFIED = 0;
+    ACTION_CREATE_JSON_FILE = 1;
+  }
+  ActionType type = 1;
+  bool encryption_required = 2; // stores the encryption required flag
+  // Ex. this will be true for SFTP trigger based workflows
+  bool skipped = 3; // generate output action is skipped
+}

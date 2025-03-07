@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+import "pb/v1alpha1/performance.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+service Evaluation {
+    rpc EvaluateQuality(EvaluateQualityRequest) returns (EvaluateQualityResponse) {}
+}
+
+message EvaluateQualityRequest {
+    // We evaluate all file objects starting with the specified prefix path returned by gcs client.
+    // Prefix has to be in the format:- gs://<bucket_name>/<path>
+    string prediction_file_path_prefix = 1;
+    string ground_truth_file_path_prefix = 2;
+    // This is an optional parameter which if provided will store the 
+    // performance proto conbined over all the document.
+    // The path needs to be a valid GCS URI path i.e for example:- gs://<bucket_name>/<folder_path>
+    string output_path = 3;
+}
+
+message EvaluateQualityResponse{
+    Performance quality = 1;
+    // This field returns number of matched documents which are downloaded succesfully from GCS and evaluated.
+    int32 evaluated_matched_files = 2;
+    // This field returns number of matched documents which are not downloaded succesfully.
+    int32 failed_matched_files = 3;
+    // This field returns number of unmatched ground truth document files 
+    int32 total_ground_truth_unmatched_files = 4;
+    // This field returns number of unmatched predicted document files 
+    int32 total_prediction_unmatched_files = 5;
+}

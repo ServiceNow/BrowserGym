@@ -1,0 +1,18 @@
+{
+  "name": "uuid-random-benchmark",
+  "version": "1.0.0",
+  "description": "Benchmarking various uuid libraries",
+  "main": "index.js",
+  "author": "Wes Roberts",
+  "license": "MIT",
+  "dependencies": {
+    "benchmark": "^2.1.4",
+    "fast-stats": "^0.0.5",
+    "id128": "^1.5.0",
+    "microtime": "^3.0.0",
+    "nanoid": "^3.1.10",
+    "platform.js": "^1.0.0",
+    "portable-uuid": "^0.3.0",
+    "uuid": "^8.1.0"
+  }
+}

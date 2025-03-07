@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "pb/v1alpha1/schedule.proto";
+import "google/protobuf/field_mask.proto";
+import "common/data_query_params.proto";
+
+package pb.v1alpha1;
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+
+service Schedules {
+  rpc CreateSchedule (CreateScheduleRequest) returns (Schedule) {}
+  rpc GetSchedule (GetScheduleRequest) returns (Schedule) {}
+  rpc UpdateSchedule (UpdateScheduleRequest) returns (Schedule) {}
+  rpc DeleteSchedule (DeleteScheduleRequest) returns (google.protobuf.Empty) {}
+  rpc ListSchedules (ListSchedulesRequest) returns (ListSchedulesResponse) {}
+}
+
+message CreateScheduleRequest {
+    Schedule schedule = 1;
+}
+
+message GetScheduleRequest {
+    string id = 1;
+    string org_id = 2;
+}
+
+message UpdateScheduleRequest {
+    Schedule schedule = 1;
+    // The fields that can be updated are: start_time, end_time, config, status.
+    google.protobuf.FieldMask field_mask = 2;
+}
+
+message DeleteScheduleRequest {
+    string id = 1;
+    string org_id = 2;
+}
+
+message ListSchedulesRequest {
+    string org_id = 1;
+    ListScheduleFilter filter = 2;
+    int32 page_number = 3;
+    int32 page_size = 4;
+    // Use this to send only relevant data in response
+    // - If field Mask is not send or is sent with empty paths then the result will contain
+    //   the complete object
+    // Valid values are start_time,end_time,create_time,last_update_time,config
+    google.protobuf.FieldMask field_mask = 5;
+  // The order of fields will effect the sorting order.
+  // Supported fields: create_time, last_update_time, start_time, end_time
+  repeated common.SortField sort = 6;
+}
+
+message ListScheduleFilter {
+  // Optional
+  string workflow_id = 1;
+  // Allowed values are {none|daily|weekly|monthly}
+  repeated string recurrence_patterns = 2;
+  repeated string creator_usernames = 3;
+}
+
+message ListSchedulesResponse {
+    repeated Schedule schedules = 1;
+    int32 total_size = 2;
+}

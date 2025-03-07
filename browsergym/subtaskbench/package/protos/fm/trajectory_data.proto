@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package fm;
+
+import "fm/action_data.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/fm";
+
+// Used by FM trajectory collector to represent the recorded trajectory of the FM agent.
+message TrajectoryData {
+  string base_url = 1 [deprecated=true]; // the URL where the trajectory started, may have been used by a task generator, deprecated in favor of domain
+  string goal = 2; // the intended goal the agent was trying to achieve
+  repeated fm.ActionData actions = 3; // the sequence of actions taken by the agent
+
+  message ResultSuccess {
+    string answer = 1; // the answer to the goal, can be text, number, url, or base64 encoded image
+  }
+  message ResultFailure {
+    enum FailureMessage {
+      FAILURE_MESSAGE_UNSPECIFIED = 0;
+      MAX_STEPS_EXCEEDED = 1; // the maximum number of steps allowed for the trajectory has been exceeded
+      REPORT_INFEASIBLE = 2; // the agent deemed the goal infeasible
+      REPETITIVE_ACTIONS = 3; // the agent repeated the same action multiple times
+      UNKNOWN_ERROR = 4; // we encountered irrecoverable errors during crawling
+    }
+    FailureMessage failure_message = 1; // the reason for the failure
+  }
+  oneof result {
+    ResultSuccess success = 4; // the result that satisfies the goal
+    ResultFailure failure = 5; // indicate goal is not satisfied and the reason for the failure
+  }
+
+  string domain = 6; // the domain name of the URL where the trajectory started
+}

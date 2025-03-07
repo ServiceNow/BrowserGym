@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+import "pb/v1alpha1/schema.proto";
+import "pb/v1alpha1/performance.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+// Stores common info or settings for generated suggestions.
+message Task {
+    // Resource name for task, in the format of users\/\*/tasks/\*
+    string name = 1;
+    // Task name description, e.g. "Process Invoice". Can't be empty.
+    string task_name = 2;
+    enum Mode {
+      UNSPECIFIED = 0;
+      DEFAULT  = 1;
+      AUTOPILOT = 2;
+      ASSISTED = 3;
+    }
+    Mode mode = 3;
+    // Only useful for ASSISTED mode, value range [0,1]
+    double confidence_threshold = 4;
+    // Performance for each date that this task has accepted suggestions
+    // in chronological order. Days without accepted task will not be included.
+    repeated DailyPerformance daily_performances = 5;
+    Schema schema = 6;
+}

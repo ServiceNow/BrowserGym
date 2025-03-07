@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package fm;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/fm";
+
+message LLMContent {
+  oneof type {
+    string text = 1; // the text of the message
+    string image_url = 2; // the URL or base64 string of the image
+  }
+}
+
+message LLMMessage {
+  string role = 1; // the role of the entity sending the message
+  repeated LLMContent llm_contents = 2; // the content of the message
+}
+
+// One interaction with the LLM model.
+message LLMInteraction {
+  string model_family = 1; // the family of the model that we called
+  string model_name = 2; // the name of the model used to make the decision
+  repeated LLMMessage llm_messages = 3; // the prompt used to make the decision
+  string response = 4; // the response from the model
+}

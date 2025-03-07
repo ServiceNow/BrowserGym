@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message DocumentBlob {
+  // Mime type of the document, e.g. "application/pdf", "image/jpeg".
+  string mime_type = 1;
+
+  // Document bytes.
+  bytes content = 2;
+
+  // Document bytes in base64 encoding.
+  // NOTE: This field is only intended to be used in textproto files for
+  // offline evaluation. In our production systems, we should only use the
+  // bytes content field.
+  bytes base64_content = 3;
+}
+
+message Document {
+  oneof data {
+    // Document with content bytes, which needs to provide the MIME type.
+    // NOTE: We prefer to send documents using gcs_uri rather than document_blob
+    // because using gcs_uri allows for better auditing and debugging capabilities.
+    DocumentBlob document_blob = 1;
+
+    // GCS URI to the document, where the MIME type can be stored in GCS file property.
+    string gcs_uri = 2;
+
+    // Refers to the documents uploaded to the UserFile service, where users
+    // only have access to the uploaded file ID, and how the uploaded files are
+    // stored internally is not visible to the user.
+    string file_id = 3;
+  }
+
+  string filename = 4;
+}

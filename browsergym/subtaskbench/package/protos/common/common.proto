@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package common;
+
+import "google/protobuf/timestamp.proto";
+import "common/user_profile.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/common";
+
+// Contains the deleted information about the object
+message DeletedObjectInfo {
+  google.protobuf.Timestamp deleted_time = 1;
+  string deleted_by = 2;
+  // Contains the reason of deletion specified
+  string deleted_reason = 3;
+  // Reason for not being able to restore
+  // Empty string means resource can be restored
+  string unrestorable_reason = 5;
+  UserProfileInfo deleter = 6;
+}

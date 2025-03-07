@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+import "pb/process_discovery/process.proto";
+import "pb/process_discovery/dataset.proto";
+import "common/user_profile.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
+
+service ProcessDiscovery {
+    rpc CreateProcess(CreateProcessRequest) returns (CreateProcessResponse) {}
+    rpc GetProcess(GetProcessRequest) returns (GetProcessResponse) {}
+    rpc ListProcesses(ListProcessesRequest) returns (ListProcessesResponse) {}
+    rpc UpdateProcess(UpdateProcessRequest) returns (UpdateProcessResponse) {}
+    rpc DeleteProcess(DeleteProcessRequest) returns (google.protobuf.Empty) {}
+}
+
+
+// This is how the user defines for the process and will be stored in the database. 
+// The DB object will also store the some additional fields such as the generated processMaps etc.
+message UserDefinedProcess {
+    string id = 1;
+    // The name of the process
+    string name = 2;
+    // The description of the process
+    string description = 3;
+
+    // The base step definitions for the process.
+    // Only the display name, description and application are inputted by the user.
+    repeated pb.process_discovery.StepType base_step_definition = 4;
+
+    // The variant step definitions for the process
+    repeated pb.process_discovery.StepType variant_step_definition = 5;
+
+    // User defines the attributes for the application and ML will associate the attributes with the step definitions.
+    repeated ApplicationAttributes application_attributes = 6;
+
+    // The users that are associated with the process
+    repeated string user_ids = 7;
+
+    google.protobuf.Timestamp create_time = 8;
+    google.protobuf.Timestamp last_update_time = 9;
+
+    // User who created the process
+    common.UserProfileInfo creator = 10;
+}
+
+message CreateProcessRequest {
+    // The id, creator, create_time, last_update_time inside the user_defined_process are added by BE.
+    UserDefinedProcess user_defined_process = 1;
+}
+
+message CreateProcessResponse {
+    UserDefinedProcess user_defined_process = 1;
+}
+
+message GetProcessRequest {
+    string process_id = 1;
+}
+
+// GetProcessResponse takes in the id of the user_defined_process and returns the corresponding processMap.
+message GetProcessResponse {
+    pb.process_discovery.Process process = 1;
+}
+
+// ListProcessesRequest is the request for listing all the user defined processes.
+message ListProcessesRequest {
+    // Maximum number of results to return
+    int32 page_size = 4;
+    // Page number for the current request
+    int32 page_number = 5;
+    // TODO:Add filters
+}
+
+message ListProcessesResponse {
+    repeated pb.process_discovery.Process processes = 1 [deprecated=true];
+    // TODO: use fieldmask.
+    int32 total_count = 2;
+    repeated UserDefinedProcess user_defined_processes = 3;
+}
+
+message UpdateProcessRequest {
+    UserDefinedProcess user_defined_process = 1;
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateProcessResponse {
+    UserDefinedProcess user_defined_process = 1;
+}
+
+message DeleteProcessRequest {
+    string process_id = 1;
+}
+
+message ApplicationAttributes {
+    string application = 1;
+    // The attributes associated with the application
+    repeated pb.process_discovery.Attribute attributes = 2;
+  }

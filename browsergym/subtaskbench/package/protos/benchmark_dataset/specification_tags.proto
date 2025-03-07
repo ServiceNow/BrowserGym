@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package benchmark_dataset;
+
+// Enum for tags supported in the benchmark dataset.
+enum DocumentTag {
+  UNSPECIFIED = 0;
+
+  // LANGUAGE: 1-99
+  // Document is written entirely in English.
+  LANGUAGE_ENGLISH = 1;
+
+  // LAYOUT: 100-199
+  // One or more page footers are present in the document.
+  LAYOUT_PAGE_FOOTER = 100;
+  // One or more page headers are present in the document.
+  LAYOUT_PAGE_HEADER = 101;
+  // One or more page numbers are present in the document.
+  LAYOUT_PAGE_NUMBERS = 102;
+  // One or more signature sections are present in the document.
+  LAYOUT_SIGNATURE_SECTION = 103;
+  // Document contains pages with a single-column layout.
+  LAYOUT_SINGLE_COLUMN = 104;
+  // Document contains one or more pages with a double-column layout.
+  LAYOUT_DOUBLE_COLUMN = 105;
+  // Document contains one or more pages with a triple-column layout.
+  LAYOUT_TRIPLE_COLUMN = 106;
+  // One or more floating text segments are present.
+  LAYOUT_FLOATING_TEXT = 107;
+  // One or more text segments are overlapping within the document.
+  LAYOUT_OVERLAPPING_TEXT = 108;
+  // Lines are numbered within the document.
+  LAYOUT_LINE_NUMBERING = 109;
+  // Annotations are placed in margins within the document.
+  LAYOUT_MARGINAL_ANNOTATIONS = 110;
+  // One or more watermarks are present in the document.
+  LAYOUT_WATERMARK = 111;
+  // One or more sections are color-coded in the document.
+  LAYOUT_COLOR_CODING = 112;
+
+  // TABLE: 200-299
+  // One or more tables with a uniform grid layout are present.
+  TABLE_SIMPLE = 200;
+  // One or more tables with a non-uniform layout are present.
+  TABLE_COMPLEX = 201;
+  // One or more nested tables are present in the document.
+  TABLE_NESTED = 202;
+  // One or more tables split across pages are present.
+  TABLE_SPLIT_ACROSS_PAGES = 203;
+  // One or more tables of significant length are present.
+  TABLE_LONG = 204;
+  // Tables oriented row-wise.
+  TABLE_ROW_ORIENTATION = 205;
+  // Tables oriented column-wise.
+  TABLE_COLUMN_ORIENTATION = 206;
+  // Tables oriented both row-wise and column-wise.
+  TABLE_ROW_AND_COLUMN_ORIENTATION = 207;
+
+  // ARTIFACT: 300-399
+  // Handwritten text is present in the document.
+  ARTIFACT_HANDWRITTEN_TEXT = 300;
+  // One or more checkboxes are present in the document.
+  ARTIFACT_CHECKBOX = 301;
+  // One or more images are present in the document.
+  ARTIFACT_IMAGE = 302;
+  // One or more charts are present in the document.
+  ARTIFACT_CHART = 303;
+  // One or more visual artifacts (folded corners, wrinkles, etc.) are present in the document.
+  ARTIFACT_VISUAL_ARTIFACT = 304;
+
+  // ENTITY: 400-499
+  // One or more simple entities are present in the document.
+  ENTITY_SIMPLE = 400;
+  // Requires long-range reasoning to understand the context or relation.
+  ENTITY_LONG_RANGE_REASONING = 401;
+  // Simple entities that are repeated within the document.
+  ENTITY_SIMPLE_REPEATED = 402;
+  // Simple entities found inside of tables.
+  ENTITY_SIMPLE_INSIDE_TABLE = 403;
+  // Nested entities present in the document.
+  ENTITY_NESTED = 404;
+  // Nested entities found outside of tables.
+  ENTITY_NESTED_OUTSIDE_TABLE = 405;
+  // Nested entities split across separated tables.
+  ENTITY_NESTED_MULTI_TABLE = 406;
+  // Nested entities with some child entities within a table and some outside of a table.
+  ENTITY_NESTED_CHILDREN_SPLIT_ACROSS_TABLES_AND_TEXT = 407;
+
+  // CONTENT: 500-599
+  // Strikethrough text is part of the content.
+  CONTENT_STRIKETHROUGH_TEXT = 500;
+}
+
+// Describes all the possible layout properties a tag can have within a document. More details at:
+// https://docs.google.com/document/d/1MQIZKo0Mxv41TjPqYgJg3WmAECtCcfY4aPDrzOZhhqA/edit#bookmark=id.chqnbhxny6il
+message PossibleTagLayoutProperties {
+  // Whether the tag is always present or always absent or a mix of both.
+  repeated bool is_present = 1;
+  // Possible position indexes of the tag within the document (if the tag is present)
+  repeated int32 position_index = 2;
+}
+
+message TagAffectingDiversity {
+  // Corresponding weights for the tag properties. This tells us how much each
+  // property affects the diversity metric.
+  // wt = 0 means the property has very little effect on the diversity metric.
+  // wt = 1 means the property has a very high effect on the diversity metric.
+  float weight_is_present = 1;
+  float weight_position_index = 2;
+  float weight_contents = 3;
+
+}
+
+message TagProperties {
+  DocumentTag tag = 1;
+  PossibleTagLayoutProperties layout_properties = 2;
+  TagAffectingDiversity affecting_diversity = 3;
+}

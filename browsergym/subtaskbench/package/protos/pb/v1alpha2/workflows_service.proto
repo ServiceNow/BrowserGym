@@ -1,0 +1,355 @@
+syntax = "proto3";
+
+package pb.v1alpha2;
+
+import "application/application_params.proto";
+import "buf/validate/validate.proto";
+import "common/data_query_params.proto";
+import "common/user_profile.proto";
+import "common/workflow_common.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+import "common/common.proto";
+import "common/review.proto";
+import "pb/v1alpha2/workflow_steps_params.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha2";
+
+service Workflows {
+  rpc ListWorkflows (ListWorkflowsRequest) returns (ListWorkflowsResponse) {}
+  rpc CreateWorkflow (CreateWorkflowRequest) returns (Workflow) {}
+  rpc DeleteWorkflow (DeleteWorkflowRequest) returns (DeleteWorkflowResponse) {}
+  rpc GetWorkflow (GetWorkflowRequest) returns (Workflow) {}
+  rpc UpdateWorkflow (UpdateWorkflowRequest) returns (Workflow) {}
+  rpc ListWorkflowFields (ListWorkflowFieldsRequest) returns (ListWorkflowFieldsResponse) {}
+}
+
+message ListWorkflowsRequest {
+  // If unset:
+  //   Admin: list workflows for the organization. Templates are eligible
+  //   User: list assigned workflows where user is a workflow user.
+  // If set: 
+  //   Admin: list assigned workflows for this user
+  //   User: error if set to other users. No difference if set to own email.
+  string user = 1;
+  // Default is 10 (when page_size is missing or set to 0). Max value is 20.
+  // Ordered by display name.
+  int32 page_size = 2;
+  // Use this to continue the previous list requests.
+  // Its value should be same with previous response's next_page_token.
+  // Please reuse the same filter and page size.
+  string page_token = 3;
+  // Supported filters: "is_template={true|false},
+  // status={status_enabled|status_disabled},type={extraction|classification}"
+  // providing type will fetch workflows of that type i.e Extraction or Classification only
+  // application={Gmail|Outlook|Google Drive|Google Sheets|MS Excel|SFTP Server}
+  // multiple application values can be provided with a dash (-) separator, eg. "application=Gmail-Outlook"
+  // mode={DEFAULT|AUTOPILOT|ASSISTED}
+  // multiple mode values can be provided with a dash (-) separator, eg. "mode=DEFAULT-AUTOPILOT"
+  // name_prefix="value"
+  // create_time_lt={UNIX_TIME_SEC}
+  // create_time_gt={UNIX_TIME_SEC}
+  // last_update_time_lt={UNIX_TIME_SEC}
+  // last_update_time_gt={UNIX_TIME_SEC}
+  // user={abc@gmail.com:xyz@gmail.com}
+  // multiple users can be provided by a colon (:) separator
+  // creator={abc@gmail.com:xyz@gmail.com}
+  // multiple creators can be provided by a colon (:) separator
+  string filter = 4;
+  // Use this to send only relevant data in response
+  // - If Field Mask is not send or is sent with empty paths then the result will contain
+  //    the complete object
+  // - Valid values for field mask are: task_name, confidence, status, create_time, complete_time,
+  //    time_saved, tags, task_resource_name, steps, performance, ready_time, accuracy
+  // - Field mask will always contain `name` field. Please donot send it in Paths to avoid errors.
+  google.protobuf.FieldMask field_mask = 5;
+  // Organization resource name. Format: organizations/{ID}
+  string org_resource_name = 6;
+  int32 page_number = 7;
+  // The order of fields will effect the sorting order.
+  // Supported fields: display_name, create_time, last_modified_time,
+  // mode, creator_email
+  repeated common.SortField sort = 8;
+}
+
+message ListWorkflowsResponse {
+  repeated Workflow workflows = 1;
+  // If the value is "", it means no further results for the request.
+  string next_page_token = 2;
+  // Total available suggestion size.
+  // Note it is NOT the remaining available suggestion size after the current response.
+  int32 total_size = 3;
+}
+
+message CreateWorkflowRequest{
+  Workflow workflow = 1;
+}
+
+message DeleteWorkflowRequest{
+  // The resource name of the workflow to be deleted, format workflows/{ID}.
+  string name = 1;
+  string deleted_reason = 2;
+}
+
+message GetWorkflowRequest{
+  // The resource name of the workflow to be retrived, format workflows/{ID}
+  string name = 1;
+  // Use this to send only relevant data in response
+  // Currently only 'additional_entities' is supported and if used then response will
+  // only contain additional_entities, resource_name and workflow_display_name fields.
+  google.protobuf.FieldMask field_mask = 5;
+}
+
+message UpdateWorkflowRequest{
+  Workflow workflow = 1;
+  // Support display_name, description, steps, manual_time_cost_in_minutes, 
+  // status, users, need_attention_threshold_default_mode, reviewer_lists, mode,
+  // hyperparameter_resource_name (internal only), learning_settings
+  // When "steps" fieldmask is used, only the GSheetsAddRowOption field inside
+  // WorkflowAction's GSheetsParam will be updated. This is used for schema
+  // change.
+  // If field_mask is empty, all updatable fields will be updated based on
+  // the provided workflow.
+  google.protobuf.FieldMask field_mask = 2;
+}
+
+message Workflow {
+  // Resource name. Format: workflows/{ID}
+  // Note: since a workflow can have multiple admins and admins can change
+  // over time, make workflow a top level resource instead of under user.
+  string name = 1;
+  // Optional workflow template resource name. Format: workflows/{ID}
+  string template_resource_name = 2;
+  string display_name = 3;
+  string description = 4;
+  repeated WorkflowStep steps = 5;
+  int32 manual_time_cost_in_minutes = 6;
+  google.protobuf.Timestamp create_time = 7;
+  // Proposal:  When this boolean field is true, some data validations can be
+  // skipped. Using a template to create a workflow means some workflow fields
+  // are copied from the template and not editable, or editable with
+  // restrictions. Each Orby-predefined workflow template is expected to be
+  // supported by predefined temporal workflows.
+  // To Support ListWorkflows() method, database index should be created.
+  bool is_template = 8;
+  google.protobuf.Timestamp last_modified_time = 9;
+  // Organization-level status. Disabled workflow won't generate tasks
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_ENABLED = 1;
+    STATUS_DISABLED = 2;
+  }
+  Status status = 10;
+  // Id of the organization the workflow belongs to. Format: organizations/{ID}
+  string organization_resource_name = 11;
+  // Any user who wants to get tasks from this workflow needs to be added to
+  // this group, including admins.
+  //users will be deprecated as the this info will be stored in reviewer_lists field
+  repeated common.WorkflowUser users = 12;
+  enum TEMPORAL_WORKFLOW {
+    TEMPORAL_WORKFLOW_UNSPECIFIED = 0;
+    DOCUMENT_PROCESSING_TO_GSHEETS_WORKFLOW = 1;
+    DOCUMENT_CLASSIFICATION_WORKFLOW = 2;
+    DOCUMENT_PROCESSING_WORKFLOW = 3;
+  }
+  TEMPORAL_WORKFLOW temporal_workflow = 13;
+  // Do not use, use creator instead.
+  string creator_email = 14;
+
+  enum Mode {
+    UNSPECIFIED = 0;
+    DEFAULT  = 1;
+    AUTOPILOT = 2;
+    ASSISTED = 3;
+  }
+  Mode mode = 15;
+  // Only useful for ASSISTED mode, value range [0,1]
+  double assisted_mode_confidence_threshold = 16;
+
+  repeated common.ReviewerList reviewer_lists = 17;
+  
+  // Workflow template type should only be used for templates
+  common.WorkflowTemplateType workflow_template_type = 18;
+  // Reserved for internal debugging purpose.
+  // Workflows with this field set can be created by specific organizations.
+  WorkflowDebugConfig workflow_debug_config = 19;
+  // Extraction predictions of default mode generated tasks whose confidence
+  // score is below this threshold are listed under "need attention" filter
+  // in the task review page. Empty prediction is always listed there.
+  // Range [0, 1]
+  double need_attention_threshold_default_mode = 20;
+  // This field allows soft deletion over time by
+  // marking workflow for deletion without immediately deleting it.
+  common.DeletedObjectInfo deleted_object_info = 21;
+  // Creator info of the workflow
+  common.UserProfileInfo creator = 22;
+
+  // Admins of the workflow. Who can CRUD all aspects of the workflow as
+  // well as its associated tasks. Can assign tasks to reviewers.
+  // Creator will be in the list of admins by default.
+  repeated string admins = 23;
+
+  // content of the email message to be sent to newly added admin account
+  // to notify an account that it has been added as an admin to the workflow.
+  // this variable works on CreateWorkflow & UpdateWorkflow.
+  string admin_email_message = 24;
+  // when set this to false, will not send email to newly added admin
+  bool send_admin_email = 25;
+  string hyperparameter_resource_name = 26;
+  
+  // Settings for machine learning models, reviewers which not used for learning
+  // will be excluded from example tasks.
+  WorkflowLearningSettings learning_settings = 27;
+  repeated WorkflowAdditionalEntities additional_entities = 28;
+
+  bool is_blocked = 29;
+
+  // This field will store entity-based accuracy over all the fields
+  // in the workflow. This is calculated by taking the average of all
+  // the fields' accuracy stored in clickhouse.
+  // If the accuracy is not available for the workflow, it will be set to -1.
+  // Else the value will be in the range [0, 1].
+  float accuracy = 30;
+  
+  // This field is used to store the email account for sending notification
+  // emails when task is completed/rejected/failed .
+  repeated string task_completion_notification_emails = 31;
+
+  // if successfully completed tasks (not archived or deleted) are less
+  // than the threshold(currently 3), it would affect model learning.
+  bool is_learning_tasks_insufficient = 32;
+}
+
+message WorkflowAdditionalEntities{
+  string task_resource_name = 1;
+  string task_display_name = 2;
+  common.UserProfileInfo creator = 3;
+  google.protobuf.Timestamp create_time = 4;
+  repeated EntityDetails entities_details = 5;
+}
+
+message WorkflowDebugConfig {
+  //bypass cache for ML workflow
+  bool bypass_cache = 1; 
+  // Used by FindExampleDocumentsAndLabels() to limit the maximum number of
+  // documents fetched **per** classification label.
+  int32 dbQueryLimit = 2;
+  // Whether to includ autopilot mode tasks in FindExampleDocumentsAndLabels()
+  // for classification or FetchSimilarExamples() for extractions.
+  bool includeAutopilotModeTasks = 3;
+  // If true, the workflow will bypass the quota check.
+  bool bypass_quota = 4;
+}
+
+message WorkflowStep {
+  // Step actions are only executed when all triggers are satisfied.
+  repeated WorkflowTrigger triggers = 1;
+  repeated WorkflowAction actions = 2;
+
+  message WorkflowAction {
+    // E.g. "Google Sheet"
+    string application = 1;
+    oneof param {
+      application.GDriveParam gdrive = 2;
+      application.GSheetsParam gsheets = 3;
+      application.GmailParam gmail = 4; // Do not use: For backward compatibility, will be removed once all logic is migrated to EmailParam.
+      DocClassificationParam classification = 5;
+      application.SFTPParam sftp = 6;
+      EntityExtractionParam entity_extraction = 7;
+      GenerateOutputParam generate_output_param = 8;
+      // GSheetsParam will be deprecated in favor of 
+      // SpreadsheetParam in the future to have a more generic name
+      // to support other spreadsheet applications
+      application.SpreadsheetParam spreadsheet = 9;
+      application.EmailParam email = 10;
+    }
+  }
+
+  message WorkflowTrigger {
+    // E.g. ”Google Drive“ for GDriveParam
+    string application = 1;
+    oneof param {
+      application.GDriveParam gdrive = 2;
+      application.GSheetsParam gsheets = 3;
+      application.GmailParam gmail = 4; // Do not use: For backward compatibility, will be removed once all logic is migrated to EmailParam.
+      application.SFTPParam sftp = 5;
+      // GSheetsParam will be deprecated in favor of 
+      // SpreadsheetParam in the future to have a more generic name
+      // to support other spreadsheet applications
+      application.SpreadsheetParam spreadsheet = 6;
+      application.EmailParam email = 7;
+    }
+  }
+}
+
+message DeleteWorkflowResponse {
+  string temporal_workflow_id = 1;
+}
+
+message WorkflowLearningSettingsReviewer {
+  // The user profile info of the reviewer
+  common.UserProfileInfo reviewer = 1;
+  // Whether the reviewer is still in the reviewer list of workflow
+  // If true, will be shown in the current reviewer list
+  // If false, will be shown in the past reviewer list
+  bool exists_in_reviewer_list = 2;
+  // Whether the reviewer's completed tasks can be used for learning
+  bool used_for_learning = 3;
+}
+
+message WorkflowLearningSettings {
+  // Reviewers of the workflow, including current reviewers and past reviewers
+  repeated WorkflowLearningSettingsReviewer reviewers = 1;
+}
+
+message WorkflowField {
+  string name = 1;
+  string workflow_display_name = 2;
+  repeated WorkflowField child_fields = 3;
+  // Accuracy of the field, range [0, 100]
+  int32 accuracy = 4;
+}
+
+message ListWorkflowFieldsFilter {
+  // Filter by field name, only support prefix-based name queries.
+  string name_prefix = 1;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    EXTRACTION_ONLY = 1;
+    CLASSIFICATION_ONLY = 2;
+  }
+  Type type = 2 [(buf.validate.field).enum = { in: [1, 2]}];
+  // The resoure name of workflows to filter by.
+  // Format: workflows/{workflowId}
+  repeated string workflow_resource_names = 3 [
+    (buf.validate.field).repeated.items = {
+      string: {
+        min_len: 1
+      }
+    }
+  ];
+  google.protobuf.Timestamp time_lt = 4;
+  google.protobuf.Timestamp time_gt = 5;
+}
+
+message ListWorkflowFieldsRequest {
+  // Organization resource name. Format: organizations/{ID}
+  string org_resource_name = 1;
+  int32 page_size = 2 [
+    (buf.validate.field).int32 = {gte: 1, lte: 50},
+    (buf.validate.field).ignore_empty = true
+  ];
+  int32 page_number = 3 [
+    (buf.validate.field).int32 = {gte: 1},
+    (buf.validate.field).ignore_empty = true
+  ];
+  ListWorkflowFieldsFilter filter = 4;
+  // The order of fields will effect the sorting order.
+  // Supported fields: accuracy.
+  repeated common.SortField sorts = 5;
+}
+
+message ListWorkflowFieldsResponse {
+  repeated WorkflowField fields = 1;
+  int32 total_size = 2;
+}

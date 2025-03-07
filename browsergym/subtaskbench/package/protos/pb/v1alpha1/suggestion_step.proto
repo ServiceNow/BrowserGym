@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+import "automation_mining/automation_mining.proto";
+import "google/cloud/documentai/v1/document.proto";
+import "automation_mining/ontology/data_models.proto";
+import "pb/v1alpha1/performance.proto";
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+message SuggestionStep {
+    string display_name = 1;
+    repeated SuggestionStepOption options = 2;
+    // Step performance metrics to be calculated once a step is completed.
+    Performance performance = 3;
+    automation_mining.ontology.Email email = 4;
+    repeated google.cloud.documentai.v1.Document documents = 5;
+    automation_mining.Activity activity = 6;
+    SuggestionStepMode mode = 7;
+    // No Change in any document: empty array
+    // Change in some/all Documents: 
+    // - If Document is modified, store all the original entities only
+    // - If Document is not modified, store empty/nil object
+    repeated google.cloud.documentai.v1.Document original_documents = 8;
+    // Stores zero value if user didn't modify the options, 
+    // otherwise store the selected option's original values. 
+    SuggestionStepOption original_option = 9;
+}
+
+message SuggestionStepOption {
+    string application = 1;
+    // Parameters for the application that are required to execute the
+    // SuggestionStep.activity. For example READ_EMAIL activity needs thread
+    // id and message id, DOWNLOAD_ATTACHMENT needs attachment urls,
+    // and Document_Understanding needs document protos (e.g. document content
+    // in source.content field).
+    oneof param {   
+        GmailReadEmailParam gmail_read_email = 2;
+        GmailDownloadAttachmentParam gmail_download_attachment = 3;
+        OrbyDocUnderstandingParam orby_doc_understanding = 4;
+        NetSuiteCreateInvoiceParam netsuite_create_invoice = 5;
+        GoogleSheetsAddRowParam gsheets_add_row = 7;
+    }
+
+    // True if the Application is selected else false 
+    bool selected = 6;
+
+    message GmailReadEmailParam {
+        // Target email thread id.
+        string thread_id = 1;
+        // Target email message id. 
+        string message_id = 2;
+    }
+    message GmailDownloadAttachmentParam {
+        // Frontend will try to download the attachments based on the urls and
+        // send them back as bytes in the documents field of SuggestionStep
+        // message through the Document proto field `source.content`.
+        // Attachment mimetype is set in the mime_type proto field.
+        // 
+        // Note: order of the attachments should correspond to the order of
+        // documents fields so that backend can map documents to attachments.
+        repeated automation_mining.ontology.EmailAttachment attachments = 1;
+    }
+    message OrbyDocUnderstandingParam {
+        // Only source.content is filled with document bytes.
+        repeated google.cloud.documentai.v1.Document documents = 1;
+    }
+    message NetSuiteCreateInvoiceParam {
+        // A list of entities used to create invoice in NetSuite.
+        repeated google.cloud.documentai.v1.Document.Entity entities = 1;
+    }
+    message GoogleSheetsAddRowParam {
+        // Google sheets URL
+        string url = 1;
+        // List of sheet names
+        repeated string sheet_names = 2;
+        // Selected sheet index, 0-based
+        int32 selected_sheet_index = 3;
+        // Available action, currently hardcoded to "Add a row"
+        string action = 4;
+    }
+}
+
+message SuggestionStepMode {
+    // If true, this step needs to be processed by frontend before a suggestion
+    // is ready.
+    bool preliminary_execution = 1;
+    // If true, payloads of this step will be rendered in a UI component when
+    // the suggestion needs human review.
+    bool review = 2;
+    // If true, this step has completed both server and client side work if any.
+    bool complete = 3;
+}
+
+message SuggestionStepOptionParam {
+
+}

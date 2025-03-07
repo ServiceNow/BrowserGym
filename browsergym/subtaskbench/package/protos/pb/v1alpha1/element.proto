@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+package pb.v1alpha1;
+
+option go_package = "github.com/orby-ai-engineering/web-api-server/pb/v1alpha1";
+
+// A rectangle for the bounding box of an element and the viewport.
+message Rect {
+  float x = 1; // x coordinate of the top-left corner
+  float y = 2; // y coordinate of the top-left corner
+  float width = 3; // width of the rectangle
+  float height = 4; // height of the rectangle
+}
+
+// (FM) This set of low-level actions is used to maintain compatibility with the action that the FM model
+// can take on elements. It is used to create a list of possible actions for each element and to concretely
+// map Action to FM actions.
+enum LowLevelActionType {
+  LOW_LEVEL_ACTION_TYPE_UNSPECIFIED = 0;
+  CLICK = 1;
+  HOVER = 2;
+  TYPE = 3;
+  SELECT_OPTION = 4;
+  SCROLL = 5;
+}
+
+// A base data structure to represent UI component in a tree structure.
+// Next ID: 26
+message Element {
+  // Id assigned by Orbot for identifying elements.
+  string id = 4;
+
+  // Type of the element. For example, a, button, etc.
+  string type = 1;
+
+  // For interactive elements like buttons, it would have a control type.
+  ControlType control_type = 6;
+
+  repeated Element children = 2;
+
+  // HTML attributes. For example, "aria-label" and "placeholder".
+  map<string, string> attributes = 3;
+
+  // Locator that can uniquely identify the element on the page. Only present in
+  // certain cases like GetActionableElementsResponse.
+  ElementLocator locator = 5;
+
+  // human readable label to identify the element. may not be unique across elements.
+  string label = 7;
+
+  // An NL description of the element.
+  string description = 8;
+
+  // FM
+  // the description of the element based on a set of heuristics during crawling; this will be deprecated in favor of description
+  string legacy_element_description = 9;
+  // the value of the input element
+  string input_value = 10;
+  // the bounding box of the element represented as a DOMRect (x, y, width, height)
+  Rect bounding_box = 11;
+  // the Playwright locator of the element
+  string playwright_locator = 12;
+  // the cursor shape when pointed at the element
+  string cursor = 13;
+  // whether the element is a new element from the previous state
+  bool is_new = 14;
+  // whether the element is interactive
+  bool is_interactive = 15;
+  // whether the element is indicated as displayed by its CSS attribute; this is different from visibility
+  bool is_displayed = 16;
+  // whether the element is at the top of the viewport
+  bool at_top = 17;
+  // whether the element is in the viewport
+  bool in_viewport = 18;
+  // whether the element is the one interacted with
+  bool acted_upon = 19;
+  // a list of possible actions that can be performed on the element
+  repeated LowLevelActionType possible_actions = 20;
+
+  // whether the element is checked / selected
+  // See https://developer.mozilla.org/en-US/docs/Web/CSS/:checked
+  bool checked = 21;
+
+  // whether the element is focused
+  // See https://developer.mozilla.org/en-US/docs/Web/CSS/:focus
+  bool focus = 22;
+
+  // whether the element is active
+  // See https://developer.mozilla.org/en-US/docs/Web/CSS/:active
+  bool active = 24;
+
+  // whether the element is being hovered over
+  // See https://developer.mozilla.org/en-US/docs/Web/CSS/:hover
+  bool hover = 25;
+
+  // The visible text content of this element, including text from descendant elements
+  string text_content = 26;
+}
+
+enum ControlType {
+  CONTROL_TYPE_UNSPECIFIED = 0;
+  BUTTON = 1;
+  LINK = 2;
+  TEXTBOX = 3;
+  CHECKBOX = 4;
+  SELECT = 5;
+}
+
+// Examples:
+// 1. Locate "Save" button in the root (Web UI)
+// {
+//   text: "Save"
+// }
+//
+// 2. Locate "Save" button in the Expense_Form (Web UI)
+// {
+//   text: "Save"
+//   parent_locator {
+//     css: "#Expense_Form"
+//   }
+// }
+//
+// 3. Locate "Save" button in an iframe (Web UI)
+// {
+//   text: "Save"
+//   parent_locator {
+//     css: "#inner-iframe"
+//     type: "iframe"
+//     parent_locator {
+//       css: "#outer-iframe"
+//       type: "iframe"
+//     }
+//   }
+// }
+//
+// 4. Locate the text area in a Windows Notepad window
+//
+// recommended way to use Action.windowIndex to locate the window in an action:
+// {
+//   click: {
+//     element_locator {
+//       type: CONTROL
+//       xpath: '/window/panel/panel/text'
+//     }
+//   }
+//   windowIndex: 1
+// }
+//
+// discouraged way that locates the window by label which may change during execution:
+// {
+//   type: CONTROL
+//   xpath: '/window/panel/panel/text'
+//   parent_locator {
+//     type: WINDOW
+//     label: 'Untitled'
+//     parent_locator {
+//       type: PROCESS
+//       label: 'notepad'
+//     }
+//   }
+// }
+//
+message ElementLocator {
+  oneof locator {
+    // locate element by label
+    string label = 1;
+    // locate element by text
+    string text = 2;
+    // While CSS selector can cover the above cases, we only use it as last resort
+    // since it's not as stable and more difficult to infer from text description.
+    string css = 3;
+
+    // XPath is currently used to locate UI element in desktop applications.
+    // It should be used only for Type.CONTROL and Type.CONTENT.
+    string xpath = 10;
+  }
+
+  enum Type {
+    ELEMENT_LOCATOR_TYPE_UNSPECIFIED = 0;
+    IFRAME = 1;
+    SHADOW_DOM = 2;
+    // To identify process in desktop application. Use the label field to specify
+    // the process name. Usage of this type is discouraged and we should prefer
+    // to use Action.windowIndex to locate a window.
+    PROCESS = 3;
+    // In desktop applications, there might be more than one window per process.
+    // For example, in the Windows Excel app, each open file would have its own
+    // window. Use the label field to specify the window name. Usage of this type
+    // is discouraged and we should prefer to use Action.windowIndex to locate a window.
+    WINDOW = 4;
+    // Windows accessibility API has two kind of elements: control and content.
+    CONTROL = 5;
+    CONTENT = 6;
+  }
+  Type type = 5;
+  ElementLocator parent_locator = 6;
+
+  // A user facing name of this element which could be shown in HITL review cards
+  // or in error messages. 
+  string name = 7;
+  // Description of the element that will assist the ML model in understanding the intention of element
+  // in order to better locating it. The concepts draw inspiration from accessible name and description in ARIA.
+  // It can be provided by user in the workflow definition, or (not implemented yet) generated by ML model 
+  // based on the element and current page context.
+  // ML model can use a combination of action description, element name and element description to locate an element.
+  string description = 11;
+
+  // Deprecated: use parent_locator and type instead.
+  ElementLocator iframe_locator = 4;
+
+  // the id of the element associated with this locator
+  string element_id = 8;
+
+  // wait time in milliseconds when trying to locate the element on the page.
+  // By default it's 4 seconds, but some actions in certain application might
+  // take longer.
+  int32 wait_time_in_ms = 9;
+}
