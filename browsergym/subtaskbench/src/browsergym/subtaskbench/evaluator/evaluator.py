@@ -3,12 +3,10 @@ from typing import List, Dict, Any
 import playwright.sync_api
 
 class Evaluator:
-    def __init__(self, start_url: str, goal: str, evaluation_script: str, expected_output: str, env_type: str):
+    def __init__(self, start_url: str, goal: str, evaluation_script: str):
         self.start_url = start_url
         self.goal = goal
         self.evaluation_script = evaluation_script
-        self.expected_output = expected_output
-        self.env_type = env_type
 
     def evaluate(self, page: playwright.sync_api.Page, answer: str) -> float:
         """
@@ -16,9 +14,14 @@ class Evaluator:
         """
         # Find the html from the playwright page
         html = page.content()
+        reward = 0
+        try:
+            # Evaluate the evaluation script
+            result = page.evaluate(self.evaluation_script, answer)
+            if result:
+                reward = 1
+        except Exception as e:
+            print(f"Error evaluating the evaluation script: {e}")
+        
+        return reward
 
-        # Evaluate the evaluation script
-        result = page.evaluate(self.evaluation_script, answer)
-
-        # Return the result
-        return result
