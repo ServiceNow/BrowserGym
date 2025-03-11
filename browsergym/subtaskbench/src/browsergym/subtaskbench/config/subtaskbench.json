@@ -10,7 +10,7 @@
             "eval_type": "js_matcher",
             "evaluate_scripts": [
                 {
-                    "script": "document.querySelector('div[data-testid=\"DueDate\"]').textContent.endsWith('21')"
+                    "script": "document.querySelectorAll('div[role=\"row\"]').length == 20"
                 }
             ]
         }
@@ -21,12 +21,12 @@
             "warc_file_path": "./data/svelte_toolbar.wacz",
             "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/"
         },
-        "goal": "Select ",
+        "goal": "Open the side menu",
         "eval": {
             "eval_type": "js_matcher",
             "evaluate_scripts": [
                 {
-                    "script": "document.querySelector('div[data-testid=\"DueDate\"]').textContent.endsWith('21')"
+                    "script": "document.querySelector('a[href=\"#/base/willow\"]') != null"
                 }
             ]
         }

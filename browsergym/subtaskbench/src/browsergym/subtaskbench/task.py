@@ -80,7 +80,7 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
 
         reward = self.evaluator.evaluate(page, answer)
         print('Reward: ', reward)
-        done = math.isclose(reward, 0.0, abs_tol=1e-5)
+        done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
         return reward, done, "", {}
 

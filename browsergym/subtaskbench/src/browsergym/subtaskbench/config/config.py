@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
-STATIC_TASK_IDS = ["static." + task_id for task_id in range(0)]
-ONLINE_TASK_IDS = ["online." + task_id for task_id in range(3)]
+STATIC_TASK_IDS = ["static." + str(task_id) for task_id in range(0)]
+ONLINE_TASK_IDS = ["online." + str(task_id) for task_id in range(3)]
 
 # Cache for loaded configurations
 _config_cache: Dict[str, Dict[str, Any]] = {}

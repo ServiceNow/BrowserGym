@@ -6,6 +6,8 @@ import tempfile
 import os
 from browsergym.subtaskbench.config.config import get_config
 from pathlib import Path
+import os
+import signal
 
 async def run_command_async(command: str, timeout_sec: Optional[int] = None) -> Tuple[Optional[int], Optional[subprocess.Popen]]:
     """
@@ -121,6 +123,6 @@ env {{
     def cleanup(self):
         """Cleanup when the task is destroyed."""
         if self.server_process:
-            self.server_process.kill()
+            os.killpg(os.getpgid(self.server_process.pid), signal.SIGTERM)
         if hasattr(self, 'f'):
             os.remove(self.f.name)
