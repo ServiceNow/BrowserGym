@@ -226,6 +226,30 @@ def massage_tasks(task_ids: list[str], max_retries: int = 1, timeout: int = 60):
                 )
 
 
+def run_massage(outcome_queue: mp.Queue, task_id: str):
+    import gymnasium as gym
+
+    gym_id = f"browsergym/{task_id}"
+    env = gym.make(gym_id)
+    no_action = "noop()"
+    # check if action space exists and is compatible with "noop()"
+    try:
+        env.unwrapped.action_mapping(no_action)
+    except:
+        no_action = ""  # fallback plan
+    # run massage
+    try:
+        env.reset()  # task setup
+        env.step(no_action)  # task validation
+        env.step(no_action)  # task validation again
+        outcome = "success", None
+    except Exception as e:
+        outcome = "exception", traceback.format_exception(e)
+    finally:
+        env.close()
+        outcome_queue.put(outcome)
+
+
 def massage_task_within_subprocess(
     task_id: str, timeout: int, kill_timeout: int = 10
 ) -> typing.Tuple[str, str]:
@@ -237,31 +261,8 @@ def massage_task_within_subprocess(
       - err_msg: error message if any, or None.
     """
 
-    def run_massage(outcome_queue: mp.Queue):
-        import gymnasium as gym
-
-        gym_id = f"browsergym/{task_id}"
-        env = gym.make(gym_id)
-        no_action = "noop()"
-        # check if action space exists and is compatible with "noop()"
-        try:
-            env.unwrapped.action_mapping(no_action)
-        except:
-            no_action = ""  # fallback plan
-        # run massage
-        try:
-            env.reset()  # task setup
-            env.step(no_action)  # task validation
-            env.step(no_action)  # task validation again
-            outcome = "success", None
-        except Exception as e:
-            outcome = "exception", traceback.format_exception(e)
-        finally:
-            env.close()
-            outcome_queue.put(outcome)
-
     queue = mp.Queue()
-    process = mp.Process(target=run_massage, args=(queue,))
+    process = mp.Process(target=run_massage, args=(queue, task_id))
     process.start()
     process.join(timeout=timeout)
 

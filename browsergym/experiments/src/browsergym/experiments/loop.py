@@ -23,8 +23,8 @@ from dataclasses_json import DataClassJsonMixin
 from PIL import Image
 from tqdm import tqdm
 
-from browsergym.core.chat import Chat
 from browsergym.core.action.parsers import highlevel_action_parser
+from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
@@ -122,6 +122,164 @@ def save_package_versions(exp_dir: Path):
         )
     )
     (exp_dir / "package_versions.txt").write_text(python_dists)
+
+
+@dataclass
+class StepTimestamps:
+    env_start: float = 0
+    action_exec_start: float = 0  # to extract begining of visual action from video
+    action_exec_stop: float = 0  # to extract end of visual action from video
+    action_exect_after_timeout: float = 0
+    env_stop: float = 0
+    agent_start: float = 0
+    agent_stop: float = 0
+
+
+@dataclass
+class StepInfo:
+    """Collects information about step that will be saved and reloaded.
+    Helper functions only modify the dataclass attributes and helps keeping the
+    information organized.
+
+    Attributes:
+    -----------
+    step: int
+        The step number of the episode.
+    obs: dict
+        The observation of the environment.
+    reward: float
+        The reward of the step.
+    raw_reward: float
+        The raw reward of the step.
+    terminated: bool
+        Whether the episode is terminated i.e. reached a terminal state.
+    truncated: bool
+        Whether the episode is truncated i.e. reached a maximum number of steps.
+    action: str
+        The action taken by the agent.
+    agent_info: dict
+        Additional information from the agent.
+    stats: dict
+        Extra statistics about the step.
+    profiling: StepTimestamps
+        Timestamps of the different events during the episode.
+    """
+
+    step: int = None
+    obs: dict = None
+    reward: float = 0
+    raw_reward: float = 0
+    terminated: bool = None
+    truncated: bool = None
+    action: str = None
+    agent_info: dict = field(default_factory=dict)
+    stats: dict = None
+    profiling: StepTimestamps = field(default_factory=StepTimestamps)
+    task_info: dict = None
+
+    def from_step(self, env: gym.Env, action: str, obs_preprocessor: callable):
+        t = self.profiling
+        t.env_start = time.time()
+        self.obs, self.reward, self.terminated, self.truncated, env_info = env.step(action)
+        t.env_stop = time.time()
+
+        self.task_info = env_info.get("task_info", None)
+
+        self.raw_reward = env_info.get("RAW_REWARD_GLOBAL", None)
+
+        t.action_exec_start = env_info["action_exec_start"]  # start
+        t.action_exect_after_timeout = env_info["action_exec_stop"]
+        t.action_exec_stop = env_info["action_exec_stop"] - env_info["action_exec_timeout"]
+
+        if obs_preprocessor:
+            self.obs = obs_preprocessor(self.obs)
+
+    def from_action(self, agent: Agent):
+        self.profiling.agent_start = time.time()
+        self.action, self.agent_info = agent.get_action(self.obs.copy())
+        self.profiling.agent_stop = time.time()
+
+        self.make_stats()
+
+        return self.action
+
+    def from_reset(self, env: gym.Env, seed: int, obs_preprocessor: callable):
+        t = self.profiling
+        t.env_start = time.time()
+        self.obs, env_info = env.reset(seed=seed)
+        self.reward, self.terminated, self.truncated = 0, False, False
+        t.env_stop = time.time()
+
+        t.action_exec_start = env_info.get("recording_start_time", t.env_start)
+        t.action_exect_after_timeout = t.env_stop
+        t.action_exec_stop = t.env_stop
+
+        if obs_preprocessor:
+            self.obs = obs_preprocessor(self.obs)
+
+    @property
+    def is_done(self):
+        return self.terminated or self.truncated
+
+    def make_stats(self):
+
+        stats = {
+            f"n_token_{key}": count_tokens(val)
+            for key, val in self.obs.items()
+            if isinstance(val, str)
+        }
+        stats.update(self.agent_info.pop("stats", {}))
+
+        messages = self.agent_info.get("chat_messages", None)
+        if messages is not None:
+            stats["n_token_agent_messages"] = count_messages_token(messages)
+
+        t = self.profiling
+        stats["step_elapsed"] = t.env_stop - t.env_start
+        stats["agent_elapsed"] = t.agent_stop - t.agent_start
+
+        self.stats = stats
+
+    def save_step_info(self, exp_dir, save_json=False, save_screenshot=True, save_som=False):
+
+        # special treatment for some of the observation fields
+        if self.obs is not None:
+            # save screenshots to separate files
+            screenshot = self.obs.pop("screenshot", None)
+            screenshot_som = self.obs.pop("screenshot_som", None)
+
+            if save_screenshot and screenshot is not None:
+                img = Image.fromarray(screenshot)
+                img.save(exp_dir / f"screenshot_step_{self.step}.png")
+
+            if save_som and screenshot_som is not None:
+                img = Image.fromarray(screenshot_som)
+                img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
+
+            # save goal object (which might contain images) to a separate file to save space
+            if self.obs.get("goal_object", False):
+                # save the goal object only once (goal should never change once setup)
+                goal_object_file = Path(exp_dir) / "goal_object.pkl.gz"
+                if not goal_object_file.exists():
+                    with gzip.open(goal_object_file, "wb") as f:
+                        pickle.dump(self.obs["goal_object"], f)
+                # set goal_object to a special placeholder value, which indicates it should be loaded from a separate file
+                self.obs["goal_object"] = None
+
+        with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
+            pickle.dump(self, f)
+
+        if save_json:
+            with open(exp_dir / "steps_info.json", "w") as f:
+                json.dump(self, f, indent=4, cls=DataclassJSONEncoder)
+
+        if self.obs is not None:
+            # add the screenshots back to the obs
+            # why do we need this?
+            if screenshot is not None:
+                self.obs["screenshot"] = screenshot
+            if screenshot_som is not None:
+                self.obs["screenshot_som"] = screenshot_som
 
 
 @dataclass
@@ -305,7 +463,7 @@ class ExpArgs:
                     e = KeyboardInterrupt("Early termination??")
                     err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
                 logger.info(f"Saving summary info.")
-                _save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
+                self.save_summary_info(episode_info, self.exp_dir, err_msg, stack_trace)
             except Exception as e:
                 logger.error(f"Error while saving summary info in the finally block: {e}")
             try:
@@ -351,163 +509,40 @@ class ExpArgs:
         root_logger = logging.getLogger()
         root_logger.removeHandler(self.logging_file_handler)
 
+    def save_summary_info(
+        self,
+        episode_info: list[StepInfo],
+        exp_dir,
+        err_msg,
+        stack_trace,
+    ):
+        # bring err from agent_info to the top level
+        if err_msg is None:
+            err_msg, stack_trace = _extract_err_msg(episode_info)
+        else:
+            # useful until we get a proper place in agent_xray to view error
+            # messages.
+            if len(episode_info) == 0:
+                episode_info.append(StepInfo())
+            episode_info[-1].agent_info["err_msg"] = err_msg
+            episode_info[-1].agent_info["stack_trace"] = stack_trace
 
-@dataclass
-class StepTimestamps:
-    env_start: float = 0
-    action_exec_start: float = 0  # to extract begining of visual action from video
-    action_exec_stop: float = 0  # to extract end of visual action from video
-    action_exect_after_timeout: float = 0
-    env_stop: float = 0
-    agent_start: float = 0
-    agent_stop: float = 0
+        summary_info = dict(
+            n_steps=len(episode_info) - 1,
+            cum_reward=sum([step.reward for step in episode_info]),
+            cum_raw_reward=sum([step.raw_reward for step in episode_info if step.raw_reward]),
+            err_msg=err_msg,
+            stack_trace=stack_trace,
+        )
+        for key, val in _aggregate_episode_stats(episode_info).items():
+            summary_info[f"stats.{key}"] = val
 
+        if len(episode_info) > 0:
+            summary_info["terminated"] = episode_info[-1].terminated
+            summary_info["truncated"] = episode_info[-1].truncated
 
-@dataclass
-class StepInfo:
-    """Collects information about step that will be saved and reloaded.
-    Helper functions only modify the dataclass attributes and helps keeping the
-    information organized.
-
-    Attributes:
-    -----------
-    step: int
-        The step number of the episode.
-    obs: dict
-        The observation of the environment.
-    reward: float
-        The reward of the step.
-    raw_reward: float
-        The raw reward of the step.
-    terminated: bool
-        Whether the episode is terminated i.e. reached a terminal state.
-    truncated: bool
-        Whether the episode is truncated i.e. reached a maximum number of steps.
-    action: str
-        The action taken by the agent.
-    agent_info: dict
-        Additional information from the agent.
-    stats: dict
-        Extra statistics about the step.
-    profiling: StepTimestamps
-        Timestamps of the different events during the episode.
-    """
-
-    step: int = None
-    obs: dict = None
-    reward: float = 0
-    raw_reward: float = 0
-    terminated: bool = None
-    truncated: bool = None
-    action: str = None
-    agent_info: dict = field(default_factory=dict)
-    stats: dict = None
-    profiling: StepTimestamps = field(default_factory=StepTimestamps)
-    task_info: dict = None
-
-    def from_step(self, env: gym.Env, action: str, obs_preprocessor: callable):
-        t = self.profiling
-        t.env_start = time.time()
-        self.obs, self.reward, self.terminated, self.truncated, env_info = env.step(action)
-        t.env_stop = time.time()
-
-        self.task_info = env_info.get("task_info", None)
-
-        self.raw_reward = env_info.get("RAW_REWARD_GLOBAL", None)
-
-        t.action_exec_start = env_info["action_exec_start"]  # start
-        t.action_exect_after_timeout = env_info["action_exec_stop"]
-        t.action_exec_stop = env_info["action_exec_stop"] - env_info["action_exec_timeout"]
-
-        if obs_preprocessor:
-            self.obs = obs_preprocessor(self.obs)
-
-    def from_action(self, agent: Agent):
-        self.profiling.agent_start = time.time()
-        self.action, self.agent_info = agent.get_action(self.obs.copy())
-        self.profiling.agent_stop = time.time()
-
-        self.make_stats()
-
-        return self.action
-
-    def from_reset(self, env: gym.Env, seed: int, obs_preprocessor: callable):
-        t = self.profiling
-        t.env_start = time.time()
-        self.obs, env_info = env.reset(seed=seed)
-        self.reward, self.terminated, self.truncated = 0, False, False
-        t.env_stop = time.time()
-
-        t.action_exec_start = env_info.get("recording_start_time", t.env_start)
-        t.action_exect_after_timeout = t.env_stop
-        t.action_exec_stop = t.env_stop
-
-        if obs_preprocessor:
-            self.obs = obs_preprocessor(self.obs)
-
-    @property
-    def is_done(self):
-        return self.terminated or self.truncated
-
-    def make_stats(self):
-
-        stats = {
-            f"n_token_{key}": count_tokens(val)
-            for key, val in self.obs.items()
-            if isinstance(val, str)
-        }
-        stats.update(self.agent_info.pop("stats", {}))
-
-        messages = self.agent_info.get("chat_messages", None)
-        if messages is not None:
-            stats["n_token_agent_messages"] = count_messages_token(messages)
-
-        t = self.profiling
-        stats["step_elapsed"] = t.env_stop - t.env_start
-        stats["agent_elapsed"] = t.agent_stop - t.agent_start
-
-        self.stats = stats
-
-    def save_step_info(self, exp_dir, save_json=False, save_screenshot=True, save_som=False):
-
-        # special treatment for some of the observation fields
-        if self.obs is not None:
-            # save screenshots to separate files
-            screenshot = self.obs.pop("screenshot", None)
-            screenshot_som = self.obs.pop("screenshot_som", None)
-
-            if save_screenshot and screenshot is not None:
-                img = Image.fromarray(screenshot)
-                img.save(exp_dir / f"screenshot_step_{self.step}.png")
-
-            if save_som and screenshot_som is not None:
-                img = Image.fromarray(screenshot_som)
-                img.save(exp_dir / f"screenshot_som_step_{self.step}.png")
-
-            # save goal object (which might contain images) to a separate file to save space
-            if self.obs.get("goal_object", False):
-                # save the goal object only once (goal should never change once setup)
-                goal_object_file = Path(exp_dir) / "goal_object.pkl.gz"
-                if not goal_object_file.exists():
-                    with gzip.open(goal_object_file, "wb") as f:
-                        pickle.dump(self.obs["goal_object"], f)
-                # set goal_object to a special placeholder value, which indicates it should be loaded from a separate file
-                self.obs["goal_object"] = None
-
-        with gzip.open(exp_dir / f"step_{self.step}.pkl.gz", "wb") as f:
-            pickle.dump(self, f)
-
-        if save_json:
-            with open(exp_dir / "steps_info.json", "w") as f:
-                json.dump(self, f, indent=4, cls=DataclassJSONEncoder)
-
-        if self.obs is not None:
-            # add the screenshots back to the obs
-            # why do we need this?
-            if screenshot is not None:
-                self.obs["screenshot"] = screenshot
-            if screenshot_som is not None:
-                self.obs["screenshot_som"] = screenshot_som
+        with open(exp_dir / "summary_info.json", "w") as f:
+            json.dump(summary_info, f, indent=4)
 
 
 def _extract_err_msg(episode_info: list[StepInfo]):
@@ -550,41 +585,6 @@ def _aggregate_episode_stats(episode_info: list[StepInfo]):
         if np.isnan(val):
             aggregated_stats[key] = None
     return aggregated_stats
-
-
-def _save_summary_info(
-    episode_info: list[StepInfo],
-    exp_dir,
-    err_msg,
-    stack_trace,
-):
-    # bring err from agent_info to the top level
-    if err_msg is None:
-        err_msg, stack_trace = _extract_err_msg(episode_info)
-    else:
-        # useful until we get a proper place in agent_xray to view error
-        # messages.
-        if len(episode_info) == 0:
-            episode_info.append(StepInfo())
-        episode_info[-1].agent_info["err_msg"] = err_msg
-        episode_info[-1].agent_info["stack_trace"] = stack_trace
-
-    summary_info = dict(
-        n_steps=len(episode_info) - 1,
-        cum_reward=sum([step.reward for step in episode_info]),
-        cum_raw_reward=sum([step.raw_reward for step in episode_info if step.raw_reward]),
-        err_msg=err_msg,
-        stack_trace=stack_trace,
-    )
-    for key, val in _aggregate_episode_stats(episode_info).items():
-        summary_info[f"stats.{key}"] = val
-
-    if len(episode_info) > 0:
-        summary_info["terminated"] = episode_info[-1].terminated
-        summary_info["truncated"] = episode_info[-1].truncated
-
-    with open(exp_dir / "summary_info.json", "w") as f:
-        json.dump(summary_info, f, indent=4)
 
 
 def _is_debugging():
