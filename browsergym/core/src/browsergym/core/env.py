@@ -76,6 +76,7 @@ class BrowserEnv(gym.Env, ABC):
         pw_context_kwargs: dict = {},
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+        obs: dict = None,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -384,6 +385,11 @@ document.addEventListener("visibilitychange", () => {
                 raise ValueError(f"Forbidden value: {text} is not a string")
             self.chat.add_message(role="assistant", msg=text)
 
+        def add_observation(obs: dict):
+            if not isinstance(obs, dict):
+                raise ValueError(f"Forbidden value: {obj} is not a dict")
+            self.obs = obs
+
         def report_infeasible_instructions(reason: str):
             if not isinstance(reason, str):
                 raise ValueError(f"Forbidden value: {reason} is not a string")
@@ -392,6 +398,7 @@ document.addEventListener("visibilitychange", () => {
 
         # try to execute the action
         logger.debug(f"Executing action")
+        self.obs = None
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -401,6 +408,7 @@ document.addEventListener("visibilitychange", () => {
                 code,
                 self.page,
                 send_message_to_user=send_message_to_user,
+                add_observation=add_observation,
                 report_infeasible_instructions=report_infeasible_instructions,
             )
             self.last_action_error = ""
@@ -438,8 +446,11 @@ document.addEventListener("visibilitychange", () => {
         if user_message:
             self.chat.add_message(role="user", msg=user_message)
 
-        # extract observation (generic)
-        obs = self._get_obs()
+        if self.obs:
+            obs = self.obs
+        else:
+            # extract observation (generic)
+            obs = self._get_obs()
         logger.debug(f"Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
