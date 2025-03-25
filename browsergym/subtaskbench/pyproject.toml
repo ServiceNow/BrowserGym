@@ -33,3 +33,6 @@ files = ["requirements.txt"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/browsergym"]
+
+[tool.hatch.build.hooks.custom]
+path = "install_node_modules.py"

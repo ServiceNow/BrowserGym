@@ -1,5 +1,8 @@
 from browsergym.core.registration import register_task
-from . import task, config
+
+from .config import config
+from . import task
+from .utils import WebReplayServerSessionHandler
 
 STATIC_SUBTASKBENCH_TASK_IDS = []
 ONLINE_SUBTASKBENCH_TASK_IDS = []

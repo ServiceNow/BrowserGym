@@ -1,0 +1,7 @@
+# proto-file: protos/pb/v1alpha1/orbot_replay.proto
+# proto-message: Replay
+
+env {
+  warc_file_path: "/Users/sanjari/orby/BrowserGym/browsergym/subtaskbench/src/browsergym/subtaskbench/data/alaska_flight_booking.wacz",
+  start_url: "https://www.alaskaair.com/search/?A=1&C=0&L=0&O=JFK&D=SFO&OD=2025-02-18&DD=2025-02-18&RT=true&errorRedirect=true"
+}

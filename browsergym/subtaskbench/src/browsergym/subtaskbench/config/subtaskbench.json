@@ -1,0 +1,146 @@
+[
+    {
+        "task_id": "online.0",
+        "env": {
+            "warc_file_path": "./data/svelte_gantt.wacz",
+            "start_url": "https://docs.svar.dev/svelte/gantt/samples/"
+        },
+        "goal": "Create a new task in the gantt chart.",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelectorAll('div[role=\"row\"]').length == 20"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.1",
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/"
+        },
+        "goal": "Open the side menu",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('a[href=\"#/base/willow\"]') != null"
+                }
+            ]
+        }
+    },    
+    {
+        "task_id": "online.2",
+        "env": {
+            "warc_file_path": "./data/alaska_flight_booking.wacz",
+            "start_url": "https://www.alaskaair.com/search/?A=1&C=0&L=0&O=JFK&D=SFO&OD=2025-02-18&DD=2025-02-18&RT=true&errorRedirect=true"
+        },
+        "goal": "Select March 21 2025 as the departing date",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('auro-datepicker').getAttribute(\"calendarfocusdate\")==\"03/21/2025\""
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.3",
+        "env": {
+            "warc_file_path": "./data/alaska_flight_booking.wacz",
+            "start_url": "https://www.alaskaair.com/search/?A=1&C=0&L=0&O=JFK&D=SFO&OD=2025-02-18&DD=2025-02-18&RT=true&errorRedirect=true"
+        },
+        "goal": "Select March 21 2025 as the departing date and April 21 2025 as the returning date",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('auro-datepicker').getAttribute(\"calendarfocusdate\")==\"03/21/2025\" && document.querySelector('auro-datepicker').getAttribute(\"valueend\")==\"04/21/2025\""
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.4",
+        "env": {
+            "warc_file_path": "./data/alaska_flight_booking.wacz",
+            "start_url": "https://www.alaskaair.com/search/?A=1&C=0&L=0&O=JFK&D=SFO&OD=2025-02-18&DD=2025-02-18&RT=true&errorRedirect=true"
+        },
+        "goal": "Fill the form to book a one way flight from Newark to San Diego on June 6 2025 for 6 adults",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('auro-combobox[id=\"fromCity\"]').getAttribute(\"value\")=='Newark, NJ (EWR-Liberty Intl.) ' && document.querySelector('auro-combobox[id=\"toCity\"]').getAttribute('value')=='San Diego, CA (SAN-San Diego International Airport)' && document.querySelector('auro-datepicker').getAttribute('value')=='06/06/2025' && document.querySelector('auro-select').getAttribute('value') == 6"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.5",
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/"
+        },
+        "goal": "Go to Button types in side menu and move slider to 40%",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[class=\"demo-status\"]').textContent == 'x changed: 40'"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.6",
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/#/buttons/willow"
+        },
+        "goal": "Select date 6 June 2024 in the date picker",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[class=\"demo-status\"]').textContent ==  'x changed: Thu Jun 06 2024 00:00:00 GMT-0700 (Pacific Daylight Time)'"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.7",
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/#/buttons/willow"
+        },
+        "goal": "Move to the last page using the widget at the bottom of the page",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[class=\"demo-status\"]').textContent ==  'x changed: 5'"
+                }
+            ]
+        }
+    },
+    {
+        "task_id": "online.8",
+        "env": {
+            "warc_file_path": "./data/svelte_toolbar.wacz",
+            "start_url": "https://docs.svar.dev/svelte/core/samples-toolbar/#/ribbon/willow"
+        },
+        "goal": "Select the font Times New Roman from the dropdown",
+        "eval": {
+            "eval_type": "js_matcher",
+            "evaluate_scripts": [
+                {
+                    "script": "document.querySelector('div[class=\"wx-label svelte-1ccyn9c\"]').textContent == 'Times'"
+                }
+            ]
+        }
+    }
+]

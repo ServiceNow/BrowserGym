@@ -4,9 +4,15 @@ import json
 import math
 import os
 import playwright.sync_api
+import subprocess
+import tempfile
+import asyncio
+from pathlib import Path
 
 from browsergym.core.task import AbstractBrowserTask
-
+from browsergym.subtaskbench.config.config import get_config
+from browsergym.subtaskbench.evaluator.evaluator import Evaluator
+from browsergym.subtaskbench.utils import run_command_async
 
 class GenericSubTaskBenchTask(AbstractBrowserTask):
     """
@@ -25,14 +31,6 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         self.viewport = {"width": 1024, "height": 1024}
         self.slow_mo = 1000  # ms
 
-        import subtaskbench
-
-        all_configs_str = (
-            importlib.resources.files(subtaskbench).joinpath(task_config_path).read_text()
-        )
-        all_configs = json.loads(all_configs_str)
-        self.task_config = all_configs[task_id]
-
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         """
         Set up everything needed to execute the task.
@@ -46,23 +44,14 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         """
         # For static tasks, we just need to provide the original start URL
         # since it is just a file
-        goal = self.task_config["goal"]
-        page.context.set_geolocation(
-            {
-                "latitude": self.task_config["geolocation"]["latitude"],
-                "longitude": self.task_config["geolocation"]["longitude"],
-            }
-        )
-        page.goto(self.task_config["start_url"])
+        goal = self.goal
+        page.goto(self.task_start_url)
 
-        from subtaskbench import Evaluator
 
         self.evaluator = Evaluator(
-            start_url=self.task_config["start_url"],
-            goal=self.task_config["goal"],
-            evaluation_script=self.task_config["evaluation_script"],
-            expected_output=self.task_config["expected_output"],
-            env_type=self.task_config["env_type"],
+            start_url=self.task_start_url,
+            goal=self.goal,
+            evaluation_script=self.evaluation_script,
         )
 
         return goal, {}
@@ -90,7 +79,8 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
             answer = ""
 
         reward = self.evaluator.evaluate(page, answer)
-        done = math.isclose(reward, 0.0, abs_tol=1e-5)
+        print('Reward: ', reward)
+        done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
         return reward, done, "", {}
 
@@ -115,12 +105,28 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
     """
 
     def __init__(
-        self, seed: int, task_id: str, task_config_path: str = "online_tests.json"
+        self, seed: int, task_id: str, task_config_path: str = "subtaskbench.json"
     ) -> None:
         super().__init__(seed, task_id, task_config_path)
+        self.parent_dir = Path(__file__).parent
 
-        # task properties, will be used to set up the browsergym environment
-        self.timeout = 100000  # ms
+        # Load configuration using the config module
+        all_configs = get_config('subtaskbench.json')
+        for config in all_configs:
+            if config['task_id'] == task_id:
+                self.task_config = config
+
+        if not self.task_config:
+            raise ValueError(f"Task ID {task_id} not found in config file.")
+        print(self.task_config)
+
+        self.timeout = 60000  # Timeout for the webserver
+        self.port = 8000
+
+        self.task_start_url = f"http://localhost:{self.port}/{self.task_config['env']['start_url']}"
+        self.goal = self.task_config['goal']
+        self.evaluation_script = self.task_config['eval']['evaluate_scripts'][0]['script']
+        
 
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         """
@@ -133,14 +139,4 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
             goal: str, goal of the task.
             info: dict, custom information from the task.
         """
-        # For online tasks, we need to edit the start URL to include the
-        # server endpoint as an evironment variable
-        dotenv.load_dotenv()
-        ENDPOINT = os.getenv("SUBTASKBENCH_ENDPOINT")
-        if not ENDPOINT:
-            raise ValueError("No endpoint provided for online tasks.")
-        self.task_config["start_url"] = self.task_config["start_url"].replace(
-            "__ENDPOINT__", ENDPOINT
-        )
-
         return super().setup(page)
