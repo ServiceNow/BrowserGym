@@ -1,18 +1,10 @@
-import dotenv
-import importlib.resources
-import json
 import math
-import os
 import playwright.sync_api
-import subprocess
-import tempfile
-import asyncio
 from pathlib import Path
 
 from browsergym.core.task import AbstractBrowserTask
-from browsergym.subtaskbench.config.config import get_config
-from browsergym.subtaskbench.evaluator.evaluator import Evaluator
-from browsergym.subtaskbench.utils import run_command_async
+from subtask_benchmark import config 
+from subtask_benchmark.evaluator import Evaluator
 
 class GenericSubTaskBenchTask(AbstractBrowserTask):
     """
@@ -24,12 +16,14 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         seed: int,
         task_id: str,
         task_config_path: str,
+        port: str,
     ) -> None:
         super().__init__(seed)
 
         # task properties, will be used to set up the browsergym environment
         self.viewport = {"width": 1024, "height": 1024}
         self.slow_mo = 1000  # ms
+        self.port = port
 
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         """
@@ -47,12 +41,7 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         goal = self.goal
         page.goto(self.task_start_url)
 
-
-        self.evaluator = Evaluator(
-            start_url=self.task_start_url,
-            goal=self.goal,
-            evaluation_script=self.evaluation_script,
-        )
+        self.evaluator = Evaluator(evaluation_script=self.evaluation_script)
 
         return goal, {}
 
@@ -105,13 +94,13 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
     """
 
     def __init__(
-        self, seed: int, task_id: str, task_config_path: str = "subtaskbench.json"
+        self, seed: int, task_id: str, task_config_path: str = "subtaskbench.json", port: int = 9222.
     ) -> None:
-        super().__init__(seed, task_id, task_config_path)
+        super().__init__(seed, task_id, task_config_path, port)
         self.parent_dir = Path(__file__).parent
 
         # Load configuration using the config module
-        all_configs = get_config('subtaskbench.json')
+        all_configs = config.get_config()
         for config in all_configs:
             if config['task_id'] == task_id:
                 self.task_config = config
@@ -121,9 +110,8 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
         print(self.task_config)
 
         self.timeout = 60000  # Timeout for the webserver
-        self.port = 8000
 
-        self.task_start_url = f"http://localhost:{self.port}/{self.task_config['env']['start_url']}"
+        self.task_start_url = self.task_config['env']['start_url']
         self.goal = self.task_config['goal']
         self.evaluation_script = self.task_config['eval']['evaluate_scripts'][0]['script']
         

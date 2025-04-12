@@ -78,6 +78,8 @@ class BrowserEnv(gym.Env, ABC):
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         extra_obs_func: Optional[callable] = None,
         init_script: Optional[str] = None,
+        connect_via_cdp: bool = False,
+        cdp_port: int = 0,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -121,6 +123,8 @@ class BrowserEnv(gym.Env, ABC):
         self.action_mapping = action_mapping
         self.extra_obs_func = extra_obs_func
         self.init_script = init_script
+        self.connect_via_cdp = connect_via_cdp
+        self.cdp_port = cdp_port
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -244,7 +248,14 @@ class BrowserEnv(gym.Env, ABC):
             pw_chromium_kwargs.pop("args")
 
         # create a new browser
-        if "user_data_dir" in pw_chromium_kwargs:
+        if self.connect_via_cdp:
+            print(f'Using CDP Port: {self.cdp_port}. If this is not the correct port, please pass `cdp_port` during gym env creation.')
+            browser_url = f"http://localhost:{self.cdp_port}"
+            logger.info(f"Connecting to: {browser_url}")
+                
+            # TODO: figure out how to make it headless and pass other args
+            self.browser = pw.chromium.connect_over_cdp(browser_url)
+        elif "user_data_dir" in pw_chromium_kwargs:
             user_data_dir = pw_chromium_kwargs.pop("user_data_dir")
             self.context = pw.chromium.launch_persistent_context(
                 user_data_dir,
@@ -265,6 +276,7 @@ class BrowserEnv(gym.Env, ABC):
                 **pw_chromium_kwargs,
             )
 
+        if not self.context:
             # create a new browser context for pages
             self.context = self.browser.new_context(
                 no_viewport=True if self.resizeable_window else None,

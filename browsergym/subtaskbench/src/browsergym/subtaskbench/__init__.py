@@ -1,15 +1,13 @@
 from browsergym.core.registration import register_task
 
-from .config import config
 from . import task
-from .utils import WebReplayServerSessionHandler
 
 STATIC_SUBTASKBENCH_TASK_IDS = []
 ONLINE_SUBTASKBENCH_TASK_IDS = []
 ALL_SUBTASKBENCH_TASK_IDS = []
 
 # register all static SubTaskBench tasks
-for task_id in config.STATIC_TASK_IDS:
+for task_id in []:
     gym_id = f"subtaskbench.{task_id}"
     register_task(
         gym_id,
@@ -20,7 +18,7 @@ for task_id in config.STATIC_TASK_IDS:
     ALL_SUBTASKBENCH_TASK_IDS.append(gym_id)
 
 # register all online SubTaskBench tasks
-for task_id in config.ONLINE_TASK_IDS:
+for task_id in [f'online.{str(i)}' for i in range(9)]:
     gym_id = f"subtaskbench.{task_id}"
     register_task(
         gym_id,
