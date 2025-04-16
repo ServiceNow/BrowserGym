@@ -114,9 +114,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         await asyncio.to_thread(_gym.close)
 
 
-mcp = FastMCP(
-    "BrowserGym", dependencies=["browsergym", "browsergym-core", "typer"], lifespan=app_lifespan
-)
+mcp = FastMCP("BrowserGym", lifespan=app_lifespan)
 
 
 def fn_wrapper(func: Callable):
