@@ -1,11 +1,13 @@
 import argparse
 import asyncio
+import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from typing import Callable
 
 import gymnasium as gym
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 
 from browsergym.core.action.highlevel import ACTION_SUBSETS, HighLevelActionSet
 from browsergym.core.env import BrowserEnv
@@ -106,13 +108,59 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         await asyncio.to_thread(_gym.close)
 
 
-mcp = FastMCP(
-    "BrowserGym", dependencies=["browsergym", "browsergym-core"], lifespan=app_lifespan
-)
+mcp = FastMCP("BrowserGym", dependencies=["browsergym", "browsergym-core"], lifespan=app_lifespan)
+
+
+def fn_wrapper(func: Callable):
+    async def decorator(*args, context: Context, **kwargs):
+        """
+        Decorator to execute function from the action space in the context of the gym.
+        1. Loads the parent module of the function to use as function context
+        2. Executes the pre_step method of the gym
+        3. Sets up the module vars from the current state of the gym
+        4. Executes the function from this module and handles any exceptions
+        5. Executes the post_step method of the gym
+
+        """
+        gym: BrowserEnv = context.request_context.lifespan_context.gym
+        while not isinstance(gym, BrowserEnv):
+            gym = gym.env
+
+        # Load the parent module of the function to use as function context
+        import browsergym.core.action.functions as fn_context
+        fn = getattr(fn_context, func.__name__)
+
+        gym.last_action = fn.__name__
+        info, send_message_to_user, rii = await asyncio.to_thread(gym.pre_step)
+
+        # Set up the module vars from the current state of the gym
+        fn_context.send_message_to_user = send_message_to_user
+        fn_context.report_infeasible_instructions = rii
+        fn_context.page = gym.page
+        fn_context.demo_mode = config.demo_mode
+
+        try:
+            fn(*args, **kwargs)
+            gym.last_action_error = ""
+        except Exception as e:
+            gym.last_action_error = f"{type(e).__name__}: {e}"
+            match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", gym.last_action_error)
+            if match:
+                info["action_exec_timeout"] = float(match.groups()[0]) / 1000
+
+        results = await asyncio.to_thread(gym.post_step, info)
+        return results
+
+    return decorator
 
 
 for fn in ACTION_SUBSETS[args.subset]:
     mcp.add_tool(fn)
+    tool = mcp._tool_manager._tools[fn.__name__]
+    tool.fn = fn_wrapper(fn)
+    tool.context_kwarg = "context"
+    tool.is_async = True
+    mcp._tool_manager._tools[fn.__name__] = tool
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
