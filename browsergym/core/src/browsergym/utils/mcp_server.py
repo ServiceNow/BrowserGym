@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 import gymnasium as gym
-from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp import FastMCP
 
 from browsergym.core.action.highlevel import ACTION_SUBSETS, HighLevelActionSet
 from browsergym.core.env import BrowserEnv
@@ -118,7 +118,7 @@ mcp = FastMCP("BrowserGym", dependencies=["browsergym", "browsergym-core"], life
 
 
 def fn_wrapper(func: Callable):
-    async def decorator(*args, context: Context, **kwargs):
+    async def decorator(*args, **kwargs):
         """
         Decorator to execute function from the action space in the context of the gym.
         1. Loads the parent module of the function to use as function context
@@ -128,7 +128,7 @@ def fn_wrapper(func: Callable):
         5. Executes the post_step method of the gym
 
         """
-        gym: BrowserEnv = context.request_context.lifespan_context.gym
+        gym: BrowserEnv = mcp.get_context().request_context.lifespan_context.gym  # type: ignore
         while not isinstance(gym, BrowserEnv):
             gym = gym.env
 
@@ -160,16 +160,14 @@ def fn_wrapper(func: Callable):
         results = await asyncio.to_thread(gym.post_step, info)
         return results
 
+    decorator.__wrapped__ = func  # type: ignore
+    decorator.__name__ = func.__name__
+    decorator.__doc__ = func.__doc__
     return decorator
 
 
 for fn in ACTION_SUBSETS[args.subset]:
-    mcp.add_tool(fn)
-    tool = mcp._tool_manager._tools[fn.__name__]
-    tool.fn = fn_wrapper(fn)
-    tool.context_kwarg = "context"
-    tool.is_async = True
-    mcp._tool_manager._tools[fn.__name__] = tool
+    mcp.add_tool(fn_wrapper(fn))
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
