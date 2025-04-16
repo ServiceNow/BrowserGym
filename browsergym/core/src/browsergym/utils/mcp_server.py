@@ -134,6 +134,7 @@ def fn_wrapper(func: Callable):
 
         # Load the parent module of the function to use as function context
         import browsergym.core.action.functions as fn_context
+
         fn = getattr(fn_context, func.__name__)
 
         gym.last_action = fn.__name__
