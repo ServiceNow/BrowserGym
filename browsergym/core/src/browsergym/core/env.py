@@ -371,7 +371,7 @@ document.addEventListener("visibilitychange", () => {
 
         return obs, info
 
-    def pre_step(self)-> tuple[dict[str, Any], Callable, Callable]:
+    def pre_step(self) -> tuple[dict[str, Any], Callable, Callable]:
         info = {}
         info["action_exec_start"] = time.time()
         info["action_exec_timeout"] = 0
@@ -426,10 +426,12 @@ document.addEventListener("visibilitychange", () => {
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
         return self.post_step(info)
 
-    def post_step(self, info: dict[str, Any])-> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+    def post_step(
+        self, info: dict[str, Any]
+    ) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
         """
         Post step method, called after executing the action.
-        This method is responsible for extracting the observation after the action. 
+        This method is responsible for extracting the observation after the action.
         It also prepares reward, task status, user message and other step info.
         Args:
             info: dictionary containing information about the step
