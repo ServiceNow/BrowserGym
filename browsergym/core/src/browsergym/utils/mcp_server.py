@@ -45,10 +45,10 @@ def get_cli_args():
         help="Task ID to run",
     )
     parser.add_argument(
-        "-v",
-        "--visible",
+        "-l",
+        "--headless",
         action="store_true",
-        help="Run in not headless mode",
+        help="Run in headless mode",
     )
     parser.add_argument(
         "-r",
@@ -84,7 +84,7 @@ def get_cli_args():
 args = get_cli_args()
 task_id = args.task_id
 config = BgymConfig(
-    headless=not args.visible,
+    headless=args.headless,
     timeout_ms=args.timeout_ms,
     record_video_dir=args.record_video_dir,
     demo_mode=args.demo_mode,
@@ -114,7 +114,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         await asyncio.to_thread(_gym.close)
 
 
-mcp = FastMCP("BrowserGym", dependencies=["browsergym", "browsergym-core"], lifespan=app_lifespan)
+mcp = FastMCP("BrowserGym", dependencies=["browsergym", "browsergym-core", "typer"], lifespan=app_lifespan)
 
 
 def fn_wrapper(func: Callable):

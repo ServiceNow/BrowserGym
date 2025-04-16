@@ -1,4 +1,4 @@
-.DS_store
+git .DS_store
 .idea/
 docs/src/generated/
 
@@ -150,3 +150,5 @@ tests/assistantbench/assistantbench-predictions-test.jsonl
 
 # weblinx
 bg_wl_data/
+
+uv.lock
