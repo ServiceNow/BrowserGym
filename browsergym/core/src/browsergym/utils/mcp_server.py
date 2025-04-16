@@ -45,11 +45,10 @@ def get_cli_args():
         help="Task ID to run",
     )
     parser.add_argument(
-        "--demo_mode",
-        type=str,
-        default="off",
-        choices=["off", "default", "all_blue", "only_visible_elements"],
-        help="Demo mode for action set",
+        "-v",
+        "--visible",
+        action="store_true",
+        help="Run in not headless mode",
     )
     parser.add_argument(
         "-r",
@@ -59,10 +58,11 @@ def get_cli_args():
         help="Directory to save recorded videos",
     )
     parser.add_argument(
-        "-v",
-        "--visible",
-        action="store_true",
-        help="Run in not headless mode",
+        "--demo_mode",
+        type=str,
+        default="off",
+        choices=["off", "default", "all_blue", "only_visible_elements"],
+        help="Demo mode for action set",
     )
     parser.add_argument(
         "--timeout_ms",
