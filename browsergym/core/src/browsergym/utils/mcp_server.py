@@ -139,7 +139,7 @@ def fn_wrapper(func: Callable, validate: bool = True):
         """
         gym: BrowserEnv = mcp.get_context().request_context.lifespan_context.gym  # type: ignore
         while not isinstance(gym, BrowserEnv):
-            gym = gym.env
+            gym = gym.env # gym library wraps the BrowserEnv in a few layers (usually 2) of wrappers, this loop unwraps them
 
         # Load the parent module of the function to use as function context
         import browsergym.core.action.functions as fn_context
