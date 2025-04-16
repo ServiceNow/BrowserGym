@@ -33,8 +33,8 @@ class AppContext:
 def get_cli_args():
     parser = argparse.ArgumentParser(
         description="BrowserGym MCP server",
-        usage="%(prog)s [options]",
-        epilog="Example: %(prog)s -t browsergym/workarena.servicenow.order-ipad-pro --demo_mode default -r /path/to/video/storage/dir",
+        usage="python browsergym/core/src/browsergym/utils/%(prog)s [options]",
+        epilog="\nExample: python browsergym/core/src/browsergym/utils/%(prog)s -t browsergym/workarena.servicenow.order-ipad-pro --demo_mode default -r /path/to/video/storage/dir",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -45,10 +45,10 @@ def get_cli_args():
         help="Task ID to run",
     )
     parser.add_argument(
-        "-d",
         "--demo_mode",
         type=str,
         default="off",
+        choices=["off", "default", "all_blue", "only_visible_elements"],
         help="Demo mode for action set",
     )
     parser.add_argument(
@@ -71,10 +71,10 @@ def get_cli_args():
         help="Timeout in milliseconds for each step",
     )
     parser.add_argument(
-        "-s",
         "--subset",
         type=str,
         default="workarena++",
+        choices=ACTION_SUBSETS.keys(),
         help="Subset of actions to use",
     )
     args, _ = parser.parse_known_args()
