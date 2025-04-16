@@ -126,6 +126,13 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP("BrowserGym", lifespan=app_lifespan)
 
 
+def format_func_call(func: Callable, args, kwargs) -> str:
+    args_str = ", ".join(repr(arg) for arg in args)
+    kwargs_str = ", ".join(f"{k}={repr(v)}" for k, v in kwargs.items())
+    all_args_str = ", ".join(filter(None, [args_str, kwargs_str]))
+    return f"{func.__name__}({all_args_str})"
+
+
 def fn_wrapper(func: Callable, validate: bool = True):
     async def decorator(*args, **kwargs):
         """
@@ -146,7 +153,7 @@ def fn_wrapper(func: Callable, validate: bool = True):
 
         fn = getattr(fn_context, func.__name__)
 
-        gym.last_action = fn.__name__
+        gym.last_action = format_func_call(fn, args, kwargs)
         info, send_message_to_user, report_infeasible_instructions = await asyncio.to_thread(
             gym.pre_step
         )
