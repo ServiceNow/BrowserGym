@@ -1,3 +1,4 @@
+# MCP server for BrowserGym
 import argparse
 import asyncio
 import re
@@ -30,7 +31,12 @@ class AppContext:
 
 
 def get_cli_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="BrowserGym MCP server",
+        usage="%(prog)s [options]",
+        epilog="Example: %(prog)s -t browsergym/workarena.servicenow.order-ipad-pro --demo_mode default -r /path/to/video/storage/dir",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "-t",
         "--task_id",
@@ -42,7 +48,7 @@ def get_cli_args():
         "-d",
         "--demo_mode",
         type=str,
-        default="default",
+        default="off",
         help="Demo mode for action set",
     )
     parser.add_argument(
