@@ -371,10 +371,7 @@ document.addEventListener("visibilitychange", () => {
 
         return obs, info
 
-    def step(self, action: str) -> tuple:
-
-        self.last_action = action
-
+    def pre_step(self):
         info = {}
         info["action_exec_start"] = time.time()
         info["action_exec_timeout"] = 0
@@ -391,7 +388,12 @@ document.addEventListener("visibilitychange", () => {
             self.infeasible_message_received = True
 
         # try to execute the action
-        logger.debug(f"Executing action")
+        logger.debug("Executing action")
+        return info, send_message_to_user, report_infeasible_instructions
+
+    def step(self, action: str) -> tuple:
+        self.last_action = action
+        info, send_message_to_user, rii = self.pre_step()
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -401,7 +403,7 @@ document.addEventListener("visibilitychange", () => {
                 code,
                 self.page,
                 send_message_to_user=send_message_to_user,
-                report_infeasible_instructions=report_infeasible_instructions,
+                report_infeasible_instructions=rii,
             )
             self.last_action_error = ""
         except Exception as e:
@@ -409,7 +411,10 @@ document.addEventListener("visibilitychange", () => {
             match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
             if match:
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
-        logger.debug(f"Action executed")
+        return self.post_step(info)
+
+    def post_step(self, info):
+        logger.debug("Action executed")
         info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
@@ -422,17 +427,17 @@ document.addEventListener("visibilitychange", () => {
         # after the action is executed, the active page might have changed
         # perform a safety check
         self._active_page_check()
-        logger.debug(f"Active page checked")
+        logger.debug("Active page checked")
 
         # if asked, wait for user message
         self._wait_for_user_message()
-        logger.debug(f"User message done")
+        logger.debug("User message done")
 
-        logger.debug(f"Initiating task validation")
+        logger.debug("Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
         reward, done, user_message, task_info = self._task_validate()
         info["task_info"] = task_info
-        logger.debug(f"Task validation done")
+        logger.debug("Task validation done")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -440,14 +445,13 @@ document.addEventListener("visibilitychange", () => {
 
         # extract observation (generic)
         obs = self._get_obs()
-        logger.debug(f"Observation extracted")
+        logger.debug("Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
         terminated = done or (
             self.terminate_on_infeasible and self.infeasible_message_received
         )  # task or agent can terminate the episode
         truncated = False
-
         return obs, reward, terminated, truncated, info
 
     def _task_validate(self):
@@ -506,7 +510,7 @@ document.addEventListener("visibilitychange", () => {
         # make sure there is always a page open
         # if all pages have been closed, create a new page
         if len(self.context.pages) == 0:
-            logger.warning(f"All pages are closed, opening a new page.")
+            logger.warning("All pages are closed, opening a new page.")
             self.page = self.context.new_page()
 
         # if the active page got closed, get the last active page from the history
