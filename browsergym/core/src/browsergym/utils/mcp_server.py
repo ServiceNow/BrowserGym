@@ -138,11 +138,13 @@ def fn_wrapper(func: Callable):
         fn = getattr(fn_context, func.__name__)
 
         gym.last_action = fn.__name__
-        info, send_message_to_user, rii = await asyncio.to_thread(gym.pre_step)
+        info, send_message_to_user, report_infeasible_instructions = await asyncio.to_thread(
+            gym.pre_step
+        )
 
         # Set up the module vars from the current state of the gym
         fn_context.send_message_to_user = send_message_to_user
-        fn_context.report_infeasible_instructions = rii
+        fn_context.report_infeasible_instructions = report_infeasible_instructions
         fn_context.page = gym.page
         fn_context.demo_mode = config.demo_mode
 

@@ -393,7 +393,7 @@ document.addEventListener("visibilitychange", () => {
 
     def step(self, action: str) -> tuple:
         self.last_action = action
-        info, send_message_to_user, rii = self.pre_step()
+        info, send_message_to_user, report_infeasible_instructions = self.pre_step()
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -403,7 +403,7 @@ document.addEventListener("visibilitychange", () => {
                 code,
                 self.page,
                 send_message_to_user=send_message_to_user,
-                report_infeasible_instructions=rii,
+                report_infeasible_instructions=report_infeasible_instructions,
             )
             self.last_action_error = ""
         except Exception as e:
