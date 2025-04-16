@@ -87,23 +87,18 @@ config = BgymConfig(
 async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     """Manage application lifecycle with type-safe context"""
     # Initialize on startup
-    try:
-        _gym: BrowserEnv = await asyncio.to_thread(
-            gym.make,
-            task_id,
-            headless=config.headless,
-            record_video_dir=config.record_video_dir,
-            action_mapping=HighLevelActionSet(
-                demo_mode=config.demo_mode
-            ).to_python_code,
-            timeout=config.timeout_ms,
-            task_kwargs={"start_url": "about:blank"},
-        )  # type: ignore
-        await asyncio.to_thread(_gym.reset)
-    except Exception as e:
-        with open("error.log", "w") as f:
-            f.write(f"Error initializing BrowserGym: {e}\ntask ID: {task_id}\n")
-        raise
+    actions = HighLevelActionSet(demo_mode=config.demo_mode, subsets=args.subset)
+    _gym: BrowserEnv = await asyncio.to_thread(
+        gym.make,
+        task_id,
+        headless=config.headless,
+        record_video_dir=config.record_video_dir,
+        action_mapping=actions.to_python_code,
+        timeout=config.timeout_ms,
+        task_kwargs={"start_url": "about:blank"},
+    )  # type: ignore
+    await asyncio.to_thread(_gym.reset)
+
     try:
         yield AppContext(gym=_gym, config=config, task_id=task_id, actions=actions)
     finally:
@@ -116,8 +111,7 @@ mcp = FastMCP(
 )
 
 
-actions = ACTION_SUBSETS[args.subset]
-for fn in actions:
+for fn in ACTION_SUBSETS[args.subset]:
     mcp.add_tool(fn)
 
 if __name__ == "__main__":
