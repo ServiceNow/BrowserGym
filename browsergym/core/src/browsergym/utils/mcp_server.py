@@ -4,7 +4,7 @@ import asyncio
 import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable
 
 import gymnasium as gym
@@ -20,6 +20,7 @@ class BgymConfig:
     timeout_ms: int = 10000
     record_video_dir: str | None = None
     demo_mode: HighLevelActionSet.DemoMode = "default"
+    validate_actions: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -77,6 +78,13 @@ def get_cli_args():
         choices=ACTION_SUBSETS.keys(),
         help="Subset of actions to use",
     )
+    parser.add_argument(
+        "--validate_actions",
+        type=str,
+        nargs="+",
+        default=["click", "goto"],
+        help="Names of actions for which validation should be performed",
+    )
     args, _ = parser.parse_known_args()
     return args
 
@@ -88,6 +96,7 @@ config = BgymConfig(
     timeout_ms=args.timeout_ms,
     record_video_dir=args.record_video_dir,
     demo_mode=args.demo_mode,
+    validate_actions=args.validate_actions,
 )
 
 
@@ -117,7 +126,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP("BrowserGym", lifespan=app_lifespan)
 
 
-def fn_wrapper(func: Callable):
+def fn_wrapper(func: Callable, validate: bool = True):
     async def decorator(*args, **kwargs):
         """
         Decorator to execute function from the action space in the context of the gym.
@@ -157,7 +166,7 @@ def fn_wrapper(func: Callable):
             if match:
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000
 
-        results = await asyncio.to_thread(gym.post_step, info)
+        results = await asyncio.to_thread(gym.post_step, info, validate)
         return results
 
     decorator.__wrapped__ = func  # type: ignore
@@ -167,7 +176,8 @@ def fn_wrapper(func: Callable):
 
 
 for fn in ACTION_SUBSETS[args.subset]:
-    mcp.add_tool(fn_wrapper(fn))
+    validate =fn.__name__ in config.validate_actions
+    mcp.add_tool(fn_wrapper(fn, validate))
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")

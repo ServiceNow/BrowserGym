@@ -427,7 +427,7 @@ document.addEventListener("visibilitychange", () => {
         return self.post_step(info)
 
     def post_step(
-        self, info: dict[str, Any]
+        self, info: dict[str, Any], validate: bool = True
     ) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
         """
         Post step method, called after executing the action.
@@ -452,20 +452,27 @@ document.addEventListener("visibilitychange", () => {
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
 
-        # after the action is executed, the active page might have changed
-        # perform a safety check
-        self._active_page_check()
-        logger.debug("Active page checked")
+        if validate:
+            # after the action is executed, the active page might have changed
+            # perform a safety check
+            self._active_page_check()
+            logger.debug("Active page checked")
 
-        # if asked, wait for user message
-        self._wait_for_user_message()
-        logger.debug("User message done")
+            # if asked, wait for user message
+            self._wait_for_user_message()
+            logger.debug("User message done")
 
-        logger.debug("Initiating task validation")
-        # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, task_info = self._task_validate()
-        info["task_info"] = task_info
-        logger.debug("Task validation done")
+            logger.debug("Initiating task validation")
+            # extract reward, done, user_message, info (task-specific)
+            reward, done, user_message, task_info = self._task_validate()
+            info["task_info"] = task_info
+            logger.debug("Task validation done")
+        else:
+            reward = 0
+            done = False
+            user_message = None
+            info["task_info"] = {}
+            logger.debug("Task validation skipped")
 
         # add any user message sent by the task to the chat
         if user_message:
