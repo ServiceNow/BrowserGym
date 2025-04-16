@@ -4,7 +4,7 @@ import re
 import time
 from abc import ABC
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Any, Callable, Literal, Optional
 
 import gymnasium as gym
 import numpy as np
@@ -371,7 +371,7 @@ document.addEventListener("visibilitychange", () => {
 
         return obs, info
 
-    def pre_step(self):
+    def pre_step(self)-> tuple[dict[str, Any], Callable, Callable]:
         info = {}
         info["action_exec_start"] = time.time()
         info["action_exec_timeout"] = 0
@@ -391,7 +391,20 @@ document.addEventListener("visibilitychange", () => {
         logger.debug("Executing action")
         return info, send_message_to_user, report_infeasible_instructions
 
-    def step(self, action: str) -> tuple:
+    def step(self, action: str) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+        """
+        Execute the action in the environment.
+
+        Args:
+            action: the action to execute. This should be a string with code or a function call
+
+        Returns:
+            obs: the observation after executing the action
+            reward: the reward received after executing the action
+            terminated: whether the episode is terminated or not
+            truncated: whether the episode is truncated or not
+            info: additional information about the step
+        """
         self.last_action = action
         info, send_message_to_user, report_infeasible_instructions = self.pre_step()
         try:
@@ -413,7 +426,20 @@ document.addEventListener("visibilitychange", () => {
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
         return self.post_step(info)
 
-    def post_step(self, info):
+    def post_step(self, info: dict[str, Any])-> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+        """
+        Post step method, called after executing the action.
+        This method is responsible for extracting the observation after the action. 
+        It also prepares reward, task status, user message and other step info.
+        Args:
+            info: dictionary containing information about the step
+        Returns:
+            obs: the observation after executing the action
+            reward: the reward received after executing the action
+            terminated: whether the episode is terminated or not
+            truncated: whether the episode is truncated or not
+            info: additional information about the step
+        """
         logger.debug("Action executed")
         info["action_exec_stop"] = time.time()
 
@@ -451,7 +477,7 @@ document.addEventListener("visibilitychange", () => {
         terminated = done or (
             self.terminate_on_infeasible and self.infeasible_message_received
         )  # task or agent can terminate the episode
-        truncated = False
+        truncated: bool = False
         return obs, reward, terminated, truncated, info
 
     def _task_validate(self):
