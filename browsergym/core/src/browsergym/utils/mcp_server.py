@@ -176,7 +176,7 @@ def fn_wrapper(func: Callable, validate: bool = True):
 
 
 for fn in ACTION_SUBSETS[args.subset]:
-    validate =fn.__name__ in config.validate_actions
+    validate = fn.__name__ in config.validate_actions
     mcp.add_tool(fn_wrapper(fn, validate))
 
 if __name__ == "__main__":
