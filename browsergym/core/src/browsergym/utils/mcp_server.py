@@ -34,7 +34,7 @@ def get_cli_args():
     parser = argparse.ArgumentParser(
         description="BrowserGym MCP server",
         usage="python browsergym/core/src/browsergym/utils/%(prog)s [options]",
-        epilog="\nExample: python browsergym/core/src/browsergym/utils/%(prog)s -t browsergym/workarena.servicenow.order-ipad-pro --demo_mode default -r /path/to/video/storage/dir",
+        epilog="To run Dev UI: mcp dev browsergym/core/src/browsergym/utils/mcp_server.py -e browsergym/core/",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(

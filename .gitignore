@@ -1,4 +1,4 @@
-git .DS_store
+.DS_store
 .idea/
 docs/src/generated/
 
