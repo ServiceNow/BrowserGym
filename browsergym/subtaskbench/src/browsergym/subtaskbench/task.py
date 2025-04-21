@@ -101,9 +101,9 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
 
         # Load configuration using the config module
         all_configs = config.get_config()
-        for config in all_configs:
-            if config['task_id'] == task_id:
-                self.task_config = config
+        for _config in all_configs:
+            if _config['task_id'] == task_id:
+                self.task_config = _config
 
         if not self.task_config:
             raise ValueError(f"Task ID {task_id} not found in config file.")
