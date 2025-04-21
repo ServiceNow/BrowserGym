@@ -47,10 +47,9 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         goal = self.goal
         page.goto(self.task_start_url)
 
-
-        self.evaluator = Evaluator(
-            start_url=self.task_start_url,
-            goal=self.goal,
+        self.eval_type = self.task_config['eval']['eval_type']
+        self.evaluator = EvaluatorRegistry.create(
+            eval_type=self.eval_type,
             evaluation_script=self.evaluation_script,
         )
 
@@ -75,10 +74,13 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         """
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
-        else:
-            answer = ""
 
-        reward = self.evaluator.evaluate(page, answer)
+        if self.eval_type == 'js_matcher':
+            reward = self.evaluator.evaluate(page)
+        elif self.eval_type == 'string_matcher':
+            reward = self.evaluator.evaluate(answer)
+        elif self.eval_type == 'url_matcher':
+            reward = self.evaluator.evaluate(page.url)
         print('Reward: ', reward)
         done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
