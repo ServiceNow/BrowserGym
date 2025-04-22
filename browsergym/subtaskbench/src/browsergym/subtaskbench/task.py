@@ -4,7 +4,7 @@ from pathlib import Path
 
 from browsergym.core.task import AbstractBrowserTask
 from subtask_benchmark import config 
-from subtask_benchmark.evaluator import Evaluator
+from subtask_benchmark.evaluator import EvaluatorRegistry
 
 class GenericSubTaskBenchTask(AbstractBrowserTask):
     """
@@ -68,6 +68,8 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         """
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
+        else:
+            answer = ""
 
         if self.eval_type == 'js_matcher':
             reward = self.evaluator.evaluate(page)
