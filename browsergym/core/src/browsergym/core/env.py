@@ -25,7 +25,7 @@ from .observation import (
     extract_merged_axtree,
     extract_screenshot,
 )
-from .spaces import AnyBox, AnyDict, Float, Unicode
+from .spaces import AnyBox, AnyDict, Anything, Float, Unicode
 from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
@@ -76,6 +76,7 @@ class BrowserEnv(gym.Env, ABC):
         pw_context_kwargs: dict = {},
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+        use_raw_page_output: bool = False,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -96,6 +97,7 @@ class BrowserEnv(gym.Env, ABC):
             pw_chromium_kwargs: extra parameters for the playwright Browser. Should only be used for debugging/testing.
             pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
+            use_raw_page_output: if set, the environment will use the raw page output instead of the default processing.
 
         """
         super().__init__()
@@ -115,6 +117,7 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_chromium_kwargs = pw_chromium_kwargs
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
+        self.use_raw_page_output = use_raw_page_output
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -132,42 +135,67 @@ class BrowserEnv(gym.Env, ABC):
         self.chat: Chat = None
 
         # observation space
-        self.observation_space = gym.spaces.Dict(
-            {
-                "chat_messages": gym.spaces.Sequence(
-                    gym.spaces.Dict(
-                        {
-                            "role": Unicode(),
-                            "timestamp": Float(),
-                            "message": Unicode(),
-                        }
-                    )
-                ),
-                "goal": Unicode(),
-                "goal_object": gym.spaces.Sequence(AnyDict()),
-                "open_pages_urls": gym.spaces.Sequence(Unicode()),
-                "open_pages_titles": gym.spaces.Sequence(Unicode()),
-                "active_page_index": gym.spaces.Box(
-                    low=0, high=255, dtype=int
-                ),  # TODO: change to an Integer (breaking change for users)
-                "url": Unicode(),
-                "screenshot": AnyBox(
-                    low=0,
-                    high=255,
-                    shape=(-1, -1, 3),
-                    dtype=np.uint8,
-                ),  # swapped axes (height, width, RGB)
-                "dom_object": AnyDict(),
-                "axtree_object": AnyDict(),
-                "extra_element_properties": AnyDict(),
-                "focused_element_bid": Unicode(),
-                "last_action": Unicode(),
-                "last_action_error": Unicode(),
-                "elapsed_time": gym.spaces.Box(
-                    low=0, high=np.inf, dtype=float
-                ),  # TODO: change to a Float (breaking change for users)
-            }
-        )
+        if use_raw_page_output:
+            self.observation_space = gym.spaces.Dict(
+                {
+                    "page": Anything(),
+                    "chat_messages": gym.spaces.Sequence(
+                        gym.spaces.Dict(
+                            {
+                                "role": Unicode(),
+                                "timestamp": Float(),
+                                "message": Unicode(),
+                            }
+                        )
+                    ),
+                    "goal": Unicode(),
+                    "goal_object": gym.spaces.Sequence(AnyDict()),
+                    "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                    "open_pages_titles": gym.spaces.Sequence(Unicode()),
+                    "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
+                    "url": Unicode(),
+                    "last_action": Unicode(),
+                    "last_action_error": Unicode(),
+                    "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
+                }
+            )
+        else:
+            self.observation_space = gym.spaces.Dict(
+                {
+                    "chat_messages": gym.spaces.Sequence(
+                        gym.spaces.Dict(
+                            {
+                                "role": Unicode(),
+                                "timestamp": Float(),
+                                "message": Unicode(),
+                            }
+                        )
+                    ),
+                    "goal": Unicode(),
+                    "goal_object": gym.spaces.Sequence(AnyDict()),
+                    "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                    "open_pages_titles": gym.spaces.Sequence(Unicode()),
+                    "active_page_index": gym.spaces.Box(
+                        low=0, high=255, dtype=int
+                    ),  # TODO: change to an Integer (breaking change for users)
+                    "url": Unicode(),
+                    "screenshot": AnyBox(
+                        low=0,
+                        high=255,
+                        shape=(-1, -1, 3),
+                        dtype=np.uint8,
+                    ),  # swapped axes (height, width, RGB)
+                    "dom_object": AnyDict(),
+                    "axtree_object": AnyDict(),
+                    "extra_element_properties": AnyDict(),
+                    "focused_element_bid": Unicode(),
+                    "last_action": Unicode(),
+                    "last_action_error": Unicode(),
+                    "elapsed_time": gym.spaces.Box(
+                        low=0, high=np.inf, dtype=float
+                    ),  # TODO: change to a Float (breaking change for users)
+                }
+            )
 
         # action space
         self.action_space = Unicode()
@@ -527,7 +555,23 @@ document.addEventListener("visibilitychange", () => {
             raise RuntimeError(f"Unexpected: active page has been closed ({self.page}).")
 
     def _get_obs(self):
-
+        if self.use_raw_page_output:
+            obs = {
+                "page": self.page,
+                "chat_messages": tuple(copy.deepcopy(self.chat.messages)),
+                "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
+                "goal_object": tuple(
+                    copy.deepcopy(self.goal_object)
+                ),  # new goal format, list of messages openai style
+                "open_pages_urls": tuple(page.url for page in self.context.pages),
+                "open_pages_titles": tuple(page.title() for page in self.context.pages),
+                "active_page_index": np.asarray([self.context.pages.index(self.page)]),
+                "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
+                "last_action": self.last_action,
+                "last_action_error": self.last_action_error,
+                "elapsed_time": np.asarray([time.time() - self.start_time]),
+            }
+            return obs
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
