@@ -1,10 +1,16 @@
 import math
 import playwright.sync_api
 from pathlib import Path
+import logging
 
 from browsergym.core.task import AbstractBrowserTask
 from subtask_benchmark import config 
 from subtask_benchmark.evaluator import EvaluatorRegistry
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("chat_messages")
 
 class GenericSubTaskBenchTask(AbstractBrowserTask):
     """
@@ -66,17 +72,13 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
             info: dictionnary, custom information from the task.
 
         """
+        logger.info(chat_messages)
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
         else:
             answer = ""
 
-        if self.eval_type == 'js_matcher':
-            reward = self.evaluator.evaluate(page)
-        elif self.eval_type == 'string_matcher':
-            reward = self.evaluator.evaluate(answer)
-        elif self.eval_type == 'url_matcher':
-            reward = self.evaluator.evaluate(page.url)
+        reward = self.evaluator.evaluate(answer, page)
         print('Reward: ', reward)
         done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
