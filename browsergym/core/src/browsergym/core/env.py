@@ -249,10 +249,12 @@ class BrowserEnv(gym.Env, ABC):
 
         # create a new browser
         if self.connect_via_cdp:
-            print(f'Using CDP Port: {self.cdp_port}. If this is not the correct port, please pass `cdp_port` during gym env creation.')
+            print(
+                f"Using CDP Port: {self.cdp_port}. If this is not the correct port, please pass `cdp_port` during gym env creation."
+            )
             browser_url = f"http://localhost:{self.cdp_port}"
             logger.info(f"Connecting to: {browser_url}")
-                
+
             # TODO: figure out how to make it headless and pass other args
             self.browser = pw.chromium.connect_over_cdp(browser_url)
         elif "user_data_dir" in pw_chromium_kwargs:
