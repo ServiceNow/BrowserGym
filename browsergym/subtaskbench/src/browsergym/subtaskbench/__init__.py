@@ -18,7 +18,7 @@ for task_id in []:
     ALL_SUBTASKBENCH_TASK_IDS.append(gym_id)
 
 # register all online SubTaskBench tasks
-for task_id in [f'online.{str(i)}' for i in range(88)]:
+for task_id in [f"online.{str(i)}" for i in range(88)]:
     gym_id = f"subtaskbench.{task_id}"
     register_task(
         gym_id,
