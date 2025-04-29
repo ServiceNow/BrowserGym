@@ -1,10 +1,17 @@
 import math
 import playwright.sync_api
 from pathlib import Path
+import logging
 
 from browsergym.core.task import AbstractBrowserTask
-from subtask_benchmark import config 
-from subtask_benchmark.evaluator import Evaluator
+from subtask_benchmark import config
+from subtask_benchmark.evaluator import EvaluatorRegistry
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("chat_messages")
+
 
 class GenericSubTaskBenchTask(AbstractBrowserTask):
     """
@@ -41,7 +48,11 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         goal = self.goal
         page.goto(self.task_start_url)
 
-        self.evaluator = Evaluator(evaluation_script=self.evaluation_script)
+        self.eval_type = self.task_config["eval"]["eval_type"]
+        self.evaluator = EvaluatorRegistry.create(
+            eval_type=self.eval_type,
+            evaluation_script=self.evaluation_script,
+        )
 
         return goal, {}
 
@@ -64,11 +75,12 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         """
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
+            logger.info(answer)
         else:
             answer = ""
 
-        reward = self.evaluator.evaluate(page, answer)
-        print('Reward: ', reward)
+        reward = self.evaluator.evaluate(answer, page)
+        logger.info("Reward: ", reward)
         done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
         return reward, done, "", {}
@@ -94,7 +106,11 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
     """
 
     def __init__(
-        self, seed: int, task_id: str, task_config_path: str = "subtaskbench.json", port: int = 9222.
+        self,
+        seed: int,
+        task_id: str,
+        task_config_path: str = "subtaskbench.json",
+        port: int = 9222,
     ) -> None:
         super().__init__(seed, task_id, task_config_path, port)
         self.parent_dir = Path(__file__).parent
@@ -102,7 +118,7 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
         # Load configuration using the config module
         all_configs = config.get_config()
         for _config in all_configs:
-            if _config['task_id'] == task_id:
+            if _config["task_id"] == task_id:
                 self.task_config = _config
 
         if not self.task_config:
@@ -111,10 +127,9 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
 
         self.timeout = 60000  # Timeout for the webserver
 
-        self.task_start_url = self.task_config['env']['start_url']
-        self.goal = self.task_config['goal']
-        self.evaluation_script = self.task_config['eval']['evaluate_scripts'][0]['script']
-        
+        self.task_start_url = self.task_config["env"]["start_url"]
+        self.goal = self.task_config["goal"]
+        self.evaluation_script = self.task_config["eval"]["evaluate_scripts"][0]["script"]
 
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
         """
