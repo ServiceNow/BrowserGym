@@ -73,14 +73,14 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
             info: dictionnary, custom information from the task.
 
         """
-        logger.info(chat_messages)
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
+            logger.info(answer)
         else:
             answer = ""
 
         reward = self.evaluator.evaluate(answer, page)
-        print("Reward: ", reward)
+        logger.info("Reward: ", reward)
         done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
         return reward, done, "", {}
@@ -110,7 +110,7 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
         seed: int,
         task_id: str,
         task_config_path: str = "subtaskbench.json",
-        port: int = 9222.0,
+        port: int = 9222,
     ) -> None:
         super().__init__(seed, task_id, task_config_path, port)
         self.parent_dir = Path(__file__).parent
