@@ -1,9 +1,6 @@
 import numpy as np
 
-from browsergym.experiments.benchmark.metadata.utils import (
-    task_list_from_metadata,
-    task_metadata,
-)
+from browsergym.experiments.benchmark.metadata.utils import task_list_from_metadata, task_metadata
 from browsergym.experiments.benchmark.utils import (
     make_env_args_list_from_fixed_seeds,
     make_env_args_list_from_repeat_tasks,
@@ -82,6 +79,13 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
     ),
     "weblinx": HighLevelActionSetArgs(
         subsets=["weblinx"],
+        multiaction=False,
+        strict=False,
+        retry_with_force=True,
+        demo_mode="off",
+    ),
+    "example": HighLevelActionSetArgs(
+        subsets=["example"],
         multiaction=False,
         strict=False,
         retry_with_force=True,
@@ -260,5 +264,19 @@ DEFAULT_BENCHMARKS = {
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("weblinx"),
+    ),
+    "example": lambda: Benchmark(
+        name="example",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["example"],
+        is_multi_tab=False,
+        supports_parallel_seeds=True,
+        backends=["example"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("example")),
+            max_steps=10,
+            n_repeats=1,  # 1 seed per task in the example benchmark
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("example"),
     ),
 }

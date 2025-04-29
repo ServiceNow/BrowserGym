@@ -1,0 +1,4 @@
+browsergym-core==0.13.3
+# any other dependencies for your benchmark
+# e.g. torch==1.13.0
+# or your own benchmark package as a backend
