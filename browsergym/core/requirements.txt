@@ -1,4 +1,4 @@
-playwright~=1.39
+playwright==1.44
 gymnasium>=0.27
 numpy>=1.14
 pyparsing>=3
