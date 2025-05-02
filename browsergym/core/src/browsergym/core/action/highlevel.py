@@ -530,7 +530,7 @@ Only a single action can be provided at once."""
         for tool_name, action in self.action_set.items():
             # Parse the signature to extract parameter names and types
             parameters = {"type": "object", "properties": {}, "required": []}
-            signature = inspect.signature(eval(tool_name))
+            signature = inspect.signature(globals()[tool_name])
             for param_name, param in signature.parameters.items():
                 param_type = "string"  # Default to string if type is not specified
                 if param.annotation != inspect.Parameter.empty:
