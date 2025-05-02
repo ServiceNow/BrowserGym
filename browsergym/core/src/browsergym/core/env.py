@@ -15,16 +15,10 @@ from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
-from .observation import (
-    MarkingError,
-    _post_extract,
-    _pre_extract,
-    extract_dom_extra_properties,
-    extract_dom_snapshot,
-    extract_focused_element_bid,
-    extract_merged_axtree,
-    extract_screenshot,
-)
+from .observation import (MarkingError, _post_extract, _pre_extract,
+                          extract_dom_extra_properties, extract_dom_snapshot,
+                          extract_focused_element_bid, extract_merged_axtree,
+                          extract_mouse_position, extract_screenshot)
 from .spaces import AnyBox, AnyDict, Float, Unicode
 from .task import AbstractBrowserTask
 
@@ -157,6 +151,9 @@ class BrowserEnv(gym.Env, ABC):
                     shape=(-1, -1, 3),
                     dtype=np.uint8,
                 ),  # swapped axes (height, width, RGB)
+                "mouse_position": gym.spaces.Tuple(
+                    (Float(), Float())
+                ),
                 "dom_object": AnyDict(),
                 "axtree_object": AnyDict(),
                 "extra_element_properties": AnyDict(),
@@ -258,12 +255,17 @@ class BrowserEnv(gym.Env, ABC):
         # set default timeout
         self.context.set_default_timeout(timeout)
 
-        # hack: keep track of the active page with a javascript callback
+        # hack: keep track of the active page and mouse position with javascript callbacks
         # there is no concept of active page in playwright
         # https://github.com/microsoft/playwright/issues/2603
         self.context.expose_binding(
             "browsergym_page_activated", lambda source: self._activate_page_from_js(source["page"])
         )
+        self.context.expose_binding(
+            "browsergym_mouse_moved", lambda source: self._update_mouse_position_from_js(source)
+        )
+        # Initialize mouse position tracking
+        self.last_mouse_position = None
         self.context.add_init_script(
             r"""
 window.browsergym_page_activated();
@@ -271,7 +273,13 @@ window.addEventListener("focus", () => {window.browsergym_page_activated();}, {c
 window.addEventListener("focusin", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("load", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("pageshow", () => {window.browsergym_page_activated();}, {capture: true});
-window.addEventListener("mousemove", () => {window.browsergym_page_activated();}, {capture: true});
+window.addEventListener("mousemove", (event) => {
+    window.browsergym_page_activated();
+    window.browsergym_mouse_moved({
+        x: event.clientX,
+        y: event.clientY
+    });
+}, {capture: true});
 window.addEventListener("mouseup", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("mousedown", () => {window.browsergym_page_activated();}, {capture: true});
 window.addEventListener("wheel", () => {window.browsergym_page_activated();}, {capture: true});
@@ -524,6 +532,25 @@ document.addEventListener("visibilitychange", () => {
                 except playwright.sync_api.Error:
                     pass
 
+    def _update_mouse_position_from_js(self, source):
+        page = source["page"]
+        x = source["x"]
+        y = source["y"]
+        logger.debug(f"_update_mouse_position_from_js called, page={str(page)}, x={x}, y={y}")
+        
+        if not page.context == self.context:
+            raise RuntimeError(
+                f"Unexpected: mouse event from a page that belongs to a different browser context ({page})."
+            )
+        
+        # Store the mouse position along with the page that received the event
+        self.last_mouse_position = {
+            "page": page,
+            "x": x,
+            "y": y,
+            "timestamp": time.time()
+        }
+
     def _activate_page_from_js(self, page: playwright.sync_api.Page):
         logger.debug(f"_activate_page_from_js(page) called, page={str(page)}")
         if not page.context == self.context:
@@ -620,6 +647,7 @@ document.addEventListener("visibilitychange", () => {
             "last_action": self.last_action,
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
+            "mouse_position": extract_mouse_position(self.page),
         }
 
         return obs
