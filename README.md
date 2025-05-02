@@ -228,6 +228,7 @@ python demo_agent/run_demo.py --help
 - [MiniWoB(++)](https://miniwob.farama.org/): A collection of over 100 web tasks on synthetic web pages.
 - [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
 - [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
+- [DoomArena](https://github.com/ServiceNow/DoomArena): A framework for AI agent security testing which supports injecting attacks into web pages from Browsergym environments.
 
 ## 🌟 Contributors
 
