@@ -1,3 +1,9 @@
+[project]
+name = "browsergym-meta"
+description = "BrowserGym: a gym environment for web task automation in the Chromium browser"
+dynamic = ["version"]
+[tool.setuptools]
+packages = []  # meta distribution, packages are included as dependencies
 [tool.black]
 line-length = 100
 include = '\.pyi?$'
