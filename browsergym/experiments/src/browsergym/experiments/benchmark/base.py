@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 import pandas as pd
-from browsergym.core.action.highlevel import HighLevelActionSet
 from dataclasses_json import DataClassJsonMixin, config
 
-from agentlab.experiments.loop import EnvArgs
+from browsergym.core.action.highlevel import HighLevelActionSet
+from browsergym.experiments.loop import EnvArgs
 
 from .metadata.utils import (
     build_env_args_dependency_graphs,

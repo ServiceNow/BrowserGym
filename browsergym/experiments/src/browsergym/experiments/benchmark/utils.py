@@ -7,7 +7,7 @@ from typing import Literal
 
 import numpy as np
 
-from agentlab.experiments.loop import SEED_MAX, EnvArgs
+from browsergym.experiments.loop import SEED_MAX, EnvArgs
 
 logger = logging.getLogger(__name__)
 
