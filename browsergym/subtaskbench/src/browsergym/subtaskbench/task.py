@@ -73,9 +73,13 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
             info: dictionnary, custom information from the task.
 
         """
+        terminal_message_received = False
         if chat_messages and chat_messages[-1]["role"] == "assistant":
             answer = chat_messages[-1]["message"]
             logger.info(answer)
+            terminal_message_received = True
+        elif chat_messages and chat_messages[-1]["role"] == "infeasible":
+            terminal_message_received = True
         else:
             answer = ""
 
@@ -83,7 +87,7 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
         logger.info(f"Reward: {reward}")
         done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
-        return reward, done, "", {}
+        return reward, terminal_message_received, "", {}
 
 
 class StaticSubTaskBenchTask(GenericSubTaskBenchTask):

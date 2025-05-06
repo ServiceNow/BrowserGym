@@ -482,7 +482,6 @@ document.addEventListener("visibilitychange", () => {
                 reward, done, user_message, task_info = self._task_validate()
                 info["task_info"] = task_info
                 logger.debug(f"Task validation done")
-                done = True
             else:
                 reward = 0
                 done = False
