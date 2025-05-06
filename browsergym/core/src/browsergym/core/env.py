@@ -129,7 +129,7 @@ class BrowserEnv(gym.Env, ABC):
         self.connect_via_cdp = connect_via_cdp
         self.cdp_port = cdp_port
         self.evaluate_reward_on_terminal_msgs = evaluate_reward_on_terminal_msgs
-
+        self.terminal_message_received  = False
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
 
@@ -477,23 +477,23 @@ document.addEventListener("visibilitychange", () => {
         logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
 
-       
-        
         if self.evaluate_reward_on_terminal_msgs:
-            if not self.terminal_message_received:
+            if self.terminal_message_received:
                 reward, done, user_message, task_info = self._task_validate()
                 info["task_info"] = task_info
                 logger.debug(f"Task validation done")
+                done = True
             else:
+                reward = 0
                 done = False
         else:
             reward, done, user_message, task_info = self._task_validate()
             info["task_info"] = task_info
             logger.debug(f"Task validation done")
 
-        # add any user message sent by the task to the chat
-        if user_message:
-            self.chat.add_message(role="user", msg=user_message)
+            # add any user message sent by the task to the chat
+            if user_message:
+                self.chat.add_message(role="user", msg=user_message)
 
         # extract observation (generic)
         obs = self._get_obs()
