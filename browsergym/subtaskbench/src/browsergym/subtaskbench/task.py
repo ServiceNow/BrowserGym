@@ -79,6 +79,7 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
             logger.info(answer)
             terminal_message_received = True
         elif chat_messages and chat_messages[-1]["role"] == "infeasible":
+            answer = chat_messages[-1]["message"]
             terminal_message_received = True
         else:
             answer = ""
