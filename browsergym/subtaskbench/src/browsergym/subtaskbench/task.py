@@ -86,7 +86,6 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
 
         reward = self.evaluator.evaluate(answer, page)
         logger.info(f"Reward: {reward}")
-        done = math.isclose(reward, 1.0, abs_tol=1e-5)
 
         return reward, terminal_message_received, "", {}
 
