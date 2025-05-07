@@ -48,7 +48,7 @@ class EnvArgs(DataClassJsonMixin):
     task_kwargs: Optional[dict] = None  # use default value from BrowserGym
 
     def make_env(
-        self, action_mapping, exp_dir, exp_task_kwargs: dict = {}, use_raw_page_output=True
+        self, action_mapping, exp_dir, exp_task_kwargs: dict = {}, use_raw_page_output=False
     ):
         """
         Instantiates the BrowserGym environment corresponding to the arguments (with some tweaks).
