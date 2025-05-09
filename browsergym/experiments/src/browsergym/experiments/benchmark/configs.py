@@ -1,9 +1,6 @@
 import numpy as np
 
-from browsergym.experiments.benchmark.metadata.utils import (
-    task_list_from_metadata,
-    task_metadata,
-)
+from browsergym.experiments.benchmark.metadata.utils import task_list_from_metadata, task_metadata
 from browsergym.experiments.benchmark.utils import (
     make_env_args_list_from_fixed_seeds,
     make_env_args_list_from_repeat_tasks,

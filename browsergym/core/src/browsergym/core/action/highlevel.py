@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from . import utils
 from .base import AbstractActionSet
-from .functions import (  # check,; uncheck,
+from .functions import (
     clear,
     click,
     dblclick,
@@ -32,7 +32,7 @@ from .functions import (  # check,; uncheck,
     noop,
     press,
     report_infeasible,
-    scroll,
+    scroll_at,
     select_option,
     send_msg_to_user,
     tab_close,
@@ -45,7 +45,7 @@ ACTION_SUBSETS = {
     "chat": [send_msg_to_user],
     "infeas": [report_infeasible],
     "bid": [
-        scroll,
+        scroll_at,
         fill,
         # These are not really needed and might pollute the action space, doing more harm than good
         # check,
@@ -61,7 +61,7 @@ ACTION_SUBSETS = {
         upload_file,
     ],
     "coord": [
-        scroll,
+        scroll_at,
         mouse_move,
         mouse_up,
         mouse_down,
@@ -89,7 +89,7 @@ ACTION_SUBSETS = {
         mouse_dblclick,  # DBLCLICK_COORDS
         mouse_down,  #     MOUSEDOWN_COORDS
         mouse_up,  #       MOUSEUP_COORDS
-        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        scroll_at,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         click,  #          CLICK_ELEMENT
         keyboard_press,  # PRESS_KEY
         keyboard_type,  #  TYPE_TEX (and substitute for TYPE_FIELD()
@@ -102,7 +102,7 @@ ACTION_SUBSETS = {
         mouse_dblclick,  # DBLCLICK_COORDS
         mouse_down,  #     MOUSEDOWN_COORDS
         mouse_up,  #       MOUSEUP_COORDS
-        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        scroll_at,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         keyboard_press,  # PRESS_KEY
     ],
     # adapted from MiniWoB repo
@@ -119,7 +119,7 @@ ACTION_SUBSETS = {
         mouse_dblclick,  # DBLCLICK_COORDS
         mouse_down,  #     MOUSEDOWN_COORDS
         mouse_up,  #       MOUSEUP_COORDS
-        scroll,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
+        scroll_at,  #         SCROLL_UP_COORDS, SCROLL_DOWN_COORDS
         keyboard_press,  # PRESS_KEY
         keyboard_type,  #  substitute for TYPE_FIELD
     ],
@@ -131,7 +131,7 @@ ACTION_SUBSETS = {
     # https://github.com/web-arena-x/webarena/blob/e31c190c9b43f63e5724322b847e00249300df40/agent/prompts/raw/p_cot_id_actree_2s.py#L13
     "webarena": [
         #                   #     code      |      paper       |      prompt
-        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        scroll_at,  #            SCROLL        | scroll(dir)      | scroll [down|up]
         keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
         #                     MOUSE_CLICK   |                  |
         #                     KEYBOARD_TYPE |                  |
@@ -158,7 +158,7 @@ ACTION_SUBSETS = {
     # https://github.com/web-arena-x/visualwebarena/blob/15890922c97a8694e366fde2d7de8dbd1ff63fb5/agent/prompts/jsons/p_cot_id_actree_3s.json#L2
     "visualwebarena": [
         #                   #     code      |      paper       |      prompt
-        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        scroll_at,  #            SCROLL        | scroll(dir)      | scroll [down|up]
         keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
         #                     MOUSE_CLICK   |                  |
         #                     KEYBOARD_TYPE |                  |
@@ -182,7 +182,7 @@ ACTION_SUBSETS = {
     # from workarena paper
     # https://arxiv.org/abs/2403.07718
     "workarena": [
-        scroll,
+        scroll_at,
         fill,
         select_option,
         click,
@@ -197,7 +197,7 @@ ACTION_SUBSETS = {
     # from workarena++ paper
     # https://arxiv.org/abs/2407.05291
     "workarena++": [
-        scroll,
+        scroll_at,
         fill,
         select_option,
         click,
@@ -226,7 +226,7 @@ ACTION_SUBSETS = {
         # change(uid=[element], value=[str]) -> ❌
         goto,  # load(url=[link]) -> goto(url=[link])
         # submit(uid=[element]) -> click(bid=[element id])
-        scroll,  # scroll(x=[int x],y=[int y]) -> scroll(delta_x=[int x], delta_y=[int y])
+        scroll_at,  # scroll(x=[int x],y=[int y]) -> scroll(delta_x=[int x], delta_y=[int y])
         # copy(uid=[element],text=[str]) -> ❌
         # paste(uid=[element],text=[str]) -> ❌
         new_tab,  # tabcreate() -> new_tab()
@@ -236,7 +236,7 @@ ACTION_SUBSETS = {
     # from assistantbench paper
     # https://arxiv.org/abs/2407.15711
     "assistantbench": [
-        scroll,  # SCROLL
+        scroll_at,  # SCROLL
         fill,  # TYPE
         select_option,  # SELECT
         click,  # CLICK
@@ -513,6 +513,56 @@ Only a single action can be provided at once."""
 
         # return the constructed python code
         return python_code
+
+    def to_tool_description(self, api="openai") -> list[dict]:
+        """
+        Translates actions to tool descriptions following the OpenAI API format.
+
+        Returns:
+            A list of tool descriptors.
+        """
+        schema_keys = {
+            "openai": "parameters",
+            "anthropic": "input_schema",
+        }
+        schema = schema_keys.get(api, "parameters")
+        tools = []
+        for tool_name, action in self.action_set.items():
+            # Parse the signature to extract parameter names and types
+            parameters = {"type": "object", "properties": {}, "required": []}
+            signature = inspect.signature(globals()[tool_name])
+            for param_name, param in signature.parameters.items():
+                param_type = "string"  # Default to string if type is not specified
+                if param.annotation != inspect.Parameter.empty:
+                    if param.annotation is str:
+                        param_type = "string"
+                    elif param.annotation is float or param.annotation is int:
+                        param_type = "number"
+                    elif param.annotation is bool:
+                        param_type = "boolean"
+                    elif param.annotation is dict:
+                        param_type = "object"
+                    elif param.annotation is list:
+                        param_type = "array"
+
+                parameters["properties"][param_name] = {
+                    "type": param_type,
+                    # "description": f"Parameter {param_name} of type {param_type}",
+                }
+                if param.default == inspect.Parameter.empty:
+                    parameters["required"].append(param_name)
+
+            # Construct the tool descriptor
+            tool = {
+                "name": tool_name,
+                "description": action.description,
+                schema: parameters,
+            }
+            if api == "openai":
+                tool["type"] = "function"
+            tools.append(tool)
+
+        return tools
 
 
 # consistency checks
