@@ -280,6 +280,17 @@ def scroll(delta_x: float, delta_y: float):
     page.mouse.wheel(delta_x, delta_y)
 
 
+def scroll_at(x: int, y: int, dx: int, dy: int):
+    """
+    Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling. Dispatches a wheel event.
+
+    Examples:
+        scroll_at(50, 100, -50, -100)
+    """
+    page.mouse.move(x, y)  # position pointer
+    page.mouse.wheel(dx, dy)
+
+
 # https://playwright.dev/python/docs/api/class-mouse#mouse-move
 def mouse_move(x: float, y: float):
     """

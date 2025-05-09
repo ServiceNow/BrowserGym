@@ -255,16 +255,22 @@ class BrowserEnv(gym.Env, ABC):
         pw: playwright.sync_api.Playwright = _get_global_playwright()
         # important: change playwright's test id attribute from "data-testid" to "bid"
         pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
+        args = [
+            (
+                f"--window-size={viewport['width']},{viewport['height']}"
+                if self.resizeable_window
+                else None
+            ),
+            "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",
+        ]
+        args = [arg for arg in args if arg is not None]  # Remove None values
 
         # create a new browser
         self.browser = pw.chromium.launch(
             headless=self.headless,
             slow_mo=slow_mo,
-            args=(
-                [f"--window-size={viewport['width']},{viewport['height']}"]
-                if self.resizeable_window
-                else None
-            ),
+            args=args,
+            ignore_default_args=["--hide-scrollbars"],  # keep native bars
             # will raise an Exception if above args are overriden
             **self.pw_chromium_kwargs,
         )

@@ -32,7 +32,7 @@ from .functions import (
     noop,
     press,
     report_infeasible,
-    scroll,
+    scroll_at,
     select_option,
     send_msg_to_user,
     tab_close,
@@ -45,7 +45,7 @@ ACTION_SUBSETS = {
     "chat": [send_msg_to_user],
     "infeas": [report_infeasible],
     "bid": [
-        scroll,
+        scroll_at,
         fill,
         # These are not really needed and might pollute the action space, doing more harm than good
         # check,
@@ -61,7 +61,7 @@ ACTION_SUBSETS = {
         upload_file,
     ],
     "coord": [
-        scroll,
+        scroll_at,
         mouse_move,
         mouse_up,
         mouse_down,
@@ -534,15 +534,15 @@ Only a single action can be provided at once."""
             for param_name, param in signature.parameters.items():
                 param_type = "string"  # Default to string if type is not specified
                 if param.annotation != inspect.Parameter.empty:
-                    if param.annotation == str:
+                    if param.annotation is str:
                         param_type = "string"
-                    elif param.annotation == float or param.annotation == int:
+                    elif param.annotation is float or param.annotation is int:
                         param_type = "number"
-                    elif param.annotation == bool:
+                    elif param.annotation is bool:
                         param_type = "boolean"
-                    elif param.annotation == dict:
+                    elif param.annotation is dict:
                         param_type = "object"
-                    elif param.annotation == list:
+                    elif param.annotation is list:
                         param_type = "array"
 
                 parameters["properties"][param_name] = {

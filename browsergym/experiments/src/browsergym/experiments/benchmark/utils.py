@@ -6,7 +6,6 @@ import typing
 from typing import Literal
 
 import numpy as np
-
 from browsergym.experiments.loop import SEED_MAX, EnvArgs
 
 logger = logging.getLogger(__name__)
@@ -46,7 +45,11 @@ def make_env_args_list_from_workarena_curriculum(
 
 
 def make_env_args_list_from_repeat_tasks(
-    task_list: list[str], max_steps: int, n_repeats: int, seeds_rng: np.random.RandomState
+    task_list: list[str],
+    max_steps: int,
+    n_repeats: int,
+    seeds_rng: np.random.RandomState,
+    viewport=None,
 ):
     """
     Generates a list of `len(task_list)` time `n_repeats` environments arguments, using randomly generated seeds.
@@ -62,7 +65,7 @@ def make_env_args_list_from_repeat_tasks(
                     headless=True,
                     record_video=False,
                     wait_for_user_message=False,
-                    viewport=None,
+                    viewport=viewport,
                     slow_mo=None,
                     storage_state=None,
                     task_kwargs=None,
