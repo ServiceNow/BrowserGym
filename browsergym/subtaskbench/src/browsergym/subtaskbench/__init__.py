@@ -7,7 +7,7 @@ ONLINE_SUBTASKBENCH_TASK_IDS = []
 ALL_SUBTASKBENCH_TASK_IDS = []
 
 # register all static SubTaskBench tasks
-for task_id in []:
+for task_id in [f"static.{str(i)}" for i in range(45)]:
     gym_id = f"subtaskbench.{task_id}"
     register_task(
         gym_id,
