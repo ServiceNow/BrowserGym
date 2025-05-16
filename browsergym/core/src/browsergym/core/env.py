@@ -477,15 +477,7 @@ document.addEventListener("visibilitychange", () => {
         logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
 
-        if self.evaluate_reward_on_terminal_msgs:
-            if self.terminal_message_received:
-                reward, done, user_message, task_info = self._task_validate()
-                info["task_info"] = task_info
-                logger.debug(f"Task validation done")
-            else:
-                reward = 0
-                done = False
-        else:
+        if not self.evaluate_reward_on_terminal_msgs or (self.evaluate_reward_on_terminal_msgs and self.terminal_message_received):
             reward, done, user_message, task_info = self._task_validate()
             info["task_info"] = task_info
             logger.debug(f"Task validation done")
@@ -494,6 +486,10 @@ document.addEventListener("visibilitychange", () => {
             if user_message:
                 self.chat.add_message(role="user", msg=user_message)
 
+        else:
+            reward = 0
+            done = False
+      
         # extract observation (generic)
         obs = self._get_obs()
         logger.debug(f"Observation extracted")
