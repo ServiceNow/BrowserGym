@@ -80,6 +80,7 @@ class BrowserEnv(gym.Env, ABC):
         init_script: Optional[str] = None,
         connect_via_cdp: bool = False,
         cdp_port: int = 0,
+        evaluate_reward_on_terminal_msgs: bool = False,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -102,6 +103,8 @@ class BrowserEnv(gym.Env, ABC):
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
             extra_obs_func: if set, this function will be called between actions to get observations.
             init_script: if set, this JavaScript code will be executed in every frame.
+            evaluate_reward_on_terminal_msgs: boolean to determine whether the evaluator should be run on every step or only when the agent finds
+            a send_msg_to_user or a report_infeasibility message.
 
         """
         super().__init__()
@@ -125,7 +128,8 @@ class BrowserEnv(gym.Env, ABC):
         self.init_script = init_script
         self.connect_via_cdp = connect_via_cdp
         self.cdp_port = cdp_port
-
+        self.evaluate_reward_on_terminal_msgs = evaluate_reward_on_terminal_msgs
+        self.terminal_message_received  = False
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
 
@@ -423,12 +427,14 @@ document.addEventListener("visibilitychange", () => {
             if not isinstance(text, str):
                 raise ValueError(f"Forbidden value: {text} is not a string")
             self.chat.add_message(role="assistant", msg=text)
+            self.terminal_message_received = True
 
         def report_infeasible_instructions(reason: str):
             if not isinstance(reason, str):
                 raise ValueError(f"Forbidden value: {reason} is not a string")
             self.chat.add_message(role="infeasible", msg=reason)
             self.infeasible_message_received = True
+            self.terminal_message_received = True
 
         # try to execute the action
         logger.debug(f"Executing action")
@@ -470,14 +476,20 @@ document.addEventListener("visibilitychange", () => {
 
         logger.debug(f"Initiating task validation")
         # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, task_info = self._task_validate()
-        info["task_info"] = task_info
-        logger.debug(f"Task validation done")
 
-        # add any user message sent by the task to the chat
-        if user_message:
-            self.chat.add_message(role="user", msg=user_message)
+        if not self.evaluate_reward_on_terminal_msgs or (self.evaluate_reward_on_terminal_msgs and self.terminal_message_received):
+            reward, done, user_message, task_info = self._task_validate()
+            info["task_info"] = task_info
+            logger.debug(f"Task validation done")
 
+            # add any user message sent by the task to the chat
+            if user_message:
+                self.chat.add_message(role="user", msg=user_message)
+
+        else:
+            reward = 0
+            done = False
+      
         # extract observation (generic)
         obs = self._get_obs()
         logger.debug(f"Observation extracted")
