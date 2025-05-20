@@ -33,6 +33,7 @@ from .functions import (  # check,; uncheck,
     press,
     report_infeasible,
     scroll,
+    scroll_at,
     select_option,
     send_msg_to_user,
     tab_close,
@@ -61,7 +62,7 @@ ACTION_SUBSETS = {
         upload_file,
     ],
     "coord": [
-        scroll,
+        scroll_at,
         mouse_move,
         mouse_up,
         mouse_down,
@@ -513,6 +514,56 @@ Only a single action can be provided at once."""
 
         # return the constructed python code
         return python_code
+
+    def to_tool_description(self, api="openai") -> list[dict]:
+        """
+        Translates actions to tool descriptions following the OpenAI API format.
+
+        Returns:
+            A list of tool descriptors.
+        """
+        schema_keys = {
+            "openai": "parameters",
+            "anthropic": "input_schema",
+        }
+        schema = schema_keys.get(api, "parameters")
+        tools = []
+        for tool_name, action in self.action_set.items():
+            # Parse the signature to extract parameter names and types
+            parameters = {"type": "object", "properties": {}, "required": []}
+            signature = inspect.signature(globals()[tool_name])
+            for param_name, param in signature.parameters.items():
+                param_type = "string"  # Default to string if type is not specified
+                if param.annotation != inspect.Parameter.empty:
+                    if param.annotation is str:
+                        param_type = "string"
+                    elif param.annotation is float or param.annotation is int:
+                        param_type = "number"
+                    elif param.annotation is bool:
+                        param_type = "boolean"
+                    elif param.annotation is dict:
+                        param_type = "object"
+                    elif param.annotation is list:
+                        param_type = "array"
+
+                parameters["properties"][param_name] = {
+                    "type": param_type,
+                    # "description": f"Parameter {param_name} of type {param_type}",
+                }
+                if param.default == inspect.Parameter.empty:
+                    parameters["required"].append(param_name)
+
+            # Construct the tool descriptor
+            tool = {
+                "name": tool_name,
+                "description": action.description,
+                schema: parameters,
+            }
+            if api == "openai":
+                tool["type"] = "function"
+            tools.append(tool)
+
+        return tools
 
 
 # consistency checks

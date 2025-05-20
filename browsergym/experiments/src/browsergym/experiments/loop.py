@@ -47,7 +47,9 @@ class EnvArgs(DataClassJsonMixin):
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: Optional[dict] = None  # use default value from BrowserGym
 
-    def make_env(self, action_mapping, exp_dir, exp_task_kwargs: dict = {}):
+    def make_env(
+        self, action_mapping, exp_dir, exp_task_kwargs: dict = {}, use_raw_page_output=False
+    ):
         """
         Instantiates the BrowserGym environment corresponding to the arguments (with some tweaks).
 
@@ -55,6 +57,9 @@ class EnvArgs(DataClassJsonMixin):
             action_mapping: overrides the action mapping of the environment.
             exp_dir: will set some environment parameters (e.g., record_video_dir) with respect to the directory where the experiment is running.
             exp_task_kwargs: use with caution! Will override task parameters to experiment-specific values. Useful to set different server configs for different experiments, or output file paths within the experiment's folder (e.g., assistantbench).
+
+        Returns:
+            env: the gym environment.
         """
         extra_kwargs = {}
         if self.record_video:
@@ -84,6 +89,7 @@ class EnvArgs(DataClassJsonMixin):
             headless=self.headless,
             wait_for_user_message=self.wait_for_user_message,
             action_mapping=action_mapping,  # action mapping is provided by the agent
+            use_raw_page_output=use_raw_page_output,
             **extra_kwargs,
         )
 
