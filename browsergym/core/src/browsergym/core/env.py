@@ -261,7 +261,7 @@ class BrowserEnv(gym.Env, ABC):
                 if self.resizeable_window
                 else None
             ),
-            "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",
+            "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
         ]
         args = [arg for arg in args if arg is not None]  # Remove None values
 
@@ -270,7 +270,9 @@ class BrowserEnv(gym.Env, ABC):
             headless=self.headless,
             slow_mo=slow_mo,
             args=args,
-            ignore_default_args=["--hide-scrollbars"],  # keep native bars
+            ignore_default_args=[
+                "--hide-scrollbars"
+            ],  # otherwise the screenshot doesn't see the scrollbars
             # will raise an Exception if above args are overriden
             **self.pw_chromium_kwargs,
         )
