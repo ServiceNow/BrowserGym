@@ -21,7 +21,6 @@ class GenericSubTaskBenchTask(AbstractBrowserTask):
     def __init__(
         self,
         seed: int,
-        task_id: str,
         task_config_path: str,
         port: str,
     ) -> None:
@@ -96,28 +95,12 @@ class StaticSubTaskBenchTask(GenericSubTaskBenchTask):
     """
 
     def __init__(
-        self, seed: int, task_id: str, task_config_path: str = "static_tests.json"
+        self, seed: int, task_id: str, task_config_path: str = "static_tests.json", port: int = 9222
     ) -> None:
-        super().__init__(seed, task_id, task_config_path)
+        if not task_id.startswith("static."):
+            raise ValueError(f"Task ID {task_id} is not a static task.")
 
-        # task properties, will be used to set up the browsergym environment
-        self.timeout = 10000  # ms
-
-
-class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
-    """
-    Class for the all tasks with served web content.
-    """
-
-    def __init__(
-        self,
-        seed: int,
-        task_id: str,
-        task_config_path: str = "subtaskbench.json",
-        port: int = 9222,
-    ) -> None:
-        super().__init__(seed, task_id, task_config_path, port)
-        self.parent_dir = Path(__file__).parent
+        super().__init__(seed, task_config_path, port)
 
         # Load configuration using the config module
         all_configs = config.get_config()
@@ -135,15 +118,36 @@ class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
         self.goal = self.task_config["goal"]
         self.evaluation_script = self.task_config["eval"]["evaluate_scripts"][0]["script"]
 
-    def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
-        """
-        Set up everything needed to execute the task.
 
-        Args:
-            page: the active playwright page.
+class OnlineSubTaskBenchTask(GenericSubTaskBenchTask):
+    """
+    Class for the all tasks with served web content.
+    """
 
-        Returns:
-            goal: str, goal of the task.
-            info: dict, custom information from the task.
-        """
-        return super().setup(page)
+    def __init__(
+        self,
+        seed: int,
+        task_id: str,
+        task_config_path: str = "subtaskbench.json",
+        port: int = 9222,
+    ) -> None:
+        if not task_id.startswith("online."):
+            raise ValueError(f"Task ID {task_id} is not a online task.")
+
+        super().__init__(seed, task_config_path, port)
+
+        # Load configuration using the config module
+        all_configs = config.get_config()
+        for _config in all_configs:
+            if _config["task_id"] == task_id:
+                self.task_config = _config
+
+        if not self.task_config:
+            raise ValueError(f"Task ID {task_id} not found in config file.")
+        print(self.task_config)
+
+        self.timeout = 60000  # Timeout for the webserver
+
+        self.task_start_url = self.task_config["env"]["start_url"]
+        self.goal = self.task_config["goal"]
+        self.evaluation_script = self.task_config["eval"]["evaluate_scripts"][0]["script"]
