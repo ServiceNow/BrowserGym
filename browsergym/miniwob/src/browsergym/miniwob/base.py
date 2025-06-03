@@ -61,7 +61,7 @@ class AbstractMiniwobTask(AbstractBrowserTask):
 
         # navigate to the task's url
         self.page.goto(self.url)
-
+        self.page.evaluate("document.documentElement.style.zoom='150%'")
         # remove human display if requested (goal, time left, last reward etc.)
         if self.remove_human_display:
             self.page.evaluate(  # if error : core is not defined, make sure you started the miniwob http server at the right place miniwob-plusplus/miniwob/html
