@@ -61,7 +61,16 @@ class AbstractMiniwobTask(AbstractBrowserTask):
 
         # navigate to the task's url
         self.page.goto(self.url)
-        self.page.evaluate("document.documentElement.style.zoom='150%'")
+        # Apply zoom using CSS transform scale instead of document.documentElement.style.zoom
+        # This avoids coordinate system mismatches with getBoundingClientRect() in whoCapturesCenterClick()
+        self.page.evaluate(
+            """
+            document.body.style.transform = 'scale(1.5)';
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = '66.67%';
+            document.body.style.height = '66.67%';
+        """
+        )
         # remove human display if requested (goal, time left, last reward etc.)
         if self.remove_human_display:
             self.page.evaluate(  # if error : core is not defined, make sure you started the miniwob http server at the right place miniwob-plusplus/miniwob/html
