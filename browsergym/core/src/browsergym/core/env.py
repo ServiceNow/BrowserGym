@@ -1,3 +1,4 @@
+import ast
 import copy
 import logging
 import re
@@ -19,6 +20,7 @@ from .observation import (
     MarkingError,
     _post_extract,
     _pre_extract,
+    add_mouse_pointer_to_screenshot,
     extract_dom_extra_properties,
     extract_dom_snapshot,
     extract_focused_element_bid,
@@ -77,6 +79,7 @@ class BrowserEnv(gym.Env, ABC):
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         use_raw_page_output: bool = False,
+        show_mouse_pointer: bool = True,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -98,6 +101,7 @@ class BrowserEnv(gym.Env, ABC):
             pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
             use_raw_page_output: if set, the environment will use the raw page output instead of the default processing.
+            show_mouse_pointer: if set to True (default), the environment will add mouse pointer visualization to screenshots for click actions. Set to False to disable.
 
         """
         super().__init__()
@@ -118,6 +122,7 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
         self.use_raw_page_output = use_raw_page_output
+        self.show_mouse_pointer = show_mouse_pointer
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -664,7 +669,13 @@ document.addEventListener("visibilitychange", () => {
             "open_pages_titles": tuple(page.title() for page in self.context.pages),
             "active_page_index": np.asarray([self.context.pages.index(self.page)]),
             "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
-            "screenshot": extract_screenshot(self.page),
+            "screenshot": (
+                extract_screenshot(self.page)
+                if not self.show_mouse_pointer
+                else add_mouse_pointer_to_screenshot(
+                    extract_screenshot(self.page), self.last_action
+                )
+            ),
             "dom_object": dom,
             "axtree_object": axtree,
             "extra_element_properties": extra_properties,

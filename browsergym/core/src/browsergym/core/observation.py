@@ -1,13 +1,15 @@
+import ast
 import base64
 import io
 import logging
 import pkgutil
 import re
-from typing import Literal
+from typing import Literal, Optional, Tuple
 
 import numpy as np
 import PIL.Image
 import playwright.sync_api
+from PIL import Image, ImageDraw
 
 from .constants import BROWSERGYM_ID_ATTRIBUTE as BID_ATTR
 from .constants import BROWSERGYM_SETOFMARKS_ATTRIBUTE as SOM_ATTR
@@ -573,3 +575,135 @@ def extract_focused_element_bid(page: playwright.sync_api.Page):
         focused_bid = ""
 
     return focused_bid
+
+
+def parse_func_call_string(call_str: str) -> Tuple[Optional[str], Optional[Tuple[list, dict]]]:
+    """
+    Parse a function call string and extract the function name and arguments.
+
+    Args:
+        call_str (str): A string like "mouse_click(100, 200)" or "mouse_drag_and_drop(x=10, y=20)"
+
+    Returns:
+        Tuple (func_name, (args, kwargs)), or (None, None) if parsing fails
+    """
+    try:
+        tree = ast.parse(call_str.strip(), mode="eval")
+        if not isinstance(tree.body, ast.Call):
+            return None, None
+
+        call_node = tree.body
+
+        # Function name
+        if isinstance(call_node.func, ast.Name):
+            func_name = call_node.func.id
+        else:
+            return None, None
+
+        # Positional arguments
+        args = []
+        for arg in call_node.args:
+            try:
+                args.append(ast.literal_eval(arg))
+            except (ValueError, TypeError):
+                return None, None
+
+        # Keyword arguments
+        kwargs = {}
+        for kw in call_node.keywords:
+            try:
+                kwargs[kw.arg] = ast.literal_eval(kw.value)
+            except (ValueError, TypeError):
+                return None, None
+
+        return func_name, (args, kwargs)
+
+    except (SyntaxError, ValueError, TypeError):
+        return None, None
+
+
+def try_extract_coords(source: dict | list, x_key, y_key) -> Optional[Tuple[int, int]]:
+    try:
+        x = int(float(source[x_key]))
+        y = int(float(source[y_key]))
+        return x, y
+    except (KeyError, IndexError, ValueError, TypeError):
+        return None
+
+
+def extract_mouse_coords_from_action(action: str) -> tuple[int, int] | None:
+    """
+    Extract mouse coordinates from a mouse action string.
+
+    Args:
+        action: A string like "mouse_click(100, 200)" or "click(x=100, y=200)"
+
+    Returns:
+        (x, y) tuple or None if extraction fails
+    """
+    if not action or not isinstance(action, str):
+        return None
+
+    mouse_actions = {
+        "mouse_click",
+        "mouse_dblclick",
+        "mouse_down",
+        "mouse_up",
+        "mouse_move",
+        "scroll_at",
+        "mouse_upload_file",
+    }
+
+    func_name, parsed_args = parse_func_call_string(action)
+    if func_name is None or func_name not in mouse_actions or parsed_args is None:
+        return None
+
+    args, kwargs = parsed_args
+    if args:
+        # If there are positional arguments, assume the first two are x and y coordinates
+        if len(args) >= 2:
+            return try_extract_coords(args, 0, 1)
+    elif kwargs:
+        # If there are keyword arguments, look for 'x' and 'y'
+        return try_extract_coords(kwargs, "x", "y")
+
+
+def add_mouse_pointer_to_screenshot(screenshot: Image.Image, action: str) -> Image.Image:
+    """
+    Add mouse pointer visualization to screenshot if the action involves mouse clicks.
+
+    Args:
+        screenshot: The screenshot PIL Image
+        action: The action string to check for mouse coordinates
+
+    Returns:
+        Screenshot with mouse pointer overlay if applicable, otherwise original screenshot
+    """
+    coords = extract_mouse_coords_from_action(action)
+    if not coords:
+        return screenshot  # No mouse coordinates found, return original screenshot
+    else:
+        # Convert numpy array to PIL Image first
+        if isinstance(screenshot, np.ndarray):
+            pil_image = Image.fromarray(screenshot)
+        else:
+            pil_image = screenshot
+
+        x, y = coords
+        pointer_size = 20  # Length of the pointer
+        overlay = pil_image.convert("RGBA").copy()
+        draw = ImageDraw.Draw(overlay)
+
+        # Define pointer shape (a simple arrow)
+        pointer_shape = [
+            (x, y),
+            (x + pointer_size, y + pointer_size // 2),
+            (x + pointer_size // 2, y + pointer_size // 2),
+            (x + pointer_size // 2, y + pointer_size),
+        ]
+
+        draw.polygon(pointer_shape, fill=(0, 0, 0, 128))  # 50% transparent black
+        result_image = Image.alpha_composite(pil_image.convert("RGBA"), overlay)
+
+        # Convert back to numpy array to match expected format
+        return np.array(result_image.convert("RGB"))
