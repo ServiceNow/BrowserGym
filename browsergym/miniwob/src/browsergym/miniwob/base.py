@@ -137,7 +137,11 @@ core.startEpisodeReal();
         # wait for the Miniwob task to have status ready
         self.page.wait_for_function(r"""() => WOB_TASK_READY""")
 
-        zoom_page(self.page, 1.5)  # zoom out to fit the task in the viewport
+        # Zoom in miniwob. Better fills the viewport and helps visual agents have more precision
+        # Reducing viewport size (smaller screenshot) leads to some VLM loosing
+        # their ability to have good coordinate mapping e.g.: claude-3.5
+        zoom_page(self.page, 1.5)
+
         return self._get_goal(), self._get_info()
 
     def teardown(self) -> None:
