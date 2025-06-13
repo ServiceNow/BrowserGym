@@ -192,7 +192,15 @@ core.startEpisodeReal();
 
 
 def zoom_page(page, zoom_factor):
-    """CSS transform scale on body"""
+    """CSS transform scale on body
+
+    This approach works reliably because:
+        - CSS transform scale doesn't affect the browser's internal viewport/window dimensions
+        - The page layout and DOM remain unchanged, only visual scaling occurs
+        - Screenshots capture the scaled content without dimension mismatches
+        - Works consistently across different monitor setups and DPI settings
+    """
+
     page.evaluate(
         f"""
         document.body.style.transform = 'scale({zoom_factor})';
