@@ -137,6 +137,7 @@ core.startEpisodeReal();
         # wait for the Miniwob task to have status ready
         self.page.wait_for_function(r"""() => WOB_TASK_READY""")
 
+        zoom_page(self.page, 1.5)  # zoom out to fit the task in the viewport
         return self._get_goal(), self._get_info()
 
     def teardown(self) -> None:
@@ -184,3 +185,13 @@ core.startEpisodeReal();
         done = info["DONE_GLOBAL"]
         msg = ""
         return reward, done, msg, info
+
+
+def zoom_page(page, zoom_factor):
+    """CSS transform scale on body"""
+    page.evaluate(
+        f"""
+        document.body.style.transform = 'scale({zoom_factor})';
+        document.body.style.transformOrigin = 'top left';
+    """
+    )
