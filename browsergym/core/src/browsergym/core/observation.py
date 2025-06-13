@@ -127,12 +127,20 @@ def extract_screenshot(page: playwright.sync_api.Page):
     cdp = page.context.new_cdp_session(page)
 
     # Set device scale factor to 1.0 to avoid monitor-dependent scaling
-    viewport = page.viewport_size
+    # Get actual window dimensions since viewport_size will be None
+    dimensions = page.evaluate(
+        """() => ({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        devicePixelRatio: window.devicePixelRatio
+    })"""
+    )
+
     cdp.send(
         "Emulation.setDeviceMetricsOverride",
         {
-            "width": viewport["width"],
-            "height": viewport["height"],
+            "width": dimensions["width"],
+            "height": dimensions["height"],
             "deviceScaleFactor": 1.0,
             "mobile": False,
         },
