@@ -140,7 +140,7 @@ core.startEpisodeReal();
         # Zoom in miniwob. Better fills the viewport and helps visual agents have more precision
         # Reducing viewport size (smaller screenshot) leads to some VLM loosing
         # their ability to have good coordinate mapping e.g.: claude-3.5
-        zoom_page(self.page, 1.5)
+        zoom_page(self.page, 1.4)
 
         return self._get_goal(), self._get_info()
 
