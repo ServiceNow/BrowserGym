@@ -125,12 +125,28 @@ def extract_screenshot(page: playwright.sync_api.Page):
     """
 
     cdp = page.context.new_cdp_session(page)
+
+    # Set device scale factor to 1.0 to avoid monitor-dependent scaling
+    viewport = page.viewport_size
+    cdp.send(
+        "Emulation.setDeviceMetricsOverride",
+        {
+            "width": viewport["width"],
+            "height": viewport["height"],
+            "deviceScaleFactor": 1.0,
+            "mobile": False,
+        },
+    )
+
     cdp_answer = cdp.send(
         "Page.captureScreenshot",
         {
             "format": "png",
         },
     )
+
+    # Reset device metrics
+    cdp.send("Emulation.clearDeviceMetricsOverride")
     cdp.detach()
 
     # bytes of a png file
