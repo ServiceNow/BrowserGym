@@ -2,7 +2,6 @@ import os
 from typing import Optional, Tuple
 
 import playwright.sync_api
-
 from browsergym.core.task import AbstractBrowserTask
 
 
@@ -36,8 +35,10 @@ class AbstractMiniwobTask(AbstractBrowserTask):
         """
         super().__init__(seed)
 
-        # task properties, will be used to set up the browsergym environment
-        self.viewport = {"width": 500, "height": 320}
+        # Screenshot is scaled for this banchmark see `_bgym_scale_factor`
+        # Keeping this aspect ratio and size works well with claude-3.5 so far.
+        # But may not be optimal for other VLMs.
+        self.viewport = {"width": 333, "height": 213}
         self.slow_mo = 100  # ms
         self.timeout = 5000  # ms
 
@@ -137,11 +138,10 @@ core.startEpisodeReal();
         # wait for the Miniwob task to have status ready
         self.page.wait_for_function(r"""() => WOB_TASK_READY""")
 
-        # Zoom in miniwob. Better fills the viewport and helps visual agents have more precision
+        # Zoom in miniwob. Helps visual agents have more precision
         # Reducing viewport size (smaller screenshot) leads to some VLM loosing
         # their ability to have good coordinate mapping e.g.: claude-3.5
-        zoom_page(self.page, 1.4)
-
+        self.page._bgym_scale_factor = 1.5  # default zoom factor
         return self._get_goal(), self._get_info()
 
     def teardown(self) -> None:
@@ -189,21 +189,3 @@ core.startEpisodeReal();
         done = info["DONE_GLOBAL"]
         msg = ""
         return reward, done, msg, info
-
-
-def zoom_page(page, zoom_factor):
-    """CSS transform scale on body
-
-    This approach works reliably because:
-        - CSS transform scale doesn't affect the browser's internal viewport/window dimensions
-        - The page layout and DOM remain unchanged, only visual scaling occurs
-        - Screenshots capture the scaled content without dimension mismatches
-        - Works consistently across different monitor setups and DPI settings
-    """
-
-    page.evaluate(
-        f"""
-        document.body.style.transform = 'scale({zoom_factor})';
-        document.body.style.transformOrigin = 'top left';
-    """
-    )
