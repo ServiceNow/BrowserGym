@@ -38,7 +38,7 @@ class AbstractMiniwobTask(AbstractBrowserTask):
         # Screenshot is scaled for this banchmark see `_bgym_scale_factor`
         # Keeping this aspect ratio and size works well with claude-3.5 so far.
         # But may not be optimal for other VLMs.
-        self.viewport = {"width": 333, "height": 213}
+        self.viewport = {"width": 332, "height": 214}
         self.slow_mo = 100  # ms
         self.timeout = 5000  # ms
 
