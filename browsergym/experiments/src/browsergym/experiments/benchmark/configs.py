@@ -83,7 +83,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         strict=False,
         retry_with_force=True,
         demo_mode="off",
-    ),
+    )
 }
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = DEFAULT_BENCHMARKS["miniwob_all"]()`
@@ -257,5 +257,48 @@ DEFAULT_BENCHMARKS = {
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("weblinx"),
+    ),
+    # from https://arxiv.org/abs/2503.04957
+    "safearena_all": lambda: Benchmark(
+        name="safenarena_all",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("safearena_all")),
+            max_steps=30,
+            n_repeats=1,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("safearena_all"),
+    ),
+    "safearena_harm": lambda: Benchmark(
+        name="safenarena_all",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("safearena_harm")),
+            max_steps=30,
+            n_repeats=1,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("safearena_harm"),
+    ),
+    "safearena_safe": lambda: Benchmark(
+        name="safenarena_all",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("safearena_safe")),
+            max_steps=30,
+            n_repeats=1,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("safearena_safe"),
     ),
 }
