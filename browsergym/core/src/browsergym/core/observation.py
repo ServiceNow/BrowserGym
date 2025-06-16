@@ -115,6 +115,7 @@ def _post_extract(page: playwright.sync_api.Page):
 def extract_screenshot(page: playwright.sync_api.Page):
     """
     Extracts the screenshot image of a Playwright page using Chrome DevTools Protocol.
+    Uses the bgym_scale_factor to capture higher resolution screenshots for better VLM understanding.
 
     Args:
         page: the playwright page of which to extract the screenshot.
@@ -124,13 +125,45 @@ def extract_screenshot(page: playwright.sync_api.Page):
 
     """
 
+    scale_factor = getattr(page, "_bgym_scale_factor", 1.0)
     cdp = page.context.new_cdp_session(page)
+    viewport = page.viewport_size
+
+    if viewport is None:
+        dimensions = page.evaluate(
+            """() => ({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio
+        })"""
+        )
+    else:
+        dimensions = {
+            "width": viewport["width"],
+            "height": viewport["height"],
+            "devicePixelRatio": 1.0,  # Override system DPR
+        }
+
+    # Apply scale factor to device metrics for higher resolution capture
+    cdp.send(
+        "Emulation.setDeviceMetricsOverride",
+        {
+            "width": dimensions["width"],
+            "height": dimensions["height"],
+            "deviceScaleFactor": scale_factor,  # Use bgym_scale_factor here
+            "mobile": False,
+        },
+    )
+
     cdp_answer = cdp.send(
         "Page.captureScreenshot",
         {
             "format": "png",
         },
     )
+
+    # Reset device metrics
+    cdp.send("Emulation.clearDeviceMetricsOverride")
     cdp.detach()
 
     # bytes of a png file
