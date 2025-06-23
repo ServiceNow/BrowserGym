@@ -5,10 +5,10 @@ from dataclasses import dataclass
 
 from . import utils
 from .base import AbstractActionSet
-from .functions import (  # check,; uncheck,
+from .functions import (
     clear,
     click,
-    dblclick,
+    dblclick,  # check,; uncheck,
     drag_and_drop,
     fill,
     focus,
@@ -245,6 +245,12 @@ ACTION_SUBSETS = {
         go_back,  # GOBACK
         goto,  # GOTO, SEARCH
         send_msg_to_user,  # TERMINATE
+    ],
+    # example action set
+    "example": [
+        scroll,
+        keyboard_type,
+        mouse_click,
     ],
 }
 
