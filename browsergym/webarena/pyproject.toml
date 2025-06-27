@@ -10,7 +10,7 @@ authors = [
     {name = "Tom Marty"},
 ]
 readme = "README.md"
-requires-python = ">3.7"
+requires-python = ">3.10"
 license = {text = "Apache-2.0"}
 classifiers = [
     "Development Status :: 3 - Alpha",
