@@ -627,7 +627,8 @@ document.addEventListener("visibilitychange", () => {
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
                 focused_element_bid = extract_focused_element_bid(self.page)
-                extra_properties = extract_dom_extra_properties(dom)
+                scale_factor = getattr(self.page, "_bgym_scale_factor", 1.0)
+                extra_properties = extract_dom_extra_properties(dom, scale_factor=scale_factor)
             except (playwright.sync_api.Error, MarkingError) as e:
                 err_msg = str(e)
                 # try to add robustness to async events (detached / deleted frames)
