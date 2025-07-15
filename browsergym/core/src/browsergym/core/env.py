@@ -77,6 +77,7 @@ class BrowserEnv(gym.Env, ABC):
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         use_raw_page_output: bool = False,
+        pre_observation_delay: float = 0.5,  # seconds
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -98,7 +99,7 @@ class BrowserEnv(gym.Env, ABC):
             pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
             use_raw_page_output: if set, the environment will use the raw page output instead of the default processing.
-
+            pre_observation_delay: float = 0.5, number of seconds to wait before starting to extract the observation. This can be important if there are some auto-complete menu that may appear after filling a field.
         """
         super().__init__()
         self.task_entrypoint = task_entrypoint
@@ -118,6 +119,7 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
         self.use_raw_page_output = use_raw_page_output
+        self.pre_observation_delay = pre_observation_delay
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -481,12 +483,18 @@ document.addEventListener("visibilitychange", () => {
         logger.debug("Action executed")
         info["action_exec_stop"] = time.time()
 
+        info["wait_for_page_loading_start"] = time.time()
         # wait a bit (for the JavaScript callback to set the active page)
-        time.sleep(0.5)  # wait for JS events to be fired (half a second)
+        logger.debug(f"Waiting {self.pre_observation_delay} seconds before extracting observation")
+        time.sleep(self.pre_observation_delay)  # wait for JS events to be fired
         self.context.cookies()  # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
 
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
+
+        info["wait_for_page_loading_stop"] = time.time()
+
+        info["validation_start"] = time.time()
 
         if validate:
             # after the action is executed, the active page might have changed
@@ -510,12 +518,16 @@ document.addEventListener("visibilitychange", () => {
             info["task_info"] = {}
             logger.debug("Task validation skipped")
 
+        info["validation_stop"] = time.time()
+
+        info["get_observation_start"] = time.time()
         # add any user message sent by the task to the chat
         if user_message:
             self.chat.add_message(role="user", msg=user_message)
 
         # extract observation (generic)
         obs = self._get_obs()
+        info["get_observation_stop"] = time.time()
         logger.debug("Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
@@ -547,6 +559,109 @@ document.addEventListener("visibilitychange", () => {
         # TODO: be smarter about when to wait for a user message (different action from the assistant?)
         if self.chat.messages[-1]["role"] == "assistant" and self.wait_for_user_message:
             self.chat.wait_for_user_message()
+
+    def _wait_dom_loaded_js_parallel(self):
+        """
+        Simple parallel frame waiting using JavaScript.
+        Only waits for active page, logs timeout frames for blacklisting.
+        """
+        # 1. Wait for active page only
+        try:
+            self.page.wait_for_load_state("domcontentloaded", timeout=1500)
+        except playwright.sync_api.Error:
+            pass
+
+        # 2. Parallel frame waiting with JavaScript
+        try:
+            result = self.page.evaluate(
+                """
+            () => {
+                const frames = Array.from(document.querySelectorAll('iframe, frame'));
+                if (frames.length === 0) return { timeouts: [] };
+                
+                const framePromises = frames.map((frame, i) => {
+                    return new Promise(resolve => {
+                        const timeout = setTimeout(() => {
+                            resolve({
+                                index: i,
+                                timeout: true,
+                                src: frame.src || '',
+                                name: frame.name || '',
+                                id: frame.id || ''
+                            });
+                        }, 800);
+                        
+                        // Check if already loaded
+                        try {
+                            if (frame.contentDocument?.readyState === 'complete') {
+                                clearTimeout(timeout);
+                                resolve({ index: i, timeout: false });
+                                return;
+                            }
+                        } catch (e) {}
+                        
+                        // Wait for load
+                        frame.addEventListener('load', () => {
+                            clearTimeout(timeout);
+                            resolve({ index: i, timeout: false });
+                        }, { once: true });
+                    });
+                });
+                
+                return Promise.allSettled(framePromises).then(results => {
+                    const frames = results.map(r => r.value);
+                    const timeouts = frames.filter(f => f.timeout);
+                    return { timeouts, total: frames.length };
+                });
+            }
+            """
+            )
+
+            # 3. Log timeout frames for blacklisting
+            if result["timeouts"]:
+                logger.warning(f"Frame timeouts ({len(result['timeouts'])}/{result['total']}):")
+                for frame in result["timeouts"]:
+                    src = frame.get("src", "")
+                    name = frame.get("name", "")
+                    frame_id = frame.get("id", "")
+                    logger.warning(
+                        f"  Frame #{frame['index']}: src='{src}' name='{name}' id='{frame_id}'"
+                    )
+
+            logger.debug(
+                f"Frame wait: {result['total'] - len(result['timeouts'])} loaded, {len(result['timeouts'])} timeout"
+            )
+
+        except Exception as e:
+            logger.debug(f"JS frame wait failed: {e}, skipping frame wait")
+
+    def _wait_dom_loaded_debug(self):
+        start_time = time.time()
+        pages = self.context.pages
+        logger.debug(f"Waiting for {len(pages)} pages to load")
+
+        for i, page in enumerate(pages):
+            page_start = time.time()
+            try:
+                page.wait_for_load_state("domcontentloaded", timeout=3000)
+                logger.debug(
+                    f"Page {i} ({page.url[:50]}...) loaded in {time.time() - page_start:.2f}s"
+                )
+            except playwright.sync_api.Error as e:
+                logger.warning(f"Page {i} timeout after {time.time() - page_start:.2f}s: {e}")
+
+            # Check frames for this page
+            for j, frame in enumerate(page.frames):
+                frame_start = time.time()
+                try:
+                    frame.wait_for_load_state("domcontentloaded", timeout=3000)
+                    if time.time() - frame_start > 0.5:  # Log slow frames
+                        logger.debug(f"Frame {j} in page {i} took {time.time() - frame_start:.2f}s")
+                except playwright.sync_api.Error as e:
+                    logger.warning(f"Frame {j} in page {i} timeout: {e}")
+
+        total_time = time.time() - start_time
+        logger.info(f"Total _wait_dom_loaded time: {total_time:.2f}s for {len(pages)} pages")
 
     def _wait_dom_loaded(self):
         for page in self.context.pages:
