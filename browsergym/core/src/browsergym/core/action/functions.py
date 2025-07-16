@@ -72,11 +72,17 @@ def fill(bid: str, value: str):
 
     def do(force: bool):
         if demo_mode != "off":
+            # Demo mode: full typing for visual effect
             delay = max(2000 / len(value), 10)
             elem.clear(force=force, timeout=500)
-            elem.type(value, delay=delay, timeout=0)  # no timeout
+            elem.type(value, delay=delay, timeout=0)
         else:
-            elem.fill(value, force=force, timeout=500)
+            # Hybrid: fill n-1 chars, type the last one to trigger autocomplete
+            elem.clear(force=force, timeout=500)
+            if len(value) > 1:
+                elem.fill(value[:-1], force=force, timeout=500)
+            if len(value) > 0:
+                elem.type(value[-1], delay=0, timeout=500)
 
     call_fun(do, retry_with_force)
 
