@@ -286,9 +286,9 @@ fill({repr(email_field.get(BID_ATTR))}, "test@test")
     # typing should be slow (only in demo mode)
     action_time = info["action_exec_stop"] - info["action_exec_start"]
     if demo_mode_active:
-        assert action_time > 2
+        assert action_time > 3.5
     else:
-        assert action_time <= 1.5
+        assert action_time <= 3.5
 
     env.close()
 

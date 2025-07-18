@@ -57,24 +57,32 @@ def noop(wait_ms: float = 1000):
 
 
 # https://playwright.dev/docs/input#text-input
-def fill(bid: str, value: str):
+def fill(bid: str, value: str, enable_autocomplete_menu: bool = False):
     """
     Fill out a form field. It focuses the element and triggers an input event with the entered text.
     It works for <input>, <textarea> and [contenteditable] elements.
 
     Examples:
-        fill('237', 'example value')
         fill('45', "multi-line\\nexample")
         fill('a12', "example with \\"quotes\\"")
+        fill('b534', "Montre", True) # This will trigger the autocomplete menu if available
     """
     elem = get_elem_by_bid(page, bid, demo_mode != "off")
     add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
 
     def do(force: bool):
         if demo_mode != "off":
+            # Demo mode: full typing for visual effect
             delay = max(2000 / len(value), 10)
             elem.clear(force=force, timeout=500)
-            elem.type(value, delay=delay, timeout=0)  # no timeout
+            elem.type(value, delay=delay, timeout=0)
+        elif enable_autocomplete_menu:
+            # Hybrid: fill n-1 chars, type the last one to trigger autocomplete
+            elem.clear(force=force, timeout=500)
+            if len(value) > 1:
+                elem.fill(value[:-1], force=force, timeout=500)
+            if len(value) > 0:
+                elem.type(value[-1], delay=0, timeout=500)
         else:
             elem.fill(value, force=force, timeout=500)
 
