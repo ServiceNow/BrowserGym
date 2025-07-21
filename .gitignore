@@ -151,4 +151,7 @@ tests/assistantbench/assistantbench-predictions-test.jsonl
 # weblinx
 bg_wl_data/
 
+# miniwob setup
+miniwob-plusplus/
+
 uv.lock

@@ -515,7 +515,7 @@ Only a single action can be provided at once."""
         # return the constructed python code
         return python_code
 
-    def to_tool_description(self, api="openai") -> list[dict]:
+    def to_tool_description(self, api="openai", add_examples=True) -> list[dict]:
         """
         Translates actions to tool descriptions following the OpenAI API format.
 
@@ -535,16 +535,16 @@ Only a single action can be provided at once."""
             for param_name, param in signature.parameters.items():
                 param_type = "string"  # Default to string if type is not specified
                 if param.annotation != inspect.Parameter.empty:
-                    if param.annotation is str:
-                        param_type = "string"
-                    elif param.annotation is float or param.annotation is int:
-                        param_type = "number"
-                    elif param.annotation is bool:
-                        param_type = "boolean"
-                    elif param.annotation is dict:
-                        param_type = "object"
-                    elif param.annotation is list:
-                        param_type = "array"
+
+                    type_map = {
+                        str: "string",
+                        float: "number",
+                        int: "number",
+                        bool: "boolean",
+                        dict: "object",
+                        list: "array",
+                    }
+                    param_type = type_map.get(param.annotation, "string")
 
                 parameters["properties"][param_name] = {
                     "type": param_type,
@@ -554,9 +554,15 @@ Only a single action can be provided at once."""
                     parameters["required"].append(param_name)
 
             # Construct the tool descriptor
+            description = action.description
+            if add_examples and action.examples:
+                description += "\n\nExamples:\n"
+                for example in action.examples:
+                    description += f"- {example}\n"
+
             tool = {
                 "name": tool_name,
-                "description": action.description,
+                "description": description,
                 schema: parameters,
             }
             if api == "openai":

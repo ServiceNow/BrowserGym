@@ -115,6 +115,7 @@ def _post_extract(page: playwright.sync_api.Page):
 def extract_screenshot(page: playwright.sync_api.Page):
     """
     Extracts the screenshot image of a Playwright page using Chrome DevTools Protocol.
+    Uses the bgym_scale_factor to capture higher resolution screenshots for better VLM understanding.
 
     Args:
         page: the playwright page of which to extract the screenshot.
@@ -124,13 +125,54 @@ def extract_screenshot(page: playwright.sync_api.Page):
 
     """
 
+    scale_factor = getattr(page, "_bgym_scale_factor", 1.0)
     cdp = page.context.new_cdp_session(page)
+    viewport = page.viewport_size
+
+    if viewport is None:
+        dimensions = page.evaluate(
+            """() => ({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio
+        })"""
+        )
+    else:
+        dimensions = {
+            "width": viewport["width"],
+            "height": viewport["height"],
+            "devicePixelRatio": 1.0,  # Override system DPR
+        }
+
+    # CAPTURE ORIGINAL METRICS BEFORE CHANGING
+    original_metrics = {
+        "width": dimensions["width"],
+        "height": dimensions["height"],
+        "deviceScaleFactor": 1.0,  # The original scale factor
+        "mobile": False,
+    }
+
+    # Apply scale factor to device metrics for higher resolution capture
+    cdp.send(
+        "Emulation.setDeviceMetricsOverride",
+        {
+            "width": dimensions["width"],
+            "height": dimensions["height"],
+            "deviceScaleFactor": scale_factor,  # Use bgym_scale_factor here
+            "mobile": False,
+        },
+    )
+
     cdp_answer = cdp.send(
         "Page.captureScreenshot",
         {
             "format": "png",
         },
     )
+
+    # RESTORE ORIGINAL METRICS (don't just clear)
+    cdp.send("Emulation.setDeviceMetricsOverride", original_metrics)
+
     cdp.detach()
 
     # bytes of a png file
@@ -248,7 +290,7 @@ def pop_bids_from_attribute(dom_snapshot, attr: str):
                         break
 
 
-def extract_dom_extra_properties(dom_snapshot):
+def extract_dom_extra_properties(dom_snapshot, scale_factor):
     def to_string(idx):
         if idx == -1:
             return None
@@ -403,9 +445,16 @@ def extract_dom_extra_properties(dom_snapshot):
             if bid:
                 if bid in extra_properties:
                     logger.warning(f"duplicate {BID_ATTR}={repr(bid)} attribute detected")
+
+                scaled_bbox = None
+                if node["bbox"]:
+                    scaled_bbox = [coord * scale_factor for coord in node["bbox"]]
+
                 extra_properties[bid] = {
-                    extra_prop: node[extra_prop]
-                    for extra_prop in ("visibility", "bbox", "clickable", "set_of_marks")
+                    "visibility": node["visibility"],
+                    "bbox": scaled_bbox,  # Use scaled coordinates
+                    "clickable": node["clickable"],
+                    "set_of_marks": node["set_of_marks"],
                 }
 
     return extra_properties

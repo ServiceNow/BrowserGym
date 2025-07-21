@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from browsergym.core.env import BrowserEnv
 import gymnasium as gym
 import numpy as np
 from dataclasses_json import DataClassJsonMixin
@@ -49,7 +50,7 @@ class EnvArgs(DataClassJsonMixin):
 
     def make_env(
         self, action_mapping, exp_dir, exp_task_kwargs: dict = {}, use_raw_page_output=False
-    ):
+    ) -> BrowserEnv:
         """
         Instantiates the BrowserGym environment corresponding to the arguments (with some tweaks).
 
