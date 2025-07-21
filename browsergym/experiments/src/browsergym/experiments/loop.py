@@ -935,6 +935,8 @@ def _get_env_name(task_name: str):
         import browsergym.assistantbench
     elif task_name.startswith("weblinx"):
         import weblinx_browsergym
+    
+    ## Do not forget to import your benchmark here..
 
     return f"browsergym/{task_name}"
 
