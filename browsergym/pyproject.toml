@@ -15,9 +15,10 @@ authors = [
     {name = "Alex Lacoste"},
     {name = "Thibault Le Sellier De Chezelles"},
     {name = "Tom Marty"},
+    {name = "Aman Jaiswal"},
 ]
 readme = "README.md"
-requires-python = ">3.7"
+requires-python = ">3.10"
 license = {text = "Apache-2.0"}
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -27,16 +28,16 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: Apache Software License",
 ]
-version="0.13.3"
+version="0.14.1"
 dependencies = [
-    "browsergym-core==0.13.3",
-    "browsergym-miniwob==0.13.3",
-    "browsergym-webarena==0.13.3",
-    "browsergym-visualwebarena==0.13.3",
-    "browsergym-assistantbench==0.13.3",
-    "browsergym-experiments==0.13.3",
+    "browsergym-core==0.14.1",
+    "browsergym-miniwob==0.14.1",
+    "browsergym-webarena==0.14.1",
+    "browsergym-visualwebarena==0.14.1",
+    "browsergym-assistantbench==0.14.1",
+    "browsergym-experiments==0.14.1",
     "browsergym-workarena>=0.4.1",
-    "weblinx-browsergym>=0.0.1dev14",
+    "weblinx-browsergym>=0.0.2",
 ]
 
 [tool.setuptools]

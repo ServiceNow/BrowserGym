@@ -923,7 +923,7 @@ go_forward()
 
 
 def test_scroll():
-    action_set = HighLevelActionSet(subsets=["coord"])
+    action_set = HighLevelActionSet(subsets=["bid", "coord"])
 
     env = gym.make(
         "browsergym/openended",
@@ -1254,3 +1254,7 @@ def test_iframe_bid():
         assert checkbox.has_attr("checked")
 
     env.close()
+
+
+if __name__ == "__main__":
+    test_scroll()

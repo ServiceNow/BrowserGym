@@ -9,6 +9,7 @@ authors = [
     {name = "Rim Assouel"},
     {name = "Maxime Gasse"},
     {name = "Tom Marty"},
+    {name = "Alexandre Lacoste"},
 ]
 readme = "README.md"
 requires-python = ">3.7"

@@ -1,6 +1,8 @@
 import numpy as np
-
-from browsergym.experiments.benchmark.metadata.utils import task_list_from_metadata, task_metadata
+from browsergym.experiments.benchmark.metadata.utils import (
+    task_list_from_metadata,
+    task_metadata,
+)
 from browsergym.experiments.benchmark.utils import (
     make_env_args_list_from_fixed_seeds,
     make_env_args_list_from_repeat_tasks,
@@ -95,7 +97,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = DEFAULT_BENCHMARKS["miniwob_all"]()`
 DEFAULT_BENCHMARKS = {
-    "miniwob": lambda: Benchmark(
+    "miniwob": lambda n_repeats=5: Benchmark(
         name="miniwob",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
@@ -104,12 +106,12 @@ DEFAULT_BENCHMARKS = {
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("miniwob")),
             max_steps=10,
-            n_repeats=5,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
     ),
-    "miniwob_tiny_test": lambda: Benchmark(
+    "miniwob_tiny_test": lambda n_repeats=2: Benchmark(
         name="miniwob_tiny_test",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["miniwob_all"],
         is_multi_tab=False,
@@ -118,12 +120,12 @@ DEFAULT_BENCHMARKS = {
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=["miniwob.click-dialog", "miniwob.click-checkboxes"],
             max_steps=5,
-            n_repeats=2,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("miniwob"),
     ),
-    "webarena": lambda: Benchmark(
+    "webarena": lambda n_repeats=1: Benchmark(
         name="webarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
@@ -132,12 +134,12 @@ DEFAULT_BENCHMARKS = {
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena")),
             max_steps=30,
-            n_repeats=1,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("webarena"),
     ),
-    "webarena_tiny": lambda: Benchmark(
+    "webarena_tiny": lambda n_repeats=1: Benchmark(
         name="webarena_tiny",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
@@ -157,7 +159,7 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("webarena"),
     ),
-    "visualwebarena_tiny": lambda: Benchmark(
+    "visualwebarena_tiny": lambda n_repeats=10: Benchmark(
         name="visualwebarena_tiny",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         is_multi_tab=True,
@@ -175,7 +177,7 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("visualwebarena"),
     ),
-    "visualwebarena": lambda: Benchmark(
+    "visualwebarena": lambda n_repeats=1: Benchmark(
         name="visualwebarena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["visualwebarena"],
         is_multi_tab=True,
@@ -184,12 +186,12 @@ DEFAULT_BENCHMARKS = {
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("visualwebarena")),
             max_steps=30,
-            n_repeats=1,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("visualwebarena"),
     ),
-    "workarena_l1": lambda: Benchmark(
+    "workarena_l1": lambda n_repeats=10: Benchmark(
         name="workarena_l1",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena"],
         is_multi_tab=False,
@@ -201,11 +203,11 @@ DEFAULT_BENCHMARKS = {
             meta_seed=42,  # meta seed for evaluation curriculum
             max_steps=15,
             curriculum_type="agent",
-            seeds_l1=10,
+            seeds_l1=n_repeats,
         ),
         task_metadata=task_metadata("workarena"),
     ),
-    "workarena_l2_agent_curriculum_eval": lambda: Benchmark(
+    "workarena_l2_agent_curriculum_eval": lambda n_repeats=1: Benchmark(
         name="workarena_l2_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
@@ -220,7 +222,7 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("workarena"),
     ),
-    "workarena_l3_agent_curriculum_eval": lambda: Benchmark(
+    "workarena_l3_agent_curriculum_eval": lambda n_repeats=1: Benchmark(
         name="workarena_l3_agent_curriculum_eval",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
@@ -235,7 +237,7 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("workarena"),
     ),
-    "assistantbench": lambda: Benchmark(
+    "assistantbench": lambda n_repeats=1: Benchmark(
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
         is_multi_tab=True,
@@ -246,12 +248,12 @@ DEFAULT_BENCHMARKS = {
                 metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
             ),
             max_steps=30,
-            n_repeats=1,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("assistantbench"),
     ),
-    "weblinx": lambda: Benchmark(
+    "weblinx": lambda n_repeats=1: Benchmark(
         name="weblinx",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["weblinx"],
         is_multi_tab=True,
@@ -260,7 +262,7 @@ DEFAULT_BENCHMARKS = {
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("weblinx")),
             max_steps=1,
-            n_repeats=1,
+            n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("weblinx"),

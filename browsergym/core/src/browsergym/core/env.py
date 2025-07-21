@@ -4,7 +4,7 @@ import re
 import time
 from abc import ABC
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Any, Callable, Literal, Optional
 
 import gymnasium as gym
 import numpy as np
@@ -25,7 +25,7 @@ from .observation import (
     extract_merged_axtree,
     extract_screenshot,
 )
-from .spaces import AnyBox, AnyDict, Float, Unicode
+from .spaces import AnyBox, AnyDict, Anything, Float, Unicode
 from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
@@ -76,6 +76,7 @@ class BrowserEnv(gym.Env, ABC):
         pw_context_kwargs: dict = {},
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
+        use_raw_page_output: bool = False,
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -96,6 +97,7 @@ class BrowserEnv(gym.Env, ABC):
             pw_chromium_kwargs: extra parameters for the playwright Browser. Should only be used for debugging/testing.
             pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
+            use_raw_page_output: if set, the environment will use the raw page output instead of the default processing.
 
         """
         super().__init__()
@@ -115,6 +117,7 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_chromium_kwargs = pw_chromium_kwargs
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
+        self.use_raw_page_output = use_raw_page_output
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -132,42 +135,67 @@ class BrowserEnv(gym.Env, ABC):
         self.chat: Chat = None
 
         # observation space
-        self.observation_space = gym.spaces.Dict(
-            {
-                "chat_messages": gym.spaces.Sequence(
-                    gym.spaces.Dict(
-                        {
-                            "role": Unicode(),
-                            "timestamp": Float(),
-                            "message": Unicode(),
-                        }
-                    )
-                ),
-                "goal": Unicode(),
-                "goal_object": gym.spaces.Sequence(AnyDict()),
-                "open_pages_urls": gym.spaces.Sequence(Unicode()),
-                "open_pages_titles": gym.spaces.Sequence(Unicode()),
-                "active_page_index": gym.spaces.Box(
-                    low=0, high=255, dtype=int
-                ),  # TODO: change to an Integer (breaking change for users)
-                "url": Unicode(),
-                "screenshot": AnyBox(
-                    low=0,
-                    high=255,
-                    shape=(-1, -1, 3),
-                    dtype=np.uint8,
-                ),  # swapped axes (height, width, RGB)
-                "dom_object": AnyDict(),
-                "axtree_object": AnyDict(),
-                "extra_element_properties": AnyDict(),
-                "focused_element_bid": Unicode(),
-                "last_action": Unicode(),
-                "last_action_error": Unicode(),
-                "elapsed_time": gym.spaces.Box(
-                    low=0, high=np.inf, dtype=float
-                ),  # TODO: change to a Float (breaking change for users)
-            }
-        )
+        if use_raw_page_output:
+            self.observation_space = gym.spaces.Dict(
+                {
+                    "page": Anything(),
+                    "chat_messages": gym.spaces.Sequence(
+                        gym.spaces.Dict(
+                            {
+                                "role": Unicode(),
+                                "timestamp": Float(),
+                                "message": Unicode(),
+                            }
+                        )
+                    ),
+                    "goal": Unicode(),
+                    "goal_object": gym.spaces.Sequence(AnyDict()),
+                    "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                    "open_pages_titles": gym.spaces.Sequence(Unicode()),
+                    "active_page_index": gym.spaces.Box(low=0, high=255, dtype=int),
+                    "url": Unicode(),
+                    "last_action": Unicode(),
+                    "last_action_error": Unicode(),
+                    "elapsed_time": gym.spaces.Box(low=0, high=np.inf, dtype=float),
+                }
+            )
+        else:
+            self.observation_space = gym.spaces.Dict(
+                {
+                    "chat_messages": gym.spaces.Sequence(
+                        gym.spaces.Dict(
+                            {
+                                "role": Unicode(),
+                                "timestamp": Float(),
+                                "message": Unicode(),
+                            }
+                        )
+                    ),
+                    "goal": Unicode(),
+                    "goal_object": gym.spaces.Sequence(AnyDict()),
+                    "open_pages_urls": gym.spaces.Sequence(Unicode()),
+                    "open_pages_titles": gym.spaces.Sequence(Unicode()),
+                    "active_page_index": gym.spaces.Box(
+                        low=0, high=255, dtype=int
+                    ),  # TODO: change to an Integer (breaking change for users)
+                    "url": Unicode(),
+                    "screenshot": AnyBox(
+                        low=0,
+                        high=255,
+                        shape=(-1, -1, 3),
+                        dtype=np.uint8,
+                    ),  # swapped axes (height, width, RGB)
+                    "dom_object": AnyDict(),
+                    "axtree_object": AnyDict(),
+                    "extra_element_properties": AnyDict(),
+                    "focused_element_bid": Unicode(),
+                    "last_action": Unicode(),
+                    "last_action_error": Unicode(),
+                    "elapsed_time": gym.spaces.Box(
+                        low=0, high=np.inf, dtype=float
+                    ),  # TODO: change to a Float (breaking change for users)
+                }
+            )
 
         # action space
         self.action_space = Unicode()
@@ -227,16 +255,24 @@ class BrowserEnv(gym.Env, ABC):
         pw: playwright.sync_api.Playwright = _get_global_playwright()
         # important: change playwright's test id attribute from "data-testid" to "bid"
         pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
+        args = [
+            (
+                f"--window-size={viewport['width']},{viewport['height']}"
+                if self.resizeable_window
+                else None
+            ),
+            "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
+        ]
+        args = [arg for arg in args if arg is not None]  # Remove None values
 
         # create a new browser
         self.browser = pw.chromium.launch(
             headless=self.headless,
             slow_mo=slow_mo,
-            args=(
-                [f"--window-size={viewport['width']},{viewport['height']}"]
-                if self.resizeable_window
-                else None
-            ),
+            args=args,
+            ignore_default_args=[
+                "--hide-scrollbars"
+            ],  # otherwise the screenshot doesn't see the scrollbars
             # will raise an Exception if above args are overriden
             **self.pw_chromium_kwargs,
         )
@@ -371,10 +407,7 @@ document.addEventListener("visibilitychange", () => {
 
         return obs, info
 
-    def step(self, action: str) -> tuple:
-
-        self.last_action = action
-
+    def pre_step(self) -> tuple[dict[str, Any], Callable, Callable]:
         info = {}
         info["action_exec_start"] = time.time()
         info["action_exec_timeout"] = 0
@@ -391,7 +424,25 @@ document.addEventListener("visibilitychange", () => {
             self.infeasible_message_received = True
 
         # try to execute the action
-        logger.debug(f"Executing action")
+        logger.debug("Executing action")
+        return info, send_message_to_user, report_infeasible_instructions
+
+    def step(self, action: str) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+        """
+        Execute the action in the environment.
+
+        Args:
+            action: the action to execute. This should be a string with code or a function call
+
+        Returns:
+            obs: the observation after executing the action
+            reward: the reward received after executing the action
+            terminated: whether the episode is terminated or not
+            truncated: whether the episode is truncated or not
+            info: additional information about the step
+        """
+        self.last_action = action
+        info, send_message_to_user, report_infeasible_instructions = self.pre_step()
         try:
             if self.action_mapping:
                 code = self.action_mapping(action)
@@ -409,7 +460,25 @@ document.addEventListener("visibilitychange", () => {
             match = re.match("TimeoutError: Timeout ([0-9]+)ms exceeded.", self.last_action_error)
             if match:
                 info["action_exec_timeout"] = float(match.groups()[0]) / 1000  # ms to sec
-        logger.debug(f"Action executed")
+        return self.post_step(info)
+
+    def post_step(
+        self, info: dict[str, Any], validate: bool = True
+    ) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
+        """
+        Post step method, called after executing the action.
+        This method is responsible for extracting the observation after the action.
+        It also prepares reward, task status, user message and other step info.
+        Args:
+            info: dictionary containing information about the step
+        Returns:
+            obs: the observation after executing the action
+            reward: the reward received after executing the action
+            terminated: whether the episode is terminated or not
+            truncated: whether the episode is truncated or not
+            info: additional information about the step
+        """
+        logger.debug("Action executed")
         info["action_exec_stop"] = time.time()
 
         # wait a bit (for the JavaScript callback to set the active page)
@@ -419,20 +488,27 @@ document.addEventListener("visibilitychange", () => {
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
 
-        # after the action is executed, the active page might have changed
-        # perform a safety check
-        self._active_page_check()
-        logger.debug(f"Active page checked")
+        if validate:
+            # after the action is executed, the active page might have changed
+            # perform a safety check
+            self._active_page_check()
+            logger.debug("Active page checked")
 
-        # if asked, wait for user message
-        self._wait_for_user_message()
-        logger.debug(f"User message done")
+            # if asked, wait for user message
+            self._wait_for_user_message()
+            logger.debug("User message done")
 
-        logger.debug(f"Initiating task validation")
-        # extract reward, done, user_message, info (task-specific)
-        reward, done, user_message, task_info = self._task_validate()
-        info["task_info"] = task_info
-        logger.debug(f"Task validation done")
+            logger.debug("Initiating task validation")
+            # extract reward, done, user_message, info (task-specific)
+            reward, done, user_message, task_info = self._task_validate()
+            info["task_info"] = task_info
+            logger.debug("Task validation done")
+        else:
+            reward = 0
+            done = False
+            user_message = None
+            info["task_info"] = {}
+            logger.debug("Task validation skipped")
 
         # add any user message sent by the task to the chat
         if user_message:
@@ -440,14 +516,13 @@ document.addEventListener("visibilitychange", () => {
 
         # extract observation (generic)
         obs = self._get_obs()
-        logger.debug(f"Observation extracted")
+        logger.debug("Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)
         terminated = done or (
             self.terminate_on_infeasible and self.infeasible_message_received
         )  # task or agent can terminate the episode
-        truncated = False
-
+        truncated: bool = False
         return obs, reward, terminated, truncated, info
 
     def _task_validate(self):
@@ -506,7 +581,7 @@ document.addEventListener("visibilitychange", () => {
         # make sure there is always a page open
         # if all pages have been closed, create a new page
         if len(self.context.pages) == 0:
-            logger.warning(f"All pages are closed, opening a new page.")
+            logger.warning("All pages are closed, opening a new page.")
             self.page = self.context.new_page()
 
         # if the active page got closed, get the last active page from the history
@@ -527,7 +602,23 @@ document.addEventListener("visibilitychange", () => {
             raise RuntimeError(f"Unexpected: active page has been closed ({self.page}).")
 
     def _get_obs(self):
-
+        if self.use_raw_page_output:
+            obs = {
+                "page": self.page,
+                "chat_messages": tuple(copy.deepcopy(self.chat.messages)),
+                "goal": _try_to_extract_legacy_goal(self.goal_object),  # legacy goal, deprecated
+                "goal_object": tuple(
+                    copy.deepcopy(self.goal_object)
+                ),  # new goal format, list of messages openai style
+                "open_pages_urls": tuple(page.url for page in self.context.pages),
+                "open_pages_titles": tuple(page.title() for page in self.context.pages),
+                "active_page_index": np.asarray([self.context.pages.index(self.page)]),
+                "url": self.page.url,  # redundant with "open_pages_urls" and "active_page_index"
+                "last_action": self.last_action,
+                "last_action_error": self.last_action_error,
+                "elapsed_time": np.asarray([time.time() - self.start_time]),
+            }
+            return obs
         for retries_left in reversed(range(EXTRACT_OBS_MAX_TRIES)):
             try:
                 # pre-extraction, mark dom elements (set bid, set dynamic attributes like value and checked)
@@ -536,7 +627,8 @@ document.addEventListener("visibilitychange", () => {
                 dom = extract_dom_snapshot(self.page)
                 axtree = extract_merged_axtree(self.page)
                 focused_element_bid = extract_focused_element_bid(self.page)
-                extra_properties = extract_dom_extra_properties(dom)
+                scale_factor = getattr(self.page, "_bgym_scale_factor", 1.0)
+                extra_properties = extract_dom_extra_properties(dom, scale_factor=scale_factor)
             except (playwright.sync_api.Error, MarkingError) as e:
                 err_msg = str(e)
                 # try to add robustness to async events (detached / deleted frames)

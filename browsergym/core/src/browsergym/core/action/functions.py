@@ -9,6 +9,7 @@ from .utils import (
     call_fun,
     get_elem_by_bid,
     highlight_by_box,
+    map_coordinates,
     smooth_move_visual_cursor_to,
 )
 
@@ -277,7 +278,23 @@ def scroll(delta_x: float, delta_y: float):
         scroll(0, 200)
         scroll(-50.2, -100.5)
     """
+    delta_x, delta_y = map_coordinates(
+        page, delta_x, delta_y
+    )  # map coordinates to page coordinates
     page.mouse.wheel(delta_x, delta_y)
+
+
+def scroll_at(x: int, y: int, dx: int, dy: int):
+    """
+    Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling. Dispatches a wheel event.
+
+    Examples:
+        scroll_at(50, 100, -50, -100)
+    """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
+    dx, dy = map_coordinates(page, dx, dy)  # map coordinates to page coordinates
+    page.mouse.move(x, y)  # position pointer
+    page.mouse.wheel(dx, dy)
 
 
 # https://playwright.dev/python/docs/api/class-mouse#mouse-move
@@ -289,6 +306,7 @@ def mouse_move(x: float, y: float):
     Examples:
         mouse_move(65.2, 158.5)
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
     page.mouse.move(x, y)
@@ -304,6 +322,7 @@ def mouse_up(x: float, y: float, button: Literal["left", "middle", "right"] = "l
         mouse_up(250, 120)
         mouse_up(47, 252, 'right')
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
         highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
@@ -321,6 +340,7 @@ def mouse_down(x: float, y: float, button: Literal["left", "middle", "right"] = 
         mouse_down(140.2, 580.1)
         mouse_down(458, 254.5, 'middle')
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
         highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
@@ -338,6 +358,7 @@ def mouse_click(x: float, y: float, button: Literal["left", "middle", "right"] =
         mouse_click(887.2, 68)
         mouse_click(56, 712.56, 'right')
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
         highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
@@ -354,6 +375,7 @@ def mouse_dblclick(x: float, y: float, button: Literal["left", "middle", "right"
         mouse_dblclick(5, 236)
         mouse_dblclick(87.5, 354, 'right')
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
         highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
@@ -369,6 +391,9 @@ def mouse_drag_and_drop(from_x: float, from_y: float, to_x: float, to_y: float):
     Examples:
         mouse_drag_and_drop(10.7, 325, 235.6, 24.54)
     """
+    from_x, from_y = map_coordinates(page, from_x, from_y)  # map coordinates to page coordinates
+    to_x, to_y = map_coordinates(page, to_x, to_y)  # map coordinates to page coordinates
+
     if demo_mode != "off":
         x, y = from_x, from_y
         smooth_move_visual_cursor_to(page, x, y)
@@ -613,6 +638,7 @@ def mouse_upload_file(x: float, y: float, file: str | list[str]):
         mouse_upload_file(132.1, 547, "my_receipt.pdf")
         mouse_upload_file(328, 812, ["/home/bob/Documents/image.jpg", "/home/bob/Documents/file.zip"])
     """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
     if demo_mode != "off":
         smooth_move_visual_cursor_to(page, x, y)
         highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})

@@ -286,3 +286,32 @@ def call_fun(fun: callable, retry_with_force: bool):
             fun(force=True)
         else:
             raise e
+
+
+def map_coordinates(page, x, y):
+    """
+    Maps screenshot coordinates back to page coordinates based on bgym_scale_factor.
+
+    When bgym_scale_factor > 1.0, the screenshot is captured at higher resolution,
+    so VLM coordinates need to be scaled down to match the actual page coordinates.
+
+    Args:
+        page: Playwright page object (should have _bgym_scale_factor attribute)
+        x: X coordinate from VLM (based on scaled screenshot)
+        y: Y coordinate from VLM (based on scaled screenshot)
+
+    Returns:
+        tuple: (mapped_x, mapped_y) coordinates for use with Playwright
+
+    Examples:
+        # If bgym_scale_factor = 1.5 and VLM returns coordinates (300, 450)
+        # from the scaled screenshot, map them back to page coordinates:
+        page_x, page_y = map_coordinates(page, 300, 450)  # Returns (200.0, 300.0)
+    """
+    scale_factor = getattr(page, "_bgym_scale_factor", 1.0)
+
+    # Scale down coordinates to match actual page coordinate system
+    mapped_x = x / scale_factor
+    mapped_y = y / scale_factor
+
+    return mapped_x, mapped_y

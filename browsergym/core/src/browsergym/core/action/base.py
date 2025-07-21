@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 import playwright.sync_api
 
@@ -32,6 +33,15 @@ class AbstractActionSet(ABC):
         Returns:
             Executable python code that performs the action in a browsergym environment.
         """
+
+    def to_tool_descriptor(self) -> list[Any]:
+        """
+        Converts the action set to a tool descriptor.
+
+        Returns:
+            A list of dictionaries describing the actions in the action set.
+        """
+        pass
 
 
 def execute_python_code(
