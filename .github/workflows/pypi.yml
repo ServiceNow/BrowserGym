@@ -28,6 +28,9 @@ jobs:
 
       - name: Build a binary wheel and a source tarball (browsergym-webarena)
         run: python3 -m build browsergym/webarena/ --outdir dist/
+      
+      - name: Build a binary wheel and a source tarball (browsergym-safearena)
+        run: python3 -m build browsergym/safearena/ --outdir dist/
 
       - name: Build a binary wheel and a source tarball (browsergym-webarena)
         run: python3 -m build browsergym/visualwebarena/ --outdir dist/

@@ -266,41 +266,40 @@ DEFAULT_BENCHMARKS = {
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
-        backends=["webarena"],
+        backends=["safearena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(metadata=task_metadata("safearena_all")),
+            task_list=task_list_from_metadata(metadata=task_metadata("safearena")),
             max_steps=30,
             n_repeats=1,
             seeds_rng=np.random.RandomState(42),
         ),
-        task_metadata=task_metadata("safearena_all"),
+        task_metadata=task_metadata("safearena"),
     ),
     "safearena_harm": lambda: Benchmark(
-        name="safenarena_all",
+        name="safenarena_harm",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
-        backends=["webarena"],
-        env_args_list=make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(metadata=task_metadata("safearena_harm")),
+        backends=["safearena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[f"safearena.{i}" for i in range(1, 250)],
             max_steps=30,
-            n_repeats=1,
-            seeds_rng=np.random.RandomState(42),
+            fixed_seeds=[0],
         ),
-        task_metadata=task_metadata("safearena_harm"),
+        task_metadata=task_metadata("safearena"),
     ),
+
     "safearena_safe": lambda: Benchmark(
-        name="safenarena_all",
+        name="safenarena_safe",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
-        backends=["webarena"],
-        env_args_list=make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(metadata=task_metadata("safearena_safe")),
+        backends=["safearena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[f"safearena.{i}" for i in range(250, 500)],
             max_steps=30,
-            n_repeats=1,
-            seeds_rng=np.random.RandomState(42),
+            fixed_seeds=[0],
         ),
-        task_metadata=task_metadata("safearena_safe"),
-    ),
+        task_metadata=task_metadata("safearena"),
+    )
 }

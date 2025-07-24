@@ -43,6 +43,7 @@ BrowserGym includes the following benchmarks by default:
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
+ - [SafeArena](https://safearena.github.io/)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -59,6 +60,7 @@ pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
 pip install weblinx-browsergym  # core + weblinx
+pip install browsergym-safearena #core + webarena
 ```
 
 Then setup playwright by running
@@ -72,6 +74,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
+ - for SafeArena, see [safearena/README.md]
 
 ### 🏗️ Development setup
 
@@ -173,8 +176,23 @@ import browsergym.workarena  # register assistantbench tasks as gym environments
 env = gym.make("browsergym/assistantbench.validation.3")
 ...
 
+
 # list all the available assistantbench tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
+print("\n".join(env_ids))
+```
+
+WebArena
+```python
+import gymnasium as gym
+import browsergym.webarena  # register safearena tasks as gym environments
+
+# start a webarena task
+env = gym.make("browsergym/safearena_all.110") # or safearena_safe, safearena_harm
+...
+
+# list all the available safearena tasks
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/safearena_all")]
 print("\n".join(env_ids))
 ```
 
@@ -211,6 +229,9 @@ python demo_agent/run_demo.py --task_name webarena.4
 
 # visualwebarena
 python demo_agent/run_demo.py --task_name visualwebarena.398
+
+# safearena
+python demo_agent/run_demo.py --task_name safearena_all.4
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more!
@@ -229,6 +250,7 @@ python demo_agent/run_demo.py --help
 - [WebLINX](https://github.com/McGill-NLP/weblinx): A dataset of real-world web interaction traces.
 - [AssistantBench](https://github.com/oriyor/assistantbench): A benchmark of realistic and time-consuming tasks on the open web.
 - [DoomArena](https://github.com/ServiceNow/DoomArena): A framework for AI agent security testing which supports injecting attacks into web pages from Browsergym environments.
+- [SafeArena](https://safearena.github.io/): Evaluate Web Agents on malicious, realistic, webarena-like tasks.
 
 ## 🌟 Contributors
 
