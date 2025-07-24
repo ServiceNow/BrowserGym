@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "browsergym-safearena"
 description = "Safearena: Web agent safety benchmark"
 authors = [
-    {name = "Ada Tur"},
+    {name = "Ada Defne Tur"},
 ]
 readme = "README.md"
 requires-python = ">3.10"

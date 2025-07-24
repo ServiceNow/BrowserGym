@@ -32,22 +32,28 @@ class SafeArenaInstance:
             )
             os.environ[key] = os.environ[append_wa(key)]
 
-        # import safearena on instanciation
+        os.environ["MAP"] = "map"
+        os.environ["WIKIPEDIA"] = "wikipedia"      
         from webarena.browser_env.env_config import (
             ACCOUNTS,
             GITLAB,
             HOMEPAGE,
+            MAP,
             REDDIT,
             SHOPPING,
             SHOPPING_ADMIN,
+            WIKIPEDIA,
         )
 
         self.urls = {
             "reddit": REDDIT,
             "gitlab": GITLAB,
             "shopping": SHOPPING,
-            "shopping_admin": SHOPPING_ADMIN
+            "shopping_admin": SHOPPING_ADMIN,
+            "wikipedia": WIKIPEDIA, #added even though not used in safearena to avoid assertion errors
+            "map": MAP, #added even though not used in safearena to avoid assertion errors
         }
+        
         self.home_url = HOMEPAGE
 
         self.credentials = ACCOUNTS
