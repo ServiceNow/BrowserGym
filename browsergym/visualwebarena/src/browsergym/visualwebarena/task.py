@@ -8,12 +8,16 @@ from typing import Literal, Optional, Tuple
 
 import playwright.sync_api
 import requests
-import torch
 
 from browsergym.core.task import AbstractBrowserTask
 
 from .instance import VisualWebArenaInstance
 from .utils import image_url_to_pil_image, pil_image_to_data_uri
+
+# Lazy import
+import importlib
+
+torch = importlib.import_module("torch")
 
 logger = logging.getLogger(__name__)
 
@@ -185,6 +189,7 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         hide_progress_bar = is_progress_bar_enabled()
         if hide_progress_bar:
             disable_progress_bar()
+
         captioning_fn = get_captioning_fn(
             device=self.eval_captioning_model_device,
             dtype=(

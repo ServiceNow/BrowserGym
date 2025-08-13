@@ -1,4 +1,5 @@
 import nltk
+import importlib.util
 
 from browsergym.core.registration import register_task
 
@@ -10,6 +11,11 @@ try:
     nltk.data.find("tokenizers/punkt_tab")
 except:
     nltk.download("punkt_tab", quiet=True, raise_on_error=True)
+
+if importlib.util.find_spec("torch") is None:
+    raise ImportError(
+        "The 'torch' package is required for VisualWebArena tasks evaluation. Please install it with 'pip install torch'."
+    )
 
 ALL_VISUALWEBARENA_TASK_IDS = []
 VISUALWEBARENA_TASK_IDS_WITH_RESET = []
