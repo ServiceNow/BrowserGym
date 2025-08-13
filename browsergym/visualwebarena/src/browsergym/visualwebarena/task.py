@@ -8,16 +8,12 @@ from typing import Literal, Optional, Tuple
 
 import playwright.sync_api
 import requests
+import torch
 
 from browsergym.core.task import AbstractBrowserTask
 
 from .instance import VisualWebArenaInstance
 from .utils import image_url_to_pil_image, pil_image_to_data_uri
-
-# Lazy import
-import importlib
-
-torch = importlib.import_module("torch")
 
 logger = logging.getLogger(__name__)
 

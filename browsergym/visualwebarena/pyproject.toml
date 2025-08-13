@@ -25,6 +25,9 @@ dynamic = ["dependencies", "version"]
 [project.urls]
 homepage = "https://github.com/ServiceNow/BrowserGym"
 
+[project.optional-dependencies]
+torch = ["torch>=2.0.0"]
+
 [tool.hatch.version]
 path = "../core/src/browsergym/core/__init__.py"
 
