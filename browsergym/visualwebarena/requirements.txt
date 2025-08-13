@@ -2,4 +2,3 @@ browsergym-core==0.14.2
 browsergym-webarena
 libvisualwebarena==0.0.15
 requests
-torch

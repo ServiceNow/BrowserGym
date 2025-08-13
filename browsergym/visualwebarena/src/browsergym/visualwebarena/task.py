@@ -185,6 +185,7 @@ class GenericVisualWebArenaTask(AbstractBrowserTask):
         hide_progress_bar = is_progress_bar_enabled()
         if hide_progress_bar:
             disable_progress_bar()
+
         captioning_fn = get_captioning_fn(
             device=self.eval_captioning_model_device,
             dtype=(
