@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Reprompt UI</title>
+  <style>
+    :root{
+      --bg:#f4f6f8; --card:#fff; --muted:#6b7280; --text:#0f172a; --brand:#2563eb; --accent:#10b981; --danger:#ef4444; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1100px;margin:24px auto;padding:0 16px}
+
+    .grid{
+      display:grid;gap:16px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+    .card h2{margin:0 0 8px 0;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .pad{padding:16px}
+
+    .tabs{display:flex;gap:8px;padding:8px 8px 0}
+    .tab{border:none;background:transparent;padding:10px 14px;border-radius:12px 12px 0 0;cursor:pointer;font-weight:600;color:var(--muted)}
+    .tab.active{background:var(--card);border:1px solid var(--border);border-bottom:none;color:var(--text)}
+    .tabpanel{border-top:1px solid var(--border)}
+
+    .screenshot{width:100%;height:520px;object-fit:contain;background:#0000000d;border-radius:8px}
+    .axtree{width:100%;height:520px;resize:none;border:none;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0b10241a}
+
+    .hints-row{display:grid;grid-template-columns: 1fr 140px;gap:12px;align-items:start}
+    textarea.hint{width:100%;min-height:120px;resize:vertical;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:12px 16px;font-weight:600;cursor:pointer}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary[disabled]{opacity:.6;cursor:not-allowed}
+    .btn-ghost{background:transparent;border:1px solid var(--border)}
+
+    .choices{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .choice{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;background:#ffffff;border:1px solid var(--border);border-radius:14px;padding:12px}
+    .choice input[type="radio"]{margin-top:6px;width:18px;height:18px}
+    .choice .action{font-weight:800}
+    .choice .row{display:flex;gap:6px;flex-wrap:wrap}
+    .choice .label{font-weight:700}
+    .choice .value{color:#0f172a}
+    .choice .reason{font-size:13px;color:#111827}
+
+    .footer{display:flex;justify-content:flex-end;gap:12px;margin-top:10px}
+
+    .banner{margin:12px 0;padding:10px 12px;border-radius:10px;font-size:14px}
+    .banner.info{background:#dbeafe;border:1px solid #bfdbfe}
+    .banner.error{background:#fee2e2;border:1px solid #fecaca;color:#991b1b}
+
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f1f5f9;color:#0f172a;border:1px solid var(--border);font-size:12px}
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns: 1fr}
+      .screenshot,.axtree{height:420px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top: Goal & Error -->
+    <div class="grid" style="display: flex; gap: 16px;">
+      <div class="card pad" style="flex: 1; height: 150px; overflow-y: auto;">
+        <h2>Goal</h2>
+        <div id="goalBox" style="padding: 12px 14px; font-size: 15px; background: #f8fafc;"></div>
+      </div>
+      <div class="card pad" style="flex: 1; height: 150px; overflow-y: auto;">
+        <h2>Error Feedback</h2>
+        <div id="errorBox" style="padding: 12px 14px; font-size: 15px; background: #fef2f2;"></div>
+      </div>
+    </div>
+
+    <!-- Middle: Tabs -->
+    <div class="card" style="margin-top:16px">
+      <div class="tabs">
+        <button class="tab active" data-tab="screenshot">Screenshot</button>
+        <button class="tab" data-tab="axtree">AxTree</button>
+        <button class="tab" data-tab="history">History</button>
+      </div>
+      <div class="pad tabpanel">
+        <div id="tab-screenshot" class="tabcontent">
+          <img id="screenshotImg" alt="screenshot" class="screenshot" />
+        </div>
+        <div id="tab-axtree" class="tabcontent" hidden>
+          <textarea id="axtreeArea" class="axtree" readonly></textarea>
+        </div>
+        <div id="tab-history" class="tabcontent" hidden>
+          <!-- intentionally empty for now -->
+          <div class="banner info">History will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hints & Reprompt -->
+    <div class="card pad" style="margin-top:16px">
+      <h2>Hints</h2>
+      <textarea id="hintInput" class="hint" placeholder="Type guidance for the next reprompt…" style="width: 100%;"></textarea>
+      <button id="repromptBtn" class="btn btn-primary" title="Send hint to get refreshed suggestions" style="margin-top: 12px;">Reprompt</button>
+      <div id="repromptStatus" class="banner info" style="display:none"></div>
+    </div>
+
+    <!-- Suggestions / Radio list -->
+    <div class="card pad" style="margin-top:16px">
+      <h2>Suggestions</h2>
+      <div id="choices" class="choices"></div>
+      <div id="choicesNote" class="banner info" style="display:none" title="Hover to see more details"></div>
+      <div class="footer">
+        <button id="resetBtn" class="btn btn-ghost" type="button" title="Click to clear all selections">Clear Selection</button>
+        <button id="submitBtn" class="btn btn-primary" disabled title="Select an action to enable">Send Action</button>
+      </div>
+      <div id="submitStatus" class="banner info" style="display:none" title="Hover to see submission status"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Bootstrapping contract
+     * You can overwrite window.__BOOTSTRAP_DATA__ from your server-side template.
+     * Fields:
+     *   goal: string
+     *   error_feedback: string
+     *   screenshot_b64: base64 string (no data: prefix required)
+     *   axtree: string
+     *   action_suggestions: Array<{ action: string, COT: string, id?: string }>
+     */
+    window.__BOOTSTRAP_DATA__ = window.__BOOTSTRAP_DATA__ || {
+      goal: "go to the hardware catalog store and order a developer laptop",
+      error_feedback: "playwright error when clicking on something that is not visible (from the previous step)",
+      screenshot_b64: "", // fill with base64 (PNG/JPG). When empty, we show a placeholder.
+      axtree: "<root>\n  <window name=\"VITASPHERE\">…</window>\n</root>",
+      action_suggestions: [
+        { id: "1", action: "click(\"42\")", COT: "The button with id 42 advances the form." },
+        { id: "2", action: "type(\"Assigned to\", \"John Doe\")", COT: "Fills the assignee field before submission." },
+        { id: "3", action: "open(\"/hardware-catalog\")", COT: "Navigate directly to the catalog page." }
+      ]
+    };
+
+    // Placeholder endpoints (replace later)
+    const ENDPOINTS = {
+      REPROMPT: "/api/reprompt",   // expects POST {hint} -> returns {action_suggestions: [...]} 
+      SUBMIT: "/api/submit"        // expects POST {hint, action, COT, id?} -> returns {action_suggestions?: [...]} (optional)
+    };
+
+    // DOM references
+    const goalBox = document.getElementById('goalBox');
+    const errorBox = document.getElementById('errorBox');
+    const screenshotImg = document.getElementById('screenshotImg');
+    const axtreeArea = document.getElementById('axtreeArea');
+    const hintInput = document.getElementById('hintInput');
+    const repromptBtn = document.getElementById('repromptBtn');
+    const repromptStatus = document.getElementById('repromptStatus');
+    const choicesEl = document.getElementById('choices');
+    const choicesNote = document.getElementById('choicesNote');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitStatus = document.getElementById('submitStatus');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // State
+    let currentSuggestions = [];
+    let selectedId = null;
+
+    // Helpers
+    function setVisible(el, visible){ el.style.display = visible ? '' : 'none'; }
+    function setBanner(el, text, variant='info'){ el.className = `banner ${variant}`; el.textContent = text; setVisible(el,true); }
+
+    function dataUrlFromBase64(b64){
+      if(!b64) return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1600\" height=\"900\"><rect width=\"100%\" height=\"100%\" fill=\"#eef2ff\"/><text x=\"50%\" y=\"50%\" font-family=\"sans-serif\" font-size=\"24\" text-anchor=\"middle\" fill=\"#64748b\">No screenshot provided</text></svg>`);
+      // naive sniff for png/jpg
+      const pref = b64.trim().startsWith('/') || b64.trim().startsWith('iVBOR') ? 'image/png' : 'image/jpeg';
+      return `data:${pref};base64,${b64}`;
+    }
+
+    function renderSuggestions(suggestions){
+      currentSuggestions = suggestions.slice(0,5); // cap at 5
+      choicesEl.innerHTML = '';
+      selectedId = null;
+      submitBtn.disabled = true;
+
+      if(currentSuggestions.length === 0){
+        setBanner(choicesNote, 'No suggestions yet. Try reprompting with a hint.');
+        return;
+      }
+      setVisible(choicesNote,false);
+
+      currentSuggestions.forEach((sugg, idx)=>{
+        const id = sugg.id || String(idx+1);
+        const wrapper = document.createElement('label');
+        wrapper.className = 'choice';
+        wrapper.setAttribute('for', `choice-${id}`);
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'choice';
+        radio.id = `choice-${id}`;
+        radio.value = id;
+        radio.addEventListener('change', ()=>{ selectedId = id; submitBtn.disabled = false; });
+
+        const box = document.createElement('div');
+        const actionRow = document.createElement('div');
+        actionRow.className = 'row';
+        const actionLabel = document.createElement('span');
+        actionLabel.className = 'label action';
+        actionLabel.textContent = 'action:';
+        const actionVal = document.createElement('span');
+        actionVal.className = 'value action';
+        actionVal.textContent = ` ${sugg.action}`;
+        actionRow.appendChild(actionLabel); actionRow.appendChild(actionVal);
+
+        const reasonRow = document.createElement('div');
+        reasonRow.className = 'row reason';
+        const reasonLabel = document.createElement('span');
+        reasonLabel.className = 'label';
+        reasonLabel.textContent = 'reasoning:';
+        const reasonVal = document.createElement('span');
+        reasonVal.className = 'value';
+        reasonVal.textContent = ` ${sugg.COT}`;
+        reasonRow.appendChild(reasonLabel); reasonRow.appendChild(reasonVal);
+
+        box.appendChild(actionRow);
+        box.appendChild(reasonRow);
+
+        wrapper.appendChild(radio);
+        wrapper.appendChild(box);
+        choicesEl.appendChild(wrapper);
+      });
+    }
+
+    function currentSelection(){
+      if(!selectedId) return null;
+      const obj = currentSuggestions.find(s=> (s.id||String(currentSuggestions.indexOf(s)+1)) === selectedId);
+      return obj || null;
+    }
+
+    // Tab logic
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const name = btn.dataset.tab;
+        document.querySelectorAll('.tabcontent').forEach(c=>c.hidden = true);
+        document.getElementById('tab-'+name).hidden = false;
+      });
+    });
+
+    // Actions
+    repromptBtn.addEventListener('click', async ()=>{
+      setBanner(repromptStatus, 'Requesting new suggestions…');
+      try{
+        const res = await fetch(ENDPOINTS.REPROMPT,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ hint: hintInput.value })
+        });
+        const data = await res.json().catch(()=>({}));
+        if(!res.ok) throw new Error(data?.error || 'Reprompt failed');
+        if(Array.isArray(data.action_suggestions)){
+          renderSuggestions(data.action_suggestions);
+          setBanner(repromptStatus, 'Suggestions updated.');
+        }else{
+          setBanner(repromptStatus, 'No suggestions returned.');
+        }
+      }catch(err){
+        setBanner(repromptStatus, String(err), 'error');
+      } finally{
+        setTimeout(()=>setVisible(repromptStatus,false), 1600);
+      }
+    });
+
+    submitBtn.addEventListener('click', async ()=>{
+      const selection = currentSelection();
+      if(!selection){ return; }
+      setBanner(submitStatus, 'Submitting selection…');
+      submitBtn.disabled = true;
+      try{
+        const payload = { hint: hintInput.value, action: selection.action, COT: selection.COT, id: selection.id };
+        const res = await fetch(ENDPOINTS.SUBMIT,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(()=>({}));
+        if(!res.ok) throw new Error(data?.error || 'Submit failed');
+        // Clear hint ONLY after successful submit
+        hintInput.value = '';
+        if(Array.isArray(data.action_suggestions)){
+          renderSuggestions(data.action_suggestions);
+        }
+        setBanner(submitStatus, 'Submitted successfully.');
+      }catch(err){
+        setBanner(submitStatus, String(err), 'error');
+      } finally{
+        setTimeout(()=>setVisible(submitStatus,false), 1600);
+      }
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('input[name="choice"]').forEach(r=> r.checked=false);
+      selectedId = null; submitBtn.disabled = true;
+    });
+
+    // Initial render from BOOTSTRAP_DATA
+    (function init(){
+      const d = window.__BOOTSTRAP_DATA__;
+      goalBox.textContent = d.goal || '';
+      errorBox.textContent = d.error_feedback || '';
+      screenshotImg.src = dataUrlFromBase64(d.screenshot_b64 || '');
+      axtreeArea.value = d.axtree || '';
+      renderSuggestions(Array.isArray(d.action_suggestions) ? d.action_suggestions : []);
+      // Start with Screenshot tab visible (already default)
+    })();
+  </script>
+</body>
+</html>

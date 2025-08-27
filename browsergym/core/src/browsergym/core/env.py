@@ -14,6 +14,7 @@ from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
+from .hint_labeling import HintLabeling
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
 from .observation import (
     MarkingError,
@@ -330,6 +331,13 @@ document.addEventListener("visibilitychange", () => {
         self.chat = Chat(
             headless=self.headless,
             chat_size=(500, max(viewport["height"], 800)),
+            record_video_dir=self.record_video_dir,
+        )
+        
+        # create the hint labeling ui
+        self.hint_labeling = HintLabeling(
+            headless=self.headless,
+            window_size=(500, max(viewport["height"], 800)),
             record_video_dir=self.record_video_dir,
         )
 

@@ -17,15 +17,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from browsergym.core.env import BrowserEnv
 import gymnasium as gym
 import numpy as np
+from browsergym.core.action.parsers import highlevel_action_parser
+from browsergym.core.chat import Chat
+from browsergym.core.env import BrowserEnv
 from dataclasses_json import DataClassJsonMixin
 from PIL import Image
 from tqdm import tqdm
-
-from browsergym.core.action.parsers import highlevel_action_parser
-from browsergym.core.chat import Chat
 
 from .agent import Agent
 from .utils import count_messages_token, count_tokens
