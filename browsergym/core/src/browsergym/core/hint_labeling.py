@@ -21,7 +21,7 @@ class HintLabelingInputs(BaseModel):
     axtree: str
     history: List[Dict[str, str]] = Field(default_factory=list)
     hint: str = ""
-    # keep 'suggestions' on Python side, but we’ll map to UI 'action_suggestions'
+    # keep 'suggestions' on Python side, but we’ll map to UI 'suggestions'
     suggestions: List[Dict[str, str]] = Field(default_factory=list)
 
 # ------- Hint Labeling backend class -------
@@ -60,7 +60,7 @@ class HintLabeling:
         route.fulfill(
             status=200,
             content_type="application/json",
-            body=json.dumps({"action_suggestions": []}),
+            body=json.dumps({"suggestions": []}),
         )
 
     def _route_submit(self, route: playwright.sync_api.Route, request: playwright.sync_api.Request):
@@ -82,15 +82,10 @@ class HintLabeling:
         route.fulfill(
             status=200,
             content_type="application/json",
-            body=json.dumps({"action_suggestions": []}),
+            body=json.dumps({"suggestions": []}),
         )
 
     def _to_ui_bootstrap(self, ctx: HintLabelingInputs) -> dict:
-        # Map 'suggestions' [{action, thought}] -> 'action_suggestions' [{action, think}]
-        action_suggestions = [
-            {"id": str(i + 1), "action": s.get("action", ""), "think": s.get("think", "")}
-            for i, s in enumerate(ctx.suggestions or [])
-        ]
         return {
             "goal": ctx.goal,
             "error_feedback": ctx.error_feedback,
@@ -98,14 +93,14 @@ class HintLabeling:
             "axtree": ctx.axtree,
             "history": ctx.history,
             "hint": ctx.hint,
-            "action_suggestions": action_suggestions,
+            "suggestions": ctx.suggestions,
         }
 
     def update_context(self, context: HintLabelingInputs):
         self._context = context
         ui_payload = self._to_ui_bootstrap(context)
         # call JS function with arg (no string concat)
-        self.page.evaluate("updateContext", ui_payload)
+        self.page.evaluate("(d) => updateContext(d)", ui_payload)
 
     def wait_for_response(self, timeout: Optional[float] = 600) -> dict:
         """

@@ -125,7 +125,7 @@
      *   screenshot: base64 string (no data: prefix required)
      *   axtree: string
      *   hint: string
-     *   action_suggestions: Array<{ action: string, think: string, id?: string }>
+     *   suggestions: Array<{ action: string, think: string, id?: string }>
      */
     window.__BOOTSTRAP_DATA__ = window.__BOOTSTRAP_DATA__ || {
       goal: "go to the hardware catalog store and order a developer laptop",
@@ -148,8 +148,8 @@
       errorBox.textContent = d.error_feedback || '';
       screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
       axtreeArea.value = d.axtree || '';
-      if (Array.isArray(d.action_suggestions)) {
-        renderSuggestions(d.action_suggestions);
+      if (Array.isArray(d.suggestions)) {
+        renderSuggestions(d.suggestions);
       }
       // keep the hint textarea in sync only if it's currently empty,
       // so we don't clobber user typing
@@ -164,8 +164,8 @@
 
     // Placeholder endpoints (replace later)
     const ENDPOINTS = {
-      REPROMPT: "/api/reprompt",   // expects POST {hint} -> returns {action_suggestions: [...]} 
-      SUBMIT: "/api/submit"        // expects POST {hint, action, think, id?} -> returns {action_suggestions?: [...]} (optional)
+      REPROMPT: "/api/reprompt",   // expects POST {hint} -> returns {suggestions: [...]} 
+      SUBMIT: "/api/submit"        // expects POST {hint, action, think, id?} -> returns {suggestions?: [...]} (optional)
     };
 
     // DOM references
@@ -279,11 +279,12 @@
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok) throw new Error(data?.error || 'Reprompt failed');
-        if(Array.isArray(data.action_suggestions)){
-          renderSuggestions(data.action_suggestions);
+        if (Array.isArray(data.suggestions) && data.suggestions.length > 0){
+          renderSuggestions(data.suggestions);
           setBanner(repromptStatus, 'Suggestions updated.');
-        }else{
-          setBanner(repromptStatus, 'No suggestions returned.');
+        } else {
+          // don't clear the current list; just keep the banner
+          setBanner(repromptStatus, 'Request sent. Waiting for new suggestions…');
         }
       }catch(err){
         setBanner(repromptStatus, String(err), 'error');
@@ -307,8 +308,8 @@
         if(!res.ok) throw new Error(data?.error || 'Submit failed');
         // Clear hint ONLY after successful submit
         hintInput.value = '';
-        if(Array.isArray(data.action_suggestions)){
-          renderSuggestions(data.action_suggestions);
+        if(Array.isArray(data.suggestions)){
+          renderSuggestions(data.suggestions);
         }
         setBanner(submitStatus, 'Submitted successfully.');
       }catch(err){
@@ -330,7 +331,7 @@
       errorBox.textContent = d.error_feedback || '';
       screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
       axtreeArea.value = d.axtree || '';
-      renderSuggestions(Array.isArray(d.action_suggestions) ? d.action_suggestions : []);
+      renderSuggestions(Array.isArray(d.suggestions) ? d.suggestions : []);
       // Start with Screenshot tab visible (already default)
     })();
   </script>
