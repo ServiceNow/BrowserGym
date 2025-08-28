@@ -320,13 +320,6 @@ def flatten_axtree_to_str(
             pass
         else:
             node_name = node["name"]["value"]
-            if node_name == "":
-                try:
-                    node_name_sources = node["name"]["sources"]
-                    node_name_sources = [elem for elem in node_name_sources if elem.get("type") == "contents"][0]
-                    node_name = node_name_sources.get("value", {}).get("value", "")
-                except Exception as e:
-                    logger.warning(f"Failed to extract node name: {e}")
             if "value" in node and "value" in node["value"]:
                 node_value = node["value"]["value"]
             else:
