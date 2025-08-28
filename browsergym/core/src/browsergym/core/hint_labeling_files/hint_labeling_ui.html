@@ -57,19 +57,26 @@
       .grid{grid-template-columns: 1fr}
       .axtree{height:420px}
     }
+
+    #goalBox,
+    #errorBox {
+      white-space: pre-wrap;     /* respects \n; collapses multiple spaces nicely */
+      overflow-wrap: anywhere;   /* wrap very long tokens (URLs/unbroken text) */
+      word-break: break-word;    /* fallback for older engines */
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- Top: Goal & Error -->
     <div class="grid" style="display: flex; gap: 16px;">
-      <div class="card pad" style="flex: 1; height: 150px; overflow-y: auto;">
+      <div class="card pad" style="flex: 1; height: 150px;">
         <h2>Goal</h2>
-        <div id="goalBox" style="padding: 12px 14px; font-size: 15px; background: #f8fafc;"></div>
+        <div id="goalBox" style="padding: 12px 14px; font-size: 15px; background: #f8fafc; height: 80%; overflow-y: auto;"></div>
       </div>
-      <div class="card pad" style="flex: 1; height: 150px; overflow-y: auto;">
+      <div class="card pad" style="flex: 1; height: 150px;">
         <h2>Error Feedback</h2>
-        <div id="errorBox" style="padding: 12px 14px; font-size: 15px; background: #fef2f2;"></div>
+        <div id="errorBox" style="padding: 12px 14px; font-size: 15px; background: #fef2f2; height: 80%; overflow-y: auto;"></div>
       </div>
     </div>
 
@@ -329,8 +336,8 @@
     // Initial render from BOOTSTRAP_DATA
     (function init(){
       const d = window.__BOOTSTRAP_DATA__;
-      goalBox.innerHTML = (d.goal || '').replace(/\n/g, '<br>');
-      errorBox.innerHTML = (d.error_feedback || '').replace(/\n/g, '<br>');
+      goalBox.textContent = d.goal || '';
+      errorBox.textContent = d.error_feedback || '';
       screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
       axtreeArea.value = d.axtree || '';
       renderSuggestions(Array.isArray(d.suggestions) ? d.suggestions : []);

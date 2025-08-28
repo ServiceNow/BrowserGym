@@ -14,6 +14,7 @@ HINT_LABELING_DIR = resources.files(hint_labeling_files)
 
 # ------- Data Classes -------
 
+
 class HintLabelingInputs(BaseModel):
     goal: str
     error_feedback: str = ""
@@ -24,11 +25,13 @@ class HintLabelingInputs(BaseModel):
     # keep 'suggestions' on Python side, but we’ll map to UI 'suggestions'
     suggestions: List[Dict[str, str]] = Field(default_factory=list)
 
+
 # ------- Hint Labeling backend class -------
+
 
 class HintLabeling:
     def __init__(self, headless: bool, window_size=(600, 1000), *args, **kwargs):
-        
+
         pw: playwright.sync_api.Playwright = _get_global_playwright()
         self.browser = pw.chromium.launch(
             headless=headless, args=[f"--window-size={window_size[0]},{window_size[1]}"]
@@ -42,12 +45,14 @@ class HintLabeling:
         self.page.route("**/api/reprompt", self._route_reprompt)
         self.page.route("**/api/submit", self._route_submit)
         self.page.set_content(get_hint_labeling_ui(HINT_LABELING_DIR))
-        
+
         # internal state
         self._context: HintLabelingInputs = None
         self._running = False
 
-    def _route_reprompt(self, route: playwright.sync_api.Route, request: playwright.sync_api.Request):
+    def _route_reprompt(
+        self, route: playwright.sync_api.Route, request: playwright.sync_api.Request
+    ):
         logger.info("Route hit: %s %s", request.method, request.url)
         try:
             body = json.loads(request.post_data() or "{}")
@@ -111,10 +116,14 @@ class HintLabeling:
 
         def is_api(req: playwright.sync_api.Request) -> bool:
             u = req.url
-            return (u.endswith("/api/reprompt") or u.endswith("/api/submit")) and req.method == "POST"
+            return (
+                u.endswith("/api/reprompt") or u.endswith("/api/submit")
+            ) and req.method == "POST"
 
         # This pumps Playwright internally; no busy waiting.
-        with self.page.expect_request(is_api, timeout=(timeout * 1000 if timeout else 0)) as req_info:
+        with self.page.expect_request(
+            is_api, timeout=(timeout * 1000 if timeout else 0)
+        ) as req_info:
             req = req_info.value
 
         body_text = req.post_data or "{}"
@@ -127,8 +136,10 @@ class HintLabeling:
         if req.url.endswith("/api/reprompt"):
             msg = {"type": "reprompt", "payload": {"hint": body.get("hint", "")}}
         else:
-            msg = {"type": "step",
-                "payload": {"think": body.get("think", ""), "action": body.get("action", "")}}
+            msg = {
+                "type": "step",
+                "payload": {"think": body.get("think", ""), "action": body.get("action", "")},
+            }
 
         logger.info("Response received: %s", msg)
         return msg
@@ -136,6 +147,7 @@ class HintLabeling:
     def close(self):
         self.context.close()
         self.browser.close()
+
 
 def get_hint_labeling_ui(hint_labeling_dir) -> str:
     with open(hint_labeling_dir / "hint_labeling_ui.html", "r") as file:

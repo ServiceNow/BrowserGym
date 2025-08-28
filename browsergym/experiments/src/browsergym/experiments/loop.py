@@ -46,6 +46,8 @@ class EnvArgs(DataClassJsonMixin):
     slow_mo: Optional[int] = None  # use default value from BrowserGym
     storage_state: Optional[str | Path | dict] = None
     task_kwargs: Optional[dict] = None  # use default value from BrowserGym
+    use_chat_ui: bool = False
+    use_hint_labeling_ui: bool = False
 
     def make_env(
         self, action_mapping, exp_dir, exp_task_kwargs: dict = {}, use_raw_page_output=False
