@@ -1,18 +1,17 @@
+import json
+import logging
 from importlib import resources
+from queue import Queue
 from typing import Dict, List, Optional
 
-from queue import Queue, Empty
 import playwright.sync_api
 from pydantic import BaseModel, Field
-import logging
-import json
+
 from . import _get_global_playwright, hint_labeling_files
 
 logger = logging.getLogger(__name__)
 
 HINT_LABELING_DIR = resources.files(hint_labeling_files)
-
-# ------- Data Classes -------
 
 
 class HintLabelingInputs(BaseModel):
@@ -22,11 +21,7 @@ class HintLabelingInputs(BaseModel):
     axtree: str
     history: List[Dict[str, str]] = Field(default_factory=list)
     hint: str = ""
-    # keep 'suggestions' on Python side, but we’ll map to UI 'suggestions'
     suggestions: List[Dict[str, str]] = Field(default_factory=list)
-
-
-# ------- Hint Labeling backend class -------
 
 
 class HintLabeling:
