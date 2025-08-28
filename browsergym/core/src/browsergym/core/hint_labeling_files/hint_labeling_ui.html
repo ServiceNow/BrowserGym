@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base href="http://route.local/"><!-- NEW: gives fetch a resolvable origin -->
   <title>Agent Reprompt UI</title>
   <style>
     :root{
@@ -121,26 +122,50 @@
      * Fields:
      *   goal: string
      *   error_feedback: string
-     *   screenshot_b64: base64 string (no data: prefix required)
+     *   screenshot: base64 string (no data: prefix required)
      *   axtree: string
-     *   action_suggestions: Array<{ action: string, COT: string, id?: string }>
+     *   hint: string
+     *   action_suggestions: Array<{ action: string, think: string, id?: string }>
      */
     window.__BOOTSTRAP_DATA__ = window.__BOOTSTRAP_DATA__ || {
       goal: "go to the hardware catalog store and order a developer laptop",
       error_feedback: "playwright error when clicking on something that is not visible (from the previous step)",
-      screenshot_b64: "", // fill with base64 (PNG/JPG). When empty, we show a placeholder.
+      screenshot: "", // fill with base64 (PNG/JPG). When empty, we show a placeholder.
       axtree: "<root>\n  <window name=\"VITASPHERE\">…</window>\n</root>",
-      action_suggestions: [
-        { id: "1", action: "click(\"42\")", COT: "The button with id 42 advances the form." },
-        { id: "2", action: "type(\"Assigned to\", \"John Doe\")", COT: "Fills the assignee field before submission." },
-        { id: "3", action: "open(\"/hardware-catalog\")", COT: "Navigate directly to the catalog page." }
+      history: [],
+      hint: "",
+      suggestions: [
+        { id: "1", action: "click(\"42\")", think: "The button with id 42 advances the form." },
+        { id: "2", action: "type(\"Assigned to\", \"John Doe\")", think: "Fills the assignee field before submission." },
+        { id: "3", action: "open(\"/hardware-catalog\")", think: "Navigate directly to the catalog page." }
       ]
     };
+
+    var RECEIVED_RESPONSE = false;
+
+    function applyContext(d){
+      goalBox.textContent = d.goal || '';
+      errorBox.textContent = d.error_feedback || '';
+      screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
+      axtreeArea.value = d.axtree || '';
+      if (Array.isArray(d.action_suggestions)) {
+        renderSuggestions(d.action_suggestions);
+      }
+      // keep the hint textarea in sync only if it's currently empty,
+      // so we don't clobber user typing
+      if (!hintInput.value) hintInput.value = d.hint || '';
+    }
+
+    // REPLACE your old updateContext with this:
+    function updateContext(data){
+      window.__BOOTSTRAP_DATA__ = data || {};
+      applyContext(window.__BOOTSTRAP_DATA__);
+    }
 
     // Placeholder endpoints (replace later)
     const ENDPOINTS = {
       REPROMPT: "/api/reprompt",   // expects POST {hint} -> returns {action_suggestions: [...]} 
-      SUBMIT: "/api/submit"        // expects POST {hint, action, COT, id?} -> returns {action_suggestions?: [...]} (optional)
+      SUBMIT: "/api/submit"        // expects POST {hint, action, think, id?} -> returns {action_suggestions?: [...]} (optional)
     };
 
     // DOM references
@@ -215,7 +240,7 @@
         reasonLabel.textContent = 'reasoning:';
         const reasonVal = document.createElement('span');
         reasonVal.className = 'value';
-        reasonVal.textContent = ` ${sugg.COT}`;
+        reasonVal.textContent = ` ${sugg.think}`;
         reasonRow.appendChild(reasonLabel); reasonRow.appendChild(reasonVal);
 
         box.appendChild(actionRow);
@@ -273,7 +298,7 @@
       setBanner(submitStatus, 'Submitting selection…');
       submitBtn.disabled = true;
       try{
-        const payload = { hint: hintInput.value, action: selection.action, COT: selection.COT, id: selection.id };
+        const payload = { hint: hintInput.value, action: selection.action, think: selection.think, id: selection.id };
         const res = await fetch(ENDPOINTS.SUBMIT,{
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify(payload)
@@ -303,7 +328,7 @@
       const d = window.__BOOTSTRAP_DATA__;
       goalBox.textContent = d.goal || '';
       errorBox.textContent = d.error_feedback || '';
-      screenshotImg.src = dataUrlFromBase64(d.screenshot_b64 || '');
+      screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
       axtreeArea.value = d.axtree || '';
       renderSuggestions(Array.isArray(d.action_suggestions) ? d.action_suggestions : []);
       // Start with Screenshot tab visible (already default)
