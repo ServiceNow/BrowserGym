@@ -14,8 +14,8 @@ from . import _get_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
-from .hint_labeling import HintLabeling
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
+from .hint_labeling import HintLabeling
 from .observation import (
     MarkingError,
     _post_extract,
@@ -143,7 +143,7 @@ class BrowserEnv(gym.Env, ABC):
 
         # hint labeling
         if self.use_hint_labeling_ui:
-            self.hint_labeling: "HintLabeling" = None
+            self.hint_labeling: HintLabeling = None
 
         # observation space
         if use_raw_page_output:
@@ -217,8 +217,9 @@ class BrowserEnv(gym.Env, ABC):
             self.task.teardown()
             self.task = None
         # close the chat
-        self.chat.close()
-        self.chat = None
+        if self.chat:
+            self.chat.close()
+            self.chat = None
 
         if self.use_hint_labeling_ui and self.hint_labeling:
             self.hint_labeling.close()
@@ -240,7 +241,7 @@ class BrowserEnv(gym.Env, ABC):
             self.task.teardown()
             self.context.close()
             self.chat.close()
-            if self.use_hint_labeling_ui:
+            if self.use_hint_labeling_ui and self.hint_labeling:
                 self.hint_labeling.close()
             self.browser.close()
 
@@ -342,6 +343,7 @@ document.addEventListener("visibilitychange", () => {
 
         # create the chat
         # chat always exist even is use_chat_ui is False since we use it to keep track of messages
+        # we only show the chat ui if both headless is False and use_chat_ui is True
         self.chat = Chat(
             headless=not (self.headless is False and self.use_chat_ui is True),
             chat_size=(500, max(viewport["height"], 800)),
@@ -352,7 +354,7 @@ document.addEventListener("visibilitychange", () => {
         if self.use_hint_labeling_ui:
             self.hint_labeling = HintLabeling(
                 headless=self.headless,
-                window_size=(500, max(viewport["height"], 800)),
+                window_size=(600, max(viewport["height"], 1000)),
                 record_video_dir=self.record_video_dir,
             )
 
