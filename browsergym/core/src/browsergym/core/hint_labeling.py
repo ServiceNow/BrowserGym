@@ -27,7 +27,7 @@ class HintLabelingInputs(BaseModel):
 # ------- Hint Labeling backend class -------
 
 class HintLabeling:
-    def __init__(self, headless: bool, window_size=(500, 800), *args, **kwargs):
+    def __init__(self, headless: bool, window_size=(600, 1000), *args, **kwargs):
         
         pw: playwright.sync_api.Playwright = _get_global_playwright()
         self.browser = pw.chromium.launch(

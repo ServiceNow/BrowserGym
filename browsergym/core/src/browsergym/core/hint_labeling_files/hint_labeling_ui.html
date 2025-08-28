@@ -26,7 +26,7 @@
     .tab.active{background:var(--card);border:1px solid var(--border);border-bottom:none;color:var(--text)}
     .tabpanel{border-top:1px solid var(--border)}
 
-    .screenshot{width:100%;height:520px;object-fit:contain;background:#0000000d;border-radius:8px}
+    .screenshot{width:100%;aspect-ratio: 16 / 9;object-fit:contain;background:#0000000d;border-radius:8px}
     .axtree{width:100%;height:520px;resize:none;border:none;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0b10241a}
 
     .hints-row{display:grid;grid-template-columns: 1fr 140px;gap:12px;align-items:start}
@@ -55,7 +55,7 @@
 
     @media (max-width: 900px){
       .grid{grid-template-columns: 1fr}
-      .screenshot,.axtree{height:420px}
+      .axtree{height:420px}
     }
   </style>
 </head>
@@ -85,7 +85,7 @@
           <img id="screenshotImg" alt="screenshot" class="screenshot" />
         </div>
         <div id="tab-axtree" class="tabcontent" hidden>
-          <textarea id="axtreeArea" class="axtree" readonly></textarea>
+          <textarea id="axtreeArea" class="axtree" readonly style="font-size: 12px; white-space: pre; overflow-wrap: normal;"></textarea>
         </div>
         <div id="tab-history" class="tabcontent" hidden>
           <!-- intentionally empty for now -->
@@ -240,6 +240,8 @@
         reasonLabel.textContent = 'reasoning:';
         const reasonVal = document.createElement('span');
         reasonVal.className = 'value';
+        reasonVal.style.maxHeight = '3em';
+        reasonVal.style.overflowY = 'auto';
         reasonVal.textContent = ` ${sugg.think}`;
         reasonRow.appendChild(reasonLabel); reasonRow.appendChild(reasonVal);
 
@@ -327,8 +329,8 @@
     // Initial render from BOOTSTRAP_DATA
     (function init(){
       const d = window.__BOOTSTRAP_DATA__;
-      goalBox.textContent = d.goal || '';
-      errorBox.textContent = d.error_feedback || '';
+      goalBox.innerHTML = (d.goal || '').replace(/\n/g, '<br>');
+      errorBox.innerHTML = (d.error_feedback || '').replace(/\n/g, '<br>');
       screenshotImg.src = dataUrlFromBase64(d.screenshot || '');
       axtreeArea.value = d.axtree || '';
       renderSuggestions(Array.isArray(d.suggestions) ? d.suggestions : []);
