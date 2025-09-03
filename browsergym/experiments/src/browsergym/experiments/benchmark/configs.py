@@ -261,8 +261,8 @@ DEFAULT_BENCHMARKS = {
         task_metadata=task_metadata("weblinx"),
     ),
     # from https://arxiv.org/abs/2503.04957
-    "safearena_all": lambda: Benchmark(
-        name="safenarena_all",
+    "safearena": lambda: Benchmark(
+        name="safearena",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
@@ -276,7 +276,7 @@ DEFAULT_BENCHMARKS = {
         task_metadata=task_metadata("safearena"),
     ),
     "safearena_harm": lambda: Benchmark(
-        name="safenarena_harm",
+        name="safearena_harm",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
@@ -290,7 +290,7 @@ DEFAULT_BENCHMARKS = {
     ),
 
     "safearena_safe": lambda: Benchmark(
-        name="safenarena_safe",
+        name="safearena_safe",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,

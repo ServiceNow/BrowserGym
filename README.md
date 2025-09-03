@@ -182,17 +182,17 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
-WebArena
+Safearena
 ```python
 import gymnasium as gym
-import browsergym.webarena  # register safearena tasks as gym environments
+import browsergym.safearena  # register safearena tasks as gym environments
 
 # start a webarena task
-env = gym.make("browsergym/safearena_all.110") # or safearena_safe, safearena_harm
+env = gym.make("browsergym/safearena.270") 
 ...
 
 # list all the available safearena tasks
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/safearena_all")]
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/safearena")]
 print("\n".join(env_ids))
 ```
 
@@ -231,7 +231,7 @@ python demo_agent/run_demo.py --task_name webarena.4
 python demo_agent/run_demo.py --task_name visualwebarena.398
 
 # safearena
-python demo_agent/run_demo.py --task_name safearena_all.4
+python demo_agent/run_demo.py --task_name safearena.270
 ```
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more!
