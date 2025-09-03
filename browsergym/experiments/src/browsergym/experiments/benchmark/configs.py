@@ -85,7 +85,7 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         strict=False,
         retry_with_force=True,
         demo_mode="off",
-    ),
+    )
 }
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = DEFAULT_BENCHMARKS["miniwob_all"]()`
@@ -260,4 +260,46 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("weblinx"),
     ),
+    # from https://arxiv.org/abs/2503.04957
+    "safearena": lambda: Benchmark(
+        name="safearena",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["safearena"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("safearena")),
+            max_steps=30,
+            n_repeats=1,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("safearena"),
+    ),
+    "safearena_harm": lambda: Benchmark(
+        name="safearena_harm",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["safearena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[f"safearena.{i}" for i in range(1, 250)],
+            max_steps=30,
+            fixed_seeds=[0],
+        ),
+        task_metadata=task_metadata("safearena"),
+    ),
+
+    "safearena_safe": lambda: Benchmark(
+        name="safearena_safe",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["safearena"],
+        env_args_list=make_env_args_list_from_fixed_seeds(
+            task_list=[f"safearena.{i}" for i in range(250, 500)],
+            max_steps=30,
+            fixed_seeds=[0],
+        ),
+        task_metadata=task_metadata("safearena"),
+    )
 }
