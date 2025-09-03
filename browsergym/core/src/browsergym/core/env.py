@@ -77,6 +77,7 @@ class BrowserEnv(gym.Env, ABC):
         # agent-related arguments
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         use_raw_page_output: bool = False,
+        pre_observation_delay: float = 0.5,  # seconds
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -98,7 +99,7 @@ class BrowserEnv(gym.Env, ABC):
             pw_context_kwargs: extra parameters for the playwright BrowserContext. Should only be used for debugging/testing.
             action_mapping: if set, the environment will use this function to map every received action to executable Python code.
             use_raw_page_output: if set, the environment will use the raw page output instead of the default processing.
-
+            pre_observation_delay: float = 0.5, number of seconds to wait before starting to extract the observation. This can be important if there are some auto-complete menu that may appear after filling a field.
         """
         super().__init__()
         self.task_entrypoint = task_entrypoint
@@ -118,6 +119,7 @@ class BrowserEnv(gym.Env, ABC):
         self.pw_context_kwargs = pw_context_kwargs
         self.action_mapping = action_mapping
         self.use_raw_page_output = use_raw_page_output
+        self.pre_observation_delay = pre_observation_delay
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -481,12 +483,18 @@ document.addEventListener("visibilitychange", () => {
         logger.debug("Action executed")
         info["action_exec_stop"] = time.time()
 
+        info["wait_for_page_loading_start"] = time.time()
         # wait a bit (for the JavaScript callback to set the active page)
-        time.sleep(0.5)  # wait for JS events to be fired (half a second)
+        logger.debug(f"Waiting {self.pre_observation_delay} seconds before extracting observation")
+        time.sleep(self.pre_observation_delay)  # wait for JS events to be fired
         self.context.cookies()  # trigger all waiting Playwright callbacks on the stack (hack, see https://playwright.dev/java/docs/multithreading)
 
         # wait for the network to idle before extracting the observation, reward etc.
         self._wait_dom_loaded()
+
+        info["wait_for_page_loading_stop"] = time.time()
+
+        info["validation_start"] = time.time()
 
         if validate:
             # after the action is executed, the active page might have changed
@@ -510,12 +518,16 @@ document.addEventListener("visibilitychange", () => {
             info["task_info"] = {}
             logger.debug("Task validation skipped")
 
+        info["validation_stop"] = time.time()
+
+        info["get_observation_start"] = time.time()
         # add any user message sent by the task to the chat
         if user_message:
             self.chat.add_message(role="user", msg=user_message)
 
         # extract observation (generic)
         obs = self._get_obs()
+        info["get_observation_stop"] = time.time()
         logger.debug("Observation extracted")
 
         # new step API wants a 5-tuple (gymnasium)

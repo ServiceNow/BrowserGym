@@ -552,6 +552,8 @@ Only a single action can be provided at once."""
                 }
                 if param.default == inspect.Parameter.empty:
                     parameters["required"].append(param_name)
+                else:
+                    parameters["properties"][param_name]["default"] = param.default
 
             # Construct the tool descriptor
             description = action.description
