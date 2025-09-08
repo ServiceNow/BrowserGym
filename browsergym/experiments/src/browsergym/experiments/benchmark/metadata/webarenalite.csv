@@ -1,0 +1,813 @@
+task_name,requires_reset,sites,eval_types,task_id,browsergym_split,depends_on
+webarenalite.0,False,shopping_admin,string_match,0,train,
+webarenalite.1,False,shopping_admin,string_match,1,test,webarenalite.0
+webarenalite.2,False,shopping_admin,string_match,2,train,webarenalite.1
+webarenalite.3,False,shopping_admin,string_match,3,test,webarenalite.2
+webarenalite.4,False,shopping_admin,string_match,4,train,webarenalite.3
+webarenalite.5,False,shopping_admin,string_match,5,train,webarenalite.4
+webarenalite.6,False,shopping_admin,string_match,6,test,webarenalite.5
+webarenalite.7,False,map,string_match,7,train,
+webarenalite.8,False,map,string_match,8,test,webarenalite.7
+webarenalite.9,False,map,string_match,9,test,webarenalite.8
+webarenalite.10,False,map,string_match,10,test,webarenalite.9
+webarenalite.11,False,shopping_admin,string_match,11,test,webarenalite.6
+webarenalite.12,False,shopping_admin,string_match,12,train,webarenalite.11
+webarenalite.13,False,shopping_admin,string_match,13,train,webarenalite.12
+webarenalite.14,False,shopping_admin,string_match,14,train,webarenalite.13
+webarenalite.15,False,shopping_admin,string_match,15,test,webarenalite.14
+webarenalite.16,False,map,string_match,16,test,webarenalite.10
+webarenalite.17,False,map,string_match,17,train,webarenalite.16
+webarenalite.18,False,map,string_match,18,test,webarenalite.17
+webarenalite.19,False,map,string_match,19,train,webarenalite.18
+webarenalite.20,False,map,string_match,20,test,webarenalite.19
+webarenalite.21,False,shopping,string_match,21,test,
+webarenalite.22,False,shopping,string_match,22,test,webarenalite.21
+webarenalite.23,False,shopping,string_match,23,test,webarenalite.22
+webarenalite.24,False,shopping,string_match,24,test,webarenalite.23
+webarenalite.25,False,shopping,string_match,25,test,webarenalite.24
+webarenalite.26,False,shopping,string_match,26,test,webarenalite.25
+webarenalite.27,False,reddit,string_match,27,test,
+webarenalite.28,False,reddit,string_match,28,train,webarenalite.27
+webarenalite.29,False,reddit,string_match,29,train,webarenalite.28
+webarenalite.30,False,reddit,string_match,30,test,webarenalite.29
+webarenalite.31,False,reddit,string_match,31,train,webarenalite.30
+webarenalite.32,False,map,string_match,32,test,webarenalite.20
+webarenalite.33,False,map,string_match,33,test,webarenalite.32
+webarenalite.34,False,map,string_match,34,train,webarenalite.33
+webarenalite.35,False,map,string_match,35,test,webarenalite.34
+webarenalite.36,False,map,string_match,36,test,webarenalite.35
+webarenalite.37,False,map,string_match,37,train,webarenalite.36
+webarenalite.38,False,map,string_match,38,train,webarenalite.37
+webarenalite.39,False,map,string_match,39,train,webarenalite.38
+webarenalite.40,False,map,string_match,40,test,webarenalite.39
+webarenalite.41,False,shopping_admin,string_match,41,train,webarenalite.15
+webarenalite.42,False,shopping_admin,string_match,42,train,webarenalite.41
+webarenalite.43,False,shopping_admin,string_match,43,test,webarenalite.42
+webarenalite.44,False,gitlab,url_match,44,train,
+webarenalite.45,False,gitlab,url_match,45,test,webarenalite.44
+webarenalite.46,False,gitlab,url_match,46,test,webarenalite.45
+webarenalite.47,False,shopping,string_match,47,train,webarenalite.26
+webarenalite.48,False,shopping,string_match,48,test,webarenalite.47
+webarenalite.49,False,shopping,string_match,49,train,webarenalite.48
+webarenalite.50,False,shopping,string_match,50,train,webarenalite.49
+webarenalite.51,False,shopping,string_match,51,test,webarenalite.50
+webarenalite.52,False,map,string_match,52,test,webarenalite.40
+webarenalite.53,False,map,string_match,53,train,webarenalite.52
+webarenalite.54,False,map,string_match,54,test,webarenalite.53
+webarenalite.55,False,map,string_match,55,train,webarenalite.54
+webarenalite.56,False,map,string_match,56,train,webarenalite.55
+webarenalite.57,False,map,string_match,57,train,webarenalite.56
+webarenalite.58,False,map,string_match,58,train,webarenalite.57
+webarenalite.59,False,map,string_match,59,test,webarenalite.58
+webarenalite.60,False,map,string_match,60,test,webarenalite.59
+webarenalite.61,False,map,string_match,61,train,webarenalite.60
+webarenalite.62,False,shopping_admin,string_match,62,train,webarenalite.43
+webarenalite.63,False,shopping_admin,string_match,63,test,webarenalite.62
+webarenalite.64,False,shopping_admin,string_match,64,test,webarenalite.63
+webarenalite.65,False,shopping_admin,string_match,65,train,webarenalite.64
+webarenalite.66,False,reddit,string_match,66,test,webarenalite.31
+webarenalite.67,False,reddit,string_match,67,test,webarenalite.66
+webarenalite.68,False,reddit,string_match,68,train,webarenalite.67
+webarenalite.69,False,reddit,string_match,69,test,webarenalite.68
+webarenalite.70,False,map,string_match,70,train,webarenalite.61
+webarenalite.71,False,map,string_match,71,test,webarenalite.70
+webarenalite.72,False,map,string_match,72,train,webarenalite.71
+webarenalite.73,False,map,string_match,73,test,webarenalite.72
+webarenalite.74,False,map,string_match,74,train,webarenalite.73
+webarenalite.75,False,map,string_match,75,train,webarenalite.74
+webarenalite.76,False,map,string_match,76,train,webarenalite.75
+webarenalite.77,False,shopping_admin,string_match,77,test,webarenalite.65
+webarenalite.78,False,shopping_admin,string_match,78,train,webarenalite.77
+webarenalite.79,False,shopping_admin,string_match,79,test,webarenalite.78
+webarenalite.80,False,map,string_match,80,test,webarenalite.76
+webarenalite.81,False,map,string_match,81,test,webarenalite.80
+webarenalite.82,False,map,string_match,82,train,webarenalite.81
+webarenalite.83,False,map,string_match,83,train,webarenalite.82
+webarenalite.84,False,map,string_match,84,train,webarenalite.83
+webarenalite.85,False,map,string_match,85,test,webarenalite.84
+webarenalite.86,False,map,string_match,86,test,webarenalite.85
+webarenalite.87,False,map,string_match,87,train,webarenalite.86
+webarenalite.88,False,map,string_match,88,train,webarenalite.87
+webarenalite.89,False,map,string_match,89,test,webarenalite.88
+webarenalite.90,False,map,string_match,90,test,webarenalite.89
+webarenalite.91,False,map,string_match,91,train,webarenalite.90
+webarenalite.92,False,map,string_match,92,train,webarenalite.91
+webarenalite.93,False,map,string_match,93,train,webarenalite.92
+webarenalite.94,False,shopping_admin,string_match,94,test,webarenalite.79
+webarenalite.95,False,shopping_admin,string_match,95,train,webarenalite.94
+webarenalite.96,False,shopping,string_match,96,test,webarenalite.51
+webarenalite.97,False,map wikipedia,string_match,97,test,webarenalite.93
+webarenalite.98,False,map,string_match,98,test,webarenalite.97
+webarenalite.99,False,map,string_match,99,train,webarenalite.98
+webarenalite.100,False,map,string_match,100,test,webarenalite.99
+webarenalite.101,False,map,string_match,101,train,webarenalite.100
+webarenalite.102,False,gitlab,url_match,102,train,webarenalite.46
+webarenalite.103,False,gitlab,url_match,103,train,webarenalite.102
+webarenalite.104,False,gitlab,url_match,104,test,webarenalite.103
+webarenalite.105,False,gitlab,url_match,105,train,webarenalite.104
+webarenalite.106,False,gitlab,url_match,106,test,webarenalite.105
+webarenalite.107,False,shopping_admin,string_match,107,test,webarenalite.95
+webarenalite.108,False,shopping_admin,string_match,108,train,webarenalite.107
+webarenalite.109,False,shopping_admin,string_match,109,test,webarenalite.108
+webarenalite.110,False,shopping_admin,string_match,110,train,webarenalite.109
+webarenalite.111,False,shopping_admin,string_match,111,train,webarenalite.110
+webarenalite.112,False,shopping_admin,string_match,112,test,webarenalite.111
+webarenalite.113,False,shopping_admin,string_match,113,test,webarenalite.112
+webarenalite.114,False,shopping_admin,string_match,114,train,webarenalite.113
+webarenalite.115,False,shopping_admin,string_match,115,test,webarenalite.114
+webarenalite.116,False,shopping_admin,string_match,116,test,webarenalite.115
+webarenalite.117,False,shopping,string_match,117,test,webarenalite.96
+webarenalite.118,False,shopping,program_html,118,train,webarenalite.117
+webarenalite.119,False,shopping_admin,string_match,119,test,webarenalite.116
+webarenalite.120,False,shopping_admin,string_match,120,train,webarenalite.119
+webarenalite.121,False,shopping_admin,string_match,121,train,webarenalite.120
+webarenalite.122,False,shopping_admin,string_match,122,test,webarenalite.121
+webarenalite.123,False,shopping_admin,string_match,123,train,webarenalite.122
+webarenalite.124,False,shopping,string_match,124,train,webarenalite.118
+webarenalite.125,False,shopping,string_match,125,train,webarenalite.124
+webarenalite.126,False,shopping,string_match,126,test,webarenalite.125
+webarenalite.127,False,shopping_admin,string_match,127,train,webarenalite.123
+webarenalite.128,False,shopping_admin,string_match,128,train,webarenalite.127
+webarenalite.129,False,shopping_admin,string_match,129,train,webarenalite.128
+webarenalite.130,False,shopping_admin,string_match,130,train,webarenalite.129
+webarenalite.131,False,shopping_admin,string_match,131,test,webarenalite.130
+webarenalite.132,False,gitlab,string_match,132,train,webarenalite.106
+webarenalite.133,False,gitlab,string_match,133,test,webarenalite.132
+webarenalite.134,False,gitlab,string_match,134,test,webarenalite.133
+webarenalite.135,False,gitlab,string_match,135,train,webarenalite.134
+webarenalite.136,False,gitlab,string_match,136,train,webarenalite.135
+webarenalite.137,False,map,string_match,137,test,webarenalite.101
+webarenalite.138,False,map,string_match,138,test,webarenalite.137
+webarenalite.139,False,map,string_match,139,test,webarenalite.138
+webarenalite.140,False,map,string_match,140,train,webarenalite.139
+webarenalite.141,False,shopping,string_match,141,train,webarenalite.126
+webarenalite.142,False,shopping,string_match,142,train,webarenalite.141
+webarenalite.143,False,shopping,string_match,143,test,webarenalite.142
+webarenalite.144,False,shopping,string_match,144,test,webarenalite.143
+webarenalite.145,False,shopping,string_match,145,train,webarenalite.144
+webarenalite.146,False,shopping,string_match,146,test,webarenalite.145
+webarenalite.147,False,shopping,string_match,147,train,webarenalite.146
+webarenalite.148,False,shopping,string_match,148,train,webarenalite.147
+webarenalite.149,False,shopping,string_match,149,test,webarenalite.148
+webarenalite.150,False,shopping,string_match,150,train,webarenalite.149
+webarenalite.151,False,map,string_match,151,train,webarenalite.140
+webarenalite.152,False,map,string_match,152,train,webarenalite.151
+webarenalite.153,False,map,string_match,153,test,webarenalite.152
+webarenalite.154,False,map,string_match,154,train,webarenalite.153
+webarenalite.155,False,map,string_match,155,test,webarenalite.154
+webarenalite.156,False,gitlab,url_match,156,test,webarenalite.136
+webarenalite.157,False,shopping_admin,url_match,157,train,webarenalite.131
+webarenalite.158,False,shopping,url_match,158,test,webarenalite.150
+webarenalite.159,False,shopping,url_match,159,train,webarenalite.158
+webarenalite.160,False,shopping,url_match,160,train,webarenalite.159
+webarenalite.161,False,shopping,url_match,161,train,webarenalite.160
+webarenalite.162,False,shopping,url_match,162,test,webarenalite.161
+webarenalite.163,False,shopping,string_match,163,test,webarenalite.162
+webarenalite.164,False,shopping,string_match,164,test,webarenalite.163
+webarenalite.165,False,shopping,string_match,165,test,webarenalite.164
+webarenalite.166,False,shopping,string_match,166,test,webarenalite.165
+webarenalite.167,False,shopping,string_match,167,test,webarenalite.166
+webarenalite.168,False,gitlab,string_match,168,test,webarenalite.156
+webarenalite.169,False,gitlab,string_match,169,train,webarenalite.168
+webarenalite.170,False,gitlab,string_match,170,train,webarenalite.169
+webarenalite.171,False,gitlab,string_match,171,test,webarenalite.170
+webarenalite.172,False,gitlab,string_match,172,train,webarenalite.171
+webarenalite.173,False,gitlab,string_match url_match,173,train,webarenalite.172
+webarenalite.174,False,gitlab,string_match url_match,174,test,webarenalite.173
+webarenalite.175,False,gitlab,string_match url_match,175,train,webarenalite.174
+webarenalite.176,False,gitlab,string_match url_match,176,train,webarenalite.175
+webarenalite.177,False,gitlab,string_match url_match,177,test,webarenalite.176
+webarenalite.178,False,gitlab,string_match url_match,178,test,webarenalite.177
+webarenalite.179,False,gitlab,string_match url_match,179,train,webarenalite.178
+webarenalite.180,False,gitlab,string_match url_match,180,train,webarenalite.179
+webarenalite.181,False,gitlab,string_match url_match,181,test,webarenalite.180
+webarenalite.182,False,gitlab,string_match url_match,182,train,webarenalite.181
+webarenalite.183,False,shopping_admin,string_match,183,train,webarenalite.157
+webarenalite.184,False,shopping_admin,string_match,184,train,webarenalite.183
+webarenalite.185,False,shopping_admin,string_match,185,test,webarenalite.184
+webarenalite.186,False,shopping_admin,string_match,186,train,webarenalite.185
+webarenalite.187,False,shopping_admin,string_match,187,test,webarenalite.186
+webarenalite.188,False,shopping,string_match,188,test,webarenalite.167
+webarenalite.189,False,shopping,string_match,189,train,webarenalite.188
+webarenalite.190,False,shopping,string_match,190,train,webarenalite.189
+webarenalite.191,False,shopping,string_match,191,train,webarenalite.190
+webarenalite.192,False,shopping,string_match,192,test,webarenalite.191
+webarenalite.193,False,shopping_admin,string_match,193,train,webarenalite.187
+webarenalite.194,False,shopping_admin,string_match,194,train,webarenalite.193
+webarenalite.195,False,shopping_admin,string_match,195,test,webarenalite.194
+webarenalite.196,False,shopping_admin,string_match,196,train,webarenalite.195
+webarenalite.197,False,shopping_admin,string_match,197,train,webarenalite.196
+webarenalite.198,False,shopping_admin,string_match,198,train,webarenalite.197
+webarenalite.199,False,shopping_admin,string_match,199,train,webarenalite.198
+webarenalite.200,False,shopping_admin,string_match,200,train,webarenalite.199
+webarenalite.201,False,shopping_admin,string_match,201,test,webarenalite.200
+webarenalite.202,False,shopping_admin,string_match,202,train,webarenalite.201
+webarenalite.203,False,shopping_admin,string_match,203,test,webarenalite.202
+webarenalite.204,False,shopping_admin,string_match,204,test,webarenalite.203
+webarenalite.205,False,gitlab,string_match,205,train,webarenalite.182
+webarenalite.206,False,gitlab,string_match,206,test,webarenalite.205
+webarenalite.207,False,gitlab,string_match,207,test,webarenalite.206
+webarenalite.208,False,shopping_admin,string_match,208,test,webarenalite.204
+webarenalite.209,False,shopping_admin,string_match,209,test,webarenalite.208
+webarenalite.210,False,shopping_admin,string_match,210,train,webarenalite.209
+webarenalite.211,False,shopping_admin,string_match,211,train,webarenalite.210
+webarenalite.212,False,shopping_admin,string_match,212,train,webarenalite.211
+webarenalite.213,False,shopping_admin,string_match,213,test,webarenalite.212
+webarenalite.214,False,shopping_admin,string_match,214,train,webarenalite.213
+webarenalite.215,False,shopping_admin,string_match,215,test,webarenalite.214
+webarenalite.216,False,shopping_admin,string_match,216,train,webarenalite.215
+webarenalite.217,False,shopping_admin,string_match,217,train,webarenalite.216
+webarenalite.218,False,map,string_match,218,train,webarenalite.155
+webarenalite.219,False,map,string_match,219,test,webarenalite.218
+webarenalite.220,False,map,string_match,220,train,webarenalite.219
+webarenalite.221,False,map,string_match,221,test,webarenalite.220
+webarenalite.222,False,map,string_match,222,train,webarenalite.221
+webarenalite.223,False,map,string_match,223,test,webarenalite.222
+webarenalite.224,False,map,string_match,224,test,webarenalite.223
+webarenalite.225,False,shopping,string_match,225,test,webarenalite.192
+webarenalite.226,False,shopping,string_match,226,train,webarenalite.225
+webarenalite.227,False,shopping,string_match,227,train,webarenalite.226
+webarenalite.228,False,shopping,string_match,228,test,webarenalite.227
+webarenalite.229,False,shopping,string_match,229,test,webarenalite.228
+webarenalite.230,False,shopping,string_match,230,train,webarenalite.229
+webarenalite.231,False,shopping,string_match,231,test,webarenalite.230
+webarenalite.232,False,shopping,string_match,232,train,webarenalite.231
+webarenalite.233,False,shopping,string_match,233,test,webarenalite.232
+webarenalite.234,False,shopping,string_match,234,train,webarenalite.233
+webarenalite.235,False,shopping,string_match,235,train,webarenalite.234
+webarenalite.236,False,map,string_match,236,train,webarenalite.224
+webarenalite.237,False,map,string_match,237,train,webarenalite.236
+webarenalite.238,False,shopping,url_match,238,train,webarenalite.235
+webarenalite.239,False,shopping,url_match,239,train,webarenalite.238
+webarenalite.240,False,shopping,url_match,240,test,webarenalite.239
+webarenalite.241,False,shopping,url_match,241,train,webarenalite.240
+webarenalite.242,False,shopping,url_match,242,test,webarenalite.241
+webarenalite.243,False,shopping_admin,string_match,243,train,webarenalite.217
+webarenalite.244,False,shopping_admin,string_match,244,test,webarenalite.243
+webarenalite.245,False,shopping_admin,string_match,245,train,webarenalite.244
+webarenalite.246,False,shopping_admin,string_match,246,test,webarenalite.245
+webarenalite.247,False,shopping_admin,string_match,247,train,webarenalite.246
+webarenalite.248,False,map,string_match,248,test,webarenalite.237
+webarenalite.249,False,map,string_match,249,train,webarenalite.248
+webarenalite.250,False,map,string_match,250,test,webarenalite.249
+webarenalite.251,False,map,string_match,251,train,webarenalite.250
+webarenalite.252,False,map,string_match,252,train,webarenalite.251
+webarenalite.253,False,map,string_match,253,test,webarenalite.252
+webarenalite.254,False,map,string_match,254,train,webarenalite.253
+webarenalite.255,False,map,string_match,255,test,webarenalite.254
+webarenalite.256,False,map,string_match,256,train,webarenalite.255
+webarenalite.257,False,map,string_match,257,test,webarenalite.256
+webarenalite.258,False,gitlab,url_match,258,train,webarenalite.207
+webarenalite.259,False,gitlab,string_match,259,train,webarenalite.258
+webarenalite.260,False,shopping,url_match,260,test,webarenalite.242
+webarenalite.261,False,shopping,url_match,261,train,webarenalite.260
+webarenalite.262,False,shopping,url_match,262,train,webarenalite.261
+webarenalite.263,False,shopping,url_match,263,test,webarenalite.262
+webarenalite.264,False,shopping,url_match,264,train,webarenalite.263
+webarenalite.265,False,wikipedia map,string_match,265,test,webarenalite.257
+webarenalite.266,False,wikipedia map,string_match,266,test,webarenalite.265
+webarenalite.267,False,wikipedia map,string_match,267,train,webarenalite.266
+webarenalite.268,False,wikipedia map,string_match,268,test,webarenalite.267
+webarenalite.269,False,shopping,url_match,269,train,webarenalite.264
+webarenalite.270,False,shopping,url_match,270,train,webarenalite.269
+webarenalite.271,False,shopping,url_match,271,test,webarenalite.270
+webarenalite.272,False,shopping,url_match,272,test,webarenalite.271
+webarenalite.273,False,shopping,url_match,273,train,webarenalite.272
+webarenalite.274,False,shopping,url_match,274,test,webarenalite.273
+webarenalite.275,False,shopping,url_match,275,test,webarenalite.274
+webarenalite.276,False,shopping,url_match,276,train,webarenalite.275
+webarenalite.277,False,shopping,url_match,277,train,webarenalite.276
+webarenalite.278,False,shopping,url_match,278,train,webarenalite.277
+webarenalite.279,False,shopping,string_match,279,train,webarenalite.278
+webarenalite.280,False,shopping,string_match,280,test,webarenalite.279
+webarenalite.281,False,shopping,string_match,281,train,webarenalite.280
+webarenalite.282,False,shopping,string_match,282,train,webarenalite.281
+webarenalite.283,False,shopping,url_match,283,test,webarenalite.282
+webarenalite.284,False,shopping,url_match,284,test,webarenalite.283
+webarenalite.285,False,shopping,url_match,285,train,webarenalite.284
+webarenalite.286,False,shopping,url_match,286,test,webarenalite.285
+webarenalite.287,False,map,string_match,287,test,webarenalite.268
+webarenalite.288,False,shopping_admin,string_match,288,train,webarenalite.247
+webarenalite.289,False,shopping_admin,string_match,289,test,webarenalite.288
+webarenalite.290,False,shopping_admin,string_match,290,train,webarenalite.289
+webarenalite.291,False,shopping_admin,string_match,291,train,webarenalite.290
+webarenalite.292,False,shopping_admin,string_match,292,test,webarenalite.291
+webarenalite.293,False,gitlab,string_match,293,train,webarenalite.259
+webarenalite.294,False,gitlab,string_match,294,train,webarenalite.293
+webarenalite.295,False,gitlab,string_match,295,test,webarenalite.294
+webarenalite.296,False,gitlab,string_match,296,train,webarenalite.295
+webarenalite.297,False,gitlab,string_match,297,test,webarenalite.296
+webarenalite.298,False,shopping,url_match,298,train,webarenalite.286
+webarenalite.299,False,shopping,url_match,299,train,webarenalite.298
+webarenalite.300,False,shopping,url_match,300,test,webarenalite.299
+webarenalite.301,False,shopping,string_match,301,test,webarenalite.300
+webarenalite.302,False,shopping,string_match,302,train,webarenalite.301
+webarenalite.303,False,gitlab,string_match,303,test,webarenalite.297
+webarenalite.304,False,gitlab,string_match,304,train,webarenalite.303
+webarenalite.305,False,gitlab,string_match,305,train,webarenalite.304
+webarenalite.306,False,gitlab,string_match,306,test,webarenalite.305
+webarenalite.307,False,gitlab,string_match,307,train,webarenalite.306
+webarenalite.308,False,gitlab,string_match,308,train,webarenalite.307
+webarenalite.309,False,gitlab,string_match,309,train,webarenalite.308
+webarenalite.310,False,gitlab,string_match,310,train,webarenalite.309
+webarenalite.311,False,gitlab,string_match,311,test,webarenalite.310
+webarenalite.312,False,gitlab,string_match,312,test,webarenalite.311
+webarenalite.313,False,shopping,string_match,313,train,webarenalite.302
+webarenalite.314,False,gitlab,string_match,314,train,webarenalite.312
+webarenalite.315,False,gitlab,string_match,315,train,webarenalite.314
+webarenalite.316,False,gitlab,string_match,316,test,webarenalite.315
+webarenalite.317,False,gitlab,string_match,317,test,webarenalite.316
+webarenalite.318,False,gitlab,string_match,318,train,webarenalite.317
+webarenalite.319,False,shopping,string_match,319,train,webarenalite.313
+webarenalite.320,False,shopping,string_match,320,test,webarenalite.319
+webarenalite.321,False,shopping,string_match,321,train,webarenalite.320
+webarenalite.322,False,shopping,string_match,322,test,webarenalite.321
+webarenalite.323,False,shopping,string_match,323,train,webarenalite.322
+webarenalite.324,False,shopping,url_match,324,train,webarenalite.323
+webarenalite.325,False,shopping,url_match,325,test,webarenalite.324
+webarenalite.326,False,shopping,url_match,326,train,webarenalite.325
+webarenalite.327,False,shopping,url_match,327,test,webarenalite.326
+webarenalite.328,False,shopping,url_match,328,train,webarenalite.327
+webarenalite.329,False,shopping,string_match,329,test,webarenalite.328
+webarenalite.330,False,shopping,string_match,330,test,webarenalite.329
+webarenalite.331,False,shopping,string_match,331,test,webarenalite.330
+webarenalite.332,False,shopping,string_match,332,train,webarenalite.331
+webarenalite.333,False,shopping,string_match,333,train,webarenalite.332
+webarenalite.334,False,shopping,string_match,334,train,webarenalite.333
+webarenalite.335,False,shopping,string_match,335,train,webarenalite.334
+webarenalite.336,False,shopping,string_match,336,test,webarenalite.335
+webarenalite.337,False,shopping,string_match,337,test,webarenalite.336
+webarenalite.338,False,shopping,string_match,338,train,webarenalite.337
+webarenalite.339,False,gitlab,url_match,339,test,webarenalite.318
+webarenalite.340,False,gitlab,url_match,340,train,webarenalite.339
+webarenalite.341,False,gitlab,url_match,341,test,webarenalite.340
+webarenalite.342,False,gitlab,url_match,342,test,webarenalite.341
+webarenalite.343,False,gitlab,url_match,343,test,webarenalite.342
+webarenalite.344,False,shopping_admin,string_match,344,test,webarenalite.292
+webarenalite.345,False,shopping_admin,string_match,345,train,webarenalite.344
+webarenalite.346,False,shopping_admin,string_match,346,train,webarenalite.345
+webarenalite.347,False,shopping_admin,string_match,347,train,webarenalite.346
+webarenalite.348,False,shopping_admin,string_match,348,test,webarenalite.347
+webarenalite.349,False,gitlab,string_match,349,test,webarenalite.343
+webarenalite.350,False,gitlab,string_match,350,test,webarenalite.349
+webarenalite.351,False,shopping,url_match,351,train,webarenalite.338
+webarenalite.352,False,shopping,url_match,352,test,webarenalite.351
+webarenalite.353,False,shopping,url_match,353,test,webarenalite.352
+webarenalite.354,False,shopping,url_match,354,train,webarenalite.353
+webarenalite.355,False,shopping,url_match,355,train,webarenalite.354
+webarenalite.356,False,map,program_html,356,test,webarenalite.287
+webarenalite.357,False,gitlab,url_match,357,test,webarenalite.350
+webarenalite.358,False,shopping,string_match,358,train,webarenalite.355
+webarenalite.359,False,shopping,string_match,359,test,webarenalite.358
+webarenalite.360,False,shopping,string_match,360,train,webarenalite.359
+webarenalite.361,False,shopping,string_match,361,train,webarenalite.360
+webarenalite.362,False,shopping,string_match,362,test,webarenalite.361
+webarenalite.363,False,map,string_match,363,train,webarenalite.356
+webarenalite.364,False,map,string_match,364,test,webarenalite.363
+webarenalite.365,False,map,string_match,365,test,webarenalite.364
+webarenalite.366,False,map,string_match,366,train,webarenalite.365
+webarenalite.367,False,map,string_match,367,train,webarenalite.366
+webarenalite.368,False,shopping,string_match,368,test,webarenalite.362
+webarenalite.369,False,map,program_html,369,train,webarenalite.367
+webarenalite.370,False,map,program_html,370,test,webarenalite.369
+webarenalite.371,False,map,program_html,371,test,webarenalite.370
+webarenalite.372,False,map,program_html,372,train,webarenalite.371
+webarenalite.373,False,map,program_html,373,train,webarenalite.372
+webarenalite.374,False,shopping_admin,url_match,374,train,webarenalite.348
+webarenalite.375,False,shopping_admin,url_match,375,train,webarenalite.374
+webarenalite.376,False,shopping,string_match,376,test,webarenalite.368
+webarenalite.377,False,map,url_match,377,test,webarenalite.373
+webarenalite.378,False,map,url_match,378,train,webarenalite.377
+webarenalite.379,False,map,url_match,379,train,webarenalite.378
+webarenalite.380,False,map,url_match,380,test,webarenalite.379
+webarenalite.381,False,map,url_match,381,train,webarenalite.380
+webarenalite.382,False,map,string_match,382,test,webarenalite.381
+webarenalite.383,False,map,string_match,383,test,webarenalite.382
+webarenalite.384,False,shopping,string_match,384,test,webarenalite.376
+webarenalite.385,False,shopping,string_match,385,train,webarenalite.384
+webarenalite.386,False,shopping,string_match,386,test,webarenalite.385
+webarenalite.387,False,shopping,string_match,387,train,webarenalite.386
+webarenalite.388,False,shopping,string_match,388,test,webarenalite.387
+webarenalite.389,False,gitlab,program_html,389,test,webarenalite.357
+webarenalite.390,False,gitlab,program_html,390,train,webarenalite.389
+webarenalite.391,False,gitlab,program_html,391,train,webarenalite.390
+webarenalite.392,False,gitlab,program_html,392,test,webarenalite.391
+webarenalite.393,False,gitlab,program_html,393,train,webarenalite.392
+webarenalite.394,False,gitlab,program_html,394,test,webarenalite.393
+webarenalite.395,False,gitlab,program_html,395,train,webarenalite.394
+webarenalite.396,False,gitlab,program_html,396,train,webarenalite.395
+webarenalite.397,False,gitlab,program_html,397,train,webarenalite.396
+webarenalite.398,False,gitlab,program_html,398,test,webarenalite.397
+webarenalite.399,False,reddit,program_html,399,train,webarenalite.69
+webarenalite.400,False,reddit,program_html,400,test,webarenalite.399
+webarenalite.401,False,reddit,program_html,401,train,webarenalite.400
+webarenalite.402,False,reddit,program_html,402,train,webarenalite.401
+webarenalite.403,False,reddit,program_html,403,test,webarenalite.402
+webarenalite.404,False,reddit,program_html,404,train,webarenalite.403
+webarenalite.405,False,reddit,program_html,405,test,webarenalite.404
+webarenalite.406,False,reddit,program_html,406,train,webarenalite.405
+webarenalite.407,False,reddit,program_html,407,test,webarenalite.406
+webarenalite.408,False,reddit,program_html,408,train,webarenalite.407
+webarenalite.409,False,reddit,program_html,409,test,webarenalite.408
+webarenalite.410,False,reddit,program_html,410,test,webarenalite.409
+webarenalite.411,False,gitlab,program_html,411,test,webarenalite.398
+webarenalite.412,False,gitlab,program_html,412,test,webarenalite.411
+webarenalite.413,False,gitlab,program_html,413,test,webarenalite.412
+webarenalite.414,False,gitlab,program_html,414,test,webarenalite.413
+webarenalite.415,False,gitlab,program_html,415,test,webarenalite.414
+webarenalite.416,False,gitlab,program_html,416,test,webarenalite.415
+webarenalite.417,False,gitlab,program_html,417,test,webarenalite.416
+webarenalite.418,False,gitlab,program_html,418,train,webarenalite.417
+webarenalite.419,False,gitlab,program_html,419,test,webarenalite.418
+webarenalite.420,False,gitlab,program_html,420,test,webarenalite.419
+webarenalite.421,False,gitlab,program_html,421,train,webarenalite.420
+webarenalite.422,False,gitlab,program_html,422,train,webarenalite.421
+webarenalite.423,False,shopping_admin,program_html,423,train,webarenalite.375
+webarenalite.424,False,wikipedia map,program_html,424,train,webarenalite.383
+webarenalite.425,False,wikipedia map,program_html,425,train,webarenalite.424
+webarenalite.426,False,wikipedia map,program_html,426,test,webarenalite.425
+webarenalite.427,False,wikipedia map,program_html,427,test,webarenalite.426
+webarenalite.428,False,wikipedia map,program_html,428,train,webarenalite.427
+webarenalite.429,False,wikipedia map,program_html,429,train,webarenalite.428
+webarenalite.430,False,wikipedia map,program_html,430,test,webarenalite.429
+webarenalite.431,False,shopping,program_html,431,train,webarenalite.388
+webarenalite.432,False,shopping,program_html,432,test,webarenalite.431
+webarenalite.433,False,shopping,program_html,433,train,webarenalite.432
+webarenalite.434,False,shopping,program_html,434,train,webarenalite.433
+webarenalite.435,False,shopping,program_html,435,train,webarenalite.434
+webarenalite.436,False,shopping,program_html,436,test,webarenalite.435
+webarenalite.437,False,shopping,program_html,437,train,webarenalite.436
+webarenalite.438,False,shopping,program_html,438,train,webarenalite.437
+webarenalite.439,False,shopping,program_html,439,train,webarenalite.438
+webarenalite.440,False,shopping,program_html,440,test,webarenalite.439
+webarenalite.441,False,gitlab,program_html,441,train,webarenalite.422
+webarenalite.442,False,gitlab,program_html,442,train,webarenalite.441
+webarenalite.443,False,gitlab,program_html,443,test,webarenalite.442
+webarenalite.444,False,gitlab,program_html,444,train,webarenalite.443
+webarenalite.445,False,gitlab,program_html,445,test,webarenalite.444
+webarenalite.446,False,gitlab,program_html,446,test,webarenalite.445
+webarenalite.447,False,gitlab,program_html,447,train,webarenalite.446
+webarenalite.448,False,gitlab,program_html,448,test,webarenalite.447
+webarenalite.449,False,gitlab,program_html,449,test,webarenalite.448
+webarenalite.450,False,gitlab,program_html,450,train,webarenalite.449
+webarenalite.451,False,gitlab,program_html,451,train,webarenalite.450
+webarenalite.452,False,gitlab,program_html,452,train,webarenalite.451
+webarenalite.453,False,shopping_admin,program_html,453,train,webarenalite.423
+webarenalite.454,False,shopping_admin,program_html,454,test,webarenalite.453
+webarenalite.455,False,shopping_admin,program_html,455,train,webarenalite.454
+webarenalite.456,False,shopping_admin,program_html,456,test,webarenalite.455
+webarenalite.457,False,shopping_admin,program_html,457,train,webarenalite.456
+webarenalite.458,False,shopping_admin,program_html,458,test,webarenalite.457
+webarenalite.459,False,shopping_admin,program_html,459,test,webarenalite.458
+webarenalite.460,False,shopping_admin,program_html,460,train,webarenalite.459
+webarenalite.461,False,shopping_admin,program_html,461,train,webarenalite.460
+webarenalite.462,False,shopping_admin,program_html,462,test,webarenalite.461
+webarenalite.463,False,shopping_admin,program_html,463,test,webarenalite.462
+webarenalite.464,False,shopping_admin,program_html,464,train,webarenalite.463
+webarenalite.465,False,shopping,program_html,465,train,webarenalite.440
+webarenalite.466,False,shopping,program_html,466,train,webarenalite.465
+webarenalite.467,False,shopping,program_html,467,train,webarenalite.466
+webarenalite.468,False,shopping,program_html,468,test,webarenalite.467
+webarenalite.469,False,shopping,program_html,469,test,webarenalite.468
+webarenalite.470,False,shopping_admin,program_html,470,test,webarenalite.464
+webarenalite.471,False,shopping_admin,program_html,471,test,webarenalite.470
+webarenalite.472,False,shopping_admin,program_html,472,train,webarenalite.471
+webarenalite.473,False,shopping_admin,program_html,473,train,webarenalite.472
+webarenalite.474,False,shopping_admin,program_html,474,train,webarenalite.473
+webarenalite.475,False,gitlab,program_html,475,train,webarenalite.452
+webarenalite.476,False,gitlab,program_html,476,train,webarenalite.475
+webarenalite.477,False,gitlab,program_html,477,train,webarenalite.476
+webarenalite.478,False,gitlab,program_html,478,test,webarenalite.477
+webarenalite.479,False,gitlab,program_html,479,test,webarenalite.478
+webarenalite.480,False,gitlab,program_html,480,train,webarenalite.479
+webarenalite.481,False,gitlab,program_html,481,train,webarenalite.480
+webarenalite.482,False,gitlab,program_html,482,train,webarenalite.481
+webarenalite.483,False,gitlab,program_html,483,test,webarenalite.482
+webarenalite.484,False,gitlab,program_html,484,train,webarenalite.483
+webarenalite.485,False,gitlab,program_html,485,test,webarenalite.484
+webarenalite.486,False,shopping_admin,program_html,486,train,webarenalite.474
+webarenalite.487,False,shopping_admin,program_html,487,test,webarenalite.486
+webarenalite.488,False,shopping_admin,program_html,488,test,webarenalite.487
+webarenalite.489,False,shopping_admin,program_html,489,train,webarenalite.488
+webarenalite.490,False,shopping_admin,program_html,490,train,webarenalite.489
+webarenalite.491,False,shopping_admin,string_match,491,test,webarenalite.490
+webarenalite.492,False,shopping_admin,program_html,492,train,webarenalite.491
+webarenalite.493,False,shopping_admin,program_html,493,train,webarenalite.492
+webarenalite.494,False,shopping_admin,program_html,494,train,webarenalite.493
+webarenalite.495,False,shopping_admin,program_html,495,test,webarenalite.494
+webarenalite.496,False,shopping_admin,program_html,496,train,webarenalite.495
+webarenalite.497,False,shopping_admin,program_html,497,test,webarenalite.496
+webarenalite.498,False,shopping_admin,program_html,498,test,webarenalite.497
+webarenalite.499,False,shopping_admin,program_html,499,train,webarenalite.498
+webarenalite.500,False,shopping_admin,program_html,500,train,webarenalite.499
+webarenalite.501,False,shopping_admin,program_html,501,train,webarenalite.500
+webarenalite.502,False,shopping_admin,program_html,502,test,webarenalite.501
+webarenalite.503,False,shopping_admin,program_html,503,train,webarenalite.502
+webarenalite.504,False,shopping_admin,program_html,504,test,webarenalite.503
+webarenalite.505,False,shopping_admin,program_html,505,train,webarenalite.504
+webarenalite.506,False,shopping,program_html,506,train,webarenalite.469
+webarenalite.507,False,shopping,program_html,507,train,webarenalite.506
+webarenalite.508,False,shopping,program_html,508,test,webarenalite.507
+webarenalite.509,False,shopping,program_html,509,test,webarenalite.508
+webarenalite.510,False,shopping,program_html,510,test,webarenalite.509
+webarenalite.511,False,shopping,program_html,511,test,webarenalite.510
+webarenalite.512,False,shopping,program_html,512,train,webarenalite.511
+webarenalite.513,False,shopping,program_html,513,train,webarenalite.512
+webarenalite.514,False,shopping,program_html,514,test,webarenalite.513
+webarenalite.515,False,shopping,program_html,515,train,webarenalite.514
+webarenalite.516,False,shopping,program_html,516,train,webarenalite.515
+webarenalite.517,False,shopping,program_html,517,test,webarenalite.516
+webarenalite.518,False,shopping,program_html,518,test,webarenalite.517
+webarenalite.519,False,shopping,program_html,519,test,webarenalite.518
+webarenalite.520,False,shopping,program_html,520,train,webarenalite.519
+webarenalite.521,False,shopping,program_html,521,test,webarenalite.520
+webarenalite.522,False,gitlab,program_html,522,test,webarenalite.485
+webarenalite.523,False,gitlab,program_html,523,train,webarenalite.522
+webarenalite.524,False,gitlab,program_html,524,test,webarenalite.523
+webarenalite.525,False,gitlab,program_html,525,train,webarenalite.524
+webarenalite.526,False,gitlab,program_html,526,train,webarenalite.525
+webarenalite.527,False,gitlab,program_html,527,test,webarenalite.526
+webarenalite.528,False,shopping,program_html,528,train,webarenalite.521
+webarenalite.529,False,shopping,program_html,529,test,webarenalite.528
+webarenalite.530,False,shopping,program_html,530,test,webarenalite.529
+webarenalite.531,False,shopping,program_html,531,train,webarenalite.530
+webarenalite.532,False,shopping,program_html,532,train,webarenalite.531
+webarenalite.533,False,gitlab,program_html,533,test,webarenalite.527
+webarenalite.534,False,gitlab,program_html,534,train,webarenalite.533
+webarenalite.535,False,gitlab,program_html,535,test,webarenalite.534
+webarenalite.536,False,gitlab,program_html,536,train,webarenalite.535
+webarenalite.537,False,gitlab,program_html,537,train,webarenalite.536
+webarenalite.538,False,shopping_admin,program_html,538,train,webarenalite.505
+webarenalite.539,False,shopping_admin,program_html,539,train,webarenalite.538
+webarenalite.540,False,shopping_admin,program_html,540,test,webarenalite.539
+webarenalite.541,False,shopping_admin,program_html,541,test,webarenalite.540
+webarenalite.542,False,shopping_admin,program_html,542,train,webarenalite.541
+webarenalite.543,False,shopping_admin,program_html,543,test,webarenalite.542
+webarenalite.544,False,shopping_admin,program_html,544,test,webarenalite.543
+webarenalite.545,False,shopping_admin,program_html,545,test,webarenalite.544
+webarenalite.546,False,shopping_admin,program_html,546,train,webarenalite.545
+webarenalite.547,False,shopping_admin,program_html,547,train,webarenalite.546
+webarenalite.548,False,shopping_admin,program_html,548,train,webarenalite.547
+webarenalite.549,False,shopping_admin,program_html,549,test,webarenalite.548
+webarenalite.550,False,shopping_admin,program_html,550,train,webarenalite.549
+webarenalite.551,False,shopping_admin,program_html,551,test,webarenalite.550
+webarenalite.552,False,gitlab reddit,program_html,552,test,webarenalite.537 webarenalite.410
+webarenalite.553,False,gitlab reddit,program_html,553,test,webarenalite.552
+webarenalite.554,False,gitlab reddit,program_html,554,test,webarenalite.553
+webarenalite.555,False,gitlab reddit,program_html,555,test,webarenalite.554
+webarenalite.556,False,gitlab wikipedia,program_html,556,train,webarenalite.555
+webarenalite.557,False,gitlab wikipedia,program_html,557,test,webarenalite.556
+webarenalite.558,False,gitlab wikipedia,program_html,558,train,webarenalite.557
+webarenalite.559,False,gitlab wikipedia,program_html,559,train,webarenalite.558
+webarenalite.560,False,gitlab wikipedia,program_html,560,test,webarenalite.559
+webarenalite.561,False,gitlab wikipedia,program_html,561,test,webarenalite.560
+webarenalite.562,False,gitlab reddit,program_html,562,train,webarenalite.561 webarenalite.555
+webarenalite.563,False,gitlab reddit,program_html,563,train,webarenalite.562
+webarenalite.564,False,gitlab reddit,program_html,564,train,webarenalite.563
+webarenalite.565,False,gitlab reddit,program_html,565,test,webarenalite.564
+webarenalite.566,False,gitlab reddit,program_html,566,test,webarenalite.565
+webarenalite.567,False,gitlab,program_html,567,test,webarenalite.566
+webarenalite.568,False,gitlab,program_html,568,train,webarenalite.567
+webarenalite.569,False,gitlab,program_html,569,train,webarenalite.568
+webarenalite.570,False,gitlab,program_html,570,test,webarenalite.569
+webarenalite.571,False,shopping,program_html,571,test,webarenalite.532
+webarenalite.572,False,shopping,program_html,572,train,webarenalite.571
+webarenalite.573,False,shopping,program_html,573,train,webarenalite.572
+webarenalite.574,False,shopping,program_html,574,test,webarenalite.573
+webarenalite.575,False,shopping,program_html,575,train,webarenalite.574
+webarenalite.576,False,gitlab,program_html,576,test,webarenalite.570
+webarenalite.577,False,gitlab,program_html,577,train,webarenalite.576
+webarenalite.578,False,gitlab,program_html,578,test,webarenalite.577
+webarenalite.579,False,gitlab,program_html,579,train,webarenalite.578
+webarenalite.580,False,reddit,program_html,580,train,webarenalite.566
+webarenalite.581,False,reddit,program_html,581,train,webarenalite.580
+webarenalite.582,False,reddit,program_html,582,test,webarenalite.581
+webarenalite.583,False,reddit,program_html,583,test,webarenalite.582
+webarenalite.584,False,reddit,program_html,584,train,webarenalite.583
+webarenalite.585,False,shopping,program_html,585,train,webarenalite.575
+webarenalite.586,False,shopping,program_html,586,test,webarenalite.585
+webarenalite.587,False,shopping,program_html,587,train,webarenalite.586
+webarenalite.588,False,shopping,program_html,588,train,webarenalite.587
+webarenalite.589,False,shopping,program_html,589,test,webarenalite.588
+webarenalite.590,False,gitlab,url_match program_html,590,train,webarenalite.579
+webarenalite.591,False,gitlab,url_match program_html,591,test,webarenalite.590
+webarenalite.592,False,gitlab,url_match program_html,592,test,webarenalite.591
+webarenalite.593,False,gitlab,url_match program_html,593,test,webarenalite.592
+webarenalite.594,False,gitlab,url_match program_html,594,train,webarenalite.593
+webarenalite.595,False,reddit,url_match program_html,595,train,webarenalite.584
+webarenalite.596,False,reddit,url_match program_html,596,test,webarenalite.595
+webarenalite.597,False,reddit,url_match program_html,597,train,webarenalite.596
+webarenalite.598,False,reddit,url_match program_html,598,train,webarenalite.597
+webarenalite.599,False,reddit,url_match program_html,599,test,webarenalite.598
+webarenalite.600,False,reddit,url_match program_html,600,test,webarenalite.599
+webarenalite.601,False,reddit,url_match program_html,601,train,webarenalite.600
+webarenalite.602,False,reddit,url_match program_html,602,train,webarenalite.601
+webarenalite.603,False,reddit,url_match program_html,603,train,webarenalite.602
+webarenalite.604,False,reddit,url_match program_html,604,test,webarenalite.603
+webarenalite.605,False,reddit,url_match program_html,605,train,webarenalite.604
+webarenalite.606,False,reddit,url_match program_html,606,train,webarenalite.605
+webarenalite.607,False,reddit,url_match program_html,607,test,webarenalite.606
+webarenalite.608,False,reddit,url_match program_html,608,test,webarenalite.607
+webarenalite.609,False,reddit,url_match program_html,609,train,webarenalite.608
+webarenalite.610,False,reddit,url_match program_html,610,train,webarenalite.609
+webarenalite.611,False,reddit,url_match program_html,611,train,webarenalite.610
+webarenalite.612,False,reddit,url_match program_html,612,test,webarenalite.611
+webarenalite.613,False,reddit,url_match program_html,613,train,webarenalite.612
+webarenalite.614,False,reddit,url_match program_html,614,test,webarenalite.613
+webarenalite.615,False,reddit,url_match program_html,615,test,webarenalite.614
+webarenalite.616,False,reddit,url_match program_html,616,test,webarenalite.615
+webarenalite.617,False,reddit,url_match program_html,617,train,webarenalite.616
+webarenalite.618,False,reddit,url_match program_html,618,train,webarenalite.617
+webarenalite.619,False,reddit,url_match program_html,619,train,webarenalite.618
+webarenalite.620,False,reddit,url_match program_html,620,train,webarenalite.619
+webarenalite.621,False,reddit,url_match program_html,621,train,webarenalite.620
+webarenalite.622,False,reddit,url_match program_html,622,train,webarenalite.621
+webarenalite.623,False,reddit,url_match program_html,623,test,webarenalite.622
+webarenalite.624,False,reddit,url_match program_html,624,test,webarenalite.623
+webarenalite.625,False,reddit,url_match program_html,625,train,webarenalite.624
+webarenalite.626,False,reddit,url_match program_html,626,train,webarenalite.625
+webarenalite.627,False,reddit,url_match program_html,627,train,webarenalite.626
+webarenalite.628,False,reddit,url_match program_html,628,test,webarenalite.627
+webarenalite.629,False,reddit,url_match program_html,629,test,webarenalite.628
+webarenalite.630,False,reddit,url_match program_html,630,test,webarenalite.629
+webarenalite.631,False,reddit,url_match program_html,631,train,webarenalite.630
+webarenalite.632,False,reddit,url_match program_html,632,train,webarenalite.631
+webarenalite.633,False,reddit,url_match program_html,633,test,webarenalite.632
+webarenalite.634,False,reddit,url_match program_html,634,train,webarenalite.633
+webarenalite.635,False,reddit,url_match program_html,635,train,webarenalite.634
+webarenalite.636,False,reddit,url_match program_html,636,train,webarenalite.635
+webarenalite.637,False,reddit,url_match program_html,637,train,webarenalite.636
+webarenalite.638,False,reddit,url_match program_html,638,test,webarenalite.637
+webarenalite.639,False,reddit,url_match program_html,639,test,webarenalite.638
+webarenalite.640,False,reddit,url_match program_html,640,train,webarenalite.639
+webarenalite.641,False,reddit,url_match program_html,641,test,webarenalite.640
+webarenalite.642,False,reddit,url_match program_html,642,test,webarenalite.641
+webarenalite.643,False,reddit,url_match program_html,643,train,webarenalite.642
+webarenalite.644,False,reddit,url_match program_html,644,train,webarenalite.643
+webarenalite.645,False,reddit,url_match program_html,645,train,webarenalite.644
+webarenalite.646,False,reddit,url_match program_html,646,train,webarenalite.645
+webarenalite.647,False,reddit,url_match program_html,647,train,webarenalite.646
+webarenalite.648,False,reddit,url_match program_html,648,test,webarenalite.647
+webarenalite.649,False,reddit,url_match program_html,649,test,webarenalite.648
+webarenalite.650,False,reddit,url_match program_html,650,train,webarenalite.649
+webarenalite.651,False,reddit,url_match program_html,651,train,webarenalite.650
+webarenalite.652,False,reddit,url_match program_html,652,train,webarenalite.651
+webarenalite.653,False,shopping,url_match program_html,653,train,webarenalite.589
+webarenalite.654,False,shopping,url_match program_html,654,test,webarenalite.653
+webarenalite.655,False,shopping,url_match program_html,655,test,webarenalite.654
+webarenalite.656,False,shopping,url_match program_html,656,train,webarenalite.655
+webarenalite.657,False,shopping,url_match program_html,657,train,webarenalite.656
+webarenalite.658,False,gitlab,url_match program_html,658,train,webarenalite.594
+webarenalite.659,False,gitlab,url_match program_html,659,test,webarenalite.658
+webarenalite.660,False,gitlab,url_match program_html,660,test,webarenalite.659
+webarenalite.661,False,gitlab,url_match program_html,661,test,webarenalite.660
+webarenalite.662,False,gitlab,url_match program_html,662,train,webarenalite.661
+webarenalite.663,False,gitlab,url_match program_html,663,train,webarenalite.662
+webarenalite.664,False,gitlab,url_match program_html,664,test,webarenalite.663
+webarenalite.665,False,gitlab,url_match program_html,665,train,webarenalite.664
+webarenalite.666,False,gitlab,url_match program_html,666,test,webarenalite.665
+webarenalite.667,False,gitlab,url_match program_html,667,test,webarenalite.666
+webarenalite.668,False,gitlab,url_match program_html,668,test,webarenalite.667
+webarenalite.669,False,gitlab,url_match program_html,669,test,webarenalite.668
+webarenalite.670,False,gitlab,url_match program_html,670,train,webarenalite.669
+webarenalite.671,False,shopping reddit,url_match program_html,671,train,webarenalite.657 webarenalite.652
+webarenalite.672,False,shopping reddit,url_match program_html,672,train,webarenalite.671
+webarenalite.673,False,shopping reddit,url_match program_html,673,test,webarenalite.672
+webarenalite.674,False,shopping reddit,url_match program_html,674,test,webarenalite.673
+webarenalite.675,False,shopping reddit,url_match program_html,675,train,webarenalite.674
+webarenalite.676,False,shopping_admin,url_match program_html,676,test,webarenalite.551
+webarenalite.677,False,shopping_admin,url_match program_html,677,test,webarenalite.676
+webarenalite.678,False,shopping_admin,url_match program_html,678,train,webarenalite.677
+webarenalite.679,False,shopping_admin,url_match program_html,679,train,webarenalite.678
+webarenalite.680,False,shopping_admin,url_match program_html,680,train,webarenalite.679
+webarenalite.681,False,reddit gitlab,url_match program_html,681,train,webarenalite.675 webarenalite.670
+webarenalite.682,False,reddit gitlab,url_match program_html,682,train,webarenalite.681
+webarenalite.683,False,reddit gitlab,url_match program_html,683,test,webarenalite.682
+webarenalite.684,False,reddit gitlab,url_match program_html,684,train,webarenalite.683
+webarenalite.685,False,reddit gitlab,url_match program_html,685,train,webarenalite.684
+webarenalite.686,False,reddit gitlab,url_match program_html,686,train,webarenalite.685
+webarenalite.687,False,reddit gitlab,url_match program_html,687,test,webarenalite.686
+webarenalite.688,False,reddit gitlab,url_match program_html,688,test,webarenalite.687
+webarenalite.689,False,shopping,url_match program_html,689,test,webarenalite.675
+webarenalite.690,False,shopping,url_match program_html,690,test,webarenalite.689
+webarenalite.691,False,shopping,url_match program_html,691,train,webarenalite.690
+webarenalite.692,False,shopping,url_match program_html,692,train,webarenalite.691
+webarenalite.693,False,shopping,url_match program_html,693,train,webarenalite.692
+webarenalite.694,False,shopping_admin,url_match program_html,694,train,webarenalite.680
+webarenalite.695,False,shopping_admin,url_match program_html,695,train,webarenalite.694
+webarenalite.696,False,shopping_admin,url_match program_html,696,test,webarenalite.695
+webarenalite.697,False,shopping_admin,url_match program_html,697,train,webarenalite.696
+webarenalite.698,False,shopping_admin,url_match program_html,698,test,webarenalite.697
+webarenalite.699,False,shopping_admin,url_match program_html,699,train,webarenalite.698
+webarenalite.700,False,shopping_admin,url_match program_html,700,test,webarenalite.699
+webarenalite.701,False,shopping_admin,url_match program_html,701,test,webarenalite.700
+webarenalite.702,False,shopping_admin,url_match program_html,702,train,webarenalite.701
+webarenalite.703,False,shopping_admin,url_match program_html,703,train,webarenalite.702
+webarenalite.704,False,shopping_admin,url_match program_html,704,test,webarenalite.703
+webarenalite.705,False,shopping_admin,url_match program_html,705,test,webarenalite.704
+webarenalite.706,False,shopping_admin,url_match program_html,706,train,webarenalite.705
+webarenalite.707,False,shopping_admin,url_match program_html,707,train,webarenalite.706
+webarenalite.708,False,shopping_admin,url_match program_html,708,train,webarenalite.707
+webarenalite.709,False,shopping_admin,url_match program_html,709,test,webarenalite.708
+webarenalite.710,False,shopping_admin,url_match program_html,710,test,webarenalite.709
+webarenalite.711,False,shopping_admin,url_match program_html,711,train,webarenalite.710
+webarenalite.712,False,shopping_admin,url_match program_html,712,train,webarenalite.711
+webarenalite.713,False,shopping_admin,url_match program_html,713,train,webarenalite.712
+webarenalite.714,False,reddit,program_html,714,train,webarenalite.688
+webarenalite.715,False,reddit,program_html,715,train,webarenalite.714
+webarenalite.716,False,reddit,program_html,716,train,webarenalite.715
+webarenalite.717,False,reddit,program_html,717,test,webarenalite.716
+webarenalite.718,False,reddit,program_html,718,test,webarenalite.717
+webarenalite.719,False,reddit,program_html,719,train,webarenalite.718
+webarenalite.720,False,reddit,program_html,720,test,webarenalite.719
+webarenalite.721,False,reddit,program_html,721,train,webarenalite.720
+webarenalite.722,False,reddit,program_html,722,train,webarenalite.721
+webarenalite.723,False,reddit,string_match,723,test,webarenalite.722
+webarenalite.724,False,reddit,program_html,724,test,webarenalite.723
+webarenalite.725,False,reddit,program_html,725,test,webarenalite.724
+webarenalite.726,False,reddit,string_match,726,test,webarenalite.725
+webarenalite.727,False,reddit,program_html,727,train,webarenalite.726
+webarenalite.728,False,reddit,program_html,728,train,webarenalite.727
+webarenalite.729,False,reddit,program_html,729,train,webarenalite.728
+webarenalite.730,False,reddit,program_html,730,test,webarenalite.729
+webarenalite.731,False,reddit,program_html,731,test,webarenalite.730
+webarenalite.732,False,reddit,program_html,732,train,webarenalite.731
+webarenalite.733,False,reddit,program_html,733,train,webarenalite.732
+webarenalite.734,False,reddit,program_html,734,train,webarenalite.733
+webarenalite.735,False,reddit,program_html,735,test,webarenalite.734
+webarenalite.736,False,gitlab,program_html,736,train,webarenalite.688
+webarenalite.737,False,wikipedia map,program_html,737,train,webarenalite.430
+webarenalite.738,False,wikipedia map,program_html,738,test,webarenalite.737
+webarenalite.739,False,wikipedia map,program_html,739,train,webarenalite.738
+webarenalite.740,False,wikipedia map,program_html,740,test,webarenalite.739
+webarenalite.741,False,wikipedia map,program_html,741,train,webarenalite.740
+webarenalite.742,False,gitlab,program_html,742,test,webarenalite.736
+webarenalite.743,False,gitlab,program_html,743,test,webarenalite.742
+webarenalite.744,False,gitlab,program_html,744,test,webarenalite.743
+webarenalite.745,False,gitlab,program_html,745,test,webarenalite.744
+webarenalite.746,False,gitlab,program_html,746,train,webarenalite.745
+webarenalite.747,False,gitlab,program_html,747,train,webarenalite.746
+webarenalite.748,False,gitlab,program_html,748,train,webarenalite.747
+webarenalite.749,False,gitlab,program_html,749,test,webarenalite.748
+webarenalite.750,False,gitlab,program_html,750,test,webarenalite.749
+webarenalite.751,False,gitlab,program_html,751,train,webarenalite.750
+webarenalite.752,False,gitlab,program_html,752,train,webarenalite.751
+webarenalite.753,False,gitlab,program_html,753,test,webarenalite.752
+webarenalite.754,False,gitlab,program_html,754,train,webarenalite.753
+webarenalite.755,False,gitlab,program_html,755,test,webarenalite.754
+webarenalite.756,False,gitlab,program_html,756,train,webarenalite.755
+webarenalite.757,False,map,program_html,757,test,webarenalite.741
+webarenalite.758,False,map,program_html,758,test,webarenalite.757
+webarenalite.759,False,map shopping_admin,program_html,759,test,webarenalite.758 webarenalite.713
+webarenalite.760,False,map shopping_admin,program_html,760,test,webarenalite.759
+webarenalite.761,False,map,program_html,761,train,webarenalite.760
+webarenalite.762,False,map,program_html,762,train,webarenalite.761
+webarenalite.763,False,map,program_html,763,test,webarenalite.762
+webarenalite.764,False,map,program_html,764,test,webarenalite.763
+webarenalite.765,False,map,program_html,765,train,webarenalite.764
+webarenalite.766,False,map,program_html,766,train,webarenalite.765
+webarenalite.767,False,map,program_html,767,train,webarenalite.766
+webarenalite.768,False,shopping_admin,program_html,768,test,webarenalite.760
+webarenalite.769,False,shopping_admin,program_html,769,test,webarenalite.768
+webarenalite.770,False,shopping_admin,program_html,770,train,webarenalite.769
+webarenalite.771,False,shopping_admin,program_html,771,test,webarenalite.770
+webarenalite.772,False,shopping_admin,program_html,772,test,webarenalite.771
+webarenalite.773,False,shopping_admin,program_html,773,train,webarenalite.772
+webarenalite.774,False,shopping_admin,program_html,774,train,webarenalite.773
+webarenalite.775,False,shopping_admin,program_html,775,train,webarenalite.774
+webarenalite.776,False,shopping_admin,program_html,776,test,webarenalite.775
+webarenalite.777,False,shopping_admin,program_html,777,train,webarenalite.776
+webarenalite.778,False,shopping_admin,program_html,778,test,webarenalite.777
+webarenalite.779,False,shopping_admin,program_html,779,train,webarenalite.778
+webarenalite.780,False,shopping_admin,program_html,780,test,webarenalite.779
+webarenalite.781,False,shopping_admin,program_html,781,train,webarenalite.780
+webarenalite.782,False,shopping_admin,program_html,782,test,webarenalite.781
+webarenalite.783,False,gitlab,string_match,783,train,webarenalite.756
+webarenalite.784,False,gitlab,string_match,784,test,webarenalite.783
+webarenalite.785,False,gitlab,string_match,785,test,webarenalite.784
+webarenalite.786,False,gitlab,string_match,786,test,webarenalite.785
+webarenalite.787,False,gitlab,string_match,787,test,webarenalite.786
+webarenalite.788,False,gitlab,string_match,788,test,webarenalite.787
+webarenalite.789,False,gitlab,string_match,789,test,webarenalite.788
+webarenalite.790,False,shopping_admin,string_match,790,test,webarenalite.782
+webarenalite.791,False,gitlab reddit,string_match,791,train,webarenalite.789 webarenalite.735
+webarenalite.792,False,shopping,string_match,792,test,webarenalite.693
+webarenalite.793,False,shopping,string_match,793,train,webarenalite.792
+webarenalite.794,False,shopping,string_match,794,test,webarenalite.793
+webarenalite.795,False,shopping,string_match,795,train,webarenalite.794
+webarenalite.796,False,shopping,string_match,796,train,webarenalite.795
+webarenalite.797,False,shopping,string_match,797,test,webarenalite.796
+webarenalite.798,False,shopping,string_match,798,train,webarenalite.797
+webarenalite.799,False,gitlab,program_html,799,train,webarenalite.791
+webarenalite.800,False,gitlab,program_html,800,test,webarenalite.799
+webarenalite.801,False,gitlab,program_html,801,train,webarenalite.800
+webarenalite.802,False,gitlab,program_html,802,train,webarenalite.801
+webarenalite.803,False,gitlab,program_html,803,test,webarenalite.802
+webarenalite.804,False,gitlab,program_html,804,train,webarenalite.803
+webarenalite.805,False,gitlab,url_match program_html,805,test,webarenalite.804
+webarenalite.806,False,gitlab,url_match program_html,806,test,webarenalite.805
+webarenalite.807,False,gitlab,url_match program_html,807,train,webarenalite.806
+webarenalite.808,False,gitlab,url_match program_html,808,train,webarenalite.807
+webarenalite.809,False,gitlab,url_match program_html,809,train,webarenalite.808
+webarenalite.810,False,gitlab,program_html,810,test,webarenalite.809
+webarenalite.811,False,gitlab,program_html,811,test,webarenalite.810
