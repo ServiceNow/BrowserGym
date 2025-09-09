@@ -1,4 +1,8 @@
-"""Implements helper functions to assist evaluation cases where other evaluators are not suitable."""
+"""
+Adopted from VisualAgentBench https://github.com/THUDM/VisualAgentBench/blob/main/VAB-WebArena-Lite/new/helper_functions_eval.py
+Implements helper functions to assist evaluation cases where other evaluators are not suitable.
+"""
+
 import json
 from typing import Any
 from urllib.parse import urlparse

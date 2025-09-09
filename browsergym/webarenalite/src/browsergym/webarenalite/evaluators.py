@@ -1,4 +1,8 @@
-"""base class for evaluation"""
+"""
+Adopted from VisualAgentBench https://github.com/THUDM/VisualAgentBench/blob/main/VAB-WebArena-Lite/new/evaluators.py
+base class for evaluation
+"""
+
 # answer string match
 import collections
 import html
@@ -351,7 +355,6 @@ class HTMLContentEvaluator(Evaluator):
                 )
 
         return score
-
 
 
 class EvaluatorComb:
