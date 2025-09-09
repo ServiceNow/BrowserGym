@@ -53,9 +53,7 @@ def shopping_get_latest_order_url() -> str:
         "searchCriteria[pageSize]": "1",
     }
 
-    response = requests.get(
-        f"{SHOPPING}/rest/V1/orders", params=params, headers=header
-    )
+    response = requests.get(f"{SHOPPING}/rest/V1/orders", params=params, headers=header)
     assert response.status_code == 200
     response_obj = response.json()["items"][0]
     order_id = int(response_obj["increment_id"])
@@ -69,9 +67,7 @@ def shopping_get_sku_latest_review_author(sku: str) -> str:
         "Authorization": f"Bearer {shopping_get_auth_token()}",
         "Content-Type": "application/json",
     }
-    response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
-    )
+    response = requests.get(f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header)
     assert response.status_code == 200
     response_obj = response.json()
     if len(response_obj) == 0:
@@ -86,9 +82,7 @@ def shopping_get_sku_latest_review_rating(sku: str) -> str:
         "Authorization": f"Bearer {shopping_get_auth_token()}",
         "Content-Type": "application/json",
     }
-    response = requests.get(
-        f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header
-    )
+    response = requests.get(f"{SHOPPING}/rest/V1/products/{sku}/reviews", headers=header)
     assert response.status_code == 200
     response_obj = response.json()
     if len(response_obj) == 0:
@@ -168,6 +162,7 @@ def _normalize_openai_response_text(response: Any) -> str:
 
     # If it's a dict from Responses API: extract text from output -> content blocks
     if isinstance(response, dict) and isinstance(response.get("output"), list):
+
         def _collect_text(block: Any) -> list[str]:
             texts: list[str] = []
             if isinstance(block, dict):
@@ -241,7 +236,9 @@ def llm_fuzzy_match(pred: str, reference: str, question: str) -> float:
     message = "Help a teacher to grade the answer of a student given a question. Keep in mind that the student may use different phrasing or wording to answer the question. The goal is to evaluate whether the answer is semantically equivalent to the reference answer.\n"
     message += f"question: {question}\n"
     message += f"reference answer: {reference}\n"
-    message += "all the string 'N/A' that you see is a special sequence that means 'not achievable'\n"
+    message += (
+        "all the string 'N/A' that you see is a special sequence that means 'not achievable'\n"
+    )
     message += f"student answer: {pred}\n"
     message += "Conclude the judgement by correct/incorrect/partially correct."
     messages = [

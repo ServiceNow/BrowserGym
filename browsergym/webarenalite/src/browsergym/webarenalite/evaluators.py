@@ -90,10 +90,7 @@ class StringEvaluator(Evaluator):
     @staticmethod
     @beartype
     def exact_match(ref: str, pred: str) -> float:
-        return float(
-            StringEvaluator.clean_answer(pred)
-            == StringEvaluator.clean_answer(ref)
-        )
+        return float(StringEvaluator.clean_answer(pred) == StringEvaluator.clean_answer(ref))
 
     @staticmethod
     @beartype
@@ -102,11 +99,7 @@ class StringEvaluator(Evaluator):
         clean_pred = StringEvaluator.clean_answer(pred)
         # tokenize the answer if the ref is a single word
         # prevent false positive (e.g, 0)
-        if (
-            tokenize
-            and len(clean_ref) == 1
-            and len(word_tokenize(clean_ref)) == 1
-        ):
+        if tokenize and len(clean_ref) == 1 and len(word_tokenize(clean_ref)) == 1:
             tok_pred = word_tokenize(clean_pred)
             return float(clean_ref in tok_pred)
         else:
@@ -166,9 +159,7 @@ class StringEvaluator(Evaluator):
                     else:
                         assert isinstance(value, list)
                         for reference in value:
-                            score *= self.fuzzy_match(
-                                ref=reference, pred=pred, intent=intent
-                            )
+                            score *= self.fuzzy_match(ref=reference, pred=pred, intent=intent)
         return score
 
 
@@ -220,12 +211,7 @@ class URLEvaluator(Evaluator):
             pred_base_paths, pred_query = parse_url(pred)
 
             base_score = float(
-                any(
-                    [
-                        ref_base_path in pred_base_paths
-                        for ref_base_path in ref_base_paths
-                    ]
-                )
+                any([ref_base_path in pred_base_paths for ref_base_path in ref_base_paths])
             )
             query_score = 1.0
             for k, possible_values in ref_queries.items():
@@ -258,7 +244,7 @@ class HTMLContentEvaluator(Evaluator):
         trajectory: Trajectory,
         config_file: Path | str,
         page: Page | PseudoPage,
-        client: CDPSession | None = None
+        client: CDPSession | None = None,
     ) -> float:
         with open(config_file, "r") as f:
             configs = json.load(f)
@@ -284,9 +270,7 @@ class HTMLContentEvaluator(Evaluator):
             if not locator.strip():
                 selected_element = page.content()
             # use JS to select the element
-            elif locator.startswith("document.") or locator.startswith(
-                "[...document."
-            ):
+            elif locator.startswith("document.") or locator.startswith("[...document."):
                 if "prep_actions" in target:
                     try:
                         for prep_action in target["prep_actions"]:
@@ -324,9 +308,7 @@ class HTMLContentEvaluator(Evaluator):
 
             if "exact_match" in target["required_contents"]:
                 required_contents = target["required_contents"]["exact_match"]
-                score *= StringEvaluator.exact_match(
-                    ref=required_contents, pred=selected_element
-                )
+                score *= StringEvaluator.exact_match(ref=required_contents, pred=selected_element)
             elif "must_include" in target["required_contents"]:
                 required_contents = target["required_contents"]["must_include"]
                 assert isinstance(required_contents, list)
@@ -334,25 +316,19 @@ class HTMLContentEvaluator(Evaluator):
                     content_or = content.split(" |OR| ")
                     score *= any(
                         [
-                            StringEvaluator.must_include(
-                                ref=content, pred=selected_element
-                            )
+                            StringEvaluator.must_include(ref=content, pred=selected_element)
                             for content in content_or
                         ]
                     )
             elif "fuzzy_match" in target["required_contents"]:
                 required_contents = target["required_contents"]["fuzzy_match"]
                 intent = configs["intent"]
-                
+
                 assert isinstance(required_contents, list)
-                reference = ', '.join(required_contents)
-                score *= self.fuzzy_match(
-                    ref=reference, pred=selected_element, intent=intent
-                )
+                reference = ", ".join(required_contents)
+                score *= self.fuzzy_match(ref=reference, pred=selected_element, intent=intent)
             else:
-                raise ValueError(
-                    f"Unknown required_contents: {target['required_contents'].keys()}"
-                )
+                raise ValueError(f"Unknown required_contents: {target['required_contents'].keys()}")
 
         return score
 

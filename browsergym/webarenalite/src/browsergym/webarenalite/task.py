@@ -20,6 +20,7 @@ class WebArenaLiteTask(GenericWebArenaTask):
     Base class for all WebArena tasks.
 
     """
+
     def __init__(
         self,
         seed: int,
@@ -28,9 +29,19 @@ class WebArenaLiteTask(GenericWebArenaTask):
         with_na_hint: bool = False,
         with_homepage_hint: bool = False,
     ):
-        super().__init__(seed=seed, task_id=task_id, intent_template_id=intent_template_id, with_na_hint=with_na_hint, with_homepage_hint=with_homepage_hint)
+        super().__init__(
+            seed=seed,
+            task_id=task_id,
+            intent_template_id=intent_template_id,
+            with_na_hint=with_na_hint,
+            with_homepage_hint=with_homepage_hint,
+        )
 
-        all_configs_str = importlib.resources.files('browsergym.webarenalite').joinpath("test_webarena_lite.raw.json").read_text()
+        all_configs_str = (
+            importlib.resources.files("browsergym.webarenalite")
+            .joinpath("test_webarena_lite.raw.json")
+            .read_text()
+        )
         # substitute URLs
         for pattern, url_key in {
             "__GITLAB__": "gitlab",
@@ -59,9 +70,7 @@ class WebArenaLiteTask(GenericWebArenaTask):
             # use old_task_id to filter configs
             task_configs = [conf for conf in all_configs if conf["old_task_id"] == task_id]
             if not task_configs:
-                raise ValueError(
-                    f"Could not find any task config with old_task_id={task_id}."
-                )
+                raise ValueError(f"Could not find any task config with old_task_id={task_id}.")
 
         self.task_configs = task_configs
 
