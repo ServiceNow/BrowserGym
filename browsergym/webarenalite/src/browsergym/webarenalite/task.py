@@ -56,10 +56,11 @@ class WebArenaLiteTask(GenericWebArenaTask):
                 )
 
         elif task_id is not None:
-            task_configs = [conf for conf in all_configs if conf["task_id"] == task_id]
+            # use old_task_id to filter configs
+            task_configs = [conf for conf in all_configs if conf["old_task_id"] == task_id]
             if not task_configs:
                 raise ValueError(
-                    f"Could not find any task config with task_id={intent_template_id}."
+                    f"Could not find any task config with old_task_id={task_id}."
                 )
 
         self.task_configs = task_configs
