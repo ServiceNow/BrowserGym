@@ -11,7 +11,7 @@ import json
 import time
 import urllib
 from pathlib import Path
-from typing import Any, Tuple, Union, Optional
+from typing import Union
 
 from beartype import beartype
 from nltk.tokenize import word_tokenize  # type: ignore

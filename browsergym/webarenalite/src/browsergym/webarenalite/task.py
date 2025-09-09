@@ -2,15 +2,12 @@ import importlib.resources
 import json
 import logging
 import tempfile
-import urllib.parse
-from typing import Optional, Tuple
+from typing import Optional
 
-import numpy as np
 import playwright.sync_api
 
-from browsergym.core.task import AbstractBrowserTask
 from browsergym.webarena.task import GenericWebArenaTask
-from browsergym.webarena.instance import WebArenaInstance
+
 
 logger = logging.getLogger(__name__)
 
