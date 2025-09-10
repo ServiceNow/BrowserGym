@@ -50,6 +50,7 @@ def test_build_benchmarks():
         "miniwob_tiny_test": 2 * 2,
         "webarena": 812,
         "webarena_tiny": 6,
+        "webarena_lite": 165,
         "visualwebarena": 910,
         "visualwebarena_tiny": 4,
         "workarena_l1": 33 * 10,
