@@ -132,6 +132,20 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("webarena"),
     ),
+    "webarena_verified": lambda n_repeats=1: Benchmark(
+        name="webarena_verified",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["webarena"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("webarena_verified")),
+            max_steps=30,
+            n_repeats=n_repeats,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("webarena_verified"),
+    ),
     "webarena_lite": lambda n_repeats=1: Benchmark(
         name="webarena_lite",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
