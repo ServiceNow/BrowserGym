@@ -1,0 +1,4 @@
+browsergym-core==0.14.2
+libwebarena==0.0.4
+webarena-verified @ file:///home/toolkit/platform-labs-agent-eval-harness/benchmarks/webarena-verified
+agent-eval-harness-common @ file:///home/toolkit/platform-labs-agent-eval-harness/packages/agent-eval-harness-common
