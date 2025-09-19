@@ -21,6 +21,7 @@ pip install browsergym-webarena-verified
 This will automatically install the required dependencies from local file paths:
 - `webarena-verified` from local platform-labs-agent-eval-harness repository
 - `agent-eval-harness-common` from local platform-labs-agent-eval-harness repository
+- `agent-eval-harness-pytest` from local platform-labs-agent-eval-harness repository
 
 **Note**: This package requires the [platform-labs-agent-eval-harness](https://github.com/ServiceNow/platform-labs-agent-eval-harness) repository to be cloned locally at `/home/toolkit/platform-labs-agent-eval-harness` before installation.
 
