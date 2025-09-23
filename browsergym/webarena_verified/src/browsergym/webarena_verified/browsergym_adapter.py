@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional
 from agent_eval_harness_common.models import AllocationResource, WebsiteRequirement
 from playwright.async_api import async_playwright
 
+from browsergym.webarena_verified.instance import WebArenaVerifiedInstance
 from webarena_verified.evaluation.evaluator import WebArenaEvaluator
 from webarena_verified.types import (
     ActionType,
@@ -137,7 +138,8 @@ class BrowserGymEvaluationAdapter:
     Main adapter that orchestrates the evaluation process for BrowserGym tasks.
     """
     
-    def __init__(self):
+    def __init__(self, webarena_instance: WebArenaVerifiedInstance):
+        self.webarena_instance = webarena_instance  # TODO use this to access the webarena_verified dispatcher and access the instances
         self.response_adapter = BrowserGymResponseAdapter()
     
     async def evaluate_task(
