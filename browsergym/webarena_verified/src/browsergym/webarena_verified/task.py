@@ -7,6 +7,8 @@ from typing import Optional
 import playwright.sync_api
 
 from browsergym.webarena.task import GenericWebArenaTask
+from browsergym.webarena_verified.evaluators import WebArenaVerifiedEvaluator
+from browsergym.webarena_verified.instance import WebArenaVerifiedInstance
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +39,9 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
             with_na_hint=with_na_hint,
             with_homepage_hint=with_homepage_hint,
         )
+
+        # override the webarena instance to use the webarena_verified instance
+        self.webarena_instance = WebArenaVerifiedInstance()
 
         # Load the webarena_verified.json file
         all_configs_str = (
@@ -74,6 +79,9 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
             task_configs = [conf for conf in all_configs if conf["task_id"] == task_id]
             if not task_configs:
                 raise ValueError(f"Could not find any task config with task_id={task_id}.")
+        else:
+            # keep all task configs
+            task_configs = all_configs
 
         self.task_configs = task_configs
 
@@ -91,7 +99,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
             self.config_file = f.name
 
         # build the evaluator using the new webarena_verified evaluation system
-        self.evaluator = WebArenaVerifiedEvaluator(self.config)
+        self.evaluator = WebArenaVerifiedEvaluator(self.webarena_instance)
 
         # authenticate
         for site in self.config["sites"]:

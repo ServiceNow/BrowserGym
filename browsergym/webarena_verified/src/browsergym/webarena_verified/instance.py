@@ -12,8 +12,9 @@ ENV_VARS = ("SHOPPING", "SHOPPING_ADMIN", "REDDIT", "GITLAB", "WIKIPEDIA", "MAP"
 
 class WebArenaVerifiedInstance:
     """
-    Utility class to access a WebArena instance.
+    Utility class to access a WebArena Verified instances.
 
+    TODO: connect to the wa_verified client dispatcher to access the instances and reset them
     """
 
     RESET_URL_VAR = "WA_FULL_RESET"  # used by full_reset()

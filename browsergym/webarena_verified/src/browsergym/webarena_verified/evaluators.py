@@ -9,6 +9,8 @@ import logging
 
 import playwright
 
+from browsergym.webarena_verified.instance import WebArenaVerifiedInstance
+
 from .browsergym_adapter import BrowserGymEvaluationAdapter
 
 logger = logging.getLogger(__name__)
@@ -24,11 +26,11 @@ class WebArenaVerifiedEvaluator:
     - expected_ui_state: Validates UI state changes
     """
     
-    def __init__(self):
+    def __init__(self, webarena_instance: WebArenaVerifiedInstance):
         """
         Initialize the evaluator.
         """
-        self.browsergym_adapter = BrowserGymEvaluationAdapter()
+        self.browsergym_adapter = BrowserGymEvaluationAdapter(webarena_instance)
 
     def __call__(
         self,
