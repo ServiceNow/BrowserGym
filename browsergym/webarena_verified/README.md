@@ -15,7 +15,7 @@ git clone https://github.com/ServiceNow/platform-labs-agent-eval-harness.git /ho
 ### 1. Install this BrowserGym package
 
 ```bash
-pip install browsergym-webarena-verified
+pip install -e ./browsergym/webarena_verified
 ```
 
 This will automatically install the required dependencies from local file paths:
