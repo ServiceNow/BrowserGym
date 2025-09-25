@@ -932,6 +932,8 @@ def _get_env_name(task_name: str):
     # lazy benchmark import
     if task_name.startswith("miniwob"):
         import browsergym.miniwob
+    elif task_name.startswith("workarenax"):
+        import browsergym.workarenax
     elif task_name.startswith("workarena"):
         import browsergym.workarena
     elif task_name.startswith("webarena"):
