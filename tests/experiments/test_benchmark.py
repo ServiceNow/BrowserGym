@@ -56,6 +56,7 @@ def test_build_benchmarks():
         "workarena_l1": 33 * 10,
         "workarena_l2_agent_curriculum_eval": 235,
         "workarena_l3_agent_curriculum_eval": 235,
+        "workarenax": 10,
         "assistantbench": 214,
         "weblinx": 31586,
     }

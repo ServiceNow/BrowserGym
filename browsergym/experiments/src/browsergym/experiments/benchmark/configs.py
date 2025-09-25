@@ -244,6 +244,21 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("workarena"),
     ),
+    "workarenax":
+    lambda n_repeats=1: Benchmark(
+        name="workarenax",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
+        is_multi_tab=True,
+        supports_parallel_seeds=False,
+        backends=["workarenax"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("workarenax")),
+            max_steps=30,
+            n_repeats=n_repeats,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("workarenax"),
+    ),
     "assistantbench": lambda n_repeats=1: Benchmark(
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
