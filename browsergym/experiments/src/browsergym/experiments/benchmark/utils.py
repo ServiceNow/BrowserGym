@@ -112,6 +112,9 @@ def prepare_backend(backend: str):
             # check setup
             browsergym.miniwob.environment_variables_precheck()
 
+        case "workarenax":
+            import browsergym.workarenax
+
         case "webarena":
             # register environments
             import browsergym.webarena
