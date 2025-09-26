@@ -14,7 +14,18 @@ class WebArenaVerifiedInstance:
     """
     Utility class to access a WebArena Verified instances.
 
-    TODO: connect to the wa_verified client dispatcher to access the instances and reset them
+    == TODO ==
+    Right now this is a copy of the WebArenaInstance class.
+    - check if we actually need a custom class or if the default WebArenaInstance class is enough.
+    MAYBE:
+    - connect to the wa_verified client dispatcher to access the instances and reset them
+    IF we need a custom class, the following fields must be present:
+    - urls: Dict[str, str]
+    - home_url: str
+    - full_reset: Callable function that resets the instance
+    - check_status: Callable function that checks the status of the instance
+    - ui_login: Callable function that logs in to the instance
+    == END TODO ==
     """
 
     RESET_URL_VAR = "WA_FULL_RESET"  # used by full_reset()
