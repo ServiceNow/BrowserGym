@@ -38,6 +38,7 @@ dependencies = [
     "browsergym-experiments==0.14.2",
     "browsergym-workarena>=0.4.1",
     "weblinx-browsergym>=0.0.2",
+    "browsergym-webarenalite==0.14.2"
 ]
 
 [tool.setuptools]
