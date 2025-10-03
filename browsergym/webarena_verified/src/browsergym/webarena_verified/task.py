@@ -86,9 +86,6 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         self.task_configs = task_configs
 
     def setup(self, page: playwright.sync_api.Page) -> tuple[str, dict]:
-        # Using the webarena_verified evaluator system
-        from .evaluators import WebArenaVerifiedEvaluator
-
         # pick a task at random
         self.config = self.random.choice(self.task_configs)
 
