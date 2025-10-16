@@ -102,6 +102,9 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         for site in self.config["sites"]:
             self.webarena_instance.ui_login(site=site, page=page)
 
+        # enable playwright tracing (required for webarena_verified evaluation)
+        page.context.tracing.start(snapshots=True)
+
         # set geolocation if specified
         if self.config.get("geolocation"):
             page.context.set_geolocation(self.config["geolocation"])

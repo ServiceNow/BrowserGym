@@ -3,17 +3,12 @@ WebArena Verified evaluators that integrate the full evaluation system
 from platform-labs-agent-eval-harness.
 """
 
-import asyncio
-import importlib
 import json
 import logging
-from datetime import datetime
+import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 import playwright
-from agent_eval_harness_common.models import AllocationResource, WebsiteRequirement
-from playwright.async_api import async_playwright
 
 from browsergym.webarena.instance import WebArenaInstance
 from webarena_verified.api.evaluator_api import TaskEvaluator
@@ -75,14 +70,27 @@ class WebArenaVerifiedEvaluator:
         Returns:
             Float score compatible with BrowserGym (1.0 or 0.0)
         """
+        # import webarena dynamically
+        from webarena.browser_env.actions import ActionTypes
+        # if last action is not a STOP action, return 0.0 as the task is not completed yet
+        if trajectory[-1].get("action_type") != ActionTypes.STOP:
+            return 0.0
+
+        # task is done: load the config file, stop playwright tracing, and evaluate the trace
         with open(config_file, "r") as f:
-            config = json.load(f)
+            config_raw = json.load(f)
+        config: WebArenaVerifiedTask = WebArenaVerifiedTask.model_validate(config_raw)
+
+        # stop playwright tracing
+        with tempfile.TemporaryDirectory() as temp_dir:
+            trace_path = Path(temp_dir) / f"wav_{config.task_id}.zip"
+            page.context.tracing.stop(path=trace_path)
 
         # create eval request
         eval_request = WebarenaTaskEvalRequest(
-            task=WebArenaVerifiedTask.model_validate(config),
+            task=config,
             agent_response_raw=trajectory[-1].get("answer"),
-            network_trace=NetworkTrace.from_playwright_trace(...), # TODO: add path to playwright trace should be Path(exp_args.exp_dir / "pw_traces" / f"{exp_args.exp_name}.zip")
+            network_trace=NetworkTrace.from_playwright_trace(trace_path), # TODO: add path to playwright trace should be Path(exp_args.exp_dir / "pw_traces" / f"{exp_args.exp_name}.zip")
         )
 
         # Run wa_verified evaluation and return float score
