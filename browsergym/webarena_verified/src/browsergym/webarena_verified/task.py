@@ -8,7 +8,6 @@ import playwright.sync_api
 
 from browsergym.webarena.task import GenericWebArenaTask
 from browsergym.webarena_verified.evaluators import WebArenaVerifiedEvaluator
-from browsergym.webarena_verified.instance import WebArenaVerifiedInstance
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +38,6 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
             with_na_hint=with_na_hint,
             with_homepage_hint=with_homepage_hint,
         )
-
-        # override the webarena instance to use the webarena_verified instance
-        self.webarena_instance = WebArenaVerifiedInstance()
 
         # Load the webarena_verified.json file
         all_configs_str = (

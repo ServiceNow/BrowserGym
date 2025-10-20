@@ -138,7 +138,7 @@ DEFAULT_BENCHMARKS = {
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
-        backends=["webarena_verified"],
+        backends=["webarena"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(metadata=task_metadata("webarena_verified")),
             max_steps=30,

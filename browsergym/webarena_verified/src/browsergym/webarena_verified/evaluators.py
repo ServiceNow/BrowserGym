@@ -11,14 +11,16 @@ from pathlib import Path
 import playwright
 
 from browsergym.webarena.instance import WebArenaInstance
-from webarena_verified.api.evaluator_api import TaskEvaluator
+from webarena_verified.api.evaluator_api import (
+    WebArenaVerifiedEvaluator as WebArenaVerifiedEvaluatorAPI,
+)
 from webarena_verified.types.eval import (
-    NetworkTrace,
-    WebarenaTaskEvalRequest,
-    WebarenaTaskEvalResult,
+    TaskEvalRequest,
+    TaskEvalResult,
 )
 from webarena_verified.types.settings import URLMap, WebArenaVerifiedSettings
 from webarena_verified.types.task import WebArenaVerifiedTask
+from webarena_verified.types.tracing import NetworkTrace
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +47,7 @@ class WebArenaVerifiedEvaluator:
         """
         Initialize the evaluator.
         """
-        self.evaluator = TaskEvaluator(
+        self.evaluator = WebArenaVerifiedEvaluatorAPI(
             WebArenaVerifiedSettings(
                 test_data_file=Path(__file__).parent.joinpath("webarena_verified.json"),
                 url_map=URLMap(root=webarena_instance.urls),
@@ -57,7 +59,7 @@ class WebArenaVerifiedEvaluator:
         trajectory: list[dict],
         config_file: str,
         page: playwright.sync_api.Page = None,
-        client: playwright.async_api.CDPSession | None = None,
+        client: playwright.sync_api.CDPSession | None = None,
     ) -> float:
         """
         Entry point compatible with GenericWebArenaTask.validate(...).
@@ -86,17 +88,10 @@ class WebArenaVerifiedEvaluator:
             trace_path = Path(temp_dir) / f"wav_{config.task_id}.zip"
             page.context.tracing.stop(path=trace_path)
 
-        # create eval request
-        eval_request = WebarenaTaskEvalRequest(
-            task=config,
-            agent_response_raw=trajectory[-1].get("answer"),
-            network_trace=NetworkTrace.from_playwright_trace(trace_path), # TODO: add path to playwright trace should be Path(exp_args.exp_dir / "pw_traces" / f"{exp_args.exp_name}.zip")
-        )
-
         # Run wa_verified evaluation and return float score
-        logger.info(f"Running webarena_verified evaluation for task {eval_request.task.task_id}")
-        results: list[WebarenaTaskEvalResult] = self.evaluator.eval_task(eval_request)
-        logger.info(f"Webarena_verified evaluation result for task {eval_request.task.task_id}:")
+        logger.info(f"Running webarena_verified evaluation for task {config.task_id}")
+        results: list[TaskEvalResult] = self.evaluator.evaluate_task(config.task_id, trajectory[-1].get("answer"), trace_path)
+        logger.info(f"Webarena_verified evaluation result for task {config.task_id}:")
         for result in results:
             logger.info(f"status: {result.status}, score: {result.score}, error_msg: {result.error_msg}")
         # return average score
