@@ -11,27 +11,24 @@ from pathlib import Path
 import playwright
 
 from browsergym.webarena.instance import WebArenaInstance
-from webarena_verified.api.evaluator_api import (
+from webarena_verified.api import WebArenaVerifiedDataReader
+from webarena_verified.api import (
     WebArenaVerifiedEvaluator as WebArenaVerifiedEvaluatorAPI,
 )
+from webarena_verified.types import WebArenaVerifiedTask
+from webarena_verified.types.config import (
+    EnvironmentConfig,
+    WebArenaSite,
+    WebArenaVerifiedConfig,
+)
 from webarena_verified.types.eval import (
-    TaskEvalRequest,
+    TaskEvalContext,
     TaskEvalResult,
 )
-from webarena_verified.types.settings import URLMap, WebArenaVerifiedSettings
-from webarena_verified.types.task import WebArenaVerifiedTask
 from webarena_verified.types.tracing import NetworkTrace
 
 logger = logging.getLogger(__name__)
 
-
-CONTAINER_NAMES = {
-    "shopping": "shopping-srv-client-0",
-    "reddit": "reddit-srv-0",
-    "shopping_admin": "shopping-srv-admin-0",
-    "gitlab": "gitlab",
-    "map": "NA",
-}
 
 class WebArenaVerifiedEvaluator:
     """
@@ -47,12 +44,25 @@ class WebArenaVerifiedEvaluator:
         """
         Initialize the evaluator.
         """
-        self.evaluator = WebArenaVerifiedEvaluatorAPI(
-            WebArenaVerifiedSettings(
-                test_data_file=Path(__file__).parent.joinpath("webarena_verified.json"),
-                url_map=URLMap(root=webarena_instance.urls),
-            )
+        # Create configuration for all sites and homepage from webarena_instance
+        config = WebArenaVerifiedConfig(
+            test_data_file=Path(__file__).parent.joinpath("webarena_verified.json"),
+            environments={
+                **{
+                    site: EnvironmentConfig(
+                        urls=[webarena_instance.urls[site]],
+                        credentials=webarena_instance.credentials.get(site),
+                    )
+                    for site in webarena_instance.urls
+                },
+                WebArenaSite.HOMEPAGE: EnvironmentConfig(
+                    urls=[webarena_instance.home_url],
+                )
+            }
         )
+        # Instantiate data reader and evaluator
+        reader = WebArenaVerifiedDataReader(config)
+        self.evaluator = WebArenaVerifiedEvaluatorAPI(config=config, reader=reader)
 
     def __call__(
         self,
@@ -81,19 +91,28 @@ class WebArenaVerifiedEvaluator:
         # task is done: load the config file, stop playwright tracing, and evaluate the trace
         with open(config_file, "r") as f:
             config_raw = json.load(f)
-        config: WebArenaVerifiedTask = WebArenaVerifiedTask.model_validate(config_raw)
+        task: WebArenaVerifiedTask = WebArenaVerifiedTask.model_validate(config_raw)
 
         # stop playwright tracing
         with tempfile.TemporaryDirectory() as temp_dir:
-            trace_path = Path(temp_dir) / f"wav_{config.task_id}.zip"
+            trace_path = Path(temp_dir) / f"wav_{task.task_id}.zip"
             page.context.tracing.stop(path=trace_path)
 
+        # Create evaluation context
+        context = TaskEvalContext(
+            task=task,
+            agent_response_raw=trajectory[-1].get("answer"),
+            network_trace=NetworkTrace.from_content(trace_path),
+            environments=self.evaluator.config.environments,
+        )
+
         # Run wa_verified evaluation and return float score
-        logger.info(f"Running webarena_verified evaluation for task {config.task_id}")
-        results: list[TaskEvalResult] = self.evaluator.evaluate_task(config.task_id, trajectory[-1].get("answer"), trace_path)
-        logger.info(f"Webarena_verified evaluation result for task {config.task_id}:")
-        for result in results:
-            logger.info(f"status: {result.status}, score: {result.score}, error_msg: {result.error_msg}")
+        logger.info(f"Running webarena_verified evaluation for task {task.task_id}")
+        results: TaskEvalResult = self.evaluator.evaluate_task(context=context)
+        logger.info(f"Webarena_verified evaluation result for task {task.task_id}:")
+        logger.info(f"status: {results.status}, score: {results.score}, error_msg: {results.error_msg}")
+        for result in results.evaluators_results:
+            logger.info(f"- {result.evaluator_name}: status: {result.status}, score: {result.score}, error_msg: {result.error_msg}")
         # return average score
-        return sum(result.score for result in results) / len(results)
+        return sum(result.score for result in results.evaluators_results) / len(results.evaluators_results)
 
