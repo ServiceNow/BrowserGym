@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 
 TASK_IDS = range(812)
 INTENT_TEMPLATE_IDS = []
 
-with open("browsergym/webarena_verified/webarena_verified.json", "r") as f:
+with open(Path(__file__).parent / "webarena_verified.json", "r") as f:
     data = json.load(f)
 
 for task in data:
