@@ -2,8 +2,11 @@ import importlib.resources
 import json
 import logging
 import tempfile
+from pathlib import Path
+from time import sleep
 from typing import Optional
 
+import playwright._impl._errors as playwright_errors
 import playwright.sync_api
 
 from browsergym.webarena.task import GenericWebArenaTask
@@ -94,9 +97,23 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         # build the evaluator using the new webarena_verified evaluation system
         self.evaluator = WebArenaVerifiedEvaluator(self.webarena_instance)
 
+        # add extra context headers if they are present (e.g. for access token to the self hosted webarena verified instances)
+        extra_headers_file_path = Path(__file__).parent / "pw_extra_headers.json"
+        if extra_headers_file_path.exists():
+            with open(extra_headers_file_path, "r") as f:
+                extra_headers = json.load(f)
+            page.context.set_extra_http_headers(extra_headers)
+
         # authenticate
         for site in self.config["sites"]:
-            self.webarena_instance.ui_login(site=site, page=page)
+            for attempt in range(3):
+                try:
+                    self.webarena_instance.ui_login(site=site, page=page)
+                    break  # Success, move to next site
+                except playwright_errors.TimeoutError as e:
+                    if attempt == 2:  # Last attempt (0, 1, 2)
+                        raise  # Re-raise the timeout error after 3 failed attempts
+                    sleep(1)  # Wait 1 second before retrying
 
         # enable playwright tracing (required for webarena_verified evaluation)
         page.context.tracing.start(snapshots=True)
@@ -107,8 +124,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
 
         # navigate to the starting url(s) (might need several pages)
         # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/browser_env/envs.py#L150
-        if self.config["start_url"]:
-            start_urls = self.config["start_url"].split(" |AND| ")
+        if start_urls := self.config.get("start_urls"):
             for i, url in enumerate(start_urls):
                 page.goto(url)
                 if i < len(start_urls) - 1:
