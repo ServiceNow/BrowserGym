@@ -147,29 +147,30 @@ def prepare_backend(backend: str):
             import browsergym.webarena_verified
 
             # full reset the instance (requires environment variables properly set up)
-            from browsergym.webarena_verified.instance import WebArenaVerifiedInstance
+            from browsergym.webarena.instance import WebArenaInstance
 
-            default_instance = WebArenaVerifiedInstance()
+            default_instance = WebArenaInstance()
             default_instance.full_reset()
 
-            # logging.info(
-            #     f"Initiating WebArena Verified instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
-            # )
-            # massage_tasks(
-            #     [
-            #         f"webarena_verified.{id}"
-            #         for id in [
-            #             410,  # reddit
-            #             533,  # gitlab
-            #             561,  # gitlab wiki
-            #             562,  # gitlab reddit
-            #             574,  # shopping
-            #             640,  # reddit
-            #             680,  # shopping_admin
-            #             740,  # wiki map
-            #         ]
-            #     ]
-            # )
+            logging.info(
+                f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
+            )
+            massage_tasks(
+                [
+                    f"webarena_verified.{intent_template_id}.{task_id}"
+                    for intent_template_id, task_id in
+                    [
+                        (23, 410),  # reddit
+                        # (330, 533),  # gitlab
+                        # (87, 561),  # gitlab wiki
+                        # (87, 562),  # gitlab reddit
+                        (165, 574),  # shopping
+                        (16, 640),  # reddit
+                        # (253, 680),  # shopping_admin
+                        # (94, 740),  # wiki map
+                    ]
+                ]
+            )
 
         case "visualwebarena":
             # register environments
