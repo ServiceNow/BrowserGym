@@ -1,3 +1,6 @@
 [submodule "AgentLab-Knows"]
 	path = AgentLab-Knows
 	url = https://github.com/farhanishmam/AgentLab-Knows
+[submodule "browsergym/knows"]
+	path = browsergym/knows
+	url = git@github.com:alexgill321/Agent-Benchmark.git

@@ -11,7 +11,7 @@ attrs==25.4.0
 beartype==0.12.0
 beautifulsoup4==4.14.2
 blinker==1.9.0
--e git+https://github.com/farhanishmam/BrowserGym-Knows@dbdf1ab03efd36a0b2b477c88b902586b99eb7c5#egg=browsergym_meta
+-e git+https://github.com/farhanishmam/BrowserGym-Knows@1d534a69b59179902fee6cefdc1b4f5d79ca96e2#egg=browsergym_meta
 cachetools==6.2.1
 certifi==2025.10.5
 charset-normalizer==3.4.4
