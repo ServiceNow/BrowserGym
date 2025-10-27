@@ -86,6 +86,13 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=True,
         demo_mode="off",
     ),
+    "knows": HighLevelActionSetArgs(
+        subsets=["knows"],
+        multiaction=False,
+        strict=False,
+        retry_with_force=True,
+        demo_mode="off",
+    ),
 }
 
 # all benchmarks are callables designed for lazy loading, i.e. `bench = DEFAULT_BENCHMARKS["miniwob_all"]()`
@@ -273,5 +280,19 @@ DEFAULT_BENCHMARKS = {
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("weblinx"),
+    ),
+    "knows_1": lambda n_repeats=1: Benchmark(
+        name="knows",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["knows"],
+        is_multi_tab=True,
+        supports_parallel_seeds=True,
+        backends=["knows"],
+        env_args_list=make_env_args_list_from_repeat_tasks(
+            task_list=task_list_from_metadata(metadata=task_metadata("knows")),
+            max_steps=100,
+            n_repeats=n_repeats,
+            seeds_rng=np.random.RandomState(42),
+        ),
+        task_metadata=task_metadata("knows"),
     ),
 }

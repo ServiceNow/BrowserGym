@@ -246,6 +246,41 @@ ACTION_SUBSETS = {
         goto,  # GOTO, SEARCH
         send_msg_to_user,  # TERMINATE
     ],
+    "knows": [
+        # clear, # do we really need this?
+        click, # definitely need this one
+        dblclick, #discuss 
+        drag_and_drop, #discuss
+        fill, # basically typing
+        # focus, # do we need this?
+        go_back, #defn need this one and the next one
+        go_forward,
+        goto, # going to a url, yup need this
+        hover,
+        # keyboard_down,
+        keyboard_insert_text,
+        keyboard_press,
+        keyboard_type,
+        # keyboard_up,
+        mouse_click,
+        mouse_dblclick,
+        # mouse_down,
+        mouse_drag_and_drop,
+        mouse_move,
+        # mouse_up,
+        mouse_upload_file,
+        new_tab,
+        noop,
+        # press,
+        report_infeasible,
+        scroll,
+        # scroll_at,
+        select_option,
+        # send_msg_to_user,
+        tab_close,
+        tab_focus,
+        upload_file,
+    ],
 }
 
 
@@ -277,6 +312,7 @@ class HighLevelActionSet(AbstractActionSet):
         "workarena++",
         "weblinx",
         "assistantbench",
+        "knows",
         "custom",
     ]
     DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]

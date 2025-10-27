@@ -208,6 +208,10 @@ def prepare_backend(backend: str):
             demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=all_tasks)
             weblinx_browsergym.download_and_unzip_demos(demo_ids=demo_ids, cache_dir=cache_dir)
 
+        case "knows":
+            # register environments
+            import browsergym.knows
+
         case _:
             raise NotImplementedError(f"Unknown benchmark backend {repr(backend)}")
 
