@@ -6,7 +6,7 @@ from agentlab.experiments.study import Study
 
 # Check registered tasks
 
-import gymnasium as gym
+# import gymnasium as gym
 
 # Import all browsergym modules to register environments
 # import browsergym.core
@@ -17,17 +17,17 @@ import gymnasium as gym
 # import browsergym.assistantbench
 # import browsergym.knows  # if you have knows installed
 
-# # Get all browsergym environments
-# env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym")]
+# # # Get all browsergym environments
+# env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/knows")]
 
-# # Print them
+# # Print themknows
 # print("\n".join(sorted(env_ids)))
 
 
 
 study = make_study(
     benchmark="knows_1",  # or "webarena", "workarena_l1" ...
-    agent_args=[AGENT_4o],
+    agent_args=[AGENT_4o_MINI],
     comment="Knows Benchmark",
 )
 
