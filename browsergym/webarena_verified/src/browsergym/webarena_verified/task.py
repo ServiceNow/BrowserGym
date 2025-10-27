@@ -11,6 +11,7 @@ import playwright.sync_api
 
 from browsergym.webarena.task import GenericWebArenaTask
 from browsergym.webarena_verified.evaluators import WebArenaVerifiedEvaluator
+from webarena_verified.types import FinalAgentResponse
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +90,10 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         self.config = self.random.choice(self.task_configs)
 
         # hack: dynamically build a config file to read from
-        with tempfile.NamedTemporaryFile(mode="w+", delete=False) as f:
-            json.dump(self.config, f)
+        with tempfile.NamedTemporaryFile(
+            mode="w+", delete=False, prefix=f"wav-{self.config['intent_template_id']}-{self.config['task_id']}_", suffix=".json"
+        ) as f:
+            json.dump(self.config, f, indent=4)
             f.flush()
             self.config_file = f.name
 
@@ -132,6 +135,18 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
 
         # recover goal
         goal = self.config["intent"]
+
+        # WebArena Verified requires a specific format for the agent response
+        response_schema = FinalAgentResponse.model_json_schema()
+        goal += f"""
+
+---
+Final response format: When you send your final answer to the user with `send_msg_to_user`, your message must be a json formatted string that matches the following schema:
+```
+{json.dumps(response_schema, indent=4)}
+```
+Your message in `send_msg_to_user` will be validated against this schema.
+"""
 
         # This note is present in all webarena's agent prompts
         # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/agent/prompts/raw/p_cot_id_actree_2s.py#L34

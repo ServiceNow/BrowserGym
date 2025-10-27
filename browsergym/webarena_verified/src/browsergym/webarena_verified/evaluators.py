@@ -8,7 +8,7 @@ import logging
 import tempfile
 from pathlib import Path
 
-import playwright
+import playwright.sync_api
 
 from browsergym.webarena.instance import WebArenaInstance
 from webarena_verified.api import WebArenaVerifiedDataReader
@@ -95,16 +95,16 @@ class WebArenaVerifiedEvaluator:
 
         # stop playwright tracing
         with tempfile.TemporaryDirectory() as temp_dir:
-            trace_path = Path(temp_dir) / f"wav_{task.task_id}.zip"
+            trace_path = Path(temp_dir) / "trace.zip"
             page.context.tracing.stop(path=trace_path)
 
-        # Create evaluation context
-        context = TaskEvalContext(
-            task=task,
-            agent_response_raw=trajectory[-1].get("answer"),
-            network_trace=NetworkTrace.from_content(trace_path),
-            environments=self.evaluator.config.environments,
-        )
+            # Create evaluation context
+            context = TaskEvalContext(
+                task=task,
+                agent_response_raw=trajectory[-1].get("answer"),
+                network_trace=NetworkTrace.from_content(trace_path),
+                config=self.evaluator.config,
+            )
 
         # Run wa_verified evaluation and return float score
         logger.info(f"Running webarena_verified evaluation for task {task.task_id}")
