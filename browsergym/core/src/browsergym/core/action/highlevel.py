@@ -36,6 +36,7 @@ from .functions import (  # check,; uncheck,
     scroll_at,
     select_option,
     send_msg_to_user,
+    send_response_to_wav,
     tab_close,
     tab_focus,
     upload_file,
@@ -150,6 +151,28 @@ ACTION_SUBSETS = {
         select_option,  #     SELECT_OPTION |                  |
         send_msg_to_user,  #  STOP          | stop(answer)     | stop [answer]
         report_infeasible,  ## explicit unachievable action, equivalent STOP "N/A"
+    ],
+    # webarena_verified agent response schema
+    # https://github.com/ServiceNow/platform-labs-webarena-verified/blob/main/src/webarena_verified/types/agent_response.py
+    "webarena_verified": [
+        #                   #     code      |      paper       |      prompt
+        scroll,  #            SCROLL        | scroll(dir)      | scroll [down|up]
+        keyboard_press,  #    KEY_PRESS     | press(key_comb)  | press [key_comb]
+        #                     MOUSE_CLICK   |                  |
+        #                     KEYBOARD_TYPE |                  |
+        #                     MOUSE_HOVER   |                  |
+        click,  #             CLICK         | click(elem)      | click [id]
+        fill,  #              TYPE          | type(elem, text) | type [id] [content]
+        hover,  #             HOVER         | hover(elem)      | hover [id]
+        tab_focus,  #         PAGE_FOCUS    | tab_focus(index) | tab_focus [tab_index]
+        new_tab,  #           NEW_TAB       | new_tab()        | new_tab
+        go_back,  #           GO_BACK       | go_back()        | go_back
+        go_forward,  #        GO_FORWARD    | go_forward()     | go_forward
+        goto,  #              GOTO_URL      | goto(url)        | goto [url]
+        tab_close,  #         PAGE_CLOSE    | tab_close()      | close_tab
+        #                     CHECK         |                  |
+        select_option,  #     SELECT_OPTION |                  |
+        send_response_to_wav,  #  STOP          | stop(answer)     | stop [answer]
     ],
     # from the visualwebarena paper
     # https://arxiv.org/abs/2401.13649
@@ -272,6 +295,7 @@ class HighLevelActionSet(AbstractActionSet):
         "miniwob_liu18",
         "miniwob_humphreys22",
         "webarena",
+        "webarena_verified",
         "visualwebarena",
         "workarena",
         "workarena++",

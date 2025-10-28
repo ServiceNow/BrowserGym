@@ -65,6 +65,13 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=True,
         demo_mode="off",
     ),
+    "webarena_verified": HighLevelActionSetArgs(
+        subsets=["webarena_verified"],
+        multiaction=False,
+        strict=False,
+        retry_with_force=True,
+        demo_mode="off",
+    ),
     # from https://arxiv.org/abs/2401.13649
     "visualwebarena": HighLevelActionSetArgs(
         subsets=["visualwebarena"],
@@ -135,7 +142,7 @@ DEFAULT_BENCHMARKS = {
     ),
     "webarena_verified": lambda n_repeats=1: Benchmark(
         name="webarena_verified",
-        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena_verified"],
         is_multi_tab=True,
         supports_parallel_seeds=False,
         backends=["webarena_verified"],
