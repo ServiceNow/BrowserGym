@@ -4,34 +4,26 @@ from agentlab.experiments.study import make_study
 from pathlib import Path
 from agentlab.experiments.study import Study
 
-# Check registered tasks
+from browsergym.experiments.benchmark import DEFAULT_BENCHMARKS
 
-# import gymnasium as gym
+# Load the benchmark configuration
+benchmark = DEFAULT_BENCHMARKS["knows_1"]()
 
-# Import all browsergym modules to register environments
-# import browsergym.core
-# import browsergym.miniwob
-# import browsergym.workarena
-# import browsergym.webarena
-# import browsergym.visualwebarena
-# import browsergym.assistantbench
-# import browsergym.knows  # if you have knows installed
+# Configure all tasks to use the extracted storage state for authentication
+# This preserves Google login across all benchmark runs
+# Run extract_auth_state.py first to create this file
+STORAGE_STATE_FILE = "storage_state.json"
 
-# # # Get all browsergym environments
-# env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/knows")]
-
-# # Print themknows
-# print("\n".join(sorted(env_ids)))
-
-
+for env_args in benchmark.env_args_list:
+    env_args.storage_state = STORAGE_STATE_FILE
 
 study = make_study(
-    benchmark="knows_1",  # or "webarena", "workarena_l1" ...
+    benchmark=benchmark,
     agent_args=[AGENT_4o_MINI],
-    comment="Knows Benchmark",
+    comment="Knows Benchmark with Google Auth",
 )
 
 study.dir = Path("results")
 
-
+# Run the study
 study.run(n_jobs=5)
