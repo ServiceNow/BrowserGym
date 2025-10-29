@@ -1,6 +1,7 @@
 import importlib.resources
 import json
 import logging
+import os
 import tempfile
 from pathlib import Path
 from time import sleep
@@ -101,11 +102,14 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         self.evaluator = WebArenaVerifiedEvaluator(self.webarena_instance)
 
         # add extra context headers if they are present (e.g. for access token to the self hosted webarena verified instances)
-        extra_headers_file_path = Path(__file__).parent / "pw_extra_headers.json"
-        if extra_headers_file_path.exists():
-            with open(extra_headers_file_path, "r") as f:
-                extra_headers = json.load(f)
-            page.context.set_extra_http_headers(extra_headers)
+        if os.environ.get("PW_EXTRA_HEADERS"):
+            extra_headers_file_path = Path(os.environ["PW_EXTRA_HEADERS"])
+            try:
+                with open(extra_headers_file_path, "r") as f:
+                    extra_headers = json.load(f)
+                page.context.set_extra_http_headers(extra_headers)
+            except Exception as e:
+                logger.warning(f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers.")
 
         # authenticate
         for site in self.config["sites"]:
