@@ -30,10 +30,5 @@ path = "../core/src/browsergym/core/__init__.py"
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
-[tool.hatch.build]
-include = [
-    "src/browsergym/webarenalite/test_webarena_lite.raw.json"
-]
-
 [tool.hatch.build.targets.wheel]
 packages = ["src/browsergym"]
