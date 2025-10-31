@@ -65,13 +65,6 @@ DEFAULT_HIGHLEVEL_ACTION_SET_ARGS = {
         retry_with_force=True,
         demo_mode="off",
     ),
-    "webarena_verified": HighLevelActionSetArgs(
-        subsets=["webarena_verified"],
-        multiaction=False,
-        strict=False,
-        retry_with_force=True,
-        demo_mode="off",
-    ),
     # from https://arxiv.org/abs/2401.13649
     "visualwebarena": HighLevelActionSetArgs(
         subsets=["visualwebarena"],

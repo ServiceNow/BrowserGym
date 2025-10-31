@@ -272,7 +272,6 @@ class HighLevelActionSet(AbstractActionSet):
         "miniwob_liu18",
         "miniwob_humphreys22",
         "webarena",
-        "webarena_verified",
         "visualwebarena",
         "workarena",
         "workarena++",

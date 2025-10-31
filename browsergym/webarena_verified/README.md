@@ -1,15 +1,15 @@
 # WebArena Verified benchmark for BrowserGym
 
-This package provides `browsergym.webarena_verified`, which integrates the WebArena Verified benchmark from the [platform-labs-agent-eval-harness](https://github.com/ServiceNow/platform-labs-agent-eval-harness) into BrowserGym.
+This package provides `browsergym.webarena_verified`, which integrates the WebArena Verified benchmark from the [platform-labs-webarena-verified](https://github.com/ServiceNow/platform-labs-webarena-verified) into BrowserGym.
 
 ## Installation
 
 ### 0. Prerequisites
 
-Before installing this package, you need to clone the platform-labs-agent-eval-harness repository locally:
+Before installing this package, you need to clone the platform-labs-webarena-verified repository locally:
 
 ```bash
-git clone https://github.com/ServiceNow/platform-labs-agent-eval-harness.git /home/toolkit/platform-labs-agent-eval-harness
+git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified
 ```
 
 ### 1. Install this BrowserGym package
@@ -19,18 +19,9 @@ pip install -e ./browsergym/webarena_verified
 ```
 
 This will automatically install the required dependencies from local file paths:
-- `webarena-verified` from local platform-labs-agent-eval-harness repository
-- `agent-eval-harness-common` from local platform-labs-agent-eval-harness repository
-- `agent-eval-harness-pytest` from local platform-labs-agent-eval-harness repository
+- `webarena-verified` from local platform-labs-webarena-verified
 
-**Note**: This package requires the [platform-labs-agent-eval-harness](https://github.com/ServiceNow/platform-labs-agent-eval-harness) repository to be cloned locally at `/home/toolkit/platform-labs-agent-eval-harness` before installation.
 
-### 2. Download required resources
-
-```bash
-# Download NLTK tokenizer resources
-python -c "import nltk; nltk.download('punkt_tab')"
-```
 
 ## Setup
 
