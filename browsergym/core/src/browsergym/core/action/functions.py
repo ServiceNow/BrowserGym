@@ -1,7 +1,6 @@
 # these are placeholders
 # all these symbols will be available in browsergym actions
-import json
-from typing import Any, Literal
+from typing import Literal
 
 import playwright.sync_api
 
@@ -24,53 +23,6 @@ retry_with_force: bool = False
 The following primitives are meant to be included in the browsergym action using
 inspect.getsource().
 """
-
-def send_response_to_wav(
-    performed_operation: Literal["RETRIEVE", "MUTATE", "NAVIGATE"],
-    status: Literal["SUCCESS", "ACTION_NOT_ALLOWED_ERROR", "NOT_FOUND_ERROR", "PERMISSION_DENIED_ERROR", "DATA_VALIDATION_ERROR", "UNKNOWN_ERROR"],
-    retrieved_data: list[str | int | float | bool | dict[str, Any] | None] | None = None,
-    error_details: str | None = None,
-):
-    """Send the final response.
-    Args:
-        performed_operation: The overall type of work performed to attain the task objective.
-            - RETRIEVE: Use when retrieving data is the main objective of the task
-            - MUTATE: Use when creating, updating, or deleting data is the main objective of the task
-            - NAVIGATE: Use when navigating or browsing to show a specific page or location is the main objective of the task
-        status: The outcome of the task execution.
-            - SUCCESS: Use when the task objective was fully achieved
-            - ACTION_NOT_ALLOWED_ERROR: Use when the platform does not support the requested action
-            - NOT_FOUND_ERROR: Use when the target entity or resource could not be located after retry attempts
-            - PERMISSION_DENIED_ERROR: Use when the current user lacks permission to perform the action
-            - DATA_VALIDATION_ERROR: Use when required input data was missing or invalid
-            - UNKNOWN_ERROR: Use when an unexpected failure doesn't match other categories
-        retrieved_data: Array of items for 'retrieve' operations, null for 'mutate' and 'navigate' operations.
-            Returns empty array if no items found. All items must be the same type (either all primitives of the same type, or all objects with the same keys).
-            Use appropriate data type formats (e.g., numbers for amounts/counts, true/false for booleans, not strings).
-            For list of objects, the user instruction contains the format specification.
-        error_details: Null when status is 'SUCCESS'. Otherwise, explains what failed, why it failed, and what was attempted.
-
-    Examples:
-        send_response_to_wav("RETRIEVE", "SUCCESS", ["The city was built in 1751."])
-        send_response_to_wav("RETRIEVE", "SUCCESS", [{"name": "John Doe", "age": 30}])
-        send_response_to_wav("RETRIEVE", "SUCCESS", [0,3])
-        send_response_to_wav("RETRIEVE", "ACTION_NOT_ALLOWED_ERROR", None)
-        send_response_to_wav("RETRIEVE", "NOT_FOUND_ERROR", None, "No city found.")
-        send_response_to_wav("MUTATE", "SUCCESS", None)
-        send_response_to_wav("MUTATE", "PERMISSION_DENIED_ERROR", None, "User lacks permission to build a city.")
-        send_response_to_wav("NAVIGATE", "SUCCESS", None)
-        send_response_to_wav("NAVIGATE", "DATA_VALIDATION_ERROR", None, "Invalid city name.")
-        send_response_to_wav("NAVIGATE", "UNKNOWN_ERROR", None, "Unexpected error.")
-
-    """
-    final_response_dict = {
-        "performed_operation": performed_operation,
-        "status": status,
-        "retrieved_data": retrieved_data,
-        "error_details": error_details,
-    }
-    text = json.dumps(final_response_dict)
-    send_message_to_user(text)
 
 
 def send_msg_to_user(text: str):

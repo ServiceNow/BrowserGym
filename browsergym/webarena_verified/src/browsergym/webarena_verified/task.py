@@ -141,36 +141,15 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         goal = self.config["intent"]
 
         # WebArena Verified requires a specific format for the agent response
-        goal += """
+        response_schema = FinalAgentResponse.model_json_schema()
+        goal += f"""
 
-When you are done, send your final answer to the user with `send_response_to_wav`.
-"""
-#         response_schema = FinalAgentResponse.model_json_schema()
-#         goal += f"""
-
-# ---
-# Final response format: When you send your final answer to the user with `send_msg_to_user`, your message must be a json formatted string that matches the following schema:
-# ```
-# {json.dumps(response_schema, indent=4)}
-# ```
-# Your message in `send_msg_to_user` will be validated against this schema.
-# """
-
-        # This note is present in all webarena's agent prompts
-        # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/agent/prompts/raw/p_cot_id_actree_2s.py#L34
-        # However, webarena_verified does not have a homepage, so skip this hint
-        self.with_homepage_hint = False
-        if self.with_homepage_hint:
-            goal += f"""
-
-(Note: if you want to visit other websites, check out the homepage at {self.webarena_instance.home_url}. It has a list of websites you can visit. {self.webarena_instance.home_url}/password.html lists all the account name and password for the websites. You can use them to log in to the websites.)
-"""
-
-        # This note is present in some of webarena's agent prompts
-        if self.with_na_hint:
-            goal += """\
-
-If you believe the task is impossible to complete, provide the answer "N/A".
+---
+Final response format: When you send your final answer to the user with `send_msg_to_user`, your message must be a json formatted string that matches the following schema:
+```
+{json.dumps(response_schema, indent=4)}
+```
+Your message in `send_msg_to_user` will be validated against this schema.
 """
 
         return goal, {}
