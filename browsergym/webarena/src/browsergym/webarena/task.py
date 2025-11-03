@@ -1,8 +1,10 @@
 import importlib.resources
 import json
 import logging
+import os
 import tempfile
 import urllib.parse
+from pathlib import Path
 from typing import Optional, Tuple
 
 import numpy as np
@@ -100,6 +102,16 @@ class GenericWebArenaTask(AbstractBrowserTask):
 
         # build the evaluator
         self.evaluator = evaluator_router(self.config_file)
+
+        # add extra context headers if they are present (e.g. for access token to the self hosted webarena verified instances)
+        if os.environ.get("PW_EXTRA_HEADERS"):
+            extra_headers_file_path = Path(os.environ["PW_EXTRA_HEADERS"])
+            try:
+                with open(extra_headers_file_path, "r") as f:
+                    extra_headers = json.load(f)
+                page.context.set_extra_http_headers(extra_headers)
+            except Exception as e:
+                logger.warning(f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers.")
 
         # authenticate
         for site in self.config["sites"]:
