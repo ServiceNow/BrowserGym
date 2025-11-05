@@ -6,27 +6,22 @@ This package provides `browsergym.webarena_verified`, which integrates the [WebA
 
 Follow the official [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)
 
-## Setup
+## WebArena Verified Setup
 
-#### 1. Install webarena-verified in the same folder that contains BrowserGym
+#### 1. Install webarena-verified
 
-```bash
-git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../webarena-verified
-pip install -e ../webarena-verified
-```
-
-#### 2. Install this BrowserGym package
-
-```bash
-pip install -e ./browsergym/webarena_verified
-```
-
-Alternatively, you can also run:
 ```bash
 make install
+make setup-webarena-verified  # this commands will install webarena-verified in the same folder that contains BrowserGym
+```
+Alternatively, you can also run:
+```bash
+pip install -e ./browsergym/webarena_verified
+git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified
+pip install -e ../platform-labs-webarena-verified
 ```
 
-#### 3. Setup WebArena environment URLs
+#### 2. Setup WebArena environment URLs
 
 ```bash
 export WA_SHOPPING="..."
