@@ -1,109 +1,58 @@
 # WebArena Verified benchmark for BrowserGym
 
-This package provides `browsergym.webarena_verified`, which integrates the WebArena Verified benchmark from the [platform-labs-webarena-verified](https://github.com/ServiceNow/platform-labs-webarena-verified) into BrowserGym.
+This package provides `browsergym.webarena_verified`, which integrates the [WebArena Verified benchmark](https://github.com/ServiceNow/platform-labs-webarena-verified) into BrowserGym.
 
-## Installation
+## WebArena Server Deployement
 
-### 0. Prerequisites
+Follow the official [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)
 
-Before installing this package, you need to clone the platform-labs-webarena-verified repository locally:
+## Setup
+
+#### 1. Install webarena-verified in the same folder that contains BrowserGym
 
 ```bash
-git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified
+git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../webarena-verified
+pip install -e ../webarena-verified
 ```
 
-### 1. Install this BrowserGym package
+#### 2. Install this BrowserGym package
 
 ```bash
 pip install -e ./browsergym/webarena_verified
 ```
 
-This will automatically install the required dependencies from local file paths:
-- `webarena-verified` from local platform-labs-webarena-verified
-
-
-
-## Setup
-
-### Environment Variables
-
-Set up the WebArena environment URLs. The ports should correspond to your WebArena instance setup:
-
+Alternatively, you can also run:
 ```bash
-BASE_URL=<YOUR_SERVER_URL_HERE>  # example: "http://myazuremachine.eastus.cloudapp.azure.com"
-
-# WebArena environment variables (change ports as needed)
-export WA_SHOPPING="$BASE_URL:8082/"
-export WA_SHOPPING_ADMIN="$BASE_URL:8083/admin"
-export WA_REDDIT="$BASE_URL:8080"
-export WA_GITLAB="$BASE_URL:9001"
-export WA_WIKIPEDIA="$BASE_URL:8081/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
-export WA_MAP="$BASE_URL:443"
-export WA_HOMEPAGE="$BASE_URL:80"
-
-# Optional: Full reset functionality
-export WA_FULL_RESET="$BASE_URL:7565"
+make install
 ```
 
-### API Keys
-
-Set up required API keys:
+#### 3. Setup WebArena environment URLs
 
 ```bash
-# OpenAI API key (required for LLM-based evaluations)
-export OPENAI_API_KEY=...
+export WA_SHOPPING="..."
+export WA_SHOPPING_ADMIN=".../admin"
+export WA_REDDIT="..."
+export WA_GITLAB="..."
+export WA_WIKIPEDIA=".../wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing"
+export WA_MAP="..."
+export WA_HOMEPAGE="..."
 
-# Optional: Langfuse API key for tracing
-export LANGFUSE_PUBLIC_KEY=...
-export LANGFUSE_SECRET_KEY=...
+# (optional) path to a json file containing extra html headers for playwright to load in the page (for instance, a secret token to access your self hosted webarena instances).
+export PW_EXTRA_HEADERS="..."
 ```
 
-## Usage
-
+If you don't have a running environment for a domain, simply replace its URL with `"todo"`,
+and filter the benchmark tasks like so:
 ```python
-import browsergym.webarena_verified
+import bgym
+from browsergym.experiments.benchmark.metadata.utils import task_metadata
 
-# The package automatically registers all WebArena Verified tasks
-# Task IDs range from 0 to 811 (812 total tasks)
-
-# Example: Run a specific task
-from browsergym.webarena_verified import ALL_WEBARENA_TASK_IDS
-print(f"Available tasks: {len(ALL_WEBARENA_TASK_IDS)}")
-
-# Example: Create a task
-from browsergym.webarena_verified.task import WebArenaVerifiedTask
-
-task = WebArenaVerifiedTask(seed=42, task_id=0)
+domains = ["shopping", "reddit"]  # only consider 'shopping' or 'reddit' tasks
+task_list = []
+for domain in domains:
+    task_list.extend(task_metadata("webarena_verified").groupby("sites").get_group(domain).task_name.to_list())
+benchmark = bgym.DEFAULT_BENCHMARKS["webarena_verified"]()  # type: bgym.Benchmark
+benchmark = benchmark.subset_from_list(
+    task_list, "webarena_verified"_suffix=f"only_{'-'.join(domains)}"
+)
 ```
-
-## Task Configuration
-
-WebArena Verified tasks are configured via the `webarena_verified.json` file, which includes:
-
-- **Task metadata**: task_id, intent, intent_template
-- **Environment setup**: sites, start_url, geolocation
-- **Evaluation criteria**: expected_retrieve_value, expected_backend_state, expected_ui_state
-- **Authentication**: storage_state for logged-in sessions
-
-## Evaluation System
-
-The evaluation system supports three types of validation:
-
-1. **Retrieve Value**: Validates that the agent successfully retrieved the expected information
-2. **Backend State**: Validates that the agent made the expected changes to the backend/database
-3. **UI State**: Validates that the agent achieved the expected UI state
-
-## Differences from Original WebArena
-
-- Enhanced evaluation with multiple validation types
-- Integration with platform-labs evaluation framework
-- Support for more sophisticated task validation
-- Better error handling and logging
-- Structured agent response format
-
-## Troubleshooting
-
-- Ensure all environment variables are set correctly
-- Verify that the WebArena instance is running and accessible
-- Check that all required API keys are configured
-- Review logs for detailed error information
