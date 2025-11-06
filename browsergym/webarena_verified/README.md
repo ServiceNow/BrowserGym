@@ -12,7 +12,7 @@ Follow the official [webarena README](https://github.com/web-arena-x/webarena/bl
 
 ```bash
 make install
-make setup-webarena-verified  # this commands will clone & install webarena-verified locally in the same folder that contains BrowserGym
+make setup-webarena-verified  # this command will clone & install webarena-verified locally in the same folder that contains BrowserGym
 ```
 Alternatively, you can also run:
 ```bash
