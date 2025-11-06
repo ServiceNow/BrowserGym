@@ -111,7 +111,9 @@ class GenericWebArenaTask(AbstractBrowserTask):
                     extra_headers = json.load(f)
                 page.context.set_extra_http_headers(extra_headers)
             except Exception as e:
-                logger.warning(f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers.")
+                logger.warning(
+                    f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers."
+                )
 
         # authenticate
         for site in self.config["sites"]:

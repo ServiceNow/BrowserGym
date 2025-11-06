@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class WebArenaVerifiedEvaluator:
     """
     Evaluator that integrates the webarena_verified evaluation system.
-    
+
     This evaluator handles the new evaluation format with:
     - expected_retrieve_value: Validates data retrieval
     - expected_backend_state: Validates backend/database changes
@@ -57,8 +57,8 @@ class WebArenaVerifiedEvaluator:
                 },
                 WebArenaSite.HOMEPAGE: EnvironmentConfig(
                     urls=[webarena_instance.home_url],
-                )
-            }
+                ),
+            },
         )
         # Instantiate data reader and evaluator
         reader = WebArenaVerifiedDataReader(config)
@@ -84,6 +84,7 @@ class WebArenaVerifiedEvaluator:
         """
         # import webarena dynamically
         from webarena.browser_env.actions import ActionTypes
+
         # if last action is not a STOP action, return 0.0 as the task is not completed yet
         if trajectory[-1].get("action_type") != ActionTypes.STOP:
             return 0.0
@@ -110,9 +111,14 @@ class WebArenaVerifiedEvaluator:
         logger.info(f"Running webarena_verified evaluation for task {task.task_id}")
         results: TaskEvalResult = self.evaluator.evaluate_task(context=context)
         logger.info(f"Webarena_verified evaluation result for task {task.task_id}:")
-        logger.info(f"status: {results.status}, score: {results.score}, error_msg: {results.error_msg}")
+        logger.info(
+            f"status: {results.status}, score: {results.score}, error_msg: {results.error_msg}"
+        )
         for result in results.evaluators_results:
-            logger.info(f"- {result.evaluator_name}: status: {result.status}, score: {result.score}, error_msg: {result.error_msg}")
+            logger.info(
+                f"- {result.evaluator_name}: status: {result.status}, score: {result.score}, error_msg: {result.error_msg}"
+            )
         # return average score
-        return sum(result.score for result in results.evaluators_results) / len(results.evaluators_results)
-
+        return sum(result.score for result in results.evaluators_results) / len(
+            results.evaluators_results
+        )

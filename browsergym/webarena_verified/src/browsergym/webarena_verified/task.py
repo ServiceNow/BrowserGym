@@ -21,10 +21,10 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
     """
     WebArena Verified task class that integrates the full evaluation system
     from platform-labs-agent-eval-harness.
-    
+
     This task class handles the new evaluation format with:
     - expected_retrieve_value
-    - expected_backend_state  
+    - expected_backend_state
     - expected_ui_state
     """
 
@@ -50,7 +50,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
             .joinpath("webarena_verified.json")
             .read_text()
         )
-        
+
         # substitute URLs
         for pattern, url_key in {
             "__GITLAB__": "gitlab",
@@ -90,9 +90,12 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         # pick a task at random
         self.config = self.random.choice(self.task_configs)
 
-        # hack: dynamically build a config file to read from
+        # dynamically build a config file to read from
         with tempfile.NamedTemporaryFile(
-            mode="w+", delete=False, prefix=f"wav-{self.config['intent_template_id']}-{self.config['task_id']}_", suffix=".json"
+            mode="w+",
+            delete=False,
+            prefix=f"wav-{self.config['intent_template_id']}-{self.config['task_id']}_",
+            suffix=".json",
         ) as f:
             json.dump(self.config, f, indent=4)
             f.flush()
@@ -109,7 +112,9 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
                     extra_headers = json.load(f)
                 page.context.set_extra_http_headers(extra_headers)
             except Exception as e:
-                logger.warning(f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers.")
+                logger.warning(
+                    f"Failed to load extra headers from {extra_headers_file_path}: {e}. Make sure to set the PW_EXTRA_HEADERS environment variable to the path of an existing json file containing the extra headers. Continuing without extra headers."
+                )
 
         # authenticate
         for site in self.config["sites"]:
