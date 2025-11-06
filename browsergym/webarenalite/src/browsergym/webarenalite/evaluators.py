@@ -16,7 +16,7 @@ from typing import Union
 from beartype import beartype
 from nltk.tokenize import word_tokenize  # type: ignore
 from playwright.sync_api import CDPSession, Page
-from webarena.evaluation_harness.helper_functions import (
+from .helper_functions import (
     PseudoPage,
     gitlab_get_project_memeber_role,
     llm_fuzzy_match,
