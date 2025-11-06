@@ -2,7 +2,7 @@
 
 This package provides `browsergym.webarena_verified`, which integrates the [WebArena Verified benchmark](https://github.com/ServiceNow/platform-labs-webarena-verified) into BrowserGym.
 
-## WebArena Server Deployement
+## WebArena Server Deployment
 
 Follow the official [webarena README](https://github.com/web-arena-x/webarena/blob/main/environment_docker/README.md)
 
@@ -12,7 +12,7 @@ Follow the official [webarena README](https://github.com/web-arena-x/webarena/bl
 
 ```bash
 make install
-make setup-webarena-verified  # this commands will install webarena-verified in the same folder that contains BrowserGym
+make setup-webarena-verified  # this commands will clone & install webarena-verified locally in the same folder that contains BrowserGym
 ```
 Alternatively, you can also run:
 ```bash
