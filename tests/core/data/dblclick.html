@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button id="dblclick-counter" ondblclick="incrementCounter()">
+        Double-click me! Count: <span id="count">0</span>
+    </button>
+
+    <script>
+        let count = 0;
+        function incrementCounter() {
+            count++;
+            document.getElementById('count').textContent = count;
+        }
+    </script>
+</body>
+</html>
