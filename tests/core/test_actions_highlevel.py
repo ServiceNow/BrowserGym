@@ -902,7 +902,6 @@ def test_mouse_dblclick():
         center_y = box["y"] + box["height"] / 2
         return center_x, center_y
 
- 
     obs, info = env.reset()
 
     # counter starts at 0    assert not obs["last_action_error"]
@@ -916,7 +915,6 @@ mouse_dblclick({counter_x}, {counter_y})
 
     obs, reward, terminated, truncated, info = env.step(action)
 
-
     # counter incremented to 1
     assert not obs["last_action_error"]
     assert counter() == "1"
@@ -928,7 +926,7 @@ mouse_dblclick({counter_x}, {counter_y})
 """
 
     obs, reward, terminated, truncated, info = env.step(action)
-    
+
     # counter incremented to 2
     assert not obs["last_action_error"]
     assert counter() == "2"
