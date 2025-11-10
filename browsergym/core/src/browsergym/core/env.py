@@ -264,6 +264,7 @@ class BrowserEnv(gym.Env, ABC):
                 else None
             ),
             "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
+            "--ignore-certificate-errors",
         ]
         args = [arg for arg in args if arg is not None]  # Remove None values
 
@@ -289,6 +290,7 @@ class BrowserEnv(gym.Env, ABC):
             record_video_size=viewport,
             locale=locale,
             timezone_id=timezone_id,
+            ignore_https_errors=True,
             # will raise an Exception if above args are overriden
             **self.pw_context_kwargs,
         )
