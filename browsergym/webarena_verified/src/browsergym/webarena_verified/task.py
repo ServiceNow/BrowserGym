@@ -118,7 +118,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
 
         # authenticate
         for site in self.config["sites"]:
-            for attempt in range(3):
+            for attempt in range(3):  # Try 3 times in case of timeout
                 try:
                     self.webarena_instance.ui_login(site=site, page=page)
                     break  # Success, move to next site
@@ -138,7 +138,14 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
         # https://github.com/web-arena-x/webarena/blob/c6475f0e9affe5252a2966e26b8cb4c834a4ae40/browser_env/envs.py#L150
         if start_urls := self.config.get("start_urls"):
             for i, url in enumerate(start_urls):
-                page.goto(url)
+                for attempt in range(3):  # Try 3 times in case of timeout
+                    try:
+                        page.goto(url)
+                        break  # Success, move to next url
+                    except playwright_errors.TimeoutError as e:
+                        if attempt == 2:  # Last attempt (0, 1, 2)
+                            raise  # Re-raise the timeout error after 3 failed attempts
+                        sleep(1)  # Wait 1 second before retrying
                 if i < len(start_urls) - 1:
                     page = page.context.new_page()
 

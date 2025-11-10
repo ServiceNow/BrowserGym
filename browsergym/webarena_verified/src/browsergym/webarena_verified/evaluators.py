@@ -118,7 +118,10 @@ class WebArenaVerifiedEvaluator:
             logger.info(
                 f"- {result.evaluator_name}: status: {result.status}, score: {result.score}, error_msg: {result.error_msg}"
             )
-        # return average score
-        return sum(result.score for result in results.evaluators_results) / len(
-            results.evaluators_results
+        # return average score if multiple evaluators are present, otherwise return the aggregated score
+        return (
+            sum(result.score for result in results.evaluators_results)
+            / len(results.evaluators_results)
+            if results.evaluators_results
+            else results.score
         )
