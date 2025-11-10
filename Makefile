@@ -38,6 +38,7 @@ setup-webarena-verified:
 	fi
 	@echo "Installing WebArena Verified package..."
 	pip install -e ../platform-labs-webarena-verified
+	cp ../platform-labs-webarena-verified/assets/dataset/webarena-verified.json ./browsergym/webarena_verified/src/browsergym/webarena_verified/webarena_verified.json
 	@echo "✅ WebArena Verified setup complete!"
 
 test-core:
