@@ -6,6 +6,7 @@ import typing
 from typing import Literal
 
 import numpy as np
+
 from browsergym.experiments.loop import SEED_MAX, EnvArgs
 
 logger = logging.getLogger(__name__)
@@ -137,6 +138,36 @@ def prepare_backend(backend: str):
                         640,  # reddit
                         680,  # shopping_admin
                         740,  # wiki map
+                    ]
+                ]
+            )
+
+        case "webarena_verified":
+            # register environments
+            import browsergym.webarena_verified
+
+            # full reset the instance (requires environment variables properly set up)
+            from browsergym.webarena.instance import WebArenaInstance
+
+            default_instance = WebArenaInstance()
+            default_instance.full_reset()
+
+            logging.info(
+                f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
+            )
+            massage_tasks(
+                [
+                    f"webarena_verified.{intent_template_id}.{task_id}"
+                    for intent_template_id, task_id in [
+                        # gitlab and map are not ready yet
+                        (23, 410),  # reddit
+                        # (330, 533),  # gitlab
+                        # (87, 561),  # gitlab wiki
+                        # (87, 562),  # gitlab reddit
+                        (165, 574),  # shopping
+                        (16, 640),  # reddit
+                        (253, 680),  # shopping_admin
+                        # (94, 740),  # wiki map
                     ]
                 ]
             )

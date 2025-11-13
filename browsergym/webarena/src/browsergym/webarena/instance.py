@@ -146,6 +146,8 @@ class WebArenaInstance:
 
         """
         for site, url in self.urls.items():
+            if url == "todo":
+                continue
             try:
                 requests.get(url, timeout=timeout)
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):

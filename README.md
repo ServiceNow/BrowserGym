@@ -39,6 +39,7 @@ _Example of a GPT4-V agent executing openended tasks (top row, chat interactive)
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
+ - [WebArenaVerified](https://github.com/ServiceNow/platform-labs-webarena-verified)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
@@ -55,6 +56,7 @@ pip install browsergym-experiments  # experiment utilities (agent, loop, benchma
 pip install browsergym-core  # core functionalities only (no benchmark, just the openended task)
 pip install browsergym-miniwob  # core + miniwob
 pip install browsergym-webarena  # core + webarena
+pip install browsergym-webarena-verified  # core + webarena_verified
 pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
@@ -69,6 +71,7 @@ playwright install chromium
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
  - for MiniWoB++, see [miniwob/README.md](browsergym/miniwob/README.md)
  - for WebArena, see [webarena/README.md](browsergym/webarena/README.md)
+ - for WebArenaVerified, see [webarena_verified/README.md](browsergym/webarena_verified/README.md)
  - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)

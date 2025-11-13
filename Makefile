@@ -1,6 +1,6 @@
 install:
 	@echo "--- 🚀 Installing project dependencies ---"
-	pip install -e ./browsergym/core -e ./browsergym/miniwob -e ./browsergym/webarena -e ./browsergym/webarenalite -e ./browsergym/visualwebarena/ -e ./browsergym/experiments -e ./browsergym/assistantbench -e ./browsergym/
+	pip install -e ./browsergym/core -e ./browsergym/miniwob -e ./browsergym/webarena -e ./browsergym/webarenalite -e ./browsergym/webarena_verified -e ./browsergym/visualwebarena/ -e ./browsergym/experiments -e ./browsergym/assistantbench -e ./browsergym/
 	playwright install chromium
 
 install-demo:
@@ -28,6 +28,19 @@ setup-miniwob:
 	@echo "💡 To use MiniWoB++, load the environment variables:"
 	@echo "   source .env"
 
+setup-webarena-verified:
+	@echo "--- 🌐 Setting up WebArena Verified ---"
+	@if [ ! -d "../platform-labs-webarena-verified" ]; then \
+		echo "Cloning WebArena Verified repository..."; \
+		git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified; \
+	else \
+		echo "WebArena Verified repository already exists, skipping clone..."; \
+	fi
+	@echo "Installing WebArena Verified package..."
+	pip install -e ../platform-labs-webarena-verified
+	cp ../platform-labs-webarena-verified/assets/dataset/webarena-verified.json ./browsergym/webarena_verified/src/browsergym/webarena_verified/webarena_verified.json
+	@echo "✅ WebArena Verified setup complete!"
+
 test-core:
 	@echo "--- 🧪 Running tests ---"
 	pytest -n auto ./tests/core
@@ -39,12 +52,13 @@ clean-miniwob:
 
 help:
 	@echo "Available targets:"
-	@echo "  install          - Install project dependencies"
-	@echo "  setup-miniwob    - Setup MiniWoB++ dependencies"
-	@echo "  install-demo     - Install demo dependencies"
-	@echo "  demo             - Run demo agent"
-	@echo "  test-core        - Run core tests"
-	@echo "  clean-miniwob    - Remove MiniWoB++ directory"
-	@echo "  help             - Show this help message"
+	@echo "  install                 - Install project dependencies"
+	@echo "  setup-miniwob           - Setup MiniWoB++ dependencies"
+	@echo "  setup-webarena-verified - Setup WebArena Verified dependencies"
+	@echo "  install-demo            - Install demo dependencies"
+	@echo "  demo                    - Run demo agent"
+	@echo "  test-core               - Run core tests"
+	@echo "  clean-miniwob           - Remove MiniWoB++ directory"
+	@echo "  help                    - Show this help message"
 
-.PHONY: install setup-miniwob install-demo demo test-core clean-miniwob help
+.PHONY: install setup-miniwob setup-webarena-verified install-demo demo test-core clean-miniwob help
