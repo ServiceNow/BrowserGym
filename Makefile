@@ -30,15 +30,15 @@ setup-miniwob:
 
 setup-webarena-verified:
 	@echo "--- 🌐 Setting up WebArena Verified ---"
-	@if [ ! -d "../platform-labs-webarena-verified" ]; then \
+	@if [ ! -d "../platform-labs-webarena-verified-internal" ]; then \
 		echo "Cloning WebArena Verified repository..."; \
-		git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified; \
+		git clone https://github.com/ServiceNow/platform-labs-webarena-verified-internal.git ../platform-labs-webarena-verified-internal; \
 	else \
 		echo "WebArena Verified repository already exists, skipping clone..."; \
 	fi
 	@echo "Installing WebArena Verified package..."
-	pip install -e ../platform-labs-webarena-verified
-	cp ../platform-labs-webarena-verified/assets/dataset/webarena-verified.json ./browsergym/webarena_verified/src/browsergym/webarena_verified/webarena_verified.json
+	pip install -e ../platform-labs-webarena-verified-internal
+	cp ../platform-labs-webarena-verified-internal/assets/dataset/webarena-verified.json ./browsergym/webarena_verified/src/browsergym/webarena_verified/webarena_verified.json
 	@echo "✅ WebArena Verified setup complete!"
 
 test-core:
