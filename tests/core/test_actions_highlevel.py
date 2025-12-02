@@ -27,6 +27,7 @@ __DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 TEXTBOX_URL = f"file://{__DATA_DIR}/textbox.html"
 EXAMPLE_URL = f"file://{__DATA_DIR}/example.html"
 HOVER_URL = f"file://{__DATA_DIR}/hover.html"
+DBLCLICK_URL = f"file://{__DATA_DIR}/dblclick.html"
 INEXISTANT_FILE_URL = f"file://{__DATA_DIR}/no_file_here.html"
 LONG_PAGE_URL = f"file://{__DATA_DIR}/long_page.html"
 TEXT_INPUT_URL = f"file://{__DATA_DIR}/input_type/text_input.html"
@@ -826,9 +827,111 @@ keyboard_type('Reno')
     env.close()
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_dblclick():
-    pass
+    action_set = HighLevelActionSet(subsets=["bid"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": DBLCLICK_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def get_counter_elem(obs):
+        soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
+        counter = soup.find("span", attrs={"id": "count"})
+        return counter
+
+    obs, info = env.reset()
+    counter = get_counter_elem(obs)
+
+    # counter starts at 0
+    assert not obs["last_action_error"]
+    assert counter.text.strip() == "0"
+
+    # test dblclick using bid
+    counter_button = counter.find_parent("button", attrs={"id": "dblclick-counter"})
+    action = f"""
+dblclick({repr(counter_button.get(BID_ATTR))})
+"""
+
+    obs, reward, terminated, truncated, info = env.step(action)
+    counter = get_counter_elem(obs)
+
+    # counter incremented to 1
+    assert not obs["last_action_error"]
+    assert counter.text.strip() == "1"
+
+    # test dblclick using bid again
+    counter_button = counter.find_parent("button", attrs={"id": "dblclick-counter"})
+    action = f"""
+dblclick({repr(counter_button.get(BID_ATTR))})
+"""
+
+    obs, reward, terminated, truncated, info = env.step(action)
+    counter = get_counter_elem(obs)
+
+    # counter incremented to 2
+    assert not obs["last_action_error"]
+    assert counter.text.strip() == "2"
+
+    env.close()
+
+
+def test_mouse_dblclick():
+    action_set = HighLevelActionSet(subsets=["coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": DBLCLICK_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def counter():
+        return env.unwrapped.page.inner_text("#count")
+
+    def get_counter_coords():
+        button = env.unwrapped.page.locator("button")
+        box = button.bounding_box()
+        center_x = box["x"] + box["width"] / 2
+        center_y = box["y"] + box["height"] / 2
+        return center_x, center_y
+
+    obs, info = env.reset()
+
+    # counter starts at 0    assert not obs["last_action_error"]
+    assert counter() == "0"
+
+    # test mouse_dblclick using coordinates
+    counter_x, counter_y = get_counter_coords()
+    action = f"""
+mouse_dblclick({counter_x}, {counter_y})
+"""
+
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    # counter incremented to 1
+    assert not obs["last_action_error"]
+    assert counter() == "1"
+
+    counter_x, counter_y = get_counter_coords()
+
+    action = f"""
+mouse_dblclick({counter_x}, {counter_y})
+"""
+
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    # counter incremented to 2
+    assert not obs["last_action_error"]
+    assert counter() == "2"
+
+    env.close()
 
 
 # copy/paste text using a sequence of keyboard_press actions
