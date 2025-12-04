@@ -48,6 +48,8 @@ for domain in domains:
     task_list.extend(task_metadata("webarena_verified").groupby("sites").get_group(domain).task_name.to_list())
 benchmark = bgym.DEFAULT_BENCHMARKS["webarena_verified"]()  # type: bgym.Benchmark
 benchmark = benchmark.subset_from_list(
-    task_list, "webarena_verified"_suffix=f"only_{'-'.join(domains)}"
+    task_list, benchmark_name_suffix=f"_{'-'.join(DOMAINS)}"
 )
 ```
+
+**NOTE**: Tasks are registered with this template: `webarena_verified.{intent_template_id}.{task_id}`
