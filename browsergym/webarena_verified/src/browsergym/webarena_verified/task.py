@@ -125,7 +125,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
                 except playwright_errors.TimeoutError as e:
                     if attempt == 2:  # Last attempt (0, 1, 2)
                         raise  # Re-raise the timeout error after 3 failed attempts
-                    sleep(1)  # Wait 1 second before retrying
+                    sleep(2**attempt)  # Exponential backoff
 
         # enable playwright tracing (required for webarena_verified evaluation)
         page.context.tracing.start(snapshots=True)
@@ -145,7 +145,7 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
                     except playwright_errors.TimeoutError as e:
                         if attempt == 2:  # Last attempt (0, 1, 2)
                             raise  # Re-raise the timeout error after 3 failed attempts
-                        sleep(1)  # Wait 1 second before retrying
+                        sleep(2**attempt)  # Exponential backoff
                 if i < len(start_urls) - 1:
                     page = page.context.new_page()
 
