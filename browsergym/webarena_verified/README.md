@@ -12,13 +12,10 @@ Follow the official [webarena README](https://github.com/web-arena-x/webarena/bl
 
 ```bash
 make install
-make setup-webarena-verified  # this command will clone & install webarena-verified locally in the same folder that contains BrowserGym
 ```
 Alternatively, you can also run:
 ```bash
 pip install -e ./browsergym/webarena_verified
-git clone https://github.com/ServiceNow/platform-labs-webarena-verified.git ../platform-labs-webarena-verified
-pip install -e ../platform-labs-webarena-verified
 ```
 
 #### 2. Setup WebArena environment URLs
