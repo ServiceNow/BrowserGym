@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def make_env_args_list_from_workarena_curriculum(
-    level: Literal["l1", "l2", "l3"],
+    level: Literal["l1", "l2", "l3", "dg"],
     task_category_filter: str,
     meta_seed: int,
     max_steps: int,
@@ -22,7 +22,7 @@ def make_env_args_list_from_workarena_curriculum(
     """
     Returns a WorkArena predefined task curriculum (e.g., task and seed combination).
     """
-    assert level in ("l1", "l2", "l3")
+    assert level in ("l1", "l2", "l3", "dg")
     assert curriculum_type in ("human", "agent")
 
     env_args_list = []
