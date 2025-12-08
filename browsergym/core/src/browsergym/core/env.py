@@ -1,6 +1,8 @@
 import copy
 import logging
 import re
+import json
+import os
 import time
 from abc import ABC
 from pathlib import Path
@@ -10,7 +12,7 @@ import gymnasium as gym
 import numpy as np
 import playwright.sync_api
 
-from . import _get_global_playwright
+from . import _get_global_playwright, _set_global_playwright
 from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
@@ -256,7 +258,21 @@ class BrowserEnv(gym.Env, ABC):
         # use the global Playwright instance
         pw: playwright.sync_api.Playwright = _get_global_playwright()
         # important: change playwright's test id attribute from "data-testid" to "bid"
-        pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
+        try:
+            pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
+        except RuntimeError as exc:
+            if "no running event loop" not in str(exc):
+                raise
+            logger.warning(
+                "Playwright global instance lost its event loop; restarting Playwright."
+            )
+            try:
+                pw.stop()
+            except Exception:
+                logger.debug("Failed to stop stale Playwright instance.", exc_info=True)
+            pw = playwright.sync_api.sync_playwright().start()
+            _set_global_playwright(pw)
+            pw.selectors.set_test_id_attribute(BROWSERGYM_ID_ATTRIBUTE)
         args = [
             (
                 f"--window-size={viewport['width']},{viewport['height']}"
@@ -281,6 +297,7 @@ class BrowserEnv(gym.Env, ABC):
         )
 
         # create a new browser context for pages
+        extra_http_headers = json.loads(os.getenv("EXTRA_HTTP_HEADERS", "{}"))
         self.context = self.browser.new_context(
             no_viewport=True if self.resizeable_window else None,
             viewport=viewport if not self.resizeable_window else None,
@@ -291,6 +308,7 @@ class BrowserEnv(gym.Env, ABC):
             locale=locale,
             timezone_id=timezone_id,
             ignore_https_errors=True,
+            extra_http_headers=extra_http_headers,
             # will raise an Exception if above args are overriden
             **self.pw_context_kwargs,
         )
