@@ -714,3 +714,13 @@ workarena.servicenow.infeasible-navigate-and-sort-incident-list-l3,l3,contextual
 workarena.servicenow.infeasible-navigate-and-sort-change-request-list-l3,l3,contextual_understanding_infeasible_tasks,test
 workarena.servicenow.infeasible-navigate-and-sort-hardware-list-l3,l3,contextual_understanding_infeasible_tasks,test
 workarena.servicenow.infeasible-navigate-and-sort-service-catalog-item-list-l3,l3,contextual_understanding_infeasible_tasks,test
+workarena.servicenow.order-apple-watch,dg,service catalog,test
+workarena.servicenow.order-developer-laptop,dg,service catalog,test
+workarena.servicenow.order-ipad-pro,dg,service catalog,test
+workarena.servicenow.assign-role-to-user-admin,dg,role,test
+workarena.servicenow.assign-role-to-user-explicit,dg,role,test
+workarena.servicenow.assign-role-to-user-implicit,dg,role,test
+workarena.servicenow.find-asset-under-account-create-case,dg,case,test
+workarena.servicenow.get-case-resnotes,dg,case,test
+workarena.servicenow.get-case-status,dg,case,test
+workarena.servicenow.close-case,dg,case,test

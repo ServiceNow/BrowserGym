@@ -244,6 +244,21 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("workarena"),
     ),
+    "workarena_dynamic_guidance": lambda n_repeats=1: Benchmark(
+        name="workarena_dynamic_guidance",
+        high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
+        is_multi_tab=True,
+        supports_parallel_seeds=True,
+        backends=["workarena"],
+        env_args_list=make_env_args_list_from_workarena_curriculum(
+            level="dg",
+            task_category_filter=None,
+            meta_seed=42,  # meta seed for evaluation curriculum
+            max_steps=50,
+            curriculum_type="agent",
+        ),
+        task_metadata=task_metadata("workarena"),
+    ),
     "assistantbench": lambda n_repeats=1: Benchmark(
         name="assistantbench",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["assistantbench"],
