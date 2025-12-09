@@ -41,11 +41,10 @@ help:
 	@echo "Available targets:"
 	@echo "  install                 - Install project dependencies"
 	@echo "  setup-miniwob           - Setup MiniWoB++ dependencies"
-	@echo "  setup-webarena-verified - Setup WebArena Verified dependencies"
 	@echo "  install-demo            - Install demo dependencies"
 	@echo "  demo                    - Run demo agent"
 	@echo "  test-core               - Run core tests"
 	@echo "  clean-miniwob           - Remove MiniWoB++ directory"
 	@echo "  help                    - Show this help message"
 
-.PHONY: install setup-miniwob setup-webarena-verified install-demo demo test-core clean-miniwob help
+.PHONY: install setup-miniwob install-demo demo test-core clean-miniwob help
