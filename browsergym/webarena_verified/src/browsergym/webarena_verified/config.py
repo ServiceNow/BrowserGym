@@ -12,7 +12,7 @@ with open(Path(__file__).parent / "webarena_verified.json", "r") as f:
 # Check if the json file is the same as the one in the webarena-verified repository
 library_json_string = (
     importlib.resources.files("webarena_verified")
-    .joinpath("../../assets/dataset/webarena-verified.json")
+    .joinpath("assets/dataset/webarena-verified.json")
     .read_text()
 )
 library_json = json.loads(library_json_string)

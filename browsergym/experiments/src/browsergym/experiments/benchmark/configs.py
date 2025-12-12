@@ -140,13 +140,16 @@ DEFAULT_BENCHMARKS = {
         supports_parallel_seeds=False,
         backends=["webarena_verified"],
         env_args_list=make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(metadata=task_metadata("webarena_verified")),
+            task_list=task_list_from_metadata(
+                metadata=task_metadata("webarena_verified")
+            ),
             max_steps=30,
             n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
         ),
         task_metadata=task_metadata("webarena_verified"),
-    ),
+    ),  # TODO: Add webarena-verified hard subsets by filtering tasks in
+    # https://github.com/ServiceNow/webarena-verified/blob/main/assets/dataset/subsets/webarena-verified-hard.json
     "webarena_lite": lambda n_repeats=1: Benchmark(
         name="webarena_lite",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["webarena"],
@@ -267,7 +270,8 @@ DEFAULT_BENCHMARKS = {
         backends=["assistantbench"],
         env_args_list=make_env_args_list_from_repeat_tasks(
             task_list=task_list_from_metadata(
-                metadata=task_metadata("assistantbench"), filter={"browsergym_split": "valid|test"}
+                metadata=task_metadata("assistantbench"),
+                filter={"browsergym_split": "valid|test"},
             ),
             max_steps=30,
             n_repeats=n_repeats,
