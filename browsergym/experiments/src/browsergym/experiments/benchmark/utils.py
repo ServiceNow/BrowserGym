@@ -157,16 +157,16 @@ def prepare_backend(backend: str):
             )
             massage_tasks(
                 [
-                    f"webarena_verified.{intent_template_id}.{task_id}"
-                    for intent_template_id, task_id in [
-                        (23, 410),  # reddit
-                        (330, 533),  # gitlab
-                        (87, 561),  # gitlab wiki
-                        (88, 562),  # gitlab reddit
-                        (165, 574),  # shopping
-                        (16, 640),  # reddit
-                        (253, 680),  # shopping_admin
-                        (94, 740),  # wiki map
+                    f"webarena_verified.{intent_template_id}.{task_id}.{revision}"
+                    for intent_template_id, task_id, revision in [
+                        (23, 410, 2),  # reddit
+                        (330, 533, 2),  # gitlab
+                        (87, 561, 3),  # gitlab wiki
+                        (88, 562, 2),  # gitlab reddit
+                        (165, 574, 2),  # shopping
+                        (16, 640, 2),  # reddit
+                        (253, 680, 2),  # shopping_admin
+                        (94, 740, 2),  # wiki map
                     ]
                 ]
             )

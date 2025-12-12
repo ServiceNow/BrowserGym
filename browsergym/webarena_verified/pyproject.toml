@@ -29,11 +29,6 @@ path = "../core/src/browsergym/core/__init__.py"
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
-[tool.hatch.build]
-include = [
-    "src/browsergym/webarena_verified/webarena_verified.json"
-]
-
 [tool.hatch.metadata]
 allow-direct-references = true
 

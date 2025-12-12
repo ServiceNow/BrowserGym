@@ -16,6 +16,7 @@ authors = [
     {name = "Thibault Le Sellier De Chezelles"},
     {name = "Tom Marty"},
     {name = "Aman Jaiswal"},
+    {name = "Nicolas Gontier"},
 ]
 readme = "README.md"
 requires-python = ">3.10"

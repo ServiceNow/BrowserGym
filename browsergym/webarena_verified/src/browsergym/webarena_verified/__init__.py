@@ -14,8 +14,10 @@ except:
 ALL_WEBARENA_TASK_IDS = []
 
 # register all WebArena benchmark
-for task_id, intent_template_id in zip(config.TASK_IDS, config.INTENT_TEMPLATE_IDS):
-    gym_id = f"webarena_verified.{intent_template_id}.{task_id}"
+for task_id, intent_template_id, revision in zip(
+    config.TASK_IDS, config.INTENT_TEMPLATE_IDS, config.REVISIONS
+):
+    gym_id = f"webarena_verified.{intent_template_id}.{task_id}.{revision}"
     register_task(
         gym_id,
         task.WebArenaVerifiedTask,

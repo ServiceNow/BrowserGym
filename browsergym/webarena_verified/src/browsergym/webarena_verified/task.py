@@ -46,8 +46,8 @@ class WebArenaVerifiedTask(GenericWebArenaTask):
 
         # Load the webarena_verified.json file
         all_configs_str = (
-            importlib.resources.files("browsergym.webarena_verified")
-            .joinpath("webarena_verified.json")
+            importlib.resources.files("webarena_verified")
+            .joinpath("assets/dataset/webarena-verified.json")
             .read_text()
         )
 

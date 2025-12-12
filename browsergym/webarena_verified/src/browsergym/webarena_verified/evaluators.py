@@ -3,6 +3,7 @@ WebArena Verified evaluators that integrate the full evaluation system
 from platform-labs-agent-eval-harness.
 """
 
+import importlib.resources
 import json
 import logging
 import tempfile
@@ -46,7 +47,9 @@ class WebArenaVerifiedEvaluator:
         """
         # Create configuration for all sites and homepage from webarena_instance
         config = WebArenaVerifiedConfig(
-            test_data_file=Path(__file__).parent.joinpath("webarena_verified.json"),
+            test_data_file=importlib.resources.files("webarena_verified").joinpath(
+                "assets/dataset/webarena-verified.json"
+            ),
             environments={
                 **{
                     site: EnvironmentConfig(
