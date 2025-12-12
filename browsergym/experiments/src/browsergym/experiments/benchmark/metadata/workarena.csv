@@ -718,9 +718,27 @@ workarena.servicenow.order-apple-watch,dg,service catalog,test
 workarena.servicenow.order-developer-laptop,dg,service catalog,test
 workarena.servicenow.order-ipad-pro,dg,service catalog,test
 workarena.servicenow.assign-role-to-user-admin,dg,role,test
-workarena.servicenow.assign-role-to-user-explicit,dg,role,test
-workarena.servicenow.assign-role-to-user-implicit,dg,role,test
+workarena.servicenow.assign-roles-to-user-explicit,dg,role,test
+workarena.servicenow.assign-roles-to-user-implicit,dg,role,test
 workarena.servicenow.find-asset-under-account-create-case,dg,case,test
-workarena.servicenow.get-case-resnotes,dg,case,test
+workarena.servicenow.get-case-resolution-notes,dg,case,test
 workarena.servicenow.get-case-status,dg,case,test
 workarena.servicenow.close-case,dg,case,test
+workarena.servicenow.add-additional-assignee-to-incident,dg,case,test
+workarena.servicenow.change-chg-approver,dg,case,test
+workarena.servicenow.change-ritm-status,dg,case,test
+workarena.servicenow.create-interaction,dg,case,test
+workarena.servicenow.find-customer-account-manager,dg,case,test
+workarena.servicenow.get-number-licenses,dg,case,test
+workarena.servicenow.go-to-page,dg,case,test
+workarena.servicenow.order-iphone,dg,case,test
+workarena.servicenow.order-misc-hardware,dg,case,test
+workarena.servicenow.order-misc-hardware-with-business-justification,dg,case,test
+workarena.servicenow.order-mobile-phone,dg,case,test
+workarena.servicenow.order-packaging-and-shipping,dg,case,test
+workarena.servicenow.order-paper-and-supplies,dg,case,test
+workarena.servicenow.order-software,dg,case,test
+workarena.servicenow.order-software-access,dg,case,test
+workarena.servicenow.resolve-incident,dg,case,test
+workarena.servicenow.update-incident,dg,case,test
+workarena.servicenow.update-ritm-quantity,dg,case,test
