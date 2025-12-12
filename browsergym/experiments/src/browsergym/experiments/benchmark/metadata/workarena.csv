@@ -724,21 +724,22 @@ workarena.servicenow.find-asset-under-account-create-case,dg,case,test
 workarena.servicenow.get-case-resolution-notes,dg,case,test
 workarena.servicenow.get-case-status,dg,case,test
 workarena.servicenow.close-case,dg,case,test
-workarena.servicenow.add-additional-assignee-to-incident,dg,case,test
-workarena.servicenow.change-chg-approver,dg,case,test
-workarena.servicenow.change-ritm-status,dg,case,test
-workarena.servicenow.create-interaction,dg,case,test
-workarena.servicenow.find-customer-account-manager,dg,case,test
-workarena.servicenow.get-number-licenses,dg,case,test
-workarena.servicenow.go-to-page,dg,case,test
-workarena.servicenow.order-iphone,dg,case,test
-workarena.servicenow.order-misc-hardware,dg,case,test
-workarena.servicenow.order-misc-hardware-with-business-justification,dg,case,test
-workarena.servicenow.order-mobile-phone,dg,case,test
-workarena.servicenow.order-packaging-and-shipping,dg,case,test
-workarena.servicenow.order-paper-and-supplies,dg,case,test
-workarena.servicenow.order-software,dg,case,test
-workarena.servicenow.order-software-access,dg,case,test
-workarena.servicenow.resolve-incident,dg,case,test
-workarena.servicenow.update-incident,dg,case,test
-workarena.servicenow.update-ritm-quantity,dg,case,test
+workarena.servicenow.add-additional-assignee-to-incident,dg,incident,test
+workarena.servicenow.change-change-request-approver,dg,change_request,test
+workarena.servicenow.change-ritm-status,dg,ritm,test
+workarena.servicenow.create-interaction,dg,interaction,test
+workarena.servicenow.find-customer-account-manager,dg,customer_account,test
+workarena.servicenow.get-number-licenses,dg,license,test
+workarena.servicenow.all-menu-custom-goal,dg,navigation,test
+workarena.servicenow.order-iphone,dg,service catalog,test
+workarena.servicenow.order-misc-hardware,dg,service catalog,test
+workarena.servicenow.order-misc-hardware-with-business-justification,dg,service catalog,test
+workarena.servicenow.order-mobile-phone,dg,service catalog,test
+workarena.servicenow.order-packaging-and-shipping,dg,service catalog,test
+workarena.servicenow.order-paper-supplies,dg,service catalog,test
+workarena.servicenow.order-reset-password,dg,service catalog,test
+workarena.servicenow.order-software,dg,service catalog,test
+workarena.servicenow.order-software-access,dg,service catalog,test
+workarena.servicenow.resolve-incident,dg,incident,test
+workarena.servicenow.update-incident,dg,incident,test
+workarena.servicenow.update-ritm-quantity,dg,ritm,test
