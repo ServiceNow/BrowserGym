@@ -162,7 +162,7 @@ def prepare_backend(backend: str):
                         (23, 410),  # reddit
                         (330, 533),  # gitlab
                         (87, 561),  # gitlab wiki
-                        (87, 562),  # gitlab reddit
+                        (88, 562),  # gitlab reddit
                         (165, 574),  # shopping
                         (16, 640),  # reddit
                         (253, 680),  # shopping_admin
