@@ -743,3 +743,7 @@ workarena.servicenow.order-software-access,dg,service catalog,test
 workarena.servicenow.resolve-incident,dg,incident,test
 workarena.servicenow.update-incident,dg,incident,test
 workarena.servicenow.update-ritm-quantity,dg,ritm,test
+workarena.servicenow.create-workspace-incident,dg,workspace,test
+workarena.servicenow.create-workspace-problem,dg,workspace,test
+workarena.servicenow.create-workspace-transfer-order-task,dg,workspace,test
+workarena.servicenow.create-workspace-user-group,dg,workspace,test
