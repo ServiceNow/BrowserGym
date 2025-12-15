@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   code-format:
     runs-on: ubuntu-latest
 
@@ -17,18 +16,21 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
-        run: pip install black[jupyter]==24.2.0 blacken-docs
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv pip install black[jupyter]==24.2.0 blacken-docs
 
       - name: Code Formatting
         run: black . --check
@@ -41,32 +43,35 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Checkout AgentLab
         uses: actions/checkout@v4
         with:
-          repository: 'ServiceNow/AgentLab'
-          ref: 'main'
-          path: 'agentlab'
+          repository: "ServiceNow/AgentLab"
+          ref: "main"
+          path: "agentlab"
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '<3.13'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
 
       - name: Install AgentLab
         working-directory: ./agentlab
-        run: pip install -e .
+        run: uv pip install -e .
 
       - name: Install BrowserGym
         run: make install
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -87,7 +92,7 @@ jobs:
       # - name: Run AgentLab Unit Tests
       #   env:
       #     MINIWOB_URL: "http://localhost:8080/miniwob/"
-        # run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
+      # run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
 
   browsergym-core:
     runs-on: ubuntu-22.04
@@ -97,22 +102,25 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -128,22 +136,25 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -174,22 +185,25 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -228,15 +242,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -269,15 +287,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -309,15 +331,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -350,15 +376,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
@@ -390,15 +420,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.12"
 
-      - name: Pip install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
         run: playwright install chromium --with-deps
