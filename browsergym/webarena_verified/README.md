@@ -10,13 +10,13 @@ Follow the official [webarena README](https://github.com/web-arena-x/webarena/bl
 
 #### 1. Install webarena-verified
 
-```bash
-make install
-```
-Alternatively, you can also run:
-```bash
-pip install -e ./browsergym/webarena_verified
-```
+**IMPORTANT!** webarena-verified is still in active development. You need to install the webarena-verified package from source.
+
+> `pip install git+https://github.com/ServiceNow/webarena-verified`
+
+then install
+
+`pip install browsergym-webarena-verified`
 
 #### 2. Setup WebArena environment URLs
 
