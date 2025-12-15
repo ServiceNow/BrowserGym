@@ -1,3 +1,5 @@
+import importlib.resources
+import json
 import logging
 import multiprocessing as mp
 import os
@@ -104,6 +106,27 @@ def make_env_args_list_from_fixed_seeds(
     return env_args_list
 
 
+def get_webarena_verified_task_name(intent_template_id: int, task_id: int) -> str:
+    """
+    Returns the task name (with revision) for a given intent template id and task id.
+    """
+    # Load the json file from the webarena-verified library
+    data = json.loads(
+        importlib.resources.files("webarena_verified")
+        .joinpath("assets/dataset/webarena-verified.json")
+        .read_text()
+    )
+    for task in data:
+        if task["intent_template_id"] == intent_template_id and task["task_id"] == task_id:
+            revision = task["revision"]
+            break
+    else:
+        raise ValueError(
+            f"No task found for intent template id {intent_template_id} and task id {task_id} in webarena-verified.json"
+        )
+    return f"webarena_verified.{intent_template_id}.{task_id}.{revision}"
+
+
 def prepare_backend(backend: str):
     match backend:
         case "miniwob":
@@ -157,16 +180,16 @@ def prepare_backend(backend: str):
             )
             massage_tasks(
                 [
-                    f"webarena_verified.{intent_template_id}.{task_id}.{revision}"
-                    for intent_template_id, task_id, revision in [
-                        (23, 410, 2),  # reddit
-                        (330, 533, 2),  # gitlab
-                        (87, 561, 3),  # gitlab wiki
-                        (88, 562, 2),  # gitlab reddit
-                        (165, 574, 2),  # shopping
-                        (16, 640, 2),  # reddit
-                        (253, 680, 2),  # shopping_admin
-                        (94, 740, 2),  # wiki map
+                    get_webarena_verified_task_name(intent_template_id, task_id)
+                    for intent_template_id, task_id in [
+                        (23, 410),  # reddit
+                        # (330, 533),  # gitlab
+                        # (87, 561),  # gitlab wiki
+                        # (88, 562),  # gitlab reddit
+                        (165, 574),  # shopping
+                        (16, 640),  # reddit
+                        (253, 680),  # shopping_admin
+                        # (94, 740),  # wiki map
                     ]
                 ]
             )
