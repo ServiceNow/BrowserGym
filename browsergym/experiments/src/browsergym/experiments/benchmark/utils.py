@@ -183,13 +183,13 @@ def prepare_backend(backend: str):
                     get_webarena_verified_task_name(intent_template_id, task_id)
                     for intent_template_id, task_id in [
                         (23, 410),  # reddit
-                        # (330, 533),  # gitlab
-                        # (87, 561),  # gitlab wiki
-                        # (88, 562),  # gitlab reddit
+                        (330, 533),  # gitlab
+                        (87, 561),  # gitlab wiki
+                        (88, 562),  # gitlab reddit
                         (165, 574),  # shopping
                         (16, 640),  # reddit
                         (253, 680),  # shopping_admin
-                        # (94, 740),  # wiki map
+                        (94, 740),  # wiki map
                     ]
                 ]
             )
