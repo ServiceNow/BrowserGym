@@ -67,9 +67,10 @@ def make_webarena_verified_metadata_if_not_exists():
         original_task = original_tasks.get(task_id, {})
 
         # Assert that new task sites matches the original task sites
-        assert sites_str == original_task.get(
-            "sites", ""
-        ), f"Task {task_id}: sites mismatch - JSON: {sites_str}, CSV: {original_task.get("sites", "")}"
+        original_sites_str = original_task.get("sites", "")
+        assert (
+            sites_str == original_sites_str
+        ), f"Task {task_id}: sites mismatch - JSON: {sites_str}, CSV: {original_sites_str}"
 
         # Construct the dependency task name
         if original_dependency := original_task.get("depends_on"):
