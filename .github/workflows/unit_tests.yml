@@ -19,15 +19,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         run: uv pip install black[jupyter]==24.2.0 blacken-docs
@@ -53,15 +46,8 @@ jobs:
           ref: "main"
           path: "agentlab"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install AgentLab
         working-directory: ./agentlab
@@ -105,15 +91,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -139,15 +118,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -188,15 +160,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -239,15 +204,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -284,15 +242,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -328,15 +279,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -373,15 +317,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
@@ -417,15 +354,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install dependencies
         working-directory: ./dev
