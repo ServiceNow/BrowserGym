@@ -13,13 +13,10 @@ import pandas as pd
 from browsergym.experiments.loop import EnvArgs
 
 
-def make_webarena_verified_metadata_if_not_exists():
+def make_webarena_verified_metadata():
     """
-    Checks if the webarena_verified.csv file exists. If not, it creates it.
+    Creates the webarena_verified.csv metadata file based on the original webarena.csv file and the webarena-verified.json file in the webarena-verified library.
     """
-    if os.path.exists(os.path.join(os.path.dirname(__file__), "webarena_verified.csv")):
-        return
-
     # Load the json file from the webarena-verified library
     data = json.loads(
         importlib.resources.files("webarena_verified")
@@ -118,7 +115,7 @@ def make_webarena_verified_metadata_if_not_exists():
 
 def task_metadata(benchmark_name: str):
     if benchmark_name == "webarena_verified":
-        make_webarena_verified_metadata_if_not_exists()
+        make_webarena_verified_metadata()
 
     return task_metadata_from_csv(
         io.StringIO(pkgutil.get_data(__name__, f"{benchmark_name}.csv").decode("utf-8"))
