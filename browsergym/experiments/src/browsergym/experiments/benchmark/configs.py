@@ -140,9 +140,7 @@ DEFAULT_BENCHMARKS = {
         supports_parallel_seeds=False,
         backends=["webarena_verified"],
         env_args_list=make_env_args_list_from_repeat_tasks(
-            task_list=task_list_from_metadata(
-                metadata=task_metadata("webarena_verified")
-            ),
+            task_list=task_list_from_metadata(metadata=task_metadata("webarena_verified")),
             max_steps=30,
             n_repeats=n_repeats,
             seeds_rng=np.random.RandomState(42),
