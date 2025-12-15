@@ -26,7 +26,7 @@ jobs:
         run: uv pip install black[jupyter]==24.2.0 blacken-docs
 
       - name: Code Formatting
-        run: black . --check
+        run: uv run black . --check
 
   agentlab:
     runs-on: ubuntu-22.04
@@ -73,7 +73,7 @@ jobs:
           port: 8080
 
       - name: Pre-download tokenizer ressources (for WebArena)
-        run: python -c "import nltk; nltk.download('punkt_tab')"
+        run: uv run python -c "import nltk; nltk.download('punkt_tab')"
 
       # - name: Run AgentLab Unit Tests
       #   env:
@@ -102,10 +102,10 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-core Unit Tests
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
 
   browsergym-miniwob:
     runs-on: ubuntu-22.04
@@ -129,7 +129,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -147,7 +147,7 @@ jobs:
       - name: Run browsergym-miniwob Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
 
   browsergym-experiments:
     runs-on: ubuntu-22.04
@@ -171,7 +171,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -190,7 +190,7 @@ jobs:
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
           BROWSERGYM_WEBLINX_CACHE_DIR: "${{ runner.temp }}/weblinx_data"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:
     runs-on: ubuntu-22.04
@@ -215,7 +215,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-webarena not slow Unit Tests
         env:
@@ -227,7 +227,7 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
+        run: uv run pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-webarena-slow:
     runs-on: ubuntu-22.04
@@ -253,7 +253,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-webarena slow Unit Tests
         env:
@@ -265,7 +265,7 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
+        run: uv run pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-visualwebarena-fast:
     runs-on: ubuntu-22.04
@@ -290,7 +290,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena not slow Unit Tests
         env:
@@ -302,7 +302,7 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-visualwebarena-slow:
     runs-on: ubuntu-22.04
@@ -328,7 +328,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena slow Unit Tests
         env:
@@ -340,8 +340,8 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
-          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-assistantbench:
     runs-on: ubuntu-22.04
@@ -365,7 +365,7 @@ jobs:
         run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-assistantbench Unit Tests
         env:
@@ -377,4 +377,4 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
+          uv run pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
