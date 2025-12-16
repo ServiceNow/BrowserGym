@@ -254,7 +254,7 @@ DEFAULT_BENCHMARKS = {
             level="dg",
             task_category_filter=None,
             meta_seed=42,  # meta seed for evaluation curriculum
-            max_steps=50,
+            max_steps=30,
             curriculum_type="agent",
             seeds_l1=n_repeats,
         ),
