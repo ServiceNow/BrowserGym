@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   code-format:
     runs-on: ubuntu-latest
 
@@ -17,21 +16,17 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
-        run: pip install black[jupyter]==24.2.0 blacken-docs
+      - name: Install dependencies
+        run: uv pip install black[jupyter]==24.2.0 blacken-docs
 
       - name: Code Formatting
-        run: black . --check
+        run: uv run black . --check
 
   agentlab:
     runs-on: ubuntu-22.04
@@ -41,32 +36,28 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Checkout AgentLab
         uses: actions/checkout@v4
         with:
-          repository: 'ServiceNow/AgentLab'
-          ref: 'main'
-          path: 'agentlab'
+          repository: "ServiceNow/AgentLab"
+          ref: "main"
+          path: "agentlab"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '<3.13'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Install AgentLab
         working-directory: ./agentlab
-        run: pip install -e .
+        run: uv pip install -e .
 
       - name: Install BrowserGym
         run: make install
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -82,12 +73,12 @@ jobs:
           port: 8080
 
       - name: Pre-download tokenizer ressources (for WebArena)
-        run: python -c "import nltk; nltk.download('punkt_tab')"
+        run: uv run python -c "import nltk; nltk.download('punkt_tab')"
 
       # - name: Run AgentLab Unit Tests
       #   env:
       #     MINIWOB_URL: "http://localhost:8080/miniwob/"
-        # run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
+      # run: pytest -n 5 --durations=10 -m 'not pricy' -v agentlab/tests/experiments/test_launch_exp.py
 
   browsergym-core:
     runs-on: ubuntu-22.04
@@ -97,28 +88,24 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-core Unit Tests
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/core
 
   browsergym-miniwob:
     runs-on: ubuntu-22.04
@@ -128,25 +115,21 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -164,7 +147,7 @@ jobs:
       - name: Run browsergym-miniwob Unit Tests
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/miniwob
 
   browsergym-experiments:
     runs-on: ubuntu-22.04
@@ -174,25 +157,21 @@ jobs:
         shell: bash -l {0}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Fetch MiniWob
         uses: actions/checkout@v4
@@ -211,7 +190,7 @@ jobs:
         env:
           MINIWOB_URL: "http://localhost:8080/miniwob/"
           BROWSERGYM_WEBLINX_CACHE_DIR: "${{ runner.temp }}/weblinx_data"
-        run: pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
+        run: uv run pytest -n 5 --durations=10 -m 'not pricy' -v tests/experiments
 
   browsergym-webarena-fast:
     runs-on: ubuntu-22.04
@@ -225,21 +204,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-webarena not slow Unit Tests
         env:
@@ -251,7 +227,7 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
+        run: uv run pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-webarena-slow:
     runs-on: ubuntu-22.04
@@ -266,21 +242,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-webarena slow Unit Tests
         env:
@@ -292,7 +265,7 @@ jobs:
           WA_MAP: "${{ vars.WA_MAP }}"
           WA_HOMEPAGE: "${{ vars.WA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
-        run: pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
+        run: uv run pytest -n 5 --durations=10 -m 'slow and not pricy' --slowmo 1000 -v tests/webarena
 
   browsergym-visualwebarena-fast:
     runs-on: ubuntu-22.04
@@ -306,21 +279,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena not slow Unit Tests
         env:
@@ -332,7 +302,7 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest -n 5 --durations=10 -m 'not slow and not pricy' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-visualwebarena-slow:
     runs-on: ubuntu-22.04
@@ -347,21 +317,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-visualwebarena slow Unit Tests
         env:
@@ -373,8 +340,8 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
-          pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest -n 5 --durations=10 -m 'slow and not pricy and not serial' --slowmo 1000 -v tests/visualwebarena
+          uv run pytest --durations=10 -m 'slow and not pricy and serial' --slowmo 1000 -v tests/visualwebarena
 
   browsergym-assistantbench:
     runs-on: ubuntu-22.04
@@ -387,21 +354,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip' # caching pip dependencies
+      - name: Setup Python and uv
+        uses: ./.github/actions/setup-python-uv
 
-      - name: Pip install
+      - name: Install dependencies
         working-directory: ./dev
-        run: pip install -r requirements.txt
+        run: uv pip install -r requirements.txt
 
-      - name: Pip list
-        run: pip list
+      - name: List installed packages
+        run: uv pip list
 
       - name: Install Playwright
-        run: playwright install chromium --with-deps
+        run: uv run playwright install chromium --with-deps
 
       - name: Run browsergym-assistantbench Unit Tests
         env:
@@ -413,4 +377,4 @@ jobs:
           VWA_HOMEPAGE: "${{ vars.VWA_HOMEPAGE }}"
           OPENAI_API_KEY: ""
         run: |
-          pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
+          uv run pytest -n 5 --durations=10 -m 'not pricy' --slowmo 1000 -v tests/assistantbench
