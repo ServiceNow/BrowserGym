@@ -1,2 +1,2 @@
 browsergym-core==0.14.3.dev4
-libwebarena==0.0.4
+webarena-verified
