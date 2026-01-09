@@ -183,6 +183,17 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
+OpenApps
+```python
+from open_apps.apps.start_page.main import app  # need to import apps to serve
+from open_apps.launcher import OpenAppsLauncher
+
+config = ... # configure a namespace with task, agent, envrionment, and server configs
+
+launcher = OpenAppsLauncher(config)
+launcher.launch()
+```
+
 ## 💻 Demo
 
 If you want to experiment with a demo agent in BrowserGym, follow these steps
