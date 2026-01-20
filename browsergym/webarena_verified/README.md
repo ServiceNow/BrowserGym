@@ -1,6 +1,6 @@
 # WebArena Verified benchmark for BrowserGym
 
-This package provides `browsergym.webarena_verified`, which integrates the [WebArena Verified benchmark](https://github.com/ServiceNow/platform-labs-webarena-verified) into BrowserGym.
+This package provides `browsergym.webarena_verified`, which integrates the [WebArena Verified benchmark](https://github.com/ServiceNow/webarena-verified) into BrowserGym.
 
 ## WebArena Server Deployment
 
