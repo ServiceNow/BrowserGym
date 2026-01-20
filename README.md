@@ -44,6 +44,7 @@ BrowserGym includes the following benchmarks by default:
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
+ - [OpenApps](https://facebookresearch.github.io/OpenApps/)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -75,6 +76,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
+ - for OpenApps, see [OpenApps docs](https://facebookresearch.github.io/OpenApps/)
 
 ### 🏗️ Development setup
 
@@ -179,6 +181,17 @@ env = gym.make("browsergym/assistantbench.validation.3")
 # list all the available assistantbench tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
 print("\n".join(env_ids))
+```
+
+OpenApps
+```python
+from open_apps.apps.start_page.main import app  # need to import apps to serve
+from open_apps.launcher import OpenAppsLauncher
+
+config = ... # configure a namespace with task, agent, envrionment, and server configs
+
+launcher = OpenAppsLauncher(config)
+launcher.launch()
 ```
 
 ## 💻 Demo
