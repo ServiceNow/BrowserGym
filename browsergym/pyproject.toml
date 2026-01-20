@@ -16,6 +16,7 @@ authors = [
     {name = "Thibault Le Sellier De Chezelles"},
     {name = "Tom Marty"},
     {name = "Aman Jaiswal"},
+    {name = "Nicolas Gontier"},
 ]
 readme = "README.md"
 requires-python = ">3.10"
@@ -28,17 +29,18 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: Apache Software License",
 ]
-version="0.14.3.dev1"
+version="0.14.3.dev4"
 dependencies = [
-    "browsergym-core==0.14.3.dev1",
-    "browsergym-miniwob==0.14.3.dev1",
-    "browsergym-webarena==0.14.3.dev1",
-    "browsergym-visualwebarena==0.14.3.dev1",
-    "browsergym-assistantbench==0.14.3.dev1",
-    "browsergym-experiments==0.14.3.dev1",
+    "browsergym-core==0.14.3.dev4",
+    "browsergym-miniwob==0.14.3.dev4",
+    "browsergym-webarena==0.14.3.dev4",
+    "browsergym-visualwebarena==0.14.3.dev4",
+    "browsergym-assistantbench==0.14.3.dev4",
+    "browsergym-experiments==0.14.3.dev4",
     "browsergym-workarena>=0.4.1",
     "weblinx-browsergym>=0.0.2",
-    "browsergym-webarenalite==0.14.3.dev1"
+    "browsergym-webarenalite==0.14.3.dev4",
+    "browsergym-webarena-verified==0.14.3.dev4"
 ]
 
 [tool.setuptools]

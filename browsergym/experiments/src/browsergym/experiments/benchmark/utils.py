@@ -1,3 +1,5 @@
+import importlib.resources
+import json
 import logging
 import multiprocessing as mp
 import os
@@ -6,6 +8,7 @@ import typing
 from typing import Literal
 
 import numpy as np
+
 from browsergym.experiments.loop import SEED_MAX, EnvArgs
 
 logger = logging.getLogger(__name__)
@@ -103,6 +106,27 @@ def make_env_args_list_from_fixed_seeds(
     return env_args_list
 
 
+def get_webarena_verified_task_name(intent_template_id: int, task_id: int) -> str:
+    """
+    Returns the task name (with revision) for a given intent template id and task id.
+    """
+    # Load the json file from the webarena-verified library
+    data = json.loads(
+        importlib.resources.files("webarena_verified")
+        .joinpath("assets/dataset/webarena-verified.json")
+        .read_text()
+    )
+    for task in data:
+        if task["intent_template_id"] == intent_template_id and task["task_id"] == task_id:
+            revision = task["revision"]
+            break
+    else:
+        raise ValueError(
+            f"No task found for intent template id {intent_template_id} and task id {task_id} in webarena-verified.json"
+        )
+    return f"webarena_verified.{intent_template_id}.{task_id}.{revision}"
+
+
 def prepare_backend(backend: str):
     match backend:
         case "miniwob":
@@ -137,6 +161,35 @@ def prepare_backend(backend: str):
                         640,  # reddit
                         680,  # shopping_admin
                         740,  # wiki map
+                    ]
+                ]
+            )
+
+        case "webarena_verified":
+            # register environments
+            import browsergym.webarena_verified
+
+            # full reset the instance (requires environment variables properly set up)
+            from browsergym.webarena.instance import WebArenaInstance
+
+            default_instance = WebArenaInstance()
+            default_instance.full_reset()
+
+            logging.info(
+                f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
+            )
+            massage_tasks(
+                [
+                    get_webarena_verified_task_name(intent_template_id, task_id)
+                    for intent_template_id, task_id in [
+                        (23, 410),  # reddit
+                        (330, 533),  # gitlab
+                        (87, 561),  # gitlab wiki
+                        (88, 562),  # gitlab reddit
+                        (165, 574),  # shopping
+                        (16, 640),  # reddit
+                        (253, 680),  # shopping_admin
+                        (94, 740),  # wiki map
                     ]
                 ]
             )

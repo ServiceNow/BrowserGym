@@ -937,6 +937,7 @@ def _get_env_name(task_name: str):
     elif task_name.startswith("webarena"):
         import browsergym.webarena
         import browsergym.webarenalite
+        import browsergym.webarena_verified
     elif task_name.startswith("visualwebarena"):
         import browsergym.visualwebarena
     elif task_name.startswith("assistantbench"):
