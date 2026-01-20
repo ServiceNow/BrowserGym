@@ -273,3 +273,5 @@ Here is an example of how they can be used:
 ```tex
 We use the BrowserGym framework for our experiments \cite{workarena2024,chezelles2025browsergym}.
 ```
+## Traces
+Traces from “The BrowserGym Ecosystem for Web Agent Research” paper are available in [Huggingface](https://huggingface.co/datasets/agentlabtraces/agentlabtraces/tree/main).
