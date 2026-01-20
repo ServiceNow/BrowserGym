@@ -39,7 +39,7 @@ _Example of a GPT4-V agent executing openended tasks (top row, chat interactive)
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
- - [WebArenaVerified](https://github.com/ServiceNow/platform-labs-webarena-verified)
+ - [WebArenaVerified](https://github.com/ServiceNow/webarena-verified)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
