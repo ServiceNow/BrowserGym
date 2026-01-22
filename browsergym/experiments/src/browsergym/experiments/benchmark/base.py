@@ -3,6 +3,7 @@ import logging
 import random
 import typing
 from dataclasses import dataclass, field
+from importlib import metadata
 from typing import Literal, Optional
 
 import pandas as pd
@@ -257,3 +258,22 @@ class Benchmark(DataClassJsonMixin):
             supports_parallel_seeds=self.supports_parallel_seeds,
         )
         return env_args_dependencies
+
+    def get_version(self):
+        if self.name.startswith("miniwob"):
+            return metadata.distribution("browsergym.miniwob").version
+        elif self.name.startswith("workarena"):
+            return metadata.distribution("browsergym.workarena").version
+        elif self.name.startswith("webarena"):
+            return metadata.distribution("browsergym.webarena").version
+        elif self.name.startswith("visualwebarena"):
+            return metadata.distribution("browsergym.visualwebarena").version
+        elif self.name.startswith("assistantbench"):
+            return metadata.distribution("browsergym.assistantbench").version
+        elif self.name.startswith("weblinx"):
+            try:
+                return metadata.distribution("weblinx_browsergym").version
+            except metadata.PackageNotFoundError:
+                return "0.0.1rc1"
+        else:
+            raise ValueError(f"Unknown benchmark {self.name}")
