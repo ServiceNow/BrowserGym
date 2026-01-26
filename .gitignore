@@ -106,7 +106,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -138,12 +137,10 @@ error_logs.txt
 # tests
 tests/results
 tmp.py
-.vscode/**
 
 # demo and results
 results/
 
-.vscode/launch.json
 
 # assistantbench
 tests/assistantbench/assistantbench-predictions-test.jsonl
@@ -155,3 +152,5 @@ bg_wl_data/
 miniwob-plusplus/
 
 uv.lock
+config.bat
+node_modules
