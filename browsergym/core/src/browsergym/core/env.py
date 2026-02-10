@@ -2,6 +2,8 @@ import copy
 import logging
 import re
 import time
+import os
+import json
 from abc import ABC
 from pathlib import Path
 from typing import Any, Callable, Literal, Optional
@@ -30,6 +32,9 @@ from .task import AbstractBrowserTask
 
 logger = logging.getLogger(__name__)
 
+extra_http_headers = {}
+if os.getenv("EXTRA_HTTP_HEADERS"):
+    extra_http_headers = json.loads(os.getenv("EXTRA_HTTP_HEADERS"))
 
 def _try_to_extract_legacy_goal(goal: list):
     legacy_goal_strings = []
@@ -264,10 +269,12 @@ class BrowserEnv(gym.Env, ABC):
                 else None
             ),
             "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
+            "--ignore-certificate-errors",
         ]
         args = [arg for arg in args if arg is not None]  # Remove None values
 
         # create a new browser
+        logger.info(f"Launching browser with args: {args}")
         self.browser = pw.chromium.launch(
             headless=self.headless,
             slow_mo=slow_mo,
@@ -289,6 +296,8 @@ class BrowserEnv(gym.Env, ABC):
             record_video_size=viewport,
             locale=locale,
             timezone_id=timezone_id,
+            ignore_https_errors=True,
+            extra_http_headers=extra_http_headers,
             # will raise an Exception if above args are overriden
             **self.pw_context_kwargs,
         )
