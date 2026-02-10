@@ -1,0 +1,20 @@
+name: 'Setup Python and uv'
+description: 'Setup Python 3.12 and install uv package manager'
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        # Install a specific version of uv.
+        version: "0.9.17"
+        enable-cache: true
+
+    - name: Create virtual environment
+      shell: bash
+      run: uv venv

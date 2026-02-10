@@ -39,10 +39,12 @@ _Example of a GPT4-V agent executing openended tasks (top row, chat interactive)
 BrowserGym includes the following benchmarks by default:
  - [MiniWoB](https://miniwob.farama.org/)
  - [WebArena](https://webarena.dev/)
+ - [WebArenaVerified](https://github.com/ServiceNow/webarena-verified)
  - [VisualWebArena](https://jykoh.com/vwa)
  - [WorkArena](https://github.com/ServiceNow/WorkArena)
  - [AssistantBench](https://github.com/oriyor/assistantbench)
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
+ - [OpenApps](https://facebookresearch.github.io/OpenApps/)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -55,6 +57,7 @@ pip install browsergym-experiments  # experiment utilities (agent, loop, benchma
 pip install browsergym-core  # core functionalities only (no benchmark, just the openended task)
 pip install browsergym-miniwob  # core + miniwob
 pip install browsergym-webarena  # core + webarena
+pip install browsergym-webarena-verified  # core + webarena_verified
 pip install browsergym-visualwebarena  # core + visualwebarena
 pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
@@ -69,9 +72,11 @@ playwright install chromium
 Finally, each benchmark comes with its own specific setup that requires to follow additional steps.
  - for MiniWoB++, see [miniwob/README.md](browsergym/miniwob/README.md)
  - for WebArena, see [webarena/README.md](browsergym/webarena/README.md)
+ - for WebArenaVerified, see [webarena_verified/README.md](browsergym/webarena_verified/README.md)
  - for VisualWebArena, see [visualwebarena/README.md](browsergym/visualwebarena/README.md)
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
+ - for OpenApps, see [OpenApps docs](https://facebookresearch.github.io/OpenApps/)
 
 ### 🏗️ Development setup
 
@@ -178,6 +183,17 @@ env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/wo
 print("\n".join(env_ids))
 ```
 
+OpenApps
+```python
+from open_apps.apps.start_page.main import app  # need to import apps to serve
+from open_apps.launcher import OpenAppsLauncher
+
+config = ... # configure a namespace with task, agent, envrionment, and server configs
+
+launcher = OpenAppsLauncher(config)
+launcher.launch()
+```
+
 ## 💻 Demo
 
 If you want to experiment with a demo agent in BrowserGym, follow these steps
@@ -270,3 +286,5 @@ Here is an example of how they can be used:
 ```tex
 We use the BrowserGym framework for our experiments \cite{workarena2024,chezelles2025browsergym}.
 ```
+## Traces
+Traces from “The BrowserGym Ecosystem for Web Agent Research” paper are available in [Huggingface](https://huggingface.co/datasets/agentlabtraces/agentlabtraces/tree/main).

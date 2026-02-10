@@ -155,3 +155,6 @@ bg_wl_data/
 miniwob-plusplus/
 
 uv.lock
+
+# webarena verified metadata (constructed automatically)
+browsergym/experiments/src/browsergym/experiments/benchmark/metadata/webarena_verified.csv

@@ -1,4 +1,8 @@
+import csv
+import importlib.resources
 import io
+import json
+import os
 import pkgutil
 from collections import defaultdict
 from copy import deepcopy
@@ -9,7 +13,110 @@ import pandas as pd
 from browsergym.experiments.loop import EnvArgs
 
 
+def make_webarena_verified_metadata():
+    """
+    Creates the webarena_verified.csv metadata file based on the original webarena.csv file and the webarena-verified.json file in the webarena-verified library.
+    """
+    # Load the json file from the webarena-verified library
+    data = json.loads(
+        importlib.resources.files("webarena_verified")
+        .joinpath("assets/dataset/webarena-verified.json")
+        .read_text()
+    )
+    # Create a mapping from task_id to intent_template_id and revision for efficient lookup. This is used to find the dependency task name.
+    task_id_to_template_id = {task["task_id"]: task["intent_template_id"] for task in data}
+    task_id_to_revision = {task["task_id"]: task["revision"] for task in data}
+
+    # Read the original webarena.csv and create a mapping from task_id to original task info
+    original_csv_path = os.path.join(os.path.dirname(__file__), "webarena.csv")
+    original_tasks = {}
+    with open(original_csv_path, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            task_id = int(row["task_id"])
+            original_tasks[task_id] = {
+                "requires_reset": row["requires_reset"],
+                "sites": row["sites"],
+                "eval_types": row["eval_types"],
+                "browsergym_split": row["browsergym_split"],
+                "depends_on": row["depends_on"],
+            }
+
+    # Create CSV data
+    csv_data = []
+    for task in data:
+        intent_template_id = task["intent_template_id"]
+        task_id = task["task_id"]
+        revision = task["revision"]
+
+        # Extract eval_types
+        new_eval_types = []
+        for evaluator_config in task.get("eval", []):
+            new_eval_types.append(evaluator_config["evaluator"])
+        assert len(new_eval_types) > 0, f"Task {task_id} has no evaluators"
+        new_eval_types_str = " ".join(new_eval_types)
+
+        # Extract new task sites
+        sites = task.get("sites", [])
+        sites_str = " ".join(sites) if sites else ""
+
+        # Get original task data for comparison and dependency copying
+        original_task = original_tasks.get(task_id, {})
+
+        # Assert that new task sites matches the original task sites
+        original_sites_str = original_task.get("sites", "")
+        assert (
+            sites_str == original_sites_str
+        ), f"Task {task_id}: sites mismatch - JSON: {sites_str}, CSV: {original_sites_str}"
+
+        # Construct the dependency task name
+        if original_dependency := original_task.get("depends_on"):
+            dependency_task_id = int(original_dependency.split(".")[-1])
+            dependency_template_id = task_id_to_template_id[dependency_task_id]
+            dependency_revision = task_id_to_revision[dependency_task_id]
+            dependency_task_name = f"webarena_verified.{dependency_template_id}.{dependency_task_id}.{dependency_revision}"
+        else:
+            dependency_task_name = ""
+
+        # Create metadata row
+        row = {
+            "task_name": f"webarena_verified.{intent_template_id}.{task_id}.{revision}",
+            "requires_reset": str(
+                original_task.get("requires_reset", False)
+            ),  # copy original requires_reset
+            "sites": sites_str,
+            "eval_types": new_eval_types_str,
+            "task_id": str(task_id),
+            "browsergym_split": original_task.get(
+                "browsergym_split", "train"
+            ),  # copy original browsergym_split
+            "depends_on": dependency_task_name,
+        }
+        csv_data.append(row)
+
+    # Write CSV file
+    output_path = os.path.join(os.path.dirname(__file__), "webarena_verified.csv")
+    with open(output_path, "w", newline="") as f:
+        fieldnames = [
+            "task_name",
+            "requires_reset",
+            "sites",
+            "eval_types",
+            "task_id",
+            "browsergym_split",
+            "depends_on",
+        ]
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(csv_data)
+
+    print(f"Created {output_path} with {len(csv_data)} tasks")
+
+
 def task_metadata(benchmark_name: str):
+    if benchmark_name == "webarena_verified":
+        make_webarena_verified_metadata()
+
     return task_metadata_from_csv(
         io.StringIO(pkgutil.get_data(__name__, f"{benchmark_name}.csv").decode("utf-8"))
     )

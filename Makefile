@@ -1,12 +1,12 @@
 install:
 	@echo "--- 🚀 Installing project dependencies ---"
-	pip install -e ./browsergym/core -e ./browsergym/miniwob -e ./browsergym/webarena -e ./browsergym/webarenalite -e ./browsergym/visualwebarena/ -e ./browsergym/experiments -e ./browsergym/assistantbench -e ./browsergym/
-	playwright install chromium
+	uv pip install -e ./browsergym/core -e ./browsergym/miniwob -e ./browsergym/webarena -e ./browsergym/webarenalite -e ./browsergym/visualwebarena/ -e ./browsergym/experiments -e ./browsergym/assistantbench -e ./browsergym/
+	uv run playwright install chromium
 
 install-demo:
 	@echo "--- 🚀 Installing demo dependencies ---"
-	pip install -r demo_agent/requirements.txt
-	playwright install chromium
+	uv pip install -r demo_agent/requirements.txt
+	uv run playwright install chromium
 
 demo:
 	@echo "--- 🚀 Running demo agent ---"
@@ -30,8 +30,7 @@ setup-miniwob:
 
 test-core:
 	@echo "--- 🧪 Running tests ---"
-	pytest -n auto ./tests/core
-
+	uv run pytest -n auto ./tests/core
 clean-miniwob:
 	@echo "--- 🧹 Cleaning MiniWoB++ installation ---"
 	rm -rf miniwob-plusplus
@@ -39,12 +38,12 @@ clean-miniwob:
 
 help:
 	@echo "Available targets:"
-	@echo "  install          - Install project dependencies"
-	@echo "  setup-miniwob    - Setup MiniWoB++ dependencies"
-	@echo "  install-demo     - Install demo dependencies"
-	@echo "  demo             - Run demo agent"
-	@echo "  test-core        - Run core tests"
-	@echo "  clean-miniwob    - Remove MiniWoB++ directory"
-	@echo "  help             - Show this help message"
+	@echo "  install                 - Install project dependencies"
+	@echo "  setup-miniwob           - Setup MiniWoB++ dependencies"
+	@echo "  install-demo            - Install demo dependencies"
+	@echo "  demo                    - Run demo agent"
+	@echo "  test-core               - Run core tests"
+	@echo "  clean-miniwob           - Remove MiniWoB++ directory"
+	@echo "  help                    - Show this help message"
 
 .PHONY: install setup-miniwob install-demo demo test-core clean-miniwob help

@@ -69,7 +69,7 @@ def _normalize_number(text: str) -> str:
 
 
 def _answer_to_bags(
-    answer: Union[str, List[str], Tuple[str, ...]]
+    answer: Union[str, List[str], Tuple[str, ...]],
 ) -> Tuple[List[str], List[Set[str]]]:
     if isinstance(answer, (list, tuple)):
         raw_spans = answer
