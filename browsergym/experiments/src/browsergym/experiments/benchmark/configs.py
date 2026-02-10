@@ -244,8 +244,8 @@ DEFAULT_BENCHMARKS = {
         ),
         task_metadata=task_metadata("workarena"),
     ),
-    "workarena_dynamic_guidance": lambda n_repeats=10: Benchmark(
-        name="workarena_dynamic_guidance",
+    "workarena_dg": lambda n_repeats=10: Benchmark(
+        name="workarena_dg",
         high_level_action_set_args=DEFAULT_HIGHLEVEL_ACTION_SET_ARGS["workarena++"],
         is_multi_tab=True,
         supports_parallel_seeds=True,
