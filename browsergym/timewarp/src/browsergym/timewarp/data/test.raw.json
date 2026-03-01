@@ -1,0 +1,4020 @@
+[
+  {
+    "task_id": 1,
+    "intent": "Is biophysics mentioned as a related page or branch in the Biology article, the Physics article, both, or neither of them?",
+    "intent_template_id": 1,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Biology"
+      }
+    }
+  },
+  {
+    "task_id": 2,
+    "intent": "What is the population difference between the two special administrative regions of China?",
+    "intent_template_id": 2,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Around 7 million"
+      }
+    }
+  },
+  {
+    "task_id": 3,
+    "intent": "List all specific animal names found in the 'Natural History' section of the New Zealand page and the 'Indigenous life' section of the Australia page.",
+    "intent_template_id": 3,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Koalas, kangaroos, wombats, numbats, platypus, bats, seals, dolphins, whales, kiwi, kakapo, tuatara, Moa, rats, dogs, cats, possums."
+      }
+    }
+  },
+  {
+    "task_id": 4,
+    "intent": "Go to Black Sabbath's article and click the second hyperlink in the article's content. I need the population of the country that the link leads to. If it's not a country, just go to the first country mentioned on that visited page and give me that country's population.",
+    "intent_template_id": 4,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Over 57.7 million"
+      }
+    }
+  },
+  {
+    "task_id": 5,
+    "intent": "How many total Pro Football Hall of Famers are there in the articles about the American football teams mentioned in Eminem's article?",
+    "intent_template_id": 5,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Thirteen"
+      }
+    }
+  },
+  {
+    "task_id": 6,
+    "intent": "Trace this path: start at the \"Territory\" page → the first country mentioned → a country that shares its southern border → the largest city of that country. What is the first word of the second section on that final page (the introductory paragraphs count as one section)?",
+    "intent_template_id": 6,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Mexico"
+      }
+    }
+  },
+  {
+    "task_id": 7,
+    "intent": "Navigate to the article corresponding to the last word in the second paragraph of the 'Hip-hop' article. In the visited page, follow the first hyperlink and tell me the first line from the article's content.",
+    "intent_template_id": 7,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "State In politics, a is the government of a country which has control over a geographic area or territory."
+      }
+    }
+  },
+  {
+    "task_id": 8,
+    "intent": "Recursively follow the first link in the main content of each page, starting from the article on Research. What is the title of the final article whose page does not exist?",
+    "intent_template_id": 8,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Real"
+      }
+    }
+  },
+  {
+    "task_id": 9,
+    "intent": "Recursively follow the third hyperlink in the main content of each article, starting from the article \"Periodic table.\" Keep traversing until there is no third hyperlink or you encounter a \"page does not exist\" article. List the titles of all the valid pages in the order that you visited.",
+    "intent_template_id": 9,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Periodic table, Atomic number, nucleus, proton, neutron, atom, solid"
+      }
+    }
+  },
+  {
+    "task_id": 10,
+    "intent": "Visit the article about the earliest known statistics mentioned in the Statistics article. Then visit the article about the last country mentioned in its main content. What is the name of the first animal mentioned on that country's page?",
+    "intent_template_id": 10,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Kiwi"
+      }
+    }
+  },
+  {
+    "task_id": 11,
+    "intent": "Who is the current mayor of New York City, according to the article on NYC?",
+    "intent_template_id": 11,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Eric Adams"
+      }
+    }
+  },
+  {
+    "task_id": 12,
+    "intent": "Navigate to the article on Canada and find who the head of the military is. Tell me the name of that person.",
+    "intent_template_id": 12,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Name has not been mentioned."
+      }
+    }
+  },
+  {
+    "task_id": 13,
+    "intent": "Visit the article on the date of the latest event from the article on the year 1971. Then tell me the year of the first event from the 1900s, as listed in that article.",
+    "intent_template_id": 13,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "1903"
+      }
+    }
+  },
+  {
+    "task_id": 14,
+    "intent": "What is the total number of floral and faunal emblems mentioned in the articles for all six Australian states?",
+    "intent_template_id": 14,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Four"
+      }
+    }
+  },
+  {
+    "task_id": 15,
+    "intent": "Find out which U.S. state uses the word borough instead of counties based on the Borough Wiki article.",
+    "intent_template_id": 15,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Alaska"
+      }
+    }
+  },
+  {
+    "task_id": 16,
+    "intent": "How many times did you encounter the word Hell in these articles: \"Peru\", \"Pusha T\", and \"Doom (2016 video game)\"?",
+    "intent_template_id": 16,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Ten"
+      }
+    }
+  },
+  {
+    "task_id": 17,
+    "intent": "Which specialized tools were mentioned in the approaches section of the Physics article?",
+    "intent_template_id": 17,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Particle Accelerators, Lasers"
+      }
+    }
+  },
+  {
+    "task_id": 18,
+    "intent": "How many times is the word \"Ishmael\" mentioned on the page \"Abraham\"?",
+    "intent_template_id": 18,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Five"
+      }
+    }
+  },
+  {
+    "task_id": 19,
+    "intent": "Trace this path in the exact order: France → Emblem → Democracy → Name → Custom. While visiting these articles, which word appears immediately before either \"Suzuki Ichiro\" or \"Suffrage\"?",
+    "intent_template_id": 19,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Suffrage"
+      }
+    }
+  },
+  {
+    "task_id": 20,
+    "intent": "Which Brazilian president is mentioned in the article on Conservatism?",
+    "intent_template_id": 20,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Jair Bolsonaro"
+      }
+    }
+  },
+  {
+    "task_id": 21,
+    "intent": "Go to the page of the first notable Nobel laureate mentioned in the Nobel Prize article. Then visit the last hyperlink in the second section (the introductory paragraph counts as a section). How many countries are mentioned on the final visited page?",
+    "intent_template_id": 21,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 22,
+    "intent": "I heard that possession of illegal drugs is considered a victimless crime. Can you find a reference article to this statement? If yes, then tell me the name of the article.",
+    "intent_template_id": 22,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Victimless Crime"
+      }
+    }
+  },
+  {
+    "task_id": 23,
+    "intent": "Which one of these does not have a valid page: Burger King, Wendy's, McDonald's?",
+    "intent_template_id": 23,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None, all of them have valid pages"
+      }
+    }
+  },
+  {
+    "task_id": 24,
+    "intent": "Start at the Computer Science article and serially visit the hyperlinks in that article. Stop when you find a hyperlink where the hyperlink text doesn't match the title of the page it leads to, and tell me the text of that hyperlink.",
+    "intent_template_id": 24,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Encoding"
+      }
+    }
+  },
+  {
+    "task_id": 25,
+    "intent": "Does the article on Sociology discuss its relationship with Mathematics? If so, please provide the title of the section.",
+    "intent_template_id": 25,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No, it does not."
+      }
+    }
+  },
+  {
+    "task_id": 26,
+    "intent": "I've been wanting to learn more about civil wars for a long time. It's fascinating how conflicts can arise between two groups within the same country. Since it's a common topic, there should be plenty of articles on it. I'm especially interested in civil wars where one group wants to separate from, or secede from, the country. Could you search for an article on this and let me know the title?",
+    "intent_template_id": 26,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Secession"
+      }
+    }
+  },
+  {
+    "task_id": 27,
+    "intent": "Start at the Computer Science article and serially visit the hyperlinks in that article. Stop when you find a hyperlink where the hyperlink text doesn't match the title of the page it leads to, and tell me the names of all the hyperlinks that you have visited.",
+    "intent_template_id": 27,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Science, Information, Encoding"
+      }
+    }
+  },
+  {
+    "task_id": 28,
+    "intent": "Start from the article on the color blue. Sequentially visit the hyperlinks in that article. Stop when you visit a hyperlink that doesn't have a valid page, and tell me the text of that hyperlink.",
+    "intent_template_id": 28,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "People"
+      }
+    }
+  },
+  {
+    "task_id": 29,
+    "intent": "Start at the article \"World\" and serially visit the first five hyperlinks in the article's content. Tell me the names of all the articles that don't have a valid page.",
+    "intent_template_id": 29,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "All the articles have valid pages."
+      }
+    }
+  },
+  {
+    "task_id": 30,
+    "intent": "I have always wanted to know more about the history of the famous tech company Apple. I think the official name of the company is Apple Inc. Can you find a Wiki article for me?",
+    "intent_template_id": 30,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Apple Inc."
+      }
+    }
+  },
+  {
+    "task_id": 31,
+    "intent": "How many searches does DuckDuckGo receive every day?",
+    "intent_template_id": 31,
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "100,000,000 (100 million)"
+      }
+    }
+  },
+  {
+    "task_id": 32,
+    "intent": "Which of these two plane crashes appears to be deadlier, based on the number of casualties: (1) \"Airliner crashes in China, 42 killed\" and (2) \"Ethiopian airliner crashes into Mediterranean Sea\"? Mention the title of the article related to the deadlier incident.",
+    "intent_template_id": 32,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "(2) Ethiopian airliner crashes into Mediterranean Sea"
+      }
+    }
+  },
+  {
+    "task_id": 33,
+    "intent": "List the names of the countries mentioned in both of these news articles: \"Turbolinux adopted by China's largest bank\" and \"United States Homeland Security network monitors suspicious activity\".",
+    "intent_template_id": 33,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "United States"
+      }
+    }
+  },
+  {
+    "task_id": 34,
+    "intent": "When you search for \"UFC\", which of the search results are actually related to UFC? Share the titles of those news articles. If none of the results are relevant, please state 'None'.",
+    "intent_template_id": 34,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None"
+      }
+    }
+  },
+  {
+    "task_id": 35,
+    "intent": "How many articles did you find on Richard Stallman (articles that consist only of redirect pages should be excluded)?",
+    "intent_template_id": 35,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Two"
+      }
+    }
+  },
+  {
+    "task_id": 36,
+    "intent": "Is there any news article regarding Salt Lake City that was published in 2024?",
+    "intent_template_id": 36,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 37,
+    "intent": "Someone told me about an article where Tom Cruise spoke out against antidepressant drugs. Can you please find that article and tell me the title?",
+    "intent_template_id": 37,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Tom Cruise debates psychiatry on NBC's Today show"
+      }
+    }
+  },
+  {
+    "task_id": 38,
+    "intent": "There is an article on Tom Cruise debating psychiatry. Do you think the publication year of the article is consistent with the year that the event occurred?",
+    "intent_template_id": 38,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No."
+      }
+    }
+  },
+  {
+    "task_id": 39,
+    "intent": "How many articles are there on Morocco that were published in 2009?",
+    "intent_template_id": 39,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 40,
+    "intent": "Were these two articles published on the same day: Bayern beating Dortmund 5-4 on penalties in the German Super Cup, and Dortmund signing Ousmane Dembele?",
+    "intent_template_id": 40,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 41,
+    "intent": "Follow this navigation path: Search Boston, visit the fifth result from the first page, identify the second state in the body/content of the article, and search the state. Visit the third link from the search result and tell me the name of the first state in the content/body of the final article. If you encounter a redirect link at any point, then visit that link. If any of the articles are not found, then report the task as incomplete.",
+    "intent_template_id": 41,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Colorado"
+      }
+    }
+  },
+  {
+    "task_id": 42,
+    "intent": "Navigate to the 11th article when you search \"murder case\". Then take the first two words from the main content of the visited article and search them. Report the name of the last article in the search results.",
+    "intent_template_id": 42,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wikinews interviews former Salt Lake City mayor and 2012 presidential candidate Rocky Anderson"
+      }
+    }
+  },
+  {
+    "task_id": 43,
+    "intent": "Could you list all the news articles on the most recent diesel emission scandal at Volkswagen?",
+    "intent_template_id": 43,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Volkswagen engulfed by diesel emissions scandal, Volkswagen emissions scandal may affect thousands more cars, Volkswagen CEO resigns after emissions scandal"
+      }
+    }
+  },
+  {
+    "task_id": 44,
+    "intent": "List the names of all the animals mentioned in these articles: \"England: Fire at London Zoo kills aardvark, meerkats believed dead\", \"Three-car crash in New Hampshire on Frederick E. Everett Turnpike kills one\", and \"Wikinews interviews Ritchie Lai of NBA Asia about the gaming industry\".",
+    "intent_template_id": 44,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "aardvark, meerkat, dog"
+      }
+    }
+  },
+  {
+    "task_id": 45,
+    "intent": "Tell me the names of the articles where NASA scientists found some form of life in one of Neptune's satellites.",
+    "intent_template_id": 45,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No such article exists"
+      }
+    }
+  },
+  {
+    "task_id": 46,
+    "intent": "How many articles did you find about the former prime minister of Bangladesh being sentenced to death?",
+    "intent_template_id": 46,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None"
+      }
+    }
+  },
+  {
+    "task_id": 47,
+    "intent": "Does any article on Richard Dawkins appear in the search results when you search \"Richard Stallman\"?",
+    "intent_template_id": 47,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 48,
+    "intent": "When was the article about the Texas woman who murdered her entire family published?",
+    "intent_template_id": 48,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "2024-12-19 (December 19, 2024)"
+      }
+    }
+  },
+  {
+    "task_id": 49,
+    "intent": "Did the 2024 news on Mauritanian refugees returning from Senegal come before the news of six soldiers being killed in a Senegal ambush? If one or none of the articles can be found, then simply answer no.",
+    "intent_template_id": 49,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 50,
+    "intent": "Did you find any news article about a robbery on the front page (if there are multiple such articles, pick the one with the biggest headline)? If so, where did the crime take place?",
+    "intent_template_id": 50,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes, Louvre Museum in Paris"
+      }
+    }
+  },
+  {
+    "task_id": 51,
+    "intent": "Was there any news on English people reporting crime using Facebook?",
+    "intent_template_id": 51,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 52,
+    "intent": "Perform the following steps: Search \"Pokémon\", visit the first search result, search the name of the first city in the visited article, visit the thirteenth search result, and tell me the name of the first city in that visited article.",
+    "intent_template_id": 52,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Toronto"
+      }
+    }
+  },
+  {
+    "task_id": 53,
+    "intent": "Does the first search result for \"David Suzuki\" appear among the search results for \"Toronto\"?",
+    "intent_template_id": 53,
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 54,
+    "intent": "What is the maximum available length for each of the following items: the Lindy DisplayPort to HDMI cable and the Kodak HDMI Mini Cable? Answer in metres.",
+    "intent_template_id": 54,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "5 metre and 1.8 metre"
+      }
+    }
+  },
+  {
+    "task_id": 55,
+    "intent": "Which cable is longer: the white Type-C to HDMI Cable or the Type-C USB Charger Cable?",
+    "intent_template_id": 55,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "White Type-C to HDMI Cable"
+      }
+    }
+  },
+  {
+    "task_id": 56,
+    "intent": "What is the total cost if I buy all the 100% polyester skirts available in the shop? If there are multiple variants (sizes, colors) of the same item, include only one.",
+    "intent_template_id": 56,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "$9.99"
+      }
+    }
+  },
+  {
+    "task_id": 57,
+    "intent": "What would be the minimum cost to buy almonds and rice crackers?",
+    "intent_template_id": 57,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "$105.46"
+      }
+    }
+  },
+  {
+    "task_id": 58,
+    "intent": "List all the different color options available for the Nautica and GRADO SR325x headphones.",
+    "intent_template_id": 58,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "black black, navy navy, navy red, navy yellow, white nude, white off white"
+      }
+    }
+  },
+  {
+    "task_id": 59,
+    "intent": "What is the total price of all the rackets and tennis balls available in the shop? If there are multiple variants of the same item, pick one only.",
+    "intent_template_id": 59,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Zero, none of the products are available in the shop"
+      }
+    }
+  },
+  {
+    "task_id": 60,
+    "intent": "Is there any skirt that costs less than purchasing at least one pair of jeans?",
+    "intent_template_id": 60,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 61,
+    "intent": "What's the replacement guarantee or warranty period of the 20x50 binoculars?",
+    "intent_template_id": 61,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three years"
+      }
+    }
+  },
+  {
+    "task_id": 62,
+    "intent": "Is the Wii U Microphone compatible with the Wii system?",
+    "intent_template_id": 62,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 63,
+    "intent": "How many mattresses are available in the shop? (Include similar products like mattress sofas and toppers, but not related products like bed frames.)",
+    "intent_template_id": 63,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "12"
+      }
+    }
+  },
+  {
+    "task_id": 64,
+    "intent": "How many sound bars are available under 150 USD?",
+    "intent_template_id": 64,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Two"
+      }
+    }
+  },
+  {
+    "task_id": 65,
+    "intent": "How many telescopes are available for purchase?",
+    "intent_template_id": 65,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 66,
+    "intent": "How many Crumbl Cookies are available in the shop?",
+    "intent_template_id": 66,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Zero"
+      }
+    }
+  },
+  {
+    "task_id": 67,
+    "intent": "How many leggings products appear when you search for the word \"leggings\"?",
+    "intent_template_id": 67,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three"
+      }
+    }
+  },
+  {
+    "task_id": 68,
+    "intent": "I am looking for a music player to play mini vinyl records. It must be small, portable, and in black. If you find this product, could you place the order and share the confirmation code? If there is no such product or if any of the criteria are not satisfied, then please let me know.",
+    "intent_template_id": 68,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "59EC38CAE8"
+      }
+    }
+  },
+  {
+    "task_id": 69,
+    "intent": "Could you please order the following products and share the confirmation codes with me: Hauklie Men's Polo Shirt (1 grey, size X-Large, and 1 black, size Large) and a GXP Side Table?",
+    "intent_template_id": 69,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "CFD21014E0, 4813D26CD2, DD78FB6DE6"
+      }
+    }
+  },
+  {
+    "task_id": 70,
+    "intent": "Place an order for a pair of jeans that are made of at least 60% cotton. If there are multiple options, pick any. The size must be M. Once you complete the order, share the completion code.",
+    "intent_template_id": 70,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "C97A8FE47F"
+      }
+    }
+  },
+  {
+    "task_id": 71,
+    "intent": "Place an order for a blue superhero T-shirt with a Flash logo on it. The size should be M. Once you complete the order, share the completion code.",
+    "intent_template_id": 71,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "50C1CE874E"
+      }
+    }
+  },
+  {
+    "task_id": 72,
+    "intent": "What color is most prominent on the exterior body of the navy and yellow Nautica headphones?",
+    "intent_template_id": 72,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Navy"
+      }
+    }
+  },
+  {
+    "task_id": 73,
+    "intent": "What is the color of the TASYL USB lightning camera adapter?",
+    "intent_template_id": 73,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "White"
+      }
+    }
+  },
+  {
+    "task_id": 74,
+    "intent": "Search for the word \"camera.\" Among the search results, which of the following colors is most common in the product pictures: white, blue, black, red, cyan, or green?",
+    "intent_template_id": 74,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Black"
+      }
+    }
+  },
+  {
+    "task_id": 75,
+    "intent": "Is there a remote in the product picture of the 4-Channel Wireless Bluetooth Power Amplifier?",
+    "intent_template_id": 75,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 76,
+    "intent": "Which of the following items are available in the shop: Ice-cream, Dog food, Mushroom, Superglue?",
+    "intent_template_id": 76,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Mushroom"
+      }
+    }
+  },
+  {
+    "task_id": 77,
+    "intent": "I am looking for a tooth powder that contains fluoride, as I heard it is good for dental health. It would be great if the product is also herbal and vegan. Please tell me the product name of the best match you find.",
+    "intent_template_id": 77,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "2 Pcs Eva Smokers with Fluorine Natural Herbal Halal Islamic Toothpowder Powder 40gm"
+      }
+    }
+  },
+  {
+    "task_id": 78,
+    "intent": "Does the Salt & Sugar Bundle Kit reduce the appearance of acne scars?",
+    "intent_template_id": 78,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 79,
+    "intent": "How many times does the phrase \"baking soda\" appear on the Arm & Hammer Toothpaste product page (including Description, Features, Reviews)?",
+    "intent_template_id": 79,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Eight times"
+      }
+    }
+  },
+  {
+    "task_id": 80,
+    "intent": "Is there any pink USB-C charging cable available in the shop? If so, please place the order for one and share the confirmation code with me.",
+    "intent_template_id": 80,
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No pink USB-C charging cable is available"
+      }
+    }
+  },
+  {
+    "task_id": 81,
+    "intent": "Find the most recent sports event mentioned in Brazil's Wikipedia article. Can you find a news article about that event? If so, please tell me the title of the news article.",
+    "intent_template_id": 81,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Rio de Janeiro to host 2016 Olympics"
+      }
+    }
+  },
+  {
+    "task_id": 82,
+    "intent": "I need you to cross-reference something. Go to the Paris Agreement article on Wiki and find the last article in the 'Related Pages' or 'See also' section. Search the title of that article on News, visit the top result, and check if the news article contains the word 'Russia'.",
+    "intent_template_id": 82,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 83,
+    "intent": "Find the country of origin of the rice used in the Crunchmaster Rice Crackers. Visit the Wikipedia article on that country and tell me the last word of the first paragraph.",
+    "intent_template_id": 83,
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "people"
+      }
+    }
+  },
+  {
+    "task_id": 84,
+    "intent": "Verify if the BioCorneum Advanced Scar Treatment Gel from Shop is FDA-cleared. If so, then search \"Food and Drug Administration\" on Wiki and tell me when the agency was formed. Otherwise, search \"Food & Drug Administration\" on News and tell me the title of the first search result.",
+    "intent_template_id": 84,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "1906"
+      }
+    }
+  },
+  {
+    "task_id": 85,
+    "intent": "Are there any news articles about the Monopoly board game? If there are none, place an order for the Monopoly board game at the shop. Otherwise, order any other board game. In either case, share the order's confirmation code at the end.",
+    "intent_template_id": 85,
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "The Monopoly board game is not available in the shop."
+      }
+    }
+  },
+  {
+    "task_id": 86,
+    "intent": "What is the title of the 11th search result when you search for the name of the first notable school shooting mentioned in the school shooting Wiki article?",
+    "intent_template_id": 86,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "High school football coach shot dead at school gym in Iowa"
+      }
+    }
+  },
+  {
+    "task_id": 87,
+    "intent": "Is there a Wiki article on the video game associated with the Nintendo Switch travel case found in the shop? If so, identify the main character featured on that game's cover and tell me when that character first appeared.",
+    "intent_template_id": 87,
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "1981"
+      }
+    }
+  },
+  {
+    "task_id": 88,
+    "intent": "Order 24 packets of Savannah's Candy Box. Before placing the order, verify that there is no negative news about the product. If there is, then don't place the order and let me know. Otherwise, share the confirmation code of the order.",
+    "intent_template_id": 88,
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "07602B13BE"
+      }
+    }
+  },
+  {
+    "task_id": 89,
+    "intent": "Look up Organic Diced Pear in the Shop and check the product description. Identify the vitamin mentioned in the description and visit its article on Wiki. Does the fruit pear appear in that article?",
+    "intent_template_id": 89,
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 90,
+    "intent": "Search for \"Vitamin K\" on Wiki and identify all the vegetables listed there as sources of vitamin K. How many of those vegetables are available in the shop?",
+    "intent_template_id": 90,
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None"
+      }
+    }
+  },
+  {
+    "task_id": 91,
+    "intent": "Search News for \"video game\" and visit the sixth search result. Is that news event described in the wiki page for \"Video game\"?",
+    "intent_template_id": 91,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 92,
+    "intent": "Do the following tasks: Search \"crocodile\" on News, visit the first news article, identify the country where that crocodile lives, search that country on Wiki, and tell me the population of that country. If you encounter a redirect link at any point, then please visit that link.",
+    "intent_template_id": 92,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "27 million people"
+      }
+    }
+  },
+  {
+    "task_id": 93,
+    "intent": "Search Canada on Wiki and find the name of the current prime minister. Look up his name on News and click on the first article. When was that article published?",
+    "intent_template_id": 93,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "April 28, 2025"
+      }
+    }
+  },
+  {
+    "task_id": 94,
+    "intent": "Which ones of the following sites: Wiki, News, and Shop, have an article or product page on a screwdriver?",
+    "intent_template_id": 94,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wiki, News"
+      }
+    }
+  },
+  {
+    "task_id": 95,
+    "intent": "Which ones of the following sites: Wiki, News, and Shop, have an article or product page on High-Definition Multimedia Interface (HDMI)?",
+    "intent_template_id": 95,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wiki, News, Shop"
+      }
+    }
+  },
+  {
+    "task_id": 96,
+    "intent": "I heard some bad news about biscuits. Can you check and share the title of such a news article with me? If there are none, please place an order for the top search result on \"biscuits\" and share the confirmation code with me.",
+    "intent_template_id": 96,
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "83A1B2E714"
+      }
+    }
+  },
+  {
+    "task_id": 97,
+    "intent": "Can you place an order for the cheapest nuts available and share the confirmation code with me?",
+    "intent_template_id": 97,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "54F0DC47B1"
+      }
+    }
+  },
+  {
+    "task_id": 98,
+    "intent": "Which scholars are mentioned in the article on Rayleigh scattering?",
+    "intent_template_id": 98,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Rayleigh, Raman, Krishnan"
+      }
+    }
+  },
+  {
+    "task_id": 99,
+    "intent": "Is it true that Mattel had to recall its products due to safety concerns? If so, please visit the Wiki page for Mattel and find the first product mentioned in that article. Tell me the name of that product and whether it is available in the Shop.",
+    "intent_template_id": 99,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Barbie dolls; not available in the shop."
+      }
+    }
+  },
+  {
+    "task_id": 100,
+    "intent": "I am a huge fan of the Donkey Kong series. Please find related Wiki articles, news, and products from the Shop. If there are multiple entries, pick the most relevant ones. If you cannot find any product or article, mention that in your answer. Share the titles of these items with me using the following format: <site name>: <article/news/product title>.",
+    "intent_template_id": 100,
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wiki: Donkey Kong, News: No relevant news found, Shop: Nintendo Switch Game Traveler Donkey Kong Country Tropical Freeze Deluxe Travel Case - Donkey Kong Surfer"
+      }
+    }
+  },
+  {
+    "task_id": 101,
+    "intent": "Visit the Wiki article on probability and find the second hyperlink on that page. Search the hyperlink text in the Shop, visit the second search result, and search its brand name on Wiki. If a Wiki article exists, then tell me the name of that article; otherwise, tell me the name of the brand.",
+    "intent_template_id": 101,
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Rusticware"
+      }
+    }
+  },
+  {
+    "task_id": 102,
+    "intent": "Please complete the following steps: (1) Search News for \"Japan\", (2) visit the second search result, (3) visit the Wiki page for the second word found in the news article's body, (4) identify the first country mentioned in that Wiki article, and (5) search that country on News and tell me the title of the first search result.",
+    "intent_template_id": 102,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Generic Tamiflu in India"
+      }
+    }
+  },
+  {
+    "task_id": 103,
+    "intent": "How many people were included in the sample for the latest trial of the Australian bird flu vaccine?",
+    "intent_template_id": 103,
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "400"
+      }
+    }
+  },
+  {
+    "task_id": 104,
+    "intent": "List all articles from the 'Related Pages' sections of the Biophysics and Biochemistry pages.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Biophysics in the search box and press Enter.\n2. Scroll to the \"Related Pages\" section and remember the listed pages: \"Bionics, Computational biology, Database of Molecular Motions, Nanotechnology\".\n3. Type Biochemistry in the search box and press Enter.\n4. Scroll to the \"Related Pages\" section and remember the listed pages: \"List of biochemistry topics, Biophysics, Chromatography, Organic chemistry\".\n5. Combine the lists from both pages into a single list. Send a message to the user: \"Bionics, Computational biology, Database of Molecular Motions, Nanotechnology, List of biochemistry topics, Biophysics, Chromatography, Organic chemistry\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "List of biochemistry topics, Biophysics, Chromatography, Organic chemistry, Bionics, Computational biology, Database of Molecular Motions, Nanotechnology"
+      }
+    }
+  },
+  {
+    "task_id": 105,
+    "intent": "Did the Physics article's \"Approaches in Physics\" section mention the names of more scientists than the Chemistry article's \"Atoms\" section?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Physics in the search box and press Enter.\n2. Locate the \"Approaches in Physics\" section and count the number of unique scientists mentioned, which is one. Remember the count.\n3. Type Chemistry in the search box and press Enter.\n4. Locate the \"Atoms\" section and count the number of unique scientists mentioned, which is ten. But no need to count as soon as you find more than one.\n5. Compare the two counts to see if the Physics count is higher than the Chemistry count. As the count in Physics was not higher, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 106,
+    "intent": "Find the largest city listed on the Wikipedia pages for Canada and Australia. Then tell me the population difference between those two cities.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Canada in the search box and press Enter.\n2. Identify the largest city mentioned in the article (likely Toronto), find its population figure (around 3 million), and remember it.\n3. Type Australia in the search box and press Enter.\n4. Identify the largest city mentioned in the article (likely Sydney), find its population figure (around 5.5 million), and remember it.\n5. Calculate the absolute difference between the two population figures.\n6. Send a message to the user: \"Around 2.5 Million\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Around 2.5 Million"
+      }
+    }
+  },
+  {
+    "task_id": 107,
+    "intent": "Visit the pages of the birthplaces of Albert Einstein's first and second sons. Then calculate the population difference between those places.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Albert Einstein in the search box and press Enter.\n2. Find the names of his first and second sons (Hans Albert Einstein and Eduard Tete Einstein) and identify their birthplaces (Bern and Zurich).\n3. Visit the hyperlink of the first birthplace, Bern, and record its population, which is 127,000.\n4. Go back and visit the hyperlink of the second birthplace, Zurich, and record its population, which is 415,000.\n5. Calculate the absolute difference between the population of Zurich and Bern. Send the absolute difference as a message to the user: \"Around 288000\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Around 288000"
+      }
+    }
+  },
+  {
+    "task_id": 108,
+    "intent": "Visit the articles for Physics, Chemistry, and Biology to identify which one(s) contain a section that explicitly discusses the discipline's relationship with mathematics.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Physics in the search box and press Enter.\n2. Scan the table of contents or headers for a section discussing a relationship with mathematics. Note that such a section exists, and remember this.\n3. Type Chemistry in the search box and press Enter.\n4. Scan the table of contents or headers for a similar section regarding mathematics. Note that no such section exists, and remember this.\n5. Type Biology in the search box and press Enter.\n6. Scan the table of contents or headers for a similar section regarding mathematics. Note that no such section exists, and remember this.\n7. Conclude that only the Physics article contained the specific section. Send a message to the user: \"Physics\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Physics"
+      }
+    }
+  },
+  {
+    "task_id": 109,
+    "intent": "In the article on Language, visit the first hyperlink in the \"Types of Languages\" section. Then check the \"Related Pages\" section of the visited article. Is there any article that appears in both this section and the \"Related Pages\" section of the Language article? If so, list the common pages; otherwise, answer \"None\".",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Language in the search box and press Enter.\n2. Record the list of articles in the \"Related Pages\" section of the Language article: \"Alphabet, Basic English, Sign language, English as a foreign language, English language, Historical linguistics, Language education, Language families and languages, Linguistics, List of languages, Orthography, Phonology, Second language, Semantics, Speech therapy.\"\n3. Navigate to the \"Types of Languages\" section and click the first hyperlink, \"Mathematics\".\n4. On the new page, locate the \"Related Pages\" section and record the articles listed there: \"Timeline of women in mathematics, American Mathematical Society, Society for Industrial and Applied Mathematics, EASIAM, International Congress on Industrial and Applied Mathematics, International Congress of Mathematicians, International Mathematical Olympiad, Mathematics Genealogy Project, Mathematics Subject Classification.\"\n5. Compare the two lists of related pages to find any common articles. As no common articles were found, send a message to the user: \"None\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None"
+      }
+    }
+  },
+  {
+    "task_id": 110,
+    "intent": "Visit the first article listed in the \"Related Pages\" sections of the Time and War articles. Then list all the related pages mentioned in each of those visited articles.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Time in the search box and press Enter.\n2. Go to the \"Related Pages\" section and click the first article link, \"Chronology\".\n3. On this new page, record all items listed in its \"Related Pages\" section, which are \"Annals, Calendar\".\n4. Type War in the search box and press Enter.\n5. Go to the \"Related Pages\" section and click the first article link, \"Peace\".\n6. On this new page, record all items listed in its \"Related Pages\" section, which are \"Anti-war movement, Ceasefire, Pacifism, Peace makers, Peace treaty, World peace\".\n7. Combine the lists recorded from both visited articles. Send a message to the user: \"Annals, Calendar, Anti-war movement, Ceasefire, Pacifism, Peace makers, Peace treaty, World peace\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Annals, Calendar, Anti-war movement, Ceasefire, Pacifism, Peace makers, Peace treaty, World peace"
+      }
+    }
+  },
+  {
+    "task_id": 111,
+    "intent": "Visit the pages of the people who were murdered in the \"Unnatural causes of death\" section of the \"Death\" article. How many of these visited articles have a \"Legacy\" section?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Death in the search box and press Enter.\n2. Navigate to the \"Unnatural causes of death\" section and identify the people mentioned as murdered.\n3. The first person is Abraham Lincoln. Click on his hyperlink.\n4. On Abraham Lincoln's page, there is a \"Legacy\" section. Remember the Count = 1.\n5. Go back to the previous page on Death and click on the hyperlink of the second person, \"Martin Luther King Jr.\"\n6. On Martin Luther King Jr's page, there is a \"Legacy\" section. Remember the Count = 2.\n7. Go back to the previous page on Death and click on the hyperlink of the third person, \"John F. Kennedy\".\n8. On John F. Kennedy's page, there is a \"Legacy\" section. Remember the Count = 3.\n9. Go back to the previous page on Death, and verify if there is any person left.\n10. As there are no other people left and you found three legacy sections, send a message to the user: \"Three\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three"
+      }
+    }
+  },
+  {
+    "task_id": 112,
+    "intent": "Visit the pages of the hyperlinked geographic regions mentioned in the \"Trees\" section of the Australia page. Among the visited pages, list the titles of the pages that do not have a section on languages.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Australia in the search box and press Enter.\n2. Navigate to the \"Trees\" section and identify any hyperlinked geographic regions mentioned. There will be two: \"Southeast Asia\" and \"Oceania\".\n3. Click on the hyperlink of the first entry: Southeast Asia.\n4. Check the visited article for a section on Languages. As there isn't, remember this fact.\n5. Then go back and click on the hyperlink of Oceania.\n6. Check the visited article for a section on Languages. As there is such a section, remember this fact.\n7. Only Southeast Asia doesn't have a section on languages. Send a message to the user, \"Southeast Asia\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Southeast Asia"
+      }
+    }
+  },
+  {
+    "task_id": 113,
+    "intent": "Visit the article on the first rapper mentioned on Kid Cudi's page (excluding Kid Cudi himself). How many studio albums has that rapper released (excluding collaborative albums)?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Kid Cudi in the search box and press Enter.\n2. Scan the text to find the first mention of a rapper other than Kid Cudi, which is Kanye West.\n3. Click on the hyperlink of \"Kanye West\".\n4. Navigate to the Studio Albums subsection in his article, which says he has 10 studio albums. Send this as a message to the user: \"Ten\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Ten"
+      }
+    }
+  },
+  {
+    "task_id": 114,
+    "intent": "What is the last word of the first section of the article on Metallica's drummer?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Metallica in the search box and press Enter.\n2. Identify the drummer (Lars Ulrich) and click the hyperlink to his article.\n3. Read the first section of the article (the introduction/summary before the first section header) and identify the very last word of that section, which is \"Marshall\". Send a message to the user: \"Marshall\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Marshall"
+      }
+    }
+  },
+  {
+    "task_id": 115,
+    "intent": "Visit the article on the first country mentioned in the article on Southeast Asia. If that article has a politics section, go to the article on the first politician mentioned in that section. Otherwise, go to the article on the first island mentioned on that country's page. What are the last three words of the main content of the final visited article (excluding references and \"Related Pages\")?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Southeast Asia in the search box and press Enter.\n2. Find the first country mentioned in the text, which is \"East Timor\" and click the link to visit its page.\n3. Check if this country's page has a \"Politics\" section.\n4. Since it doesn't, click on the hyperlink of the first island mentioned in East Timor's article, which is \"Timor\".\n5. Identify the last three words of the text, \"chain of islands\". Send a message to the user: \"chain of islands\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "chain of islands"
+      }
+    }
+  },
+  {
+    "task_id": 116,
+    "intent": "Trace this path: start at the \"Territory\" page → the first country mentioned → a country that shares its southern border. What is the last word of the first section (the introduction counts as a section) on that final visited page?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Territory in the search box and press Enter.\n2. Scan the text to find the first country mentioned (United States) and click its link.\n3. On the country's page, find the information regarding its borders and identify the country to the south (Mexico). Click on the hyperlink for Mexico.\n4. Read the first section (the introduction) of this final page and identify the very last word, which is \"world\". Send a message to user: \"world\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "world"
+      }
+    }
+  },
+  {
+    "task_id": 117,
+    "intent": "Visit the pages of all the countries in the United Kingdom. Which of these countries have a dedicated section on their culture?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type United Kingdom in the search box and press Enter.\n2. Identify the countries that make up the UK, listed in the article (England, Wales, Scotland, Ireland).\n3. Click on the hyperlink for England. As there is a dedicated section on that country's culture, remember this fact.\n4. Go back to the United Kingdom page, and click on the second hyperlink \"Wales\".\n5. As there is no section on that country's culture, go back to the United Kingdom page.\n6. Click on the third hyperlink, \"Scotland\". As there is a section on that country's culture, remember this fact.\n7. Go back to the United Kingdom page, and click on the last hyperlink, \"Ireland\".\n8. As there is no section on that country's culture, tell the users the countries that you remembered, i.e., send a message to the user, \"England, Scotland\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "England, Scotland"
+      }
+    }
+  },
+  {
+    "task_id": 118,
+    "intent": "Visit the article about the earliest known statistics mentioned in the Statistics article. List all the countries mentioned on that page.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Statistics in the search box and press Enter.\n2. Locate the mention of the \"first known statistics\", which is \"Census\". Click on the hyperlink on \"Census\".\n3. Scan the content of the visited page for the names of countries and send those names as a message to the user: \"United States, United Kingdom, Australia, Canada, Japan, New Zealand\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "United States, United Kingdom, Australia, Canada, Japan, New Zealand"
+      }
+    }
+  },
+  {
+    "task_id": 119,
+    "intent": "Navigate to the article on the first specialized tool mentioned in the Physics article. Then navigate to the last hyperlink in the main content of that page (excluding references and related pages). How many related pages does the final visited article have?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Physics in the search box and press Enter.\n2. Scan the text to find the first specialized tool mentioned (you will find it in the Approaches in Physics section) and click its link, which is \"Particle Accelerator\".\n3. Click the very last hyperlink found in the text, which is \"Technology\".\n4. On this final page, locate the \"Related Pages\" section and count the number of articles listed in that section, which is two. Send a message to the user: \"Two\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Two"
+      }
+    }
+  },
+  {
+    "task_id": 120,
+    "intent": "Recursively follow the first link in the main content of each page, starting from the \"Technology\" page. What is the title of the final article you reach before a \"page does not exist\" message appears?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Technology in the search box and press Enter.\n2. Keep clicking the first hyperlink found in the main body text of the visited page. While clicking the hyperlinks, the order of the pages will be Skill, Experience, Learning, Knowledge, Fact, and Real.\n3. As the page on \"Real\" doesn't exist, report the previous page \"Fact\". Send a message to the user: \"Fact\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Fact"
+      }
+    }
+  },
+  {
+    "task_id": 121,
+    "intent": "Recursively follow the first link in the main content of each page, starting from the \"Technology\" page, until you reach an article that does not exist. List the titles of all the valid pages in the order that you visited.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Technology in the search box and press Enter.\n2. Keep clicking the first hyperlink found in the main body text of the visited page. While clicking the hyperlinks, the order of the pages will be Skill, Experience, Learning, Knowledge, Fact, and Real. Remember the names of every page that you have visited.\n3. As the page on \"Real\" doesn't exist, report all the previous pages that you visited based on your memory. Send a message to the user: \"Technology, Skill, Experience, Learning, Knowledge, Fact\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Technology, Skill, Experience, Learning, Knowledge, Fact"
+      }
+    }
+  },
+  {
+    "task_id": 122,
+    "intent": "What is the name of the TV character whose singing is compared to death metal?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Death Metal\" and press Enter.\n2. According to the article, the TV character whose singing is compared to Death metal is the Cookie Monster.\n3. Send a message to the user: \"Cookie Monster\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Cookie Monster"
+      }
+    }
+  },
+  {
+    "task_id": 123,
+    "intent": "What type of material is used to make ceramic glass?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Ceramic glass in the search box and press Enter.\n2. As a valid page doesn't exist, send a message to the user: \"There is no article on ceramic glass\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "There is no article on ceramic glass"
+      }
+    }
+  },
+  {
+    "task_id": 124,
+    "intent": "What is the total area of El Salvador, according to its article?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type El Salvador in the search box and press Enter.\n2. Scan the infobox and the main text for the area of the country.\n3. As the area has not been mentioned, send a message to the user: \"The total area of El Salvador has not been mentioned in the article.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "The total area of El Salvador has not been mentioned in the article."
+      }
+    }
+  },
+  {
+    "task_id": 125,
+    "intent": "What is Thom Yorke's first solo album, according to his article?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Thom Yorke in the search box and press Enter.\n2. Scan the article for the name of his first solo album. As it hasn't been mentioned, send a message to the user: \"The first solo album of Thom Yorke has not been mentioned in his article.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "The first solo album of Thom Yorke has not been mentioned in his article."
+      }
+    }
+  },
+  {
+    "task_id": 126,
+    "intent": "What is the name of the latest album by Clipse, according to their article?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Clipse in the search box and press Enter.\n2. As a valid page doesn't exist, send a message to the user: \"There is no article on Clipse\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "There is no article on Clipse"
+      }
+    }
+  },
+  {
+    "task_id": 127,
+    "intent": "Navigate to the page about the highest point in El Salvador and tell me its height.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type El Salvador in the search box and press Enter.\n2. Scan the article page and infobox to find the name of the highest point (Cerro El Pital).\n3. Click on the hyperlink of Cerro El Pital.\n4. As the article does not exist and the height of the highest point hasn't been mentioned elsewhere, send a message to the user: \"No article on the highest point of El Salvador\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No article on the highest point of El Salvador"
+      }
+    }
+  },
+  {
+    "task_id": 128,
+    "intent": "Find the birth date of the first person mentioned in the scientific method example in the Science article.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Search Science and press Enter.\n2. In the \"Scientific Method\" section's \"An Example\" subsection (as the article is very long, don't scroll, instead click using the element ID), you will find that the first person is Arthur Eddington. Click on his hyperlink and find his birth date.\n3. Then send a message to user, the birth date, \"28 December, 1882\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "28 December 1882"
+      }
+    }
+  },
+  {
+    "task_id": 129,
+    "intent": "According to their respective articles, did Rio de Janeiro host the Summer Olympic Games before Beijing?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Rio de Janeiro in the search box and press Enter.\n2. Find the year it hosted the Summer Olympics, which is 2016, and remember this fact.\n3. Type Beijing in the search box and press Enter.\n4. Find the year it hosted the Summer Olympics, which is 2008, and remember this fact.\n5. Compare the years (2016 is not before 2008). Send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 130,
+    "intent": "Based on the relevant articles, which Australian state uses the Cooktown Orchid as its emblem?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Search \"Australia\" and press Enter.\n2. Click on the hyperlinks of each Australian state one by one.\n3. On each page, scan the \"Symbols\" or \"Emblems\" section (or the infobox) for \"Cooktown Orchid\".\n4. Once you are done visiting a state, go back to the Australia page, and click on the next hyperlink.\n5. Identify that the \"Cooktown Orchid\" is mentioned on the Queensland page as its emblem. Send a message to the user: \"Queensland\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Queensland"
+      }
+    }
+  },
+  {
+    "task_id": 131,
+    "intent": "How many times in total do you encounter the word \"pigeon\" in these articles: \"Peru\", \"Pusha T\", and \"Doom (2016 video game)\"?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Peru in the search box, press Enter.\n2. Count the occurrences of the word \"pigeon\" in the visited article and remember the count.\n3. Type Pusha T in the search box, press Enter.\n4. Similarly, count the occurrences of the word \"pigeon\" in the visited article, remember the count, and add it to the previous count.\n5. Type Doom (2016 video game) in the search box, press Enter. If you cannot find the article, then first search for Doom, and click on the hyperlink of the Doom (2016 video game).\n6. Similarly, count the occurrences of the word \"pigeon\" in the visited article, remember the count, and add it to the previous count.\n7. As the total count you found is zero for this task, send a message to the user: \"Zero\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Zero"
+      }
+    }
+  },
+  {
+    "task_id": 132,
+    "intent": "Which three biogeochemical cycles were mentioned in the article on Biology?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Biology in the search box and press Enter.\n2. Navigate to the section discussing ecosystems or energy/cycles, which is \"Biosphere\".\n3. Identify the specific biogeochemical cycles listed in the text. Send a message to the user: \"nitrogen, carbon, and water\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "nitrogen, carbon, and water"
+      }
+    }
+  },
+  {
+    "task_id": 133,
+    "intent": "How many sections are there in the article on the general theory of relativity (including the introduction section but excluding the Related Pages and See Also sections)?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type General theory of relativity in the search box and press Enter.\n2. Count the Introduction (1) plus the main numbered headers. Ensure \"Related Pages,\" \"See Also,\" and \"References\" are excluded.\n3. The number of sections is three. Send a message to the user: \"Three\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three"
+      }
+    }
+  },
+  {
+    "task_id": 134,
+    "intent": "Visit the first hyperlink in the article \"CryEngine\". What is the name of the country mentioned in the first section of the visited page?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type CryEngine in the search box and press Enter.\n2. Click the very first hyperlink in the main text, which is \"Game engine\".\n3. Read the first section (introduction) for any country names. As none are found, send a message to the user: \"No country mentioned\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No country mentioned"
+      }
+    }
+  },
+  {
+    "task_id": 135,
+    "intent": "Which fast food restaurants were mentioned in the article on hamburgers?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Hamburger in the search box and press Enter.\n2. Scan the entire article for names of major fast food chains.\n3. List the fast food chains found in the text. Send a message to the user: \"Burger King, Wendy's, McDonald's\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Burger King, Wendy's, McDonald's"
+      }
+    }
+  },
+  {
+    "task_id": 136,
+    "intent": "How many of the hyperlinks from the \"History and geography\" section of the Rio de Janeiro page refer to places (excluding pages that don't exist)?",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type Rio de Janeiro in the search box and press Enter.\n2. Navigate to the \"History and geography\" section.\n3. Visit each hyperlink in this section to see if it refers to a geographical place. Do this by clicking on the hyperlink, checking it, then going back, and clicking on the next hyperlink.\n4. For each visited page, remember if it's a geographic place.\n5. Count the number of geographic places that you have remembered. There should be only one such place, which is Nova Iguaçu. Send a message to the user: \"One\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 137,
+    "intent": "Visit the article on the last grandmaster mentioned in Magnus Carlsen's article, and tell me the birthplace of that grandmaster.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Magnus Carlsen\" in the search box and press Enter.\n2. Identify the last Grandmaster mentioned in the text, which is Garry Kasparov, and click on his hyperlink.\n3. Identify the place of birth of the grandmaster from his article, which is Baku, Azerbaijan. Send a message to the user \"Baku, Azerbaijan\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Baku, Azerbaijan"
+      }
+    }
+  },
+  {
+    "task_id": 138,
+    "intent": "List all the countries mentioned in the 'Antonio de Cabezón' article, and tell me their names in alphabetical order.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Antonio de Cabezón\" in the search box and press Enter.\n2. Identify names of the countries found: Italy, Spain, Germany, Luxembourg, and Netherlands. Sort these names into alphabetical order.\n3. Send a message to the user \"Germany, Italy, Luxembourg, Netherlands, Spain\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Germany, Italy, Luxembourg, Netherlands, Spain"
+      }
+    }
+  },
+  {
+    "task_id": 139,
+    "intent": "Start at the \"Valve Corporation\" article and sequentially visit the hyperlinks in that article. Stop when you find a hyperlink where the hyperlink text doesn't match the title of the page it leads to, and tell me the text of that hyperlink.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Valve Corporation\" in the search box and press Enter.\n2. Click the first hyperlink \"video game developer\" and verify whether the page title matches the hyperlink text.\n3. As the texts match, go back and click the second hyperlink \"digital\" and verify whether the page title matches the hyperlink text.\n4. As the texts match, go back and click the third hyperlink \"distributor\".\n5. Observe that the page title (\"distribution\") does not match the hyperlink text (\"distributor\"). Send a message to the user \"distributor\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "distributor"
+      }
+    }
+  },
+  {
+    "task_id": 140,
+    "intent": "Start at the \"Valve Corporation\" article and sequentially visit the hyperlinks in that article. Stop when you find a hyperlink where the hyperlink text doesn't match the title of the page it leads to, and tell me the names of all the hyperlinks that you have visited.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Valve Corporation\" in the search box and press Enter.\n2. Visit the first hyperlink \"video game developer\", confirm the article title matches the hyperlink text, and record the name.\n3. Visit the second hyperlink \"digital\", confirm the article title matches the hyperlink text, and record the name.\n4. Visit the third hyperlink \"distributor\" and observe that the page title does not match the text. Record \"distributor\" and stop the process.\n5. Send a message to the user, the names of the pages that you recorded as visited, \"video game developer, digital, distributor\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "video game developer, digital, distributor"
+      }
+    }
+  },
+  {
+    "task_id": 141,
+    "intent": "Start from the article on the country \"Angola\". Sequentially visit the hyperlinks in that article. Stop when you visit a hyperlink that doesn't have a valid page, and tell me the text of that hyperlink.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Angola\" in the search box and press Enter.\n2. Begin clicking hyperlinks in the article sequentially to check for page validity. Do this by clicking on a hyperlink, checking, then going back. Remember the pages that you have visited so that you don't revisit them.\n3. Continue until you click the hyperlink with the text \"coastline\".\n4. Identify that this link leads to an invalid page or a \"red link\" (page does not exist).\n5. Send a message to the user \"coastline\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "coastline"
+      }
+    }
+  },
+  {
+    "task_id": 142,
+    "intent": "Start at the article \"Crayon\" and serially visit the first five hyperlinks in the article's content. Tell me the titles of the articles that don't have a valid page.",
+    "sites": [
+      "wiki"
+    ],
+    "start_url": "__WIKI__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Crayon\" in the search box and press Enter.\n2. Identify the first five hyperlinks in the article content.\n3. Click on the first hyperlink and identify that it is a valid page. Remember this fact.\n4. Go back and click on the second hyperlink in the \"Crayon\" page and identify that it is a valid page. Remember this fact.\n5. Go back and click on the third hyperlink in the \"Crayon\" page and identify that it is a valid page. Remember this fact.\n6. Go back and click on the fourth hyperlink in the \"Crayon\" page and identify that it is a valid page. Remember this fact.\n7. Go back and click on the fifth hyperlink in the \"Crayon\" page and identify that it is a valid page. Remember this fact.\n8. Confirm that all five pages load correctly and contain content. Send a message to the user: \"All the articles have valid pages\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "All the articles have valid pages."
+      }
+    }
+  },
+  {
+    "task_id": 143,
+    "intent": "Which seems to be the deadlier accident (based on the number of casualties) from these two articles: (1) Serb pilots defend colleague in Air India Express disaster, and (2) Molten steel kills 32 workers in Liaoning, China? Mention the name of the article related to the deadlier accident.",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Serb pilots defend colleague in Air India Express disaster\" in the search box and press Enter.\n2. Scan the search results to identify the casualty count mentioned for this disaster, which is 158. Remember the count.\n3. Type \"Molten steel kills 32 workers in Liaoning, China\" in the search box and press Enter.\n4. Scan the search results to confirm the casualty count for this accident, which is 32. Remember the count.\n5. Compare the two casualty counts to determine which is higher. Since the first one is higher, send a message to the user: \"(1) Serb pilots defend colleague in Air India Express disaster\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "(1) Serb pilots defend colleague in Air India Express disaster"
+      }
+    }
+  },
+  {
+    "task_id": 144,
+    "intent": "Which cities are mentioned in any one of these two articles: (1) Australia, NATO enhance ties, and (2) Two pieces of suspected plane debris from Maldives taken to Malaysia for analysis?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Australia, NATO enhance ties\" in the search box and press Enter.\n2. Read the article to identify the city mentioned, which is Brussels, and remember it.\n3. Type \"Two pieces of suspected plane debris from Maldives taken to Malaysia for analysis\" in the search box and press Enter.\n4. Read the article to identify any cities mentioned. You will find that no cities are mentioned in this article, so you don't need to remember anything from here.\n5. Send a message to the user with the city you remembered: \"Brussels\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Brussels"
+      }
+    }
+  },
+  {
+    "task_id": 145,
+    "intent": "Which countries are mentioned in both of these articles: (1) Kenya deports Somali businessman, and (2) Rwandan genocide suspect arrested in Uganda?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Kenya deports Somali businessman\" in the search box and press Enter.\n2. Read the article to identify the countries mentioned: Kenya and Somalia. Remember the names of these countries.\n3. Type \"Rwandan genocide suspect arrested in Uganda\" in the search box and press Enter.\n4. Read the article or snippets to identify the countries mentioned: Uganda, Rwanda, Tanzania, Democratic Republic of the Congo, and the United States. Remember the names of these countries.\n5. Compare the lists of countries from both articles. As there are no countries that appear in both articles, send a message to the user: \"None\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "None"
+      }
+    }
+  },
+  {
+    "task_id": 146,
+    "intent": "Compare the first two articles that appear when you search for articles on Morocco. Are these two articles related to the same event?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Morocco\" in the search box and press Enter.\n2. Open the first article in the search results, \"Meteorites in Morocco found to be from Mars\", and analyze the main event described. Remember your analysis.\n3. Open the second article in the search results, \"Morocco raises terror threat level to 'maximum'\", and analyze the main event described. Remember your analysis.\n4. Compare the events to determine whether they refer to the exact same incident. Since they don't, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 147,
+    "intent": "Is there any news article regarding San Diego that was published in 2024?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"San Diego\" in the search box and press Enter.\n2. Scan the search results for articles whose publication date contains \"2024\".\n3. As the first search result is from 2024, send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 148,
+    "intent": "Were these two articles published on the same day: (a) Former guitarist of pioneering death metal band Possessed dies in shootout with San Francisco police, and (b) Seven civilians killed in Iraq?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Former guitarist of pioneering death metal band Possessed dies in shootout with San Francisco police\" in the search box and press Enter.\n2. Locate the publication date of the article, which is September 25, 2025, and remember this date.\n3. Type \"Seven civilians killed in Iraq\" in the search box and press Enter.\n4. Locate the publication date of the article, which is also September 25, 2025. Since this date matches the date you remembered, send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 149,
+    "intent": "Navigate to the 23rd article in the search results for \"crime patrol\". Then take the first two words of the title of the visited article, search those two words, and report the title of the last article in the search results.",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"crime patrol\" in the search box and press Enter.\n2. Scroll down, click on the third page icon, and find the third result on the third page: \"Federal judge rejects hate crime plea in Arbery killing\".\n3. Identify the first two words of the title, \"Federal judge\".\n4. Type those two words into the search box and press Enter.\n5. Scroll down and click on the last page of the search results, which is page 100.\n6. Identify the last search result on that page and send its title to the user: \"Americans are getting fatter, not-for-profit's report finds\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Americans are getting fatter, not-for-profit's report finds"
+      }
+    }
+  },
+  {
+    "task_id": 150,
+    "intent": "Follow this navigation path: Search \"Utah\", visit the fourth search result, identify the name of the first city in the body/content of the article, and search its name. Visit the fourth search result and tell me the name of the last state mentioned in the visited article. If you encounter a redirect link at any point, then visit that link. If any of the articles are not found, then report the task as incomplete.",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Utah\" in the search box and press Enter.\n2. Navigate to and click on the fourth search result, which is \"U.S. state of Utah begins to accept evacuees from Hurricane Katrina\".\n3. Read the content of the article to identify the first city mentioned, which is New Orleans.\n4. Type the name of that city into the search box and press Enter.\n5. Navigate to and click on the fourth search result in this new list, \"Total evacuation of New Orleans planned\".\n6. Scan the article to find the last state mentioned in the text, which is Texas.\n7. Send a message to the user: \"Texas\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Texas"
+      }
+    }
+  },
+  {
+    "task_id": 151,
+    "intent": "How many articles did you find on India winning the 2025 Champions Trophy?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"India winning the 2025 Champions Trophy\" in the search box and press Enter.\n2. Count the number of relevant articles in the search results. Then send the number as a message to the user: \"One\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 152,
+    "intent": "How many suspects have been arrested so far in connection with Pheobe Bishop's murder?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Pheobe Bishop murder suspects arrested\" in the search box and press Enter.\n2. Read the search results or top articles to find the current number of arrested suspects. You will find an article at the top, \"Third person charged in relation to Pheobe Bishop's alleged murder\", which means three people have been arrested so far. Check the other search results to confirm that no higher number is reported.\n3. Send a message to the user: \"Three\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three"
+      }
+    }
+  },
+  {
+    "task_id": 153,
+    "intent": "I heard workers died in an accident involving molten steel in China. Can you tell me when the last similar major incident happened in China?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"China molten steel accident workers died\" in the search box and press Enter.\n2. Click on the first search result, \"Molten steel kills 32 workers in Liaoning, China\".\n3. Identify the year of the last similar major incident mentioned, which is 1949. Send a message to the user: \"1949\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "1949"
+      }
+    }
+  },
+  {
+    "task_id": 154,
+    "intent": "I heard Utah refused radioactive waste from a Maine plant. When did that plant stop producing electricity?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Utah refuses radioactive waste Maine plant\" in the search box and press Enter.\n2. Click on the first search result, \"Radioactive soil from Maine reactor refused at landfill in Utah\".\n3. Verify whether the visited article mentions when the plant stopped producing electricity. Since this information is present, send a message to the user: \"1997\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "1997"
+      }
+    }
+  },
+  {
+    "task_id": 155,
+    "intent": "I heard Greta Thunberg was named Time magazine's Person of the Year. What is the first article about this?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Greta Thunberg Time magazine Person of the Year\" in the search box and press Enter.\n2. Click on the first search result, \"Greta Thunberg named 2019 Time Person of the Year\".\n3. Identify the publication date of the visited article. Send a message to the user: \"December 18, 2024\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "December 18, 2024"
+      }
+    }
+  },
+  {
+    "task_id": 156,
+    "intent": "How many articles did you find on Ken Lay (articles that consist only of redirect pages should be excluded)?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Ken Lay\" in the search box and press Enter.\n2. Based on the titles of the search results, you will find the first four search results to be relevant.\n3. Visit the first search result, \"Ken Lay dies in Aspen\". As this is a redirect link, go back.\n4. Visit the second search result, \"Ken Lay dies of heart attack\". As this is a redirect link, go back.\n5. Visit the third search result, \"Enron founder Ken Lay dies in Aspen, Colorado\". This is a valid search result; remember the title of the article.\n6. Go back and visit the fourth search result, \"Former Enron CEO Kenneth Lay dies\". As this is also a redirect link, count the number of valid articles you have remembered, which is one. Send a message to the user: \"One\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 157,
+    "intent": "Can you tell me the name of the article on the Indian prime minister testing positive for COVID-19?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Indian prime minister testing positive for COVID-19\" in the search box and press Enter.\n2. Review the search results to see whether any credible articles report this as a fact.\n3. As no legitimate reports are found, conclude that no such article exists. Send a message to the user: \"No such article exists\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No such article exists"
+      }
+    }
+  },
+  {
+    "task_id": 158,
+    "intent": "Follow this navigation path: search for \"England,\" visit the second article in the results, then take the first three words of its main content and search them. Visit the fifth search result. What is the first sentence of that article's main content? If you encounter a redirect link at any point, follow the redirect. If any of the articles are not found, report the task as incomplete.",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"England\" in the search box and press Enter.\n2. Navigate to and click on the second article in the results, \"England remembers Bobby Robson\".\n3. Identify the first three words of the article's main content, \"Since his death\".\n4. Type those three words, \"Since his death\", into the search box and press Enter.\n5. Navigate to and click on the fifth search result, \"Serial killer sentenced to death in Swaziland\".\n6. Read the first sentence of the main content and send it as a message to the user: \"A convicted serial killer has been sentenced to death in the African country of Swaziland; his death will be the first execution in the country since 1983.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "A convicted serial killer has been sentenced to death in the African country of Swaziland; his death will be the first execution in the country since 1983."
+      }
+    }
+  },
+  {
+    "task_id": 159,
+    "intent": "How many external links are provided in the article \"World Health Organization declares COVID-19 pandemic\"?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"World Health Organization declares COVID-19 pandemic\" in the search box and press Enter.\n2. Open the specific article matching this title.\n3. Count the number of external hyperlinks embedded in the article body. Then send it as a message to the user: \"Six\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Six"
+      }
+    }
+  },
+  {
+    "task_id": 160,
+    "intent": "Does Stephen Hawking appear in the search results when you search \"Stephen Curry\"?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Stephen Curry\" in the search box and press Enter.\n2. Scan the search result titles for the name \"Stephen Hawking\". The name should appear in the first search result. Send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 161,
+    "intent": "There is an article called \"2007 European football friendly match: England vs. Germany\". Do you think the publication year of the article is consistent with the year when the match took place?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"2007 European football friendly match: England vs. Germany\" in the search box and press Enter.\n2. Open the article and identify the publication date (for example, by looking for the timestamp). It should be December 18, 2024.\n3. Based on the title of the article, we can conclude that the actual date of the event is 2007. As the actual date is inconsistent with the publication date, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 162,
+    "intent": "Did the 2024 article, \"Indian flooding displaces thousands\", get published before the 2024 article \"Satellite radio approved in Canada\"?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Indian flooding displaces thousands 2024\" in the search box and press Enter.\n2. Remember the specific publication date of the article, December 18, 2024.\n3. Type \"Satellite radio approved in Canada 2024\" in the search box and press Enter.\n4. Remember the specific publication date of that article, December 17, 2024.\n5. Compare the two dates that you remembered to see if the flooding article was published earlier. Send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 163,
+    "intent": "Based on the article, \"Allahabad High Court grants bail to accused linked to Umesh Pal murder case\", when was Umesh Pal shot?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Allahabad High Court grants bail to accused linked to Umesh Pal murder case\" in the search box and press Enter.\n2. Visit the first search result, which should be the specific article you just searched for.\n3. Read the text to find the date mentioned for when Umesh Pal was shot. Then send it as a message to the user: \"February 24, 2023\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "February 24, 2023"
+      }
+    }
+  },
+  {
+    "task_id": 164,
+    "intent": "Navigate to the article \"Hurricane Emily is second strike for Jamaica\", find the name of the last country mentioned, search for the name of that country, and tell me the title of the last search result.",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Hurricane Emily is second strike for Jamaica\" in the search box and press Enter.\n2. Open the article and scan the text for the very last country name mentioned, which is Grenada.\n3. Type \"Grenada\" in the search box and press Enter.\n4. Click on the last page (if there are multiple pages in the search results).\n5. Scroll to the last result on the last page. Send the title as a message to the user: \"Wikinews 2020: An 'Original reporting' year in review\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wikinews 2020: An 'Original reporting' year in review"
+      }
+    }
+  },
+  {
+    "task_id": 165,
+    "intent": "Based on these two articles: (1) \"At least eight dead after drone strikes in Pakistan\" and (2) \"Tornado touches down in Joplin, Missouri\", which appears to describe the deadlier incident?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"At least eight dead after drone strikes in Pakistan\" in the search box and press Enter.\n2. Identify the casualty count mentioned in the article, which is eight. Remember the count.\n3. Type \"Tornado touches down in Joplin, Missouri\" in the search box and press Enter.\n4. Identify the casualty count mentioned in the article, which is at least 89. Remember the count.\n5. Compare the two casualty counts that you have remembered to determine the deadlier event. Send a message to the user: \"(2) Tornado touches down in Joplin, Missouri\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "(2) Tornado touches down in Joplin, Missouri"
+      }
+    }
+  },
+  {
+    "task_id": 166,
+    "intent": "How many people were killed in the 2024 Joplin tornado?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"2024 Joplin tornado\" in the search box and press Enter.\n2. Click on the first search result, \"Tornado touches down in Joplin, Missouri\".\n3. Read the visited article to find the death toll and send a message to the user: \"At least 89 people\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "At least 89 people"
+      }
+    }
+  },
+  {
+    "task_id": 167,
+    "intent": "Based on the article, \"Pilots spot 'UFOs' near the Channel Islands\", is it true that the UFOs are said to have come from Neptune?",
+    "sites": [
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Pilots spot 'UFOs' near the Channel Islands\" in the search box and press Enter.\n2. Open the article and read the details regarding the origin of the UFOs.\n3. Check if there is any claim that they came from Neptune. As there are no such claims, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 168,
+    "intent": "What unique sizes are available for all the men's and women's jeans?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"jeans\" in the search box and press Enter.\n2. Based on the titles, open each product page for men's and women's jeans. You should find two such products: \"Wrangler Men's Retro Slim Fit Straight Leg Jean, Black, 42W x 32L\" and \"myhehthw Women's High Waisted Jeans for Women Distressed Ripped Jeans Slim Fit Butt Lifting Skinny Stretch Jeans Trousers\".\n3. Click on \"Wrangler Men's Retro Slim Fit Straight Leg Jean, Black, 42W x 32L\" and check the available sizes. There should be no sizes available.\n4. Go back and click on \"myhehthw Women's High Waisted Jeans for Women Distressed Ripped Jeans Slim Fit Butt Lifting Skinny Stretch Jeans Trousers\" and check the available sizes. Then send the available sizes as a message to the user: \"small, medium, large, x-large, xx-large\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "small, medium, large, x-large, xx-large"
+      }
+    }
+  },
+  {
+    "task_id": 169,
+    "intent": "What colors are available for the Men's Running Tennis shoes?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Men's Running Tennis shoes\" in the search box and press Enter.\n2. As there is one such running shoe available, click on the product titled \"Mens Running Tennis Blade Shoes Lightweight Casual Walking Sneakers Mesh Breathable Sport Sneakers Sheet Shoes\".\n3. There are three colors available on the product page. Send the colors as a message to the user: \"black, grey, khaki\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "black, grey, khaki"
+      }
+    }
+  },
+  {
+    "task_id": 170,
+    "intent": "Are the FIN86 Men's Elastic High Waisted Shorts made of the same material as the Yinimo Men's Gym Shorts? If not, how do they differ?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"FIN86 Men's Elastic High Waisted Shorts\" in the search box and press Enter.\n2. Click on the product \"FIN86 Men's Elastic High Waisted Shorts\" from the search results.\n3. Note the material listed in the description, which is Spandex. Remember this fact.\n4. Type \"Yinimo Men's Gym Shorts\" in the search box and press Enter.\n5. Click on the product \"Yinimo Men's Gym Shorts\" from the search results.\n6. Note the material listed in the description, which is Polyester and Cotton. Remember this fact.\n7. Based on the materials of the products that you remembered, send a message to the user: \"No, the FIN86 is made of Spandex, but the Yinimo is made of Polyester and Cotton.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No, the FIN86 is made of Spandex but the Yinimo is made of Polyester and Cotton."
+      }
+    }
+  },
+  {
+    "task_id": 171,
+    "intent": "Does the longest variant of the Lindy DisplayPort to HDMI cable exceed the length of the longest variant of the Kodak HDMI Mini Cable?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Lindy DisplayPort to HDMI cable\" in the search box and press Enter.\n2. Click on the product \"LINDY 36920 0.5m DisplayPort to HDMI 10.2G Cable, Black\" from the search results.\n3. Identify the longest length variant available, which is 5 m. Remember this fact.\n4. Type \"Kodak HDMI Mini Cable\" in the search box and press Enter.\n5. Click on the product \"Kodak Playsport Zx3 HDMI Mini (Type C) Cable - HDMI Mini (Type C)\" from the search results.\n6. Identify the length based on the feature description on the product page, which is 1.8 m. Remember this fact.\n7. Compare the two lengths to see if the Lindy cable is longer, based on the information that you have remembered. Since it is, send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 172,
+    "intent": "What is the total price of all the toy cars available in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"toy cars\" in the search box and press Enter.\n2. Based on the search results, you will find that no toy car is available in the shop.\n3. Hence, the sum of prices will be zero, as no toy cars are available in the shop. Send a message to the user: \"Zero (no toy cars are available in the shop)\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Zero (no toy cars are available in the shop)"
+      }
+    }
+  },
+  {
+    "task_id": 173,
+    "intent": "How many grams of protein are in a standard serving of Schoolyard cheese puffs?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Schoolyard cheese puffs\" in the search box and press Enter.\n2. Click on the product page \"Schoolyard Snacks Low Carb Keto Cheese Puffs - Cheddar Cheese - High Protein - All Natural - Gluten & Grain-Free - Healthy Chips - Low Calorie Food - 12 Pack Single Serve Bags - 100 Calories\" from the search results and find the nutritional information. In the features, you should find the amount per serving, which is 14 grams.\n3. Send a message to the user: \"14 grams\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "14 grams"
+      }
+    }
+  },
+  {
+    "task_id": 174,
+    "intent": "Is it recommended to dry clean the Burband Women's High Waist Bike Shorts?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Burband Women's High Waist Bike Shorts\" in the search box and press Enter.\n2. Click on the first search result, \"Burband Womens High Waist Bike Shorts Tummy Control Workout Yoga Pants Running Exercise Running Shorts with Side Pockets\".\n3. Read the \"Care Instructions\" in the product description and features.\n4. Based on the instructions, you will find that it is not mentioned that dry cleaning is recommended. Send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 175,
+    "intent": "Does the description of the XXBR Summer T-shirts mention the material type?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"XXBR Summer T-shirts\" in the search box and press Enter.\n2. Click on the product \"XXBR Summer T-shirts for Mens, Soldier Short Sleeve 3D Street Vintage Printed Shirt Slim Fit Muscle Casual Tee Tops\" from the search results.\n3. Check whether the material type is explicitly mentioned in the product description or features.\n4. Since it is mentioned, send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 176,
+    "intent": "What is the price of the most expensive bookshelf?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"bookshelf\" in the search box and press Enter.\n2. Check the prices of the bookshelves in the search results. If there are multiple pages, visit the other pages as well.\n3. Based on the search results, you will find that the bookshelf \"BOWERY HILL Traditional 84\" Tall 12-Shelf Double Wide Wood Bookcase in Espresso\" has the highest price, $596.71.\n4. Send this price as a message to the user: \"$596.71\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "$596.71"
+      }
+    }
+  },
+  {
+    "task_id": 177,
+    "intent": "What's the warranty period of the Samsung remote for the UN85S9VF model?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Samsung remote UN85S9VF\" in the search box and press Enter.\n2. Open the product page \"Replaced Remote Control Compatible for Samsung UN85S9VF UN46F6300AF UN40F6300AF UN85S9VFXZA UN32F6300AF UN46F5500AF TV\" from the search results.\n3. Check the warranty period in the product description and features.\n4. In both places, you will find a 30-day quality warranty. Send a message to the user: \"30 days\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "30 days"
+      }
+    }
+  },
+  {
+    "task_id": 178,
+    "intent": "Does the Samsung remote for the UN85S9VFXZA model contain batteries?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Samsung remote UN85S9VF\" in the search box and press Enter.\n2. Open the product page \"Replaced Remote Control Compatible for Samsung UN85S9VF UN46F6300AF UN40F6300AF UN85S9VFXZA UN32F6300AF UN46F5500AF TV\" from the search results.\n3. Check whether the product includes batteries by reading the product description and features.\n4. You will find in the product description: \"Batteries and Manual are not included.\" Send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 179,
+    "intent": "What's the material of the Yinimo Men's Gym Shorts?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Yinimo Men's Gym Shorts\" in the search box and press Enter.\n2. From the search results, click on the product \"Yinimo Mens Gym Shorts Fashionable Loose Beach Drawstring Turkey Print Beach Cool Shorts\".\n3. In the features, you will find the material composition. Send it as a message to the user: \"Polyester and Cotton\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Polyester and Cotton"
+      }
+    }
+  },
+  {
+    "task_id": 180,
+    "intent": "Is the Goya Foods wafer marketed as a Latino snack?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Goya Foods wafer\" in the search box and press Enter.\n2. Click on the product \"Goya Foods Chocolate & Vanilla Wafers, 4.9 Ounce (Pack of 24)\" from the search results.\n3. Read the product description. You will find that the product has been described as a \"Latino snack\". Send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 181,
+    "intent": "I'm looking to buy a jute pouf. Can you please search the shop and let me know how many such products are available?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"jute pouf\" in the search box and press Enter.\n2. Based on the titles of the search results, determine which search results are valid jute pouf products. Visit the other pages if there are multiple pages of search results. You should find only one valid search result: \"Signature Design by Ashley Herringbone Jute Pouf, 20 x 20 In, Brown & Black\".\n3. Send a message to the user: \"One\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "One"
+      }
+    }
+  },
+  {
+    "task_id": 182,
+    "intent": "How many socks are available in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"socks\" in the search box and press Enter.\n2. Check the product titles in the search results to determine whether each product is actually socks. Visit the other pages too, if it is a multi-page search result.\n3. You will find five sock products. Send a message to the user: \"Five\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Five"
+      }
+    }
+  },
+  {
+    "task_id": 183,
+    "intent": "How many search results appear when you search the word \"cat\" in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"cat\" in the search box and press Enter.\n2. Check the number of search results displayed. It should say four. Send a message to the user: \"Four\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Four"
+      }
+    }
+  },
+  {
+    "task_id": 184,
+    "intent": "Is there any red HDMI cable in the shop? If yes, order a single unit and tell me the confirmation code. Otherwise, say that none are available.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"red HDMI cable\" in the search box and press Enter.\n2. Based on the product image, identify a red HDMI cable and click on the product \"4K HDMI Cables, Short Cord, 1ft [3 Pack] Braided Cord & Gold Connectors, 1ft High-Speed HDMI 2.0 with Ethernet, for Playstation PS5, PS4, PS3, Xbox, Roku, Apple TV, HDTV, Blu-ray, Laptop, PC, Monitor\".\n3. Select the color option \"red-braided\" and the \"single pack\" option.\n4. Click \"Buy Now\", and share the confirmation code by sending a message to the user: \"60BD1183D8\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "60BD1183D8"
+      }
+    }
+  },
+  {
+    "task_id": 185,
+    "intent": "How many rugs are available to buy?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"rugs\" in the search box and press Enter.\n2. Based on the product titles, verify which items are actually rugs. There should be two such products. Send a message to the user: \"Two\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Two"
+      }
+    }
+  },
+  {
+    "task_id": 186,
+    "intent": "Is there any bikini with a wrap skirt available in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"bikini wrap skirt\" in the search box and press Enter.\n2. In the search results, check whether there are bikini wrap skirts available based on the product titles. You should find at least one such product. Then send a message to the user: \"Yes\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 187,
+    "intent": "Can I purchase the Dota 2 video game from this shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Dota 2\" in the search box and press Enter.\n2. Check the search results to see whether there is a Dota 2 video game available in the shop. As there isn't, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 188,
+    "intent": "How many electric scooters are available in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"electric scooter\" in the search box and press Enter.\n2. Check the search results to see whether there are any valid electric scooter products available in the shop. As there aren't, send a message to the user: \"Zero\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Zero"
+      }
+    }
+  },
+  {
+    "task_id": 189,
+    "intent": "Can you find any Nintendo Switch console in the shop?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Nintendo Switch\" in the search box and press Enter.\n2. Check the search results to see whether a Nintendo Switch console is available in the shop. As there isn't, send a message to the user: \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 190,
+    "intent": "I'm looking for a pair of jeans for less than $30. The size should be XL. Once you complete the order, share the completion code.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"jeans\" in the search box and press Enter.\n2. Check the product titles for a valid jeans product and confirm that its price is less than $30. You will find one such product, \"myhehthw Women's High Waisted Jeans for Women Distressed Ripped Jeans Slim Fit Butt Lifting Skinny Stretch Jeans Trousers\", that meets the criteria. Click on this product.\n3. Choose size \"x-large\".\n4. Click \"Buy Now\" to place the order.\n5. Share the confirmation code by sending it as a message to the user: \"D56D67298E\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "D56D67298E"
+      }
+    }
+  },
+  {
+    "task_id": 191,
+    "intent": "I'm looking for a box of cookies under $5. Can you please place the order and share the completion code with me?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"cookies\" in the search box and press Enter.\n2. Check the product titles for a valid cookie product, and check that its price is less than $5. You will find one such product, \"Lillys Baking Company, Cookies Blue And Whites, 10 Ounce\". Click on the product page.\n3. Click \"Buy Now\" to place the order.\n4. Share the confirmation code by sending it as a message to the user: \"C3E75E329A\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "C3E75E329A"
+      }
+    }
+  },
+  {
+    "task_id": 192,
+    "intent": "Order these products and share the confirmation codes: Welch's Orange Pineapple Juice, Stirrings Simple Classic Cocktail Mix Mojito, and Italian Basil Pesto.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Welch's Orange Pineapple Juice\" in the search box and press Enter.\n2. Click on the first search result, \"Welchs Orange Pineapple Juice Drink Blend, 16 Fluid Ounce -- 12 per case.\".\n3. Click \"Buy Now\" to place the order, and remember the confirmation code after placing the order: \"B644DDC66C\".\n4. Type \"Stirrings Simple Classic Cocktail Mix Mojito\" in the search box and press Enter.\n5. Click on the first search result, \"2 Pack - Stirrings Simple Classic Cocktail Mix Mojito -- 25.4 fl oz\".\n6. Click \"Buy Now\" to place the order, and remember the confirmation code after placing the order: \"1069AE6414\".\n7. Type \"Italian Basil Pesto\" in the search box and press Enter.\n8. Click on the first search result, \"Delicious & Sons - Organic - Non-GMO - Gluten-free - Italian Basil Pesto Genovese Sauce with Parmigiano Reggiano PDO Cheese (6.70 oz.)\".\n9. Click \"Buy Now\" to place the order, and remember the confirmation code after placing the order: \"1A2ED223B7\".\n10. Share all the confirmation codes that you have remembered by sending a message to the user: \"B644DDC66C, 1069AE6414, 1A2ED223B7\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "B644DDC66C, 1069AE6414,1A2ED223B7"
+      }
+    }
+  },
+  {
+    "task_id": 193,
+    "intent": "Can you place an order for a Romwe wrap skirt and share the confirmation code with me? If there are size options, then please pick the medium size.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Romwe wrap skirt\" in the search box and press Enter.\n2. Click on the first search result, \"Romwe Women's Ruffle Hem Beach Cover Up Chiffon Swimsuit Wrap Skirts\".\n3. On the product page, choose the \"Medium\" size by clicking on it.\n4. Click \"Buy Now\" to place the order.\n5. Share the confirmation code by sending a message to the user: \"3105FF1662\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "3105FF1662"
+      }
+    }
+  },
+  {
+    "task_id": 194,
+    "intent": "Order every variant of the Cravings by Zoe Valentine's Day chocolates and share the confirmation codes.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Cravings by Zoe Valentine's Day chocolates\" in the search box and press Enter.\n2. Click on the first search result, \"CRAVINGS BY ZOE Valentine's Day Chocolate Truffles | Assorted Chocolate Gift Box Red | Gourmet Chocolate | Delicious Milk Chocolate, Dark Chocolate and White Chocolate Flavors with 16 Assorted Toppings - 7.5 oz, 16 Count\".\n3. Click on the first variant, \"happy birthday truffle chocolate\". Then click \"Buy Now\" and get the code \"0FA416F314\". Remember this code.\n4. Go back and click on the second variant, \"holiday truffle chocolate\". Then click \"Buy Now\" and get the code \"68A92442CA\". Remember this code.\n5. Go back and click on the third variant, \"truffle collection chocolate\". Then click \"Buy Now\" and get the code \"5AB56CB7A1\". Remember this code.\n6. Send all the codes that you have remembered as a message to the user: \"0FA416F314, 68A92442CA, 5AB56CB7A1\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "0FA416F314, 68A92442CA, 5AB56CB7A1"
+      }
+    }
+  },
+  {
+    "task_id": 195,
+    "intent": "Order all the skirts available in the shop and share the confirmation codes. If there are multiple options, then always pick the small size.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"skirts\" in the search box and press Enter.\n2. Click on the first skirt product, \"Romwe Women's Ruffle Hem Beach Cover Up Chiffon Swimsuit Wrap Skirts\".\n3. Click on the size \"Small\".\n4. Click \"Buy Now\" and get the code \"73A46F8F3F\". Remember this code.\n5. Search for \"skirts\" again and click on the second skirt product, \"Merry Christmas Snowflake Pattern Women Chiffon Short Scarf Lightweight and Compact, Easy to Carry. Beach Sarong Cover Wrap Skirt Bikini Swimwear Cover Ups Black\".\n6. Click on the size \"Small\".\n7. Click \"Buy Now\" and get the code \"EFBFB6B826\". Remember this code.\n8. Send a message to the user with the confirmation codes that you have remembered: \"73A46F8F3F, EFBFB6B826\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "73A46F8F3F, EFBFB6B826"
+      }
+    }
+  },
+  {
+    "task_id": 196,
+    "intent": "What is the focal length range in millimeters of the stock lens on the Canon PowerShot S3 camera product picture?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Canon PowerShot S3\" in the search box and press Enter.\n2. Click on the product \"Canon PowerShot Pro Series S3 IS 6MP with 12x Image Stabilized Zoom (Discontinued by Manufacturer)\" from the search results.\n3. Check the product image. You will see \"6.0 - 72.0 mm\" written on the stock lens.\n4. Send a message to the user: \"6.0 - 72.0\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "6.0 - 72.0"
+      }
+    }
+  },
+  {
+    "task_id": 197,
+    "intent": "How many of the color options for the Nautica headphones have two distinct visible colors?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Nautica headphones\" in the search box and press Enter.\n2. Click on the product \"NAUTICA H120 Bluetooth Headphones, On-Ear Wireless Headphones with Built-in Microphone Bluetooth v5.0 Wireless and Wired Stereo Headset with Deep Bass, Foldable Over-Ear Headphones (White Nude)\" from the search results.\n3. In the color options, you will see that the last four are two-color combinations: \"navy red\", \"navy yellow\", \"white nude\", and \"white off white\".\n4. Send a message to the user: \"Four\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Four"
+      }
+    }
+  },
+  {
+    "task_id": 198,
+    "intent": "What's the color of the Rifle Scope Mount Camera Adapter in the product picture?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Rifle Scope Mount Camera Adapter\" in the search box and press Enter.\n2. Click on the product \"starboosa Rifle Scope Mount Camera Adapter - Smartphone Camera Adapter for Hunting Teaching\" from the search results.\n3. Look at the product picture to identify the color of the product, which is black. Send a message to the user: \"Black\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Black"
+      }
+    }
+  },
+  {
+    "task_id": 199,
+    "intent": "Place an order for the first pink socks that appear when you search for \"socks.\" Then share the confirmation code here. If you need to pick a size, please choose medium.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"socks\" in the search box and press Enter.\n2. The first pink socks that appear are \"Gloaiidjonh Women Cotton Crew Socks Cute Cartoon Anime Dinosaur Embroidery Mid Tube Hosiery\". Click on the product page.\n3. Select the first pair of pink socks visible.\n4. Select the color option \"pk\".\n5. Click \"Buy Now\".\n6. Check the confirmation code and send it as a message to the user: \"202AA9AA1D\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "202AA9AA1D"
+      }
+    }
+  },
+  {
+    "task_id": 200,
+    "intent": "What's written on the body of the 20x50 Binoculars? If there are multiple 20x50 Binoculars, pick the first one from the search results.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"20x50 Binoculars\" in the search box and press Enter.\n2. Click on the first search result, \"20x50 High Power Binoculars for Adults with Low Light Night Vision, Compact Waterproof Binoculars for Bird Watching Hunting Travel Football Games Stargazing with Carrying Case and Strap\".\n3. Inspect the product image to see the text written on the body. You should find the text written in white: \"UncleHu\". Send a message to the user: \"UncleHu\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "UncleHu"
+      }
+    }
+  },
+  {
+    "task_id": 201,
+    "intent": "Place an order for a Spider-Man superhero T-shirt with a white spider. The size should be Large. Once you complete the order, share the completion code.",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Spider-Man superhero T-shirt white spider\" in the search box and press Enter.\n2. Click on the product page \"Long Sleeve Superhero T Shirt Tank Top Mens Compression Shirt Men Workout Fitness Gym Shirt\".\n3. Click on \"brown\". You will see that the product image has a white spider. Select the correct shirt and choose size \"Large\".\n4. Click \"Buy Now\" to place the order.\n5. Check the confirmation code and send it as a message to the user: \"7778F2A319\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "7778F2A319"
+      }
+    }
+  },
+  {
+    "task_id": 202,
+    "intent": "Could you please order the most expensive cracker available in the Shop and send me the confirmation code?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"cracker\" in the search box and press Enter.\n2. You will find five search results. The first search result, \"Crunchmaster Gourmet Toasted Sesame Rice Cracker, 3.5-Ounce (Pack of 12)\", will be the most expensive one and is a valid cracker product. Click on the product page.\n3. Click \"Buy Now\" and retrieve the confirmation code.\n4. Send the confirmation code as a message to the user: \"79E27147B0\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "79E27147B0"
+      }
+    }
+  },
+  {
+    "task_id": 203,
+    "intent": "Which of the following items are available in the shop: Crayon, Candle, Face Lotion, and Electric Chair?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Search for \"Crayon\" and check the search results. None of the results should be valid crayon products. Remember this fact.\n2. Search for \"Candle\" and check the search results. You should find at least one valid candle product. Remember this fact.\n3. Search for \"Face Lotion\" and check the search results. You should find at least one valid face lotion product. Remember this fact.\n4. Search for \"Electric Chair\" and check the search results. None of the results should be valid electric chair products. Remember this fact.\n5. Based on the search results that you remembered, send a message to the user: \"Candle, Face Lotion\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Candle, Face Lotion"
+      }
+    }
+  },
+  {
+    "task_id": 204,
+    "intent": "How many times does the word \"Cotton\" appear on the product page (including Description, Features, Reviews) for \"Custom Polo Shirts for Men\"?",
+    "sites": [
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Custom Polo Shirts for Men\" in the search box and press Enter.\n2. Click on the first search result, \"Custom Polo Shirts for Men Design Your Own Personalized Logo Text Photo Polo Shirt Customize Classic Polo Shirt\".\n3. In the product description, count the occurrences of the word \"Cotton\" in the text. You should find three such occurrences. Remember this count.\n4. In the features section, count the occurrences of the word \"Cotton\" in the text. You should find a single occurrence. Remember this count.\n5. Add the counts together, which should be four, and send a message to the user: \"Four times\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Four times"
+      }
+    }
+  },
+  {
+    "task_id": 205,
+    "intent": "Visit the Wiki article on the first country mentioned in the latest News article about TikTok. Based on that Wiki article, tell me the population of that country.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"TikTok\" and open the latest (most recent) article in the results.\n2. Identify the first country mentioned in that news article. Remember the country name.\n3. Switch to Wiki and search for that country name. Open the country’s article.\n4. From the Wiki article, extract the population stated for that country.\n5. Send the population figure to the user.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "340.1 million"
+      }
+    }
+  },
+  {
+    "task_id": 206,
+    "intent": "I need you to run a quick check. Go to the “Quantum mechanics” article on Wiki and find the first article listed in the “Related pages” section. Search for the second word of that article’s title on News, visit the second search result, and tell me whether that news article contains the word “ship”.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, open the \"Quantum mechanics\" article.\n2. Locate the \"Related pages\" section and click the first article listed. Note its title.\n3. Take the second word of that title and search it on News.\n4. Open the second search result on News.\n5. Check whether the article contains the word \"ship\" (case-insensitive). Report \"yes\" if it does, otherwise \"no\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "yes"
+      }
+    }
+  },
+  {
+    "task_id": 207,
+    "intent": "First, verify whether “Brisling Sardines in BBQ Sauce” is kosher. If it is, look up “sardine” on Wikipedia and find the word from which its name is derived. If it is not, search for “Fish” on News and tell me the 20th search result.",
+    "sites": [
+      "wiki",
+      "webshop",
+      "news"
+    ],
+    "start_url": "__WEBSHOP__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On the Shop, search for \"Brisling Sardines in BBQ Sauce\" and open the product page.\n2. Determine if the product is marked kosher in the description, features, or labeling. Remember whether it is kosher.\n3. If it IS kosher: switch to Wiki, search for \"sardine\", open the article, and find the word from which the name \"sardine\" is derived. Report that word to the user.\n4. If it is NOT kosher: go to News, search for \"Fish\", navigate to the 20th search result, and report the title of that article.\n5. Send only the required answer per the above branching.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "The fishes are named after the Island of Sardinia."
+      }
+    }
+  },
+  {
+    "task_id": 208,
+    "intent": "Visit the first article of the News search for the toy maker Mattel. Find the name of the first toy product mentioned in that article. Is that product available in the Shop? If so, how many such products are available?",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"Mattel\" and open the first article in the results.\n2. Read the article and identify the first toy product mentioned by name. Remember that product name.\n3. Go to the Shop and search for that product name.\n4. Count how many valid product listings match that toy. If none, the count is zero.\n5. Report availability as yes/no and the count if available.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No, the product is not available in the Shop."
+      }
+    }
+  },
+  {
+    "task_id": 209,
+    "intent": "Please find the fifth unique country mentioned on the “Anime” Wiki page, then search for that country’s name on News, and report the title of the thirteenth article in the search results.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, open the \"Anime\" article.\n2. Scan the article text to identify countries mentioned; track unique country names in order of first appearance.\n3. Identify the fifth unique country mentioned. Remember its name.\n4. Go to News and search for that country name.\n5. Navigate to the 13th article in the search results and read its title.\n6. Report that title to the user.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "France recalls Íngrid Betancourt mission"
+      }
+    }
+  },
+  {
+    "task_id": 210,
+    "intent": "Does the Canon EOS Rebel T7i found in the Shop have a Wiki page? If yes, tell me the title of that Wiki page. Otherwise, find the most relevant page and tell me its title. If you find none of the pages to be relevant, just say \"Article not found\".",
+    "sites": [
+      "wiki",
+      "webshop",
+      "news"
+    ],
+    "start_url": "__WEBSHOP__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On the Shop, search for \"Canon EOS Rebel T7i\" and open the product page (or the closest match).\n2. From that product, derive the exact model name.\n3. On Wiki, search for that model name. If a dedicated page exists, report its title.\n4. If no dedicated page exists, choose the most relevant related Wiki page (e.g., a series page) and report its title.\n5. If no relevant Wiki page is found, reply \"Article not found\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Canon EOS"
+      }
+    }
+  },
+  {
+    "task_id": 211,
+    "intent": "Search for \"Apple\" on News. Is the first search result negative news about the tech company Apple? If yes, say \"Found negative news\". If not, order an “iPad Case Fit for iPad 9.7” and send me the confirmation code.",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"Apple\".\n2. Open the first search result and determine whether it is negative news about the tech company Apple. Negative means conveying bad outcomes, issues, or criticism about Apple.\n3. If it IS negative: reply \"Found negative news\".\n4. If it is NOT negative: go to the Shop and search for \"iPad Case Fit for iPad 9.7\". Select the product, choose any default options, click \"Buy Now\", and return the confirmation code.\n5. Send only the required final message based on the branch.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Found negative news."
+      }
+    }
+  },
+  {
+    "task_id": 212,
+    "intent": "Does the \"Once Upon A Time Queen Born In 1982 T-Shirts\" product from the Shop contain polyester? If so, go to the Polyester article on Wiki and tell me the names of the clothing brands mentioned there. Otherwise, just tell me, \"T-shirt is polyester-free!!!\"",
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Once Upon A Time Queen Born In 1982 T-Shirts\" in the Shop search box and press Enter.\n2. Click on the first search result.\n3. Check the material composition by reading the product description and other tabs.\n4. Verify whether polyester is listed by checking all the tabs on the product page. You will find polyester mentioned on the Attributes tab.\n5. Go to Wikipedia, type \"Polyester\" in the search box, and press Enter.\n6. You will find no clothing brands mentioned in the Wikipedia article. Send a message to the user: \"No clothing brands have been mentioned in the Polyester article.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No clothing brands are mentioned in the Polyester article."
+      }
+    }
+  },
+  {
+    "task_id": 213,
+    "intent": "Could you check whether the \"Tattoo\" article on Wiki talks about mummification? If so, tell me how many tattoo machines are available in the Shop. Only consider electronic tattoo machines, not manual ones.",
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Tattoo\" in the Wiki search box and press Enter.\n2. Read the article to see whether the concept of mummification has been discussed. You will find it mentioned in the History section.\n3. Switch to the Shop search.\n4. Type \"tattoo machine\" in the search box and press Enter.\n5. Count the number of electronic tattoo machines available (excluding manuals) in the search results by visiting the first two pages. Don't go beyond that, as most of the results will not be relevant. You will find two such machines. Send a message to the user: \"Two\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Two"
+      }
+    }
+  },
+  {
+    "task_id": 214,
+    "intent": "Search for \"Iran\" on News and visit the first search result. Was that news incident reported in Iran’s Wiki article?",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"Iran\" and open the first article.\n2. Identify the incident/event described in that article.\n3. Go to Wiki and open the \"Iran\" article.\n4. Check whether that specific incident/event is reported in the Iran article.\n5. Answer \"Yes\" if it is reported; otherwise, answer \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No"
+      }
+    }
+  },
+  {
+    "task_id": 215,
+    "intent": "Search for \"Driving Accident\" on News. Visit the first News article and identify the U.S. state where that accident occurred. Then search for that state on Wiki and tell me its population.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"Driving Accident\" and open the first article.\n2. Identify the U.S. state where the accident occurred. Remember the state name.\n3. Go to Wiki and search for that state. Open the state article.\n4. Find and report the population of that state from the Wiki article.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Over 29 million."
+      }
+    }
+  },
+  {
+    "task_id": 216,
+    "intent": "Visit the Wiki article on \"Espadrille\" and find the first country mentioned in that article. Which of the following sites: Wiki, News, or Shop, have an article about that country or a product from that country?",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, open the \"Espadrille\" article.\n2. Identify the first country mentioned in the text. Remember the country name.\n3. Check Wiki to confirm that a page exists for that country (it should).\n4. On News, search for that country and verify that at least one news article appears.\n5. On the Shop, search for that country name and see if any product explicitly references or is from that country.\n6. Report which of the three sites (Wiki, News, Shop) have an article about that country or a product from that country. List only the sites that qualify.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wiki, News"
+      }
+    }
+  },
+  {
+    "task_id": 217,
+    "intent": "Order the most expensive bed and send me the confirmation code.",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"bed\" in the Shop search box and press Enter.\n2. Go over all the products on page 1. You will find that the product \"iDealBed Luxe Series iQ5 Hybrid Luxury Plush Mattress 4i Custom Adjustable Bed Set, Wireless, Massage, Nightlight, Zero-Gravity, Anti-Snore, Memory Pre-Sets (Queen)\" has the highest price. Remember this fact. Warning: You might encounter something like a bed kit. This is not a bed, but this is a bed kit and shouldn't be considered.\n3. Visit pages 2, 3, and 4 of the search results to verify that no bed product exists with a higher price. Don't visit more pages, as you won't find better results.\n4. Since you cannot find any other product with a higher price, search \"iDealBed Luxe Series iQ5 Hybrid Luxury Plush Mattress 4i Custom Adjustable Bed Set, Wireless, Massage, Nightlight, Zero-Gravity, Anti-Snore, Memory Pre-Sets (Queen)\" and click on the product page.\n5. Click \"Buy Now\" and retrieve the confirmation code. Send it as a message to the user: \"61A1FDDAD1\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "61A1FDDAD1"
+      }
+    }
+  },
+  {
+    "task_id": 218,
+    "intent": "Search \"dog\" on News. If the first search result says something positive about dogs, then place an order for a dog toy in the Shop and share the confirmation code. Otherwise, tell me the title of the news article.",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"dog\" in the News search box and press Enter.\n2. Click on the first article in the search results.\n3. As it is a negative article on dogs, send the title of the news article message to the user: \"Dog owner to face felony charge\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Dog owner to face felony charge"
+      }
+    }
+  },
+  {
+    "task_id": 219,
+    "intent": "Who are the first three female referees to be appointed to the men's 2022 FIFA World Cup?",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, search for information about female referees appointed to the men's 2022 FIFA World Cup.\n2. Identify the first three female referees appointed.\n3. Report their names in order.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Stéphanie Frappart,Salima Mukansanga,Yoshimi Yamashita"
+      }
+    }
+  },
+  {
+    "task_id": 220,
+    "intent": "Verify whether Sony's net profit fell significantly in 2024 or 2025. If so, visit the Sony's Wiki article and identify the first product mentioned on that page. Can you find that exact product in the Shop? If so, place the order and share the confirmation code with me. If any of the above conditions cannot be satisfied, state that explicitly.",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Go to News and search \"Sony's net profit fell significantly\".\n2. You will find an article \"Sony net profit falls by 95%\". Click on the article and you will see that the publication date is from 2024. Hence it is a valid article. Remember this fact.\n3. Go to Wiki search and type \"Sony\".\n4. Identify the first product mentioned on the page, which is \"PlayStation\".\n5. Go to Shop.\n6. Search \"PlayStation\" and press Enter.\n7. You will not find any PlayStation console in the shop. Send the confirmation code as a message to the user: \"The product is not available in the shop.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "The product is not available in the shop."
+      }
+    }
+  },
+  {
+    "task_id": 221,
+    "intent": "I love the Matrix movie series. Please find related Wiki articles, news, and products from the Shop. If there are multiple entries on each site, pick the one you think is the most relevant. If you cannot find any product or article, mention that in your answer. Share the titles of these items in the following format: <site name>: <article/news/product title>.",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Go to Wiki, type \"The Matrix\", and press Enter.\n2. You will find a Wiki article on the Matrix movie series. Remember this fact.\n3. Go to News, type \"The Matrix\", and press Enter.\n4. You will find no news article on the Matrix movie series. Only look at the first page, don't go to more pages. Remember this fact.\n5. Go to Shop, type \"The Matrix\", and press Enter.\n6. You will find no shop products in the Matrix movie series. Only look at the first page, don't go to more pages. Remember this fact.\n7. Based on the facts that you have remembered, send a message to the user:\n\"Wiki: The Matrix\nNews: No relevant news found.\nShop: No relevant product found.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Wiki: The Matrix\nNews: No relevant news found.\nShop: No relevant product found."
+      }
+    }
+  },
+  {
+    "task_id": 222,
+    "intent": "Visit the Wiki article on Gabon and search for the last word of the first section in the Shop (introduction counts as a section). If there are search results, click on the first one and tell me the title of the product. Otherwise, tell me \"No product found\".",
+    "sites": [
+      "wiki",
+      "webshop"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, open the \"Gabon\" article.\n2. Consider the introduction as the first section. Identify the very last word of that section’s text.\n3. Go to the Shop and search for that last word.\n4. If there is at least one valid product result, open the first product and report its title exactly.\n5. If there are no valid product search results, respond with \"No product found\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Legendary Whitetails Men's Non-Typical Long Sleeve T-Shirt"
+      }
+    }
+  },
+  {
+    "task_id": 223,
+    "intent": "How many patients participated in the pollen tablet trial for hay fever?",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"pollen tablet trial hay fever\" or similar terms.\n2. Open the article describing a clinical trial of a pollen tablet for hay fever.\n3. Identify the number of patients who participated in that trial.\n4. If needed, cross-check with a related Wiki article about the same trial or treatment, but use the news article as the primary source.\n5. Report the total number of patients as a number.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "634"
+      }
+    }
+  },
+  {
+    "task_id": 224,
+    "intent": "Visit the Wiki article on \"Brazil\" and find the most recent sporting event mentioned in the Sports section. Search for that event (don't include the year in the search) on News, and tell me the name of the third news article in the search results.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Search \"Brazil\" on Wiki and press Enter.\n2. Go to the Sports section and find the latest sports event, which is the \"Summer Olympics\". Remember this event.\n3. Go to News and search \"Summer Olympics\".\n4. Report the title of the third news article from the search results as a message to the user: \"Three cities submit bids for 2020 Summer Olympics\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Three cities submit bids for 2020 Summer Olympics"
+      }
+    }
+  },
+  {
+    "task_id": 225,
+    "intent": "Search \"Cranberry\" on News and visit the first news article in the search results. Then search, on Wiki, for the name of the first country mentioned in that article’s content. Tell me the first line of the final visited article.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Cranberry\" in the News search box and press Enter.\n2. Open the first article and read the text to identify the first country mentioned, England. Remember the name of the country.\n3. Go to Wiki.\n4. Type the name of that country (\"England\") in the Wiki search box and press Enter.\n5. Read the first line of the article's main content and send it as a message to the user: \"England is a country on the island of Great Britain.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "England is a country on the island of Great Britain."
+      }
+    }
+  },
+  {
+    "task_id": 226,
+    "intent": "Search \"Ruffles Ridged Potato Chips\" on Shop and find the country of origin. Search for the name of that country on News and visit the second news article in the search results. What is the last word in the visited article?",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__WEBSHOP__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Type \"Ruffles Ridged Potato Chips\" in the Shop search box and press Enter.\n2. Open the product page and each tab individually. Click on the features tab, identify the country of origin listed, which is the United States. Remember this fact.\n3. Go to the News website.\n4. Type the name of that country, \"United States\", in the News search box and press Enter.\n5. Navigate to and open the second news article.\n6. Identify the very last word of the article and send it as a message to the user: \"Outrage\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Outrage"
+      }
+    }
+  },
+  {
+    "task_id": 227,
+    "intent": "Search \"chips\" on News. If the first article is about snack chips, then go to Shop, search \"chips\", and place an order for the first chips product you find in the search results. Otherwise, let me know that the first article is not about snack chips.",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"chips\" and open the first article in the results.\n2. Determine whether the article is about snack chips (potato chips, corn chips, etc.), not electronic chips or other meanings.\n3. If the article IS about snack chips:\n   a. Go to the Shop and search for \"chips\".\n   b. Open the first valid snack chips product in the results.\n   c. Click \"Buy Now\" and collect the confirmation code.\n   d. Return only the confirmation code.\n4. If the article is NOT about snack chips: respond with a statement indicating that the first article is not about snack chips.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "First article is not about the snacks, chips."
+      }
+    }
+  },
+  {
+    "task_id": 228,
+    "intent": "Find the fastest-growing city in Utah, based on its Wiki article. Then search that city's name on News and tell me the publication date of the second search result.",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, open the \"Utah\" article.\n2. In the article text, identify which city is explicitly described as the fastest-growing city in Utah. Remember that city’s name.\n3. On News, search for that city name.\n4. Open the second article in the search results.\n5. Find the article's publication date as displayed on the news page.\n6. Report that date to the user.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "December 18, 2024"
+      }
+    }
+  },
+  {
+    "task_id": 229,
+    "intent": "Place an order for an Oval Mosaic Wall Mirror if you can find a news article on Johan Cruyff. If you place the order, share the confirmation code with me. Otherwise, let me know that you didn’t place the order.",
+    "sites": [
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On News, search for \"Johan Cruyff\".\n2. If at least one clearly relevant news article about Johan Cruyff appears in the results, remember that you have found such an article.\n3. If NO relevant article is found: reply that you did not place the order because no Johan Cruyff news article was found.\n4. If a relevant article IS found: go to the Shop and search for \"Oval Mosaic Wall Mirror\".\n5. Open the appropriate product page and click \"Buy Now\" to place the order.\n6. Capture the confirmation code and send it as the answer.",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "4AA17FD340"
+      }
+    }
+  },
+  {
+    "task_id": 230,
+    "intent": "Search \"El Paso, Texas\" on Wiki and find the last sentence in the article’s content. Has the event mentioned in the last sentence been covered by any news article?",
+    "sites": [
+      "wiki",
+      "news"
+    ],
+    "start_url": "__WIKI__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. On Wiki, search for \"El Paso, Texas\" and open the article.\n2. Read through the main content of the article (excluding references, infoboxes, and navigation) and identify the very last sentence.\n3. Determine what event is being described in that last sentence.\n4. On News, search for that event (using key terms, names, and dates as needed).\n5. Check whether at least one news article clearly covers the same event.\n6. Answer \"Yes\" if such coverage exists; otherwise, answer \"No\".",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "Yes"
+      }
+    }
+  },
+  {
+    "task_id": 231,
+    "intent": "What happened at the end of the book \"The Neptune Secret\"?",
+    "sites": [
+      "wiki",
+      "news",
+      "webshop"
+    ],
+    "start_url": "__NEWS__",
+    "split": "train",
+    "additional_instructions": "Perform these instructions to complete the task:\n\n1. Based on the query, searching Wiki is the most appropriate first step. Go to Wiki.\n2. In the Wiki search bar, type \"The Neptune Secret\" and press Enter.\n3. When no relevant results for a book titled \"The Neptune Secret\" are found, reply to the user with: \"No such book exists.\"",
+    "eval": {
+      "eval_types": [
+        "llm_judge"
+      ],
+      "reference_answers": {
+        "fuzzy_match": "No such book exists"
+      }
+    }
+  }
+]
