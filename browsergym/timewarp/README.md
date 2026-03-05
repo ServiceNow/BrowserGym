@@ -2,7 +2,11 @@
 
 TimeWarp benchmark with 4 environments: WIKI, WEBSHOP, NEWS, HOME.
 
-## Setup
+## Environment Setup
+
+To set the environment, please follow the instructions in our [Github repo](https://github.com/sparklabutah/timewarp).
+
+## Browsergym Setup
 
 ```sh
 pip install browsergym-timewarp
