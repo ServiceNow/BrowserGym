@@ -29,7 +29,6 @@ class GenericTimeWarpTask(AbstractBrowserTask):
         task_id: Optional[int] = None,
         intent_template_id: Optional[int] = None,
         with_na_hint: bool = False,
-        with_homepage_hint: bool = False,
     ) -> None:
         super().__init__(seed)
 
@@ -40,7 +39,6 @@ class GenericTimeWarpTask(AbstractBrowserTask):
         self.timewarp_instance = TimeWarpInstance()
         self.config_file: str = None
         self.with_na_hint = with_na_hint
-        self.with_homepage_hint = with_homepage_hint
 
         if (task_id is None) == (intent_template_id is None):
             raise ValueError(
@@ -126,8 +124,6 @@ class GenericTimeWarpTask(AbstractBrowserTask):
         if "additional_instructions" in self.config:
             goal += f"\n\n{self.config['additional_instructions']}"
 
-        if self.with_homepage_hint:
-            goal += f"\n\n(Note: The TimeWarp homepage is at {self.timewarp_instance.home_url})"
 
         if self.with_na_hint:
             goal += '\n\nIf you believe the task is impossible to complete, provide the answer "N/A".'

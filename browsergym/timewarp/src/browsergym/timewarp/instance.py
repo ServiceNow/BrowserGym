@@ -18,7 +18,7 @@ class TimeWarpInstance:
 
     def __init__(self) -> None:
         # TimeWarp environment variables
-        required_vars = ["TW_WIKI", "TW_WEBSHOP", "TW_NEWS", "TW_HOME"]
+        required_vars = ["TW_WIKI", "TW_WEBSHOP", "TW_NEWS"]
         missing_vars = [var for var in required_vars if var not in os.environ]
         
         if missing_vars:
@@ -27,18 +27,14 @@ class TimeWarpInstance:
                 "Please set the following environment variables:\n"
                 "  TW_WIKI - Wiki environment URL\n"
                 "  TW_WEBSHOP - Webshop environment URL\n"
-                "  TW_NEWS - News environment URL\n"
-                "  TW_HOME - Home environment URL"
+                "  TW_NEWS - News environment URL"
             )
 
         self.urls = {
             "wiki": os.environ["TW_WIKI"],
             "webshop": os.environ["TW_WEBSHOP"],
             "news": os.environ["TW_NEWS"],
-            "home": os.environ["TW_HOME"],
         }
-        
-        self.home_url = self.urls["home"]
 
         # Credentials (customize as needed)
         self.credentials = {
@@ -51,10 +47,6 @@ class TimeWarpInstance:
                 "password": os.environ.get("TW_PASSWORD", "admin"),
             },
             "news": {
-                "username": os.environ.get("TW_USERNAME", "admin"),
-                "password": os.environ.get("TW_PASSWORD", "admin"),
-            },
-            "home": {
                 "username": os.environ.get("TW_USERNAME", "admin"),
                 "password": os.environ.get("TW_PASSWORD", "admin"),
             },

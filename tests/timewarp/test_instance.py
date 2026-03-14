@@ -3,7 +3,7 @@ import pytest
 
 # Only run these tests if TimeWarp environment variables are set
 pytestmark = pytest.mark.skipif(
-    not os.environ.get("TW_SHOPPING"),
+    not all(os.environ.get(v) for v in ["TW_WIKI", "TW_NEWS", "TW_WEBSHOP"]),
     reason="TimeWarp environment variables not set",
 )
 
@@ -24,7 +24,7 @@ def test_timewarp_instance_urls():
     from browsergym.timewarp.instance import TimeWarpInstance
 
     instance = TimeWarpInstance()
-    expected_sites = ["reddit", "gitlab", "shopping", "shopping_admin", "wikipedia", "map"]
+    expected_sites = ["wiki", "webshop", "news"]
     for site in expected_sites:
         assert site in instance.urls
         assert instance.urls[site]  # URL should not be empty
