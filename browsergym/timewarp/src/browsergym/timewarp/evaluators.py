@@ -33,7 +33,7 @@ class Evaluator:
     @staticmethod
     def clean_answer(answer: str) -> str:
         """Clean and normalize answer for robust matching.
-        
+
         - Strips leading/trailing whitespace
         - Removes surrounding quotes
         - Normalizes internal whitespace (multiple spaces/tabs/newlines -> single space)
@@ -45,7 +45,7 @@ class Evaluator:
         elif answer.startswith('"') and answer.endswith('"'):
             answer = answer[1:-1]
         # Normalize all whitespace (spaces, tabs, newlines) to single spaces
-        answer = re.sub(r'\s+', ' ', answer)
+        answer = re.sub(r"\s+", " ", answer)
         # Strip again after normalization in case quotes removal left whitespace
         answer = answer.strip()
         return answer.lower()
@@ -53,7 +53,7 @@ class Evaluator:
 
 class ExactMatchEvaluator(Evaluator):
     """Exact match evaluator with robust normalization.
-    
+
     Performs case-insensitive matching with whitespace normalization:
     - Converts to lowercase
     - Strips leading/trailing whitespace
@@ -75,7 +75,7 @@ class ExactMatchEvaluator(Evaluator):
         pred = self.clean_answer(last_action.get("answer", ""))
 
         ref_answers = configs["eval"].get("reference_answers", {})
-        
+
         if "exact_match" in ref_answers:
             ref = self.clean_answer(ref_answers["exact_match"])
             return float(pred == ref)
@@ -88,7 +88,7 @@ def _normalize_openai_response_text(response: Any) -> str:
     # If it's already a string
     if isinstance(response, str):
         return response
-    
+
     # If it's an SDK-like object with `choices`
     try:
         choices = getattr(response, "choices", None)
@@ -111,7 +111,7 @@ def _normalize_openai_response_text(response: Any) -> str:
                 return text
     except Exception:
         pass
-    
+
     # If it's a plain dict, try common keys
     if isinstance(response, dict):
         # Direct content
@@ -126,24 +126,28 @@ def _normalize_openai_response_text(response: Any) -> str:
                     return msg["content"]
                 if isinstance(first_choice.get("text"), str):
                     return first_choice["text"]
-    
+
     # Fallback: stringify
     return str(response)
 
 
-def llm_fuzzy_match(pred: str, reference: str, question: str, model: str = "gpt-5.1-2025-11-13") -> float:
+def llm_fuzzy_match(
+    pred: str, reference: str, question: str, model: str = "gpt-5.1-2025-11-13"
+) -> float:
     """Check whether the prediction matches the reference using an LLM judge."""
     try:
         from openai import OpenAI
     except ImportError:
-        raise ImportError("openai package required for LLM judge evaluation. Install with: pip install openai")
-    
+        raise ImportError(
+            "openai package required for LLM judge evaluation. Install with: pip install openai"
+        )
+
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OPENAI_API_KEY environment variable not set")
-    
+
     client = OpenAI(api_key=api_key)
-    
+
     message = f"""Help a teacher grade the answer of a student given a question. Keep in mind that the student may use different phrasing or wording to answer the question. The goal is to evaluate whether the answer is semantically equivalent to the reference answer.
 Input:
 - question: {question}
@@ -162,12 +166,12 @@ Output: You must respond with EXACTLY one of the following words (nothing else):
 2) 'partially correct': if the answer is somewhat related but incomplete or inaccurate
 3) 'incorrect': if the answer is wrong or unrelated
 Do not include any additional text, explanation, or formatting. Only respond with one of the three words above."""
-    
+
     messages = [
         {"role": "system", "content": "You are a helpful assistant"},
         {"role": "user", "content": message},
     ]
-    
+
     try:
         response = client.chat.completions.create(
             model=model,
@@ -177,19 +181,20 @@ Do not include any additional text, explanation, or formatting. Only respond wit
         )
         response_text = _normalize_openai_response_text(response).strip()
         raw_response = response_text  # Keep original for debugging
-        
+
         # Print raw response for debugging (can be controlled via logging level)
         import logging
+
         logger = logging.getLogger(__name__)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"LLM judge raw response: '{raw_response}'")
         # Also print in test mode (when called from test script)
         if os.environ.get("LLM_JUDGE_DEBUG", "").lower() in ("1", "true", "yes"):
             print(f"LLM Raw Response: '{raw_response}'")
-        
+
         response_text = response_text.lower()
         response_clean = response_text.strip()
-        
+
         # Check for exact matches first (most strict)
         if response_clean == "correct":
             return 1.0
@@ -199,16 +204,22 @@ Do not include any additional text, explanation, or formatting. Only respond wit
         elif "correct" in response_clean and "partially" not in response_clean:
             # Log a warning if we're using fallback matching
             import logging
+
             logger = logging.getLogger(__name__)
-            logger.warning(f"LLM judge returned non-exact response: '{response_text}'. Using fallback matching.")
+            logger.warning(
+                f"LLM judge returned non-exact response: '{response_text}'. Using fallback matching."
+            )
             return 1.0
         elif "partially correct" in response_clean or "incorrect" in response_clean:
             return 0.0
         else:
             # If response doesn't contain expected keywords, default to 0
             import logging
+
             logger = logging.getLogger(__name__)
-            logger.warning(f"LLM judge returned unexpected response: '{response_text}'. Defaulting to 0.0.")
+            logger.warning(
+                f"LLM judge returned unexpected response: '{response_text}'. Defaulting to 0.0."
+            )
             return 0.0
     except Exception as e:
         print(f"Error in LLM judge evaluation: {e}")
@@ -217,10 +228,10 @@ Do not include any additional text, explanation, or formatting. Only respond wit
 
 class LLMJudgeEvaluator(Evaluator):
     """LLM-based judge evaluator for semantic matching"""
-    
+
     def __init__(self, model: str = "gpt-5.1-2025-11-13"):
         self.model = model
-    
+
     def __call__(
         self,
         trajectory: list,
@@ -230,22 +241,22 @@ class LLMJudgeEvaluator(Evaluator):
     ) -> float:
         with open(config_file, "r") as f:
             configs = json.load(f)
-        
+
         last_action = self.get_last_action(trajectory)
         pred = last_action.get("answer", "")
-        
+
         # Get the task goal/question from config
         question = configs.get("goal", configs.get("intent", ""))
-        
+
         # Get reference answers from config
         ref_answers = configs["eval"].get("reference_answers", {})
-        
+
         # Support both single reference and list of references
         if "fuzzy_match" in ref_answers:
             references = ref_answers["fuzzy_match"]
             if isinstance(references, str):
                 references = [references]
-            
+
             # Any reference can match (OR logic)
             for ref in references:
                 if ref == "N/A":
@@ -256,7 +267,7 @@ class LLMJudgeEvaluator(Evaluator):
                     if llm_fuzzy_match(pred, ref, question, self.model) > 0:
                         return 1.0
             return 0.0
-        
+
         return 0.0
 
 
@@ -296,6 +307,8 @@ def evaluator_router(config_file: Path | str) -> EvaluatorComb:
                 model = configs["eval"].get("llm_model", "gpt-5.1-2025-11-13")
                 evaluators.append(LLMJudgeEvaluator(model=model))
             case _:
-                raise ValueError(f"eval_type {eval_type} is not supported. Supported types: 'exact_match', 'llm_judge'")
+                raise ValueError(
+                    f"eval_type {eval_type} is not supported. Supported types: 'exact_match', 'llm_judge'"
+                )
 
     return EvaluatorComb(evaluators)

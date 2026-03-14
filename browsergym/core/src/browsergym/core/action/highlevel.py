@@ -246,7 +246,7 @@ ACTION_SUBSETS = {
         goto,  # GOTO, SEARCH
         send_msg_to_user,  # TERMINATE
     ],
-    "timewarp": [ #Starting from an action set identical to assistantbench
+    "timewarp": [  # Starting from an action set identical to assistantbench
         scroll,  # SCROLL
         fill,  # TYPE
         click,  # CLICK
@@ -255,9 +255,9 @@ ACTION_SUBSETS = {
         goto,  # GOTO, SEARCH
         send_msg_to_user,  # TERMINATE, sends message to user
         report_infeasible,  # explicit unachievable action, equivalent STOP "N/A"
-        new_tab, # Creates a new tab
-        tab_close, #Closes a tab
-        tab_focus, #Switches tabs
+        new_tab,  # Creates a new tab
+        tab_close,  # Closes a tab
+        tab_focus,  # Switches tabs
     ],
 }
 

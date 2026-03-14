@@ -20,7 +20,7 @@ class TimeWarpInstance:
         # TimeWarp environment variables
         required_vars = ["TW_WIKI", "TW_WEBSHOP", "TW_NEWS"]
         missing_vars = [var for var in required_vars if var not in os.environ]
-        
+
         if missing_vars:
             raise AssertionError(
                 f"Missing environment variables: {', '.join(missing_vars)}\n"
@@ -60,7 +60,9 @@ class TimeWarpInstance:
                 f"Environment variable {self.RESET_URL_VAR} is missing or empty, required for a full instance reset."
             )
             if skip_if_not_set:
-                logger.warning("Skipping automated reset. Make sure the instance has been manually reset.")
+                logger.warning(
+                    "Skipping automated reset. Make sure the instance has been manually reset."
+                )
             else:
                 raise RuntimeError("Could not reset instance, aborting.")
         else:
@@ -94,7 +96,9 @@ class TimeWarpInstance:
                 time_elapsed = time.time() - start_time
                 logger.info(f"Reset still running after {time_elapsed:.0f} seconds...")
                 if time_elapsed > timeout:
-                    raise Exception(f"Reset still running after {time_elapsed} seconds (> {timeout}), aborting.")
+                    raise Exception(
+                        f"Reset still running after {time_elapsed} seconds (> {timeout}), aborting."
+                    )
                 time.sleep(retry_after)
 
             retries_left = 3
@@ -106,7 +110,9 @@ class TimeWarpInstance:
                 except Exception as e:
                     if not retries_left:
                         raise
-                    logger.info(f"Instance unresponsive after reset, retrying ({retries_left} retries left)\n{e}")
+                    logger.info(
+                        f"Instance unresponsive after reset, retrying ({retries_left} retries left)\n{e}"
+                    )
 
     def check_status(self):
         self._check_is_reachable(timeout=10)
@@ -116,7 +122,9 @@ class TimeWarpInstance:
             try:
                 response = requests.get(url, timeout=timeout)
                 if response.status_code >= 500:
-                    raise RuntimeError(f'TimeWarp site "{site}" ({url}) returned server error: {response.status_code}')
+                    raise RuntimeError(
+                        f'TimeWarp site "{site}" ({url}) returned server error: {response.status_code}'
+                    )
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
                 raise RuntimeError(f'TimeWarp site "{site}" ({url}) is not reachable. Error: {e}')
 

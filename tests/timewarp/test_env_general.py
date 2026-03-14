@@ -39,6 +39,3 @@ def test_env_generic(task_id):
     obs, info = env.reset()
 
     env.close()
-
-
-

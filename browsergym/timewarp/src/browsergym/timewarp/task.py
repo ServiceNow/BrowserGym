@@ -72,7 +72,9 @@ class GenericTimeWarpTask(AbstractBrowserTask):
                 conf for conf in all_configs if conf.get("intent_template_id") == intent_template_id
             ]
             if not task_configs:
-                raise ValueError(f"Could not find task config with intent_template_id={intent_template_id}.")
+                raise ValueError(
+                    f"Could not find task config with intent_template_id={intent_template_id}."
+                )
         elif task_id is not None:
             task_configs = [conf for conf in all_configs if conf.get("task_id") == task_id]
             if not task_configs:
@@ -119,14 +121,15 @@ class GenericTimeWarpTask(AbstractBrowserTask):
                     raise
 
         goal = self.config.get("intent", "Complete the task")
-        
+
         # Add additional instructions if present
         if "additional_instructions" in self.config:
             goal += f"\n\n{self.config['additional_instructions']}"
 
-
         if self.with_na_hint:
-            goal += '\n\nIf you believe the task is impossible to complete, provide the answer "N/A".'
+            goal += (
+                '\n\nIf you believe the task is impossible to complete, provide the answer "N/A".'
+            )
 
         task_info = {
             "goal": goal,
@@ -147,6 +150,7 @@ class GenericTimeWarpTask(AbstractBrowserTask):
         if self.config_file:
             try:
                 import os
+
                 os.unlink(self.config_file)
             except Exception as e:
                 logger.warning(f"Failed to clean up config file: {e}")
@@ -156,8 +160,7 @@ class GenericTimeWarpTask(AbstractBrowserTask):
     ) -> Tuple[float, bool, str, dict]:
         # Check authorized URLs
         authorized_locations = ["newtab", "localhost", "127.0.0.1", ""] + [
-            urllib.parse.urlparse(url).netloc
-            for url in self.timewarp_instance.urls.values()
+            urllib.parse.urlparse(url).netloc for url in self.timewarp_instance.urls.values()
         ]
 
         for open_page in page.context.pages:

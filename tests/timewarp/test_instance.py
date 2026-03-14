@@ -28,6 +28,3 @@ def test_timewarp_instance_urls():
     for site in expected_sites:
         assert site in instance.urls
         assert instance.urls[site]  # URL should not be empty
-
-
-

@@ -22,4 +22,3 @@ for task_id in config.TASK_IDS:
         task_kwargs={"task_id": task_id},
     )
     ALL_TIMEWARP_TASK_IDS.append(gym_id)
-
