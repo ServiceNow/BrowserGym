@@ -45,7 +45,7 @@ BrowserGym includes the following benchmarks by default:
  - [AssistantBench](https://github.com/oriyor/assistantbench)
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
  - [OpenApps](https://facebookresearch.github.io/OpenApps/)
- - TimeWarp
+ - [TimeWarp](https://timewarp-web.github.io)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -79,7 +79,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for WorkArena, see [WorkArena](https://github.com/ServiceNow/WorkArena)
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
  - for OpenApps, see [OpenApps docs](https://facebookresearch.github.io/OpenApps/)
-  - for TimeWarp, see [timewarp/README.md](browsergym/timewarp/README.md)
+  - for TimeWarp, see [timewarp/README.md](https://github.com/sparklabutah/timewarp)
 
 ### 🏗️ Development setup
 
