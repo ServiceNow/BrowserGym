@@ -15,3 +15,4 @@ tenacity
 -e ../browsergym/webarena_verified # local package
 browsergym-workarena
 weblinx_browsergym
+browsergym-timewarp

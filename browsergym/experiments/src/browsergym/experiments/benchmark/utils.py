@@ -260,7 +260,8 @@ def prepare_backend(backend: str):
                 all_tasks.extend(weblinx_browsergym.list_tasks(split=split, cache_dir=cache_dir))
             demo_ids = weblinx_browsergym.get_unique_demo_ids(tasks=all_tasks)
             weblinx_browsergym.download_and_unzip_demos(demo_ids=demo_ids, cache_dir=cache_dir)
-
+        case "timewarp":
+            import browsergym.timewarp
         case _:
             raise NotImplementedError(f"Unknown benchmark backend {repr(backend)}")
 
