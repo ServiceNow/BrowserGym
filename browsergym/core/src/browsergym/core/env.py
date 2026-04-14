@@ -15,7 +15,7 @@ from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
-from .audio import AudioCapturer, is_pulseaudio_available
+from .audio import extract_audio, install_audio_capture, transcribe_audio
 from .observation import (
     MarkingError,
     _post_extract,
@@ -132,21 +132,6 @@ class BrowserEnv(gym.Env, ABC):
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
 
-        # audio capturer
-        self.audio_capturer: Optional[AudioCapturer] = None
-        if self.enable_audio:
-            if not is_pulseaudio_available():
-                logger.warning(
-                    "Audio capture requested but PulseAudio is not available. "
-                    "Audio observations will be empty."
-                )
-            else:
-                self.audio_capturer = AudioCapturer(
-                    sink_name=f"bgym_audio_{id(self)}",
-                    sample_rate=16000,
-                    channels=1,
-                )
-
         # task
         self.task = None
 
@@ -234,11 +219,6 @@ class BrowserEnv(gym.Env, ABC):
         self.action_space = Unicode()
 
     def close(self):
-        # stop audio capture
-        if self.audio_capturer:
-            if self.audio_capturer._recording:
-                self.audio_capturer.stop()
-            self.audio_capturer.teardown_sink()
         # stop the task
         if self.task:
             self.task.teardown()
@@ -302,11 +282,6 @@ class BrowserEnv(gym.Env, ABC):
             "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
         ]
         args = [arg for arg in args if arg is not None]  # Remove None values
-
-        # setup audio capture sink and add chromium args to route audio
-        if self.audio_capturer:
-            self.audio_capturer.setup_sink()
-            args.extend(self.audio_capturer.get_chromium_pulse_args())
 
         # create a new browser
         self.browser = pw.chromium.launch(
@@ -729,19 +704,16 @@ document.addEventListener("visibilitychange", () => {
         }
 
         # capture audio if enabled
-        if self.enable_audio and self.audio_capturer:
-            audio_bytes = self.audio_capturer.capture_segment(self.audio_duration)
-            obs["audio_segment"] = audio_bytes  # raw WAV bytes for omni models
-            if self.audio_transcribe:
+        if self.enable_audio:
+            audio_bytes = extract_audio(self.page, duration=self.audio_duration)
+            obs["audio_segment"] = audio_bytes  # raw audio bytes for omni models
+            if self.audio_transcribe and audio_bytes:
                 try:
-                    obs["audio_transcript"] = self.audio_capturer.transcribe(audio_bytes)
+                    obs["audio_transcript"] = transcribe_audio(audio_bytes)
                 except Exception as e:
                     logger.warning(f"Audio transcription failed: {e}")
                     obs["audio_transcript"] = ""
             else:
                 obs["audio_transcript"] = ""
-        elif self.enable_audio:
-            obs["audio_segment"] = None
-            obs["audio_transcript"] = ""
 
         return obs
