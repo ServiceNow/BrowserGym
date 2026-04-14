@@ -15,6 +15,7 @@ from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
+from .audio import AudioCapturer, is_pulseaudio_available
 from .observation import (
     MarkingError,
     _post_extract,
@@ -78,6 +79,10 @@ class BrowserEnv(gym.Env, ABC):
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         use_raw_page_output: bool = False,
         pre_observation_delay: float = 0.5,  # seconds
+        # multimodal arguments
+        enable_audio: bool = False,
+        audio_duration: float = 5.0,  # seconds of audio to capture per step
+        audio_transcribe: bool = True,  # also run Whisper transcription
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -120,9 +125,27 @@ class BrowserEnv(gym.Env, ABC):
         self.action_mapping = action_mapping
         self.use_raw_page_output = use_raw_page_output
         self.pre_observation_delay = pre_observation_delay
+        self.enable_audio = enable_audio
+        self.audio_duration = audio_duration
+        self.audio_transcribe = audio_transcribe
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
+
+        # audio capturer
+        self.audio_capturer: Optional[AudioCapturer] = None
+        if self.enable_audio:
+            if not is_pulseaudio_available():
+                logger.warning(
+                    "Audio capture requested but PulseAudio is not available. "
+                    "Audio observations will be empty."
+                )
+            else:
+                self.audio_capturer = AudioCapturer(
+                    sink_name=f"bgym_audio_{id(self)}",
+                    sample_rate=16000,
+                    channels=1,
+                )
 
         # task
         self.task = None
@@ -196,6 +219,14 @@ class BrowserEnv(gym.Env, ABC):
                     "elapsed_time": gym.spaces.Box(
                         low=0, high=np.inf, dtype=float
                     ),  # TODO: change to a Float (breaking change for users)
+                    **(
+                        {
+                            "audio_segment": Anything(),  # raw WAV bytes (for omni models)
+                            "audio_transcript": Unicode(),  # Whisper transcription (for LLM agents)
+                        }
+                        if self.enable_audio
+                        else {}
+                    ),
                 }
             )
 
@@ -203,6 +234,11 @@ class BrowserEnv(gym.Env, ABC):
         self.action_space = Unicode()
 
     def close(self):
+        # stop audio capture
+        if self.audio_capturer:
+            if self.audio_capturer._recording:
+                self.audio_capturer.stop()
+            self.audio_capturer.teardown_sink()
         # stop the task
         if self.task:
             self.task.teardown()
@@ -266,6 +302,11 @@ class BrowserEnv(gym.Env, ABC):
             "--disable-features=OverlayScrollbars,ExtendedOverlayScrollbars",  # otherwise the screenshot doesn't see the scrollbars
         ]
         args = [arg for arg in args if arg is not None]  # Remove None values
+
+        # setup audio capture sink and add chromium args to route audio
+        if self.audio_capturer:
+            self.audio_capturer.setup_sink()
+            args.extend(self.audio_capturer.get_chromium_pulse_args())
 
         # create a new browser
         self.browser = pw.chromium.launch(
@@ -686,5 +727,21 @@ document.addEventListener("visibilitychange", () => {
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
         }
+
+        # capture audio if enabled
+        if self.enable_audio and self.audio_capturer:
+            audio_bytes = self.audio_capturer.capture_segment(self.audio_duration)
+            obs["audio_segment"] = audio_bytes  # raw WAV bytes for omni models
+            if self.audio_transcribe:
+                try:
+                    obs["audio_transcript"] = self.audio_capturer.transcribe(audio_bytes)
+                except Exception as e:
+                    logger.warning(f"Audio transcription failed: {e}")
+                    obs["audio_transcript"] = ""
+            else:
+                obs["audio_transcript"] = ""
+        elif self.enable_audio:
+            obs["audio_segment"] = None
+            obs["audio_transcript"] = ""
 
         return obs
