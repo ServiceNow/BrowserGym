@@ -317,13 +317,14 @@ def extract_audio(
     return None
 
 
-def transcribe_audio(audio_bytes: Optional[bytes], language: str = None) -> str:
+def transcribe_audio(audio_bytes: Optional[bytes], language: str = None, use_api: bool = True) -> str:
     """
     Transcribe audio bytes using Whisper.
 
     Args:
         audio_bytes: Audio file bytes (webm, wav, mp3, etc.).
         language: Optional language hint (e.g., "en").
+        use_api: If True (default), use OpenAI Whisper API. If False, use local whisper model.
 
     Returns:
         Transcription text, or empty string if transcription fails.
@@ -331,9 +332,46 @@ def transcribe_audio(audio_bytes: Optional[bytes], language: str = None) -> str:
     if audio_bytes is None or len(audio_bytes) == 0:
         return ""
 
+    if use_api:
+        return _transcribe_api(audio_bytes, language)
+    else:
+        return _transcribe_local(audio_bytes, language)
+
+
+def _transcribe_api(audio_bytes: bytes, language: str = None) -> str:
+    """Transcribe using OpenAI Whisper API."""
+    try:
+        from openai import OpenAI
+    except ImportError:
+        raise ImportError(
+            "openai is required for Whisper API transcription. "
+            "Install it with: pip install openai"
+        )
+
+    tmp = tempfile.mktemp(suffix=".webm")
+    try:
+        with open(tmp, "wb") as f:
+            f.write(audio_bytes)
+
+        client = OpenAI()
+        with open(tmp, "rb") as audio_file:
+            kwargs = {"model": "whisper-1", "file": audio_file}
+            if language:
+                kwargs["language"] = language
+            result = client.audio.transcriptions.create(**kwargs)
+        return result.text.strip()
+    except Exception as e:
+        logger.warning(f"Whisper API transcription failed: {e}")
+        return ""
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+
+
+def _transcribe_local(audio_bytes: bytes, language: str = None) -> str:
+    """Transcribe using local Whisper model."""
     model = _get_whisper_model()
 
-    # Write to temp file — Whisper accepts most audio formats
     tmp = tempfile.mktemp(suffix=".webm")
     try:
         with open(tmp, "wb") as f:
@@ -341,7 +379,7 @@ def transcribe_audio(audio_bytes: Optional[bytes], language: str = None) -> str:
         result = model.transcribe(tmp, language=language)
         return result.get("text", "").strip()
     except Exception as e:
-        logger.warning(f"Audio transcription failed: {e}")
+        logger.warning(f"Local Whisper transcription failed: {e}")
         return ""
     finally:
         if os.path.exists(tmp):
