@@ -1,13 +1,16 @@
 """
-Test LLM agent on audio + browser action tasks using GPT-4o.
+Test LLM/VLM agent on audio + video tasks.
 
-Tests cross-modality tasks: agent must understand audio AND interact with the page.
+Modes:
+  --mode vlm   : VLM agent — sees raw video frames as images + audio transcript
+  --mode llm   : LLM agent — sees VLM-generated frame captions + audio transcript
 
 Usage:
     export OPENAI_API_KEY="sk-..."
     conda activate browsergym-multimodal
-    python test_llm_agent.py --task_id 10
-    python test_llm_agent.py --task_id 12   # audio + browser action
+    python test_llm_agent.py --task_id 12                  # audio + action
+    python test_llm_agent.py --task_id 14 --mode vlm       # video (VLM sees frames)
+    python test_llm_agent.py --task_id 14 --mode llm       # video (LLM sees captions)
 """
 
 import argparse
@@ -21,6 +24,7 @@ from PIL import Image
 import playwright.sync_api
 
 from browsergym.core.audio import extract_audio, install_audio_capture, transcribe_audio
+from browsergym.core.video import extract_video_frames, describe_video_frames, format_frame_descriptions, frames_to_base64_list
 from browsergym.core.observation import _pre_extract, _post_extract, extract_merged_axtree
 from browsergym.utils.obs import flatten_axtree_to_str
 
@@ -68,7 +72,7 @@ TASKS = {
         "start_url": f"{MATTERMOST_URL}/engineering/channels/town-square",
         "eval_must_include": ["Project Alpha", "Friday"],
         "audio_index": 2,
-        "type": "audio_comprehension",
+        "type": "video_comprehension",
     },
 }
 
@@ -137,7 +141,7 @@ def get_axtree_text(page, max_chars=10000):
         return "(AXTree not available)"
 
 
-def build_observation_prompt(task_intent, url, axtree_text, audio_transcript, step_info=""):
+def build_observation_prompt(task_intent, url, axtree_text, audio_transcript, step_info="", video_observation=""):
     """Build the structured observation prompt for the agent."""
     prompt = f"""You are a web browsing agent interacting with a Mattermost chat application.
 
@@ -152,6 +156,12 @@ AXTree (interactive elements on page):
         prompt += f'Transcript from media attachment on this page:\n"{audio_transcript}"\n'
     else:
         prompt += "No audio captured yet.\n"
+
+    prompt += "\n## Video Observation\n"
+    if video_observation:
+        prompt += f"{video_observation}\n"
+    else:
+        prompt += "No video frames captured yet.\n"
 
     prompt += f"""
 ## Task
@@ -213,24 +223,140 @@ def is_media_element(info):
     return any(ext in combined for ext in [".mp3", ".wav", ".mp4", ".webm", ".ogg", "voice", "audio", "video"])
 
 
-def try_capture_audio_after_click(page):
-    """After clicking a media file, try to play it and capture audio."""
+def try_capture_media_after_click(page, clicked_bid=None):
+    """After clicking a media file, capture video frames and/or audio transcript.
+    Uses clicked_bid to find the media URL associated with the clicked element.
+    Returns (audio_transcript, video_frames)."""
     page.wait_for_timeout(2000)
 
-    media_count = page.evaluate(
-        "document.querySelectorAll('video, audio').length"
-    )
-    if media_count == 0:
-        return None
+    has_video = page.evaluate("document.querySelectorAll('video').length") > 0
+    has_audio = page.evaluate("document.querySelectorAll('audio').length") > 0
 
-    page.evaluate("""
-        const el = document.querySelector('video') || document.querySelector('audio');
-        if (el && el.paused) el.play();
-    """)
-    page.wait_for_timeout(1000)
+    # If no native media element, find a download link on the page,
+    # fetch it with auth cookies, and inject via blob URL.
+    # We pass the clicked element's info to prioritize the right file.
+    if not has_video and not has_audio:
+        # Debug: check what's on the page
+        debug = page.evaluate("""
+            () => {
+                const downloads = document.querySelectorAll('a[download]');
+                const modalTitle = document.querySelector('.file-preview-modal__file-name');
+                return {
+                    download_links: Array.from(downloads).map(a => ({download: a.download, href: (a.href||'').substring(0, 80)})),
+                    modal_title: modalTitle ? modalTitle.textContent : null,
+                };
+            }
+        """)
+        print(f"[debug] Page state: {debug}")
+
+        injected = page.evaluate("""
+            async (targetBid) => {
+                // First, check if the modal shows a specific filename
+                const modalTitle = document.querySelector('.file-preview-modal__file-name');
+                const targetName = modalTitle ? modalTitle.textContent.trim() : '';
+
+                // Find all download links on the page
+                const links = document.querySelectorAll('a[download], a[href*="/files/"]');
+
+                // Sort: prefer links matching the target filename
+                const sorted = Array.from(links).sort((a, b) => {
+                    const aName = a.download || '';
+                    const bName = b.download || '';
+                    const aMatch = targetName && aName === targetName ? -1 : 0;
+                    const bMatch = targetName && bName === targetName ? -1 : 0;
+                    return aMatch - bMatch;
+                });
+
+                for (const link of sorted) {
+                    const href = link.href || '';
+                    if (!href) continue;
+                    const fileName = link.download || href.split('/').pop().split('?')[0];
+                    const isVideo = /\\.(mp4|webm|mov|avi|mkv)$/i.test(fileName);
+                    const isAudio = /\\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(fileName);
+
+                    if (isVideo || isAudio) {
+                        try {
+                            const fetchUrl = href.replace(/[?&]download=1/, '');
+                            const resp = await fetch(fetchUrl, {credentials: 'include'});
+                            if (!resp.ok) continue;
+                            const arrayBuf = await resp.arrayBuffer();
+
+                            let mimeType = isVideo ? 'video/mp4' : 'audio/mpeg';
+                            if (fileName.endsWith('.webm')) mimeType = isVideo ? 'video/webm' : 'audio/webm';
+                            else if (fileName.endsWith('.wav')) mimeType = 'audio/wav';
+                            else if (fileName.endsWith('.ogg')) mimeType = isVideo ? 'video/ogg' : 'audio/ogg';
+
+                            const blob = new Blob([arrayBuf], {type: mimeType});
+                            const blobUrl = URL.createObjectURL(blob);
+
+                            const tag = isVideo ? 'video' : 'audio';
+                            const mediaEl = document.createElement(tag);
+                            mediaEl.src = blobUrl;
+                            mediaEl.preload = 'auto';
+                            if (isVideo) {
+                                mediaEl.style.cssText = 'position:fixed;top:0;left:0;width:640px;height:360px;z-index:-1';
+                            }
+                            document.body.appendChild(mediaEl);
+
+                            const loadResult = await new Promise((resolve) => {
+                                mediaEl.onloadeddata = () => resolve('loaded');
+                                mediaEl.onerror = () => resolve('error:' + (mediaEl.error ? mediaEl.error.message : 'unknown'));
+                                setTimeout(() => resolve('timeout:readyState=' + mediaEl.readyState), 15000);
+                            });
+
+                            return {
+                                type: tag,
+                                src: fetchUrl.substring(0, 100),
+                                readyState: mediaEl.readyState,
+                                duration: mediaEl.duration,
+                                loadResult: loadResult,
+                                blobSize: arrayBuf.byteLength,
+                                mimeType: mimeType,
+                            };
+                        } catch(e) {
+                            continue;
+                        }
+                    }
+                }
+                return null;
+            }
+        """, clicked_bid)
+        print(f"[debug] Inject result: {injected}")
+        if injected and injected.get('readyState', 0) >= 2:
+            print(f"[media] Loaded {injected['type']} via blob URL ({injected.get('duration', 0):.1f}s)")
+            has_video = injected['type'] == 'video'
+            has_audio = injected['type'] == 'audio'
+        elif injected:
+            print(f"[media] Injected but failed to load (readyState={injected.get('readyState')})")
+            return None, None
+        else:
+            return None, None
+
+    # Extract video frames FIRST (before audio capture, which changes video state)
+    frames = None
+    if has_video:
+        frames = extract_video_frames(page, num_frames=10)
+        if frames:
+            print(f"[video] Extracted {len(frames)} frames")
+        else:
+            print("[video] Frame extraction returned nothing")
+
+    # Now capture audio — play the media first
+    try:
+        page.evaluate("""
+            const el = document.querySelector('video') || document.querySelector('audio');
+            if (el) { el.currentTime = 0; el.play(); }
+        """)
+        page.wait_for_timeout(1000)
+    except Exception as e:
+        print(f"[media] Play failed: {e}")
 
     install_audio_capture(page)
     audio_bytes = extract_audio(page, duration=8.0)
+    transcript = None
+    if audio_bytes and len(audio_bytes) > 100:
+        transcript = transcribe_audio(audio_bytes)
+        print(f"[audio] Transcribed: \"{transcript}\"")
 
     # Clean up: stop playback and remove media elements to free memory
     page.evaluate("""
@@ -244,11 +370,7 @@ def try_capture_audio_after_click(page):
     page.keyboard.press("Escape")
     page.wait_for_timeout(1000)
 
-    if audio_bytes and len(audio_bytes) > 100:
-        transcript = transcribe_audio(audio_bytes)
-        print(f"[audio] Transcribed: \"{transcript}\"")
-        return transcript
-    return None
+    return transcript, frames
 
 
 def click_by_bid(page, bid):
@@ -325,13 +447,14 @@ def parse_and_execute_action(page, action_text):
             print(f"[action] Click failed for bid={bid}: {e}")
             return "error", str(e), None
 
-        # If it's a media file, capture audio
-        transcript = None
+        # If it's a media file, capture audio and/or video frames
+        media_result = None
         if is_media:
-            print(f"[media] Detected media click on bid={bid}, capturing audio...")
-            transcript = try_capture_audio_after_click(page)
+            print(f"[media] Detected media click on bid={bid}, capturing media...")
+            transcript, video_frames = try_capture_media_after_click(page, clicked_bid=bid)
+            media_result = {"transcript": transcript, "video_frames": video_frames}
 
-        return "click", f"bid={bid}", transcript
+        return "click", f"bid={bid}", media_result
 
     # scroll(x, y)
     match = re.search(r"scroll\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)", action_text)
@@ -395,12 +518,17 @@ def verify_action_task(page, task):
     return in_correct_channel, message_posted
 
 
-def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
-    """Run the LLM agent on a task."""
+def run_agent(task_id: int, model: str = "gpt-4o", mode: str = "vlm", max_steps: int = 10):
+    """Run the agent on a task.
+
+    mode='vlm': agent sees raw video frames as images
+    mode='llm': agent sees VLM-generated frame captions as text
+    """
     task = TASKS[task_id]
     print(f"\n{'='*60}")
     print(f"Task {task_id}: {task['intent']}")
     print(f"Type: {task['type']}")
+    print(f"Mode: {mode.upper()}")
     print(f"Model: {model}")
     print(f"{'='*60}\n")
 
@@ -420,6 +548,8 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
             print(f"\n--- Agent loop (max {max_steps} steps) ---")
             final_answer = None
             audio_transcript = ""
+            video_frames = None
+            video_description_text = ""
 
             # Keep conversation history so agent remembers what it already tried
             conversation = []
@@ -440,31 +570,45 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
                 step_info = ""
                 if audio_transcript and task["type"] == "audio_comprehension":
                     step_info = "You have the audio transcript. Use send_msg_to_user() to give your response."
+                if (video_frames or video_description_text) and task["type"] == "video_comprehension":
+                    step_info = "You have the video observation. Use send_msg_to_user() to give your response."
 
-                # Build prompt
+                # Build prompt with video observation
+                video_obs_text = ""
+                if video_description_text:
+                    video_obs_text = video_description_text
+                elif video_frames and mode == "vlm":
+                    video_obs_text = f"({len(video_frames)} video frames attached as images below)"
+
                 prompt = build_observation_prompt(
-                    task["intent"], page.url, axtree_text, audio_transcript, step_info
+                    task["intent"], page.url, axtree_text, audio_transcript, step_info,
+                    video_observation=video_obs_text,
                 )
 
-                # Add current observation — include screenshot only if available
+                # Build message content
+                content = [{"type": "text", "text": prompt}]
+
+                # Add screenshot
                 if screenshot_b64:
-                    conversation.append({
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/jpeg;base64,{screenshot_b64}", "detail": "low"},
-                            },
-                        ],
-                    })
-                else:
-                    conversation.append({
-                        "role": "user",
-                        "content": prompt,
+                    content.append({
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{screenshot_b64}", "detail": "low"},
                     })
 
-                # Call GPT-4o with full conversation history
+                # VLM mode: attach raw video frames as images
+                if video_frames and mode == "vlm":
+                    for i, frame in enumerate(video_frames):
+                        content.append({
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{frame['base64']}",
+                                "detail": "high",
+                            },
+                        })
+
+                conversation.append({"role": "user", "content": content})
+
+                # Call model
                 print(f"[llm] Calling {model}...")
                 response = client.chat.completions.create(
                     model=model,
@@ -478,11 +622,22 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
                 conversation.append({"role": "assistant", "content": action_text})
 
                 # Execute action
-                action_type, action_result, new_transcript = parse_and_execute_action(page, action_text)
+                action_type, action_result, media_result = parse_and_execute_action(page, action_text)
 
-                # If a media file was clicked, update the audio transcript
-                if new_transcript:
-                    audio_transcript = new_transcript
+                # If a media file was clicked, update audio/video observations
+                if media_result:
+                    if media_result.get("transcript"):
+                        audio_transcript = media_result["transcript"]
+                    if media_result.get("video_frames"):
+                        video_frames = media_result["video_frames"]
+                        if mode == "llm":
+                            # LLM mode: caption the frames using VLM as tool
+                            print(f"[video] Generating frame descriptions for LLM agent...")
+                            described = describe_video_frames(
+                                video_frames, task_hint=task["intent"]
+                            )
+                            video_description_text = format_frame_descriptions(described)
+                            print(f"[video] Descriptions:\n{video_description_text}")
 
                 # Add execution feedback to history
                 if action_type == "error":
@@ -492,18 +647,23 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
                     })
                 elif action_type == "click":
                     feedback = f"Clicked '{action_result}'. Page URL is now: {page.url}"
-                    if new_transcript:
-                        feedback += f"\nAudio transcription from this file: \"{new_transcript}\""
+                    if media_result and media_result.get("transcript"):
+                        feedback += f"\nAudio transcription from this file: \"{media_result['transcript']}\""
+                    if media_result and media_result.get("video_frames"):
+                        if mode == "llm":
+                            feedback += f"\nVideo frame descriptions:\n{video_description_text}"
+                        else:
+                            feedback += f"\nVideo frames extracted ({len(video_frames)} frames). They will appear in the next observation."
                     conversation.append({"role": "user", "content": feedback})
                 elif action_type == "navigate":
                     conversation.append({
                         "role": "user",
                         "content": f"Navigated to {action_result}. Page URL is now: {page.url}"
                     })
-                elif action_type == "type":
+                elif action_type == "fill":
                     conversation.append({
                         "role": "user",
-                        "content": f"Typed and sent: '{action_result}'. Page URL is now: {page.url}"
+                        "content": f"Filled {action_result}. Page URL is now: {page.url}"
                     })
 
                 if action_type == "answer":
@@ -518,7 +678,7 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
             print(f"\n{'='*60}")
             print(f"Task type: {task['type']}")
 
-            if task["type"] == "audio_comprehension":
+            if task["type"] in ("audio_comprehension", "video_comprehension"):
                 if final_answer:
                     must_include = task.get("eval_must_include", [])
                     passed = all(ref.lower() in final_answer.lower() for ref in must_include)
@@ -534,7 +694,9 @@ def run_agent(task_id: int, model: str = "gpt-4o", max_steps: int = 10):
                 print(f"Message posted ('{task['verify_message']}'): {msg_posted}")
                 print(f"Result: {'PASS' if (in_channel and msg_posted) else 'FAIL'}")
 
+            print(f"Mode: {mode.upper()}")
             print(f"Audio transcript available: {bool(audio_transcript)}")
+            print(f"Video frames captured: {len(video_frames) if video_frames else 0}")
             print(f"{'='*60}")
 
         except Exception as e:
@@ -549,6 +711,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task_id", type=int, default=10, choices=list(TASKS.keys()))
     parser.add_argument("--model", type=str, default="gpt-5-mini", help="OpenAI model name")
+    parser.add_argument("--mode", type=str, default="vlm", choices=["vlm", "llm"],
+                        help="vlm = raw frames as images, llm = VLM-captioned frame descriptions")
     parser.add_argument("--max_steps", type=int, default=10)
     args = parser.parse_args()
-    run_agent(args.task_id, model=args.model, max_steps=args.max_steps)
+    run_agent(args.task_id, model=args.model, mode=args.mode, max_steps=args.max_steps)
