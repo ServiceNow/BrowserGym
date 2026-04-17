@@ -16,6 +16,7 @@ from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
 from .audio import extract_audio, install_audio_capture, transcribe_audio
+from .video import extract_video_frames
 from .observation import (
     MarkingError,
     _post_extract,
@@ -83,6 +84,8 @@ class BrowserEnv(gym.Env, ABC):
         enable_audio: bool = False,
         audio_duration: float = 5.0,  # seconds of audio to capture per step
         audio_transcribe: bool = True,  # also run Whisper transcription
+        enable_video: bool = False,
+        video_num_frames: int = 10,  # number of frames to extract from video
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -128,6 +131,8 @@ class BrowserEnv(gym.Env, ABC):
         self.enable_audio = enable_audio
         self.audio_duration = audio_duration
         self.audio_transcribe = audio_transcribe
+        self.enable_video = enable_video
+        self.video_num_frames = video_num_frames
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -210,6 +215,13 @@ class BrowserEnv(gym.Env, ABC):
                             "audio_transcript": Unicode(),  # Whisper transcription (for LLM agents)
                         }
                         if self.enable_audio
+                        else {}
+                    ),
+                    **(
+                        {
+                            "video_frames": Anything(),  # list of frame dicts (base64 JPEG + timestamp)
+                        }
+                        if self.enable_video
                         else {}
                     ),
                 }
@@ -715,5 +727,12 @@ document.addEventListener("visibilitychange", () => {
                     obs["audio_transcript"] = ""
             else:
                 obs["audio_transcript"] = ""
+
+        # capture video frames if enabled
+        if self.enable_video:
+            frames = extract_video_frames(
+                self.page, num_frames=self.video_num_frames
+            )
+            obs["video_frames"] = frames  # list of {timestamp, base64, image} dicts
 
         return obs
