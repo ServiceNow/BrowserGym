@@ -189,3 +189,133 @@ def frames_to_base64_list(frames: list[dict]) -> list[str]:
         List of base64-encoded JPEG strings.
     """
     return [f["base64"] for f in frames]
+
+
+def describe_video_frames(
+    frames: list[dict],
+    task_hint: str = "",
+    use_api: bool = True,
+) -> list[dict]:
+    """
+    Generate text descriptions of video frames using a VLM (for LLM agents).
+
+    Args:
+        frames: List of frame dicts from extract_video_frames().
+        task_hint: Optional hint about what to look for in the frames.
+        use_api: If True (default), use OpenAI GPT-4o API.
+
+    Returns:
+        List of dicts with keys:
+            - 'timestamp': float
+            - 'description': str (VLM-generated caption)
+    """
+    if not frames:
+        return []
+
+    if use_api:
+        return _describe_frames_api(frames, task_hint)
+    else:
+        logger.warning("Local VLM captioning not implemented. Use use_api=True.")
+        return [{"timestamp": f["timestamp"], "description": ""} for f in frames]
+
+
+def _describe_frames_api(frames: list[dict], task_hint: str = "") -> list[dict]:
+    """Describe video frames using OpenAI GPT-4o API."""
+    try:
+        from openai import OpenAI
+    except ImportError:
+        raise ImportError(
+            "openai is required for video frame description. "
+            "Install it with: pip install openai"
+        )
+
+    client = OpenAI()
+
+    # Build a single request with all frames for efficiency
+    content = []
+
+    prompt = "Describe each of the following video frames concisely (1-2 sentences each). "
+    prompt += "Focus on visible text, people, actions, and key visual elements. "
+    prompt += f"Number your descriptions to match the frame order."
+    if task_hint:
+        prompt += f" Context: {task_hint}"
+
+    content.append({"type": "text", "text": prompt})
+
+    for i, frame in enumerate(frames):
+        content.append({"type": "text", "text": f"Frame {i+1} (at {frame['timestamp']:.1f}s):"})
+        content.append({
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/jpeg;base64,{frame['base64']}",
+                "detail": "low",
+            },
+        })
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": content}],
+            max_completion_tokens=1000,
+            temperature=0,
+        )
+        response_text = response.choices[0].message.content.strip()
+
+        # Parse numbered descriptions
+        descriptions = []
+        lines = response_text.split("\n")
+        current_desc = ""
+        current_idx = 0
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            # Check if line starts a new frame description
+            import re
+            match = re.match(r"(?:Frame\s*)?(\d+)[\.\)\:]?\s*(.*)", line)
+            if match and int(match.group(1)) > current_idx:
+                if current_desc and current_idx > 0:
+                    descriptions.append(current_desc.strip())
+                current_idx = int(match.group(1))
+                current_desc = match.group(2)
+            else:
+                current_desc += " " + line
+
+        if current_desc:
+            descriptions.append(current_desc.strip())
+
+        # Match descriptions to frames
+        result = []
+        for i, frame in enumerate(frames):
+            desc = descriptions[i] if i < len(descriptions) else ""
+            result.append({
+                "timestamp": frame["timestamp"],
+                "description": desc,
+            })
+
+        return result
+
+    except Exception as e:
+        logger.warning(f"Video frame description failed: {e}")
+        return [{"timestamp": f["timestamp"], "description": ""} for f in frames]
+
+
+def format_frame_descriptions(described_frames: list[dict]) -> str:
+    """
+    Format frame descriptions as text for LLM agents.
+
+    Args:
+        described_frames: List of dicts from describe_video_frames().
+
+    Returns:
+        Formatted string for inclusion in agent observations.
+    """
+    if not described_frames:
+        return "No video frames available."
+
+    lines = []
+    for f in described_frames:
+        if f["description"]:
+            lines.append(f"[{f['timestamp']:.1f}s] {f['description']}")
+    return "\n".join(lines) if lines else "No frame descriptions available."
