@@ -30,6 +30,7 @@ HOVER_URL = f"file://{__DATA_DIR}/hover.html"
 DBLCLICK_URL = f"file://{__DATA_DIR}/dblclick.html"
 INEXISTANT_FILE_URL = f"file://{__DATA_DIR}/no_file_here.html"
 LONG_PAGE_URL = f"file://{__DATA_DIR}/long_page.html"
+SCROLL_LIST_URL = f"file://{__DATA_DIR}/scroll_list.html"
 TEXT_INPUT_URL = f"file://{__DATA_DIR}/input_type/text_input.html"
 URL_INPUT_URL = f"file://{__DATA_DIR}/input_type/url_input.html"
 CHECKBOX_URL = f"file://{__DATA_DIR}/input_type/checkbox_input.html"
@@ -1132,6 +1133,125 @@ def test_scroll():
     # movement
     assert prev_top_x == top_x and prev_top_y > top_y
     assert prev_bottom_x == bottom_x and prev_bottom_y > bottom_y
+
+    env.close()
+
+
+def test_scroll_in_sub_element():
+    """
+    Verifies that `scroll(dx, dy, bid=...)` scrolls inside the targeted element
+    (e.g. a listbox or a scrollable div) without scrolling the page, while
+    the plain `scroll(dx, dy)` call keeps scrolling the page.
+    """
+    action_set = HighLevelActionSet(subsets=["bid", "coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SCROLL_LIST_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def get_bid(obs, tag, elem_id):
+        soup = bs4.BeautifulSoup(
+            flatten_dom_to_str(obs["dom_object"], obs["extra_element_properties"]),
+            "lxml",
+        )
+        elem = soup.find(tag, attrs={"id": elem_id})
+        assert elem is not None, f"Element <{tag} id={elem_id}> not found"
+        return elem.get(BID_ATTR)
+
+    def page_scroll_y():
+        return env.unwrapped.page.evaluate("window.scrollY")
+
+    def elem_scroll_top(selector):
+        return env.unwrapped.page.evaluate(
+            f"document.querySelector({selector!r}).scrollTop"
+        )
+
+    obs, info = env.reset()
+    listbox_bid = get_bid(obs, "select", "listbox")
+    scrollable_bid = get_bid(obs, "div", "scrollable")
+
+    # baseline: nothing has been scrolled
+    assert page_scroll_y() == 0
+    assert elem_scroll_top("#listbox") == 0
+    assert elem_scroll_top("#scrollable") == 0
+
+    # scroll inside the scrollable div by bid — page must NOT scroll
+    obs, _, _, _, _ = env.step(f"scroll(0, 200, bid={scrollable_bid!r})")
+    assert not obs["last_action_error"]
+    assert elem_scroll_top("#scrollable") > 0
+    assert page_scroll_y() == 0
+
+    # scroll inside the listbox by bid — page must NOT scroll
+    obs, _, _, _, _ = env.step(f"scroll(0, 500, bid={listbox_bid!r})")
+    assert not obs["last_action_error"]
+    assert elem_scroll_top("#listbox") > 0
+    assert page_scroll_y() == 0
+
+    # plain scroll (no bid) still scrolls the page
+    prev_page_y = page_scroll_y()
+    obs, _, _, _, _ = env.step("scroll(0, 300)")
+    assert not obs["last_action_error"]
+    assert page_scroll_y() > prev_page_y
+
+    env.close()
+
+
+def test_scroll_without_bid_ignores_focused_listbox():
+    """
+    Regression test pinning down the behavior that motivated adding bid support:
+    focusing a listbox does NOT make `scroll(dx, dy)` (no bid) scroll that listbox.
+    The plain form routes through page.mouse.wheel, which targets whatever is
+    under the mouse cursor — not the focused element. Agents must pass `bid=`
+    to scroll inside a sub-element.
+    """
+    action_set = HighLevelActionSet(subsets=["bid", "coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SCROLL_LIST_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def get_bid(obs, tag, elem_id):
+        soup = bs4.BeautifulSoup(
+            flatten_dom_to_str(obs["dom_object"], obs["extra_element_properties"]),
+            "lxml",
+        )
+        elem = soup.find(tag, attrs={"id": elem_id})
+        return elem.get(BID_ATTR)
+
+    obs, info = env.reset()
+    listbox_bid = get_bid(obs, "select", "listbox")
+
+    # focus the listbox, then scroll without a bid
+    obs, _, _, _, _ = env.step(f"focus({listbox_bid!r})")
+    assert not obs["last_action_error"]
+
+    page = env.unwrapped.page
+    assert page.evaluate("document.activeElement.id") == "listbox"
+    assert page.evaluate("document.querySelector('#listbox').scrollTop") == 0
+    assert page.evaluate("window.scrollY") == 0
+
+    obs, _, _, _, _ = env.step("scroll(0, 300)")
+    assert not obs["last_action_error"]
+
+    # listbox was focused but did NOT scroll
+    assert page.evaluate("document.querySelector('#listbox').scrollTop") == 0
+    # the page (or the element under the cursor) received the wheel instead
+    # — this is exactly the symptom that made `bid=` necessary.
+
+    # now with bid, the listbox does scroll
+    obs, _, _, _, _ = env.step(f"scroll(0, 500, bid={listbox_bid!r})")
+    assert not obs["last_action_error"]
+    assert page.evaluate("document.querySelector('#listbox').scrollTop") > 0
 
     env.close()
 
