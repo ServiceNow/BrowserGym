@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; padding: 20px; }
+        #spacer { height: 2000px; background: linear-gradient(#eef, #fee); }
+        #scrollable {
+            width: 220px;
+            height: 120px;
+            overflow-y: scroll;
+            border: 1px solid #333;
+            margin: 10px 0;
+        }
+        #scrollable div { height: 40px; padding: 4px; border-bottom: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <p id="top">This is the top</p>
+
+    <select id="listbox" size="4">
+        <option value="a">Apple</option>
+        <option value="b">Banana</option>
+        <option value="c">Cherry</option>
+        <option value="d">Date</option>
+        <option value="e">Elderberry</option>
+        <option value="f">Fig</option>
+        <option value="g">Grape</option>
+        <option value="h">Honeydew</option>
+        <option value="i">Iyokan</option>
+        <option value="j">Jackfruit</option>
+    </select>
+
+    <div id="scrollable">
+        <div id="item-0">item 0</div>
+        <div id="item-1">item 1</div>
+        <div id="item-2">item 2</div>
+        <div id="item-3">item 3</div>
+        <div id="item-4">item 4</div>
+        <div id="item-5">item 5</div>
+        <div id="item-6">item 6</div>
+        <div id="item-7">item 7</div>
+        <div id="item-8">item 8</div>
+        <div id="item-9">item 9</div>
+    </div>
+
+    <div id="spacer"></div>
+    <p id="bottom">This is the bottom</p>
+</body>
+</html>

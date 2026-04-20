@@ -278,18 +278,34 @@ def drag_and_drop(from_bid: str, to_bid: str):
 
 
 # https://playwright.dev/python/docs/api/class-mouse#mouse-wheel
-def scroll(delta_x: float, delta_y: float):
+def scroll(delta_x: float, delta_y: float, bid: str | None = None):
     """
-    Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling. Dispatches a wheel event.
+    Scroll horizontally and vertically. Amounts in pixels, positive for right or down scrolling, negative for left or up scrolling.
+    If bid is provided, scrolls inside that element (e.g. a listbox or a scrollable div) without moving the outer page. Uses Element.scrollBy, so sites that implement custom scrolling via 'wheel' event handlers (virtualized lists, carousels) will not be triggered by this path.
+    Otherwise, dispatches a wheel event at the current mouse position (typically scrolls the page).
 
     Examples:
         scroll(0, 200)
         scroll(-50.2, -100.5)
+        scroll(0, 200, bid='a17')
     """
     delta_x, delta_y = map_coordinates(
         page, delta_x, delta_y
     )  # map coordinates to page coordinates
-    page.mouse.wheel(delta_x, delta_y)
+    if bid is None:
+        page.mouse.wheel(delta_x, delta_y)
+    else:
+        # scroll_into_view=False: the whole point of this path is to scroll
+        # inside the element without moving the outer page.
+        elem = get_elem_by_bid(page, bid, scroll_into_view=False)
+        add_demo_mode_effects(page, elem, bid, demo_mode=demo_mode, move_cursor=False)
+        # Use scrollBy rather than a synthetic wheel event: untrusted wheel
+        # events do not trigger native scrolling, and bubbling them would let
+        # page-level handlers cancel a scroll that was meant for this element.
+        elem.evaluate(
+            "(el, deltas) => { el.scrollBy(deltas[0], deltas[1]); }",
+            [delta_x, delta_y],
+        )
 
 
 def scroll_at(x: int, y: int, dx: int, dy: int):
