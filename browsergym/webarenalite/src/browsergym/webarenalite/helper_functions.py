@@ -23,6 +23,13 @@ from webarena.llms.providers.openai_utils import (
     generate_from_openai_chat_completion,
 )
 
+GITLAB = GITLAB.rstrip("/")
+MAP = MAP.rstrip("/")
+REDDIT = REDDIT.rstrip("/")
+SHOPPING = SHOPPING.rstrip("/")
+SHOPPING_ADMIN = SHOPPING_ADMIN.rstrip("/")
+WIKIPEDIA = WIKIPEDIA.rstrip("/")
+
 
 def shopping_get_auth_token() -> str:
     response = requests.post(
