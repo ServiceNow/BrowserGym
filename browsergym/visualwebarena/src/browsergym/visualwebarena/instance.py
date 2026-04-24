@@ -33,7 +33,7 @@ class VisualWebArenaInstance(WebArenaInstance):
                 + "Please set the following environment variables to use VisualWebArena through BrowserGym:\n"
                 + "\n".join([append_vwa(x) for x in ENV_VARS])
             )
-            os.environ[key] = os.environ[append_vwa(key)]
+            os.environ[key] = os.environ[append_vwa(key)].rstrip("/")
 
         # import webarena on instantiation
         from visualwebarena.browser_env.env_config import (
