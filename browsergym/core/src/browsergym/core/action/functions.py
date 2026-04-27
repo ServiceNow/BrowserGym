@@ -390,6 +390,64 @@ def mouse_dblclick(x: float, y: float, button: Literal["left", "middle", "right"
     page.mouse.dblclick(x, y, button=button)
 
 
+def mouse_select_option(x: float, y: float, options: str | list[str]):
+    """
+    Select one or multiple options in a native <select> element located at the
+    given coordinates. Use this instead of mouse_click for native
+    select/combobox dropdowns: Playwright's synthetic mouse events cannot
+    interact with the browser-rendered native option popup.
+
+    Note: closed shadow roots and cross-origin iframes are not reachable from
+    JavaScript and will not be descended into.
+
+    Examples:
+        mouse_select_option(270, 167, "blue")
+        mouse_select_option(270, 167, ["red", "green"])
+    """
+    x, y = map_coordinates(page, x, y)  # map coordinates to page coordinates
+    if demo_mode != "off":
+        smooth_move_visual_cursor_to(page, x, y)
+        highlight_by_box(page, {"x": x, "y": y, "width": 1, "height": 1})
+    # Descend through open shadow roots and same-origin iframes so the lookup
+    # works for selects nested inside either. Coordinates inside an iframe are
+    # relative to the iframe's own viewport, hence the rect subtraction.
+    # `iframe.contentDocument` returns null (does not throw) on cross-origin
+    # frames, so we just stop descent there.
+    elem = page.evaluate_handle(
+        """([startX, startY]) => {
+            let cx = startX, cy = startY;
+            let el = document.elementFromPoint(cx, cy);
+            let prev = null;
+            while (el && el !== prev) {
+                prev = el;
+                if (el.shadowRoot) {
+                    const next = el.shadowRoot.elementFromPoint(cx, cy);
+                    if (next && next !== el) { el = next; continue; }
+                }
+                const tag = el.tagName;
+                if (tag === 'IFRAME' || tag === 'FRAME') {
+                    const doc = el.contentDocument;
+                    if (doc) {
+                        const r = el.getBoundingClientRect();
+                        const ix = cx - r.left, iy = cy - r.top;
+                        const next = doc.elementFromPoint(ix, iy);
+                        if (next) { el = next; cx = ix; cy = iy; continue; }
+                    }
+                }
+            }
+            return el?.closest('select');
+        }""",
+        [x, y],
+    ).as_element()
+    if elem is None:
+        raise ValueError(f"No <select> element found at coordinates ({x}, {y})")
+
+    def do(force: bool):
+        elem.select_option(options, force=force, timeout=500)
+
+    call_fun(do, retry_with_force)
+
+
 def mouse_drag_and_drop(from_x: float, from_y: float, to_x: float, to_y: float):
     """
     Drag and drop from a location to a location. Uses absolute client
