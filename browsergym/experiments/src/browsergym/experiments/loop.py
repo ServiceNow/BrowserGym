@@ -942,6 +942,8 @@ def _get_env_name(task_name: str):
         import browsergym.visualwebarena
     elif task_name.startswith("assistantbench"):
         import browsergym.assistantbench
+    elif task_name.startswith("openapps"):
+        import browsergym.openapps
     elif task_name.startswith("weblinx"):
         import weblinx_browsergym
     elif task_name.startswith("timewarp"):
