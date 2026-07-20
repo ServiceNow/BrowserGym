@@ -259,6 +259,34 @@ ACTION_SUBSETS = {
         tab_close,  # Closes a tab
         tab_focus,  # Switches tabs
     ],
+    "knows": [  # Google Workspace tasks: on top of the usual bid actions, they need
+        # file upload and direct mouse control to edit Docs/Sheets/Slides canvases
+        click,
+        dblclick,
+        drag_and_drop,
+        fill,
+        go_back,
+        go_forward,
+        goto,
+        hover,
+        keyboard_insert_text,
+        keyboard_press,
+        keyboard_type,
+        mouse_click,
+        mouse_dblclick,
+        mouse_drag_and_drop,
+        mouse_move,
+        mouse_upload_file,
+        new_tab,
+        noop,
+        report_infeasible,
+        scroll,
+        select_option,
+        send_msg_to_user,
+        tab_close,
+        tab_focus,
+        upload_file,
+    ],
 }
 
 
@@ -291,6 +319,7 @@ class HighLevelActionSet(AbstractActionSet):
         "weblinx",
         "assistantbench",
         "timewarp",
+        "knows",
         "custom",
     ]
     DemoMode = typing.Literal["off", "default", "all_blue", "only_visible_elements"]

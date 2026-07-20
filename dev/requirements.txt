@@ -16,3 +16,4 @@ tenacity
 browsergym-workarena
 weblinx_browsergym
 browsergym-timewarp
+browsergym-knows

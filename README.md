@@ -46,6 +46,7 @@ BrowserGym includes the following benchmarks by default:
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
  - [OpenApps](https://facebookresearch.github.io/OpenApps/)
  - [TimeWarp](https://timewarp-web.github.io)
+ - [Knows](https://github.com/alexgill321/Agent-Benchmark)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
@@ -64,6 +65,7 @@ pip install browsergym-workarena  # core + workarena
 pip install browsergym-assistantbench  # core + assistantbench
 pip install weblinx-browsergym  # core + weblinx
 pip install browsergym-timewarp  # core + timewarp 
+pip install browsergym-knows  # core + knows
 ```
 
 Then setup playwright by running
@@ -80,6 +82,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
  - for OpenApps, see [OpenApps docs](https://facebookresearch.github.io/OpenApps/)
   - for TimeWarp, see [timewarp/README.md](https://github.com/sparklabutah/timewarp)
+  - for Knows, see [knows/README.md](https://github.com/alexgill321/Agent-Benchmark) (requires a Google account and a Google Cloud service account)
 
 ### 🏗️ Development setup
 
@@ -208,6 +211,20 @@ env = gym.make("browsergym/timewarp.1")
 
 # list all the available timewarp tasks
 env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/timewarp")]
+print("\n".join(env_ids))
+```
+
+Knows
+```python
+import gymnasium as gym
+import browsergym.knows  # register knows tasks as gym environments
+
+# start a knows task
+env = gym.make("browsergym/knows.docs_1_formal_letter.1")
+...
+
+# list all the available knows tasks
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/knows")]
 print("\n".join(env_ids))
 ```
 

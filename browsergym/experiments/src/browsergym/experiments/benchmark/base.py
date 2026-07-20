@@ -61,6 +61,7 @@ BenchmarkBackend = Literal[
     "assistantbench",
     "weblinx",
     "timewarp",
+    "knows",
 ]
 
 
