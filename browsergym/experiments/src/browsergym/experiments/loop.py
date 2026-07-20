@@ -946,6 +946,8 @@ def _get_env_name(task_name: str):
         import weblinx_browsergym
     elif task_name.startswith("timewarp"):
         import browsergym.timewarp
+    elif task_name.startswith("knows"):
+        import browsergym.knows
 
     return f"browsergym/{task_name}"
 

@@ -46,6 +46,9 @@ weblinx = [
 timewarp = [
   "browsergym-timewarp"
 ]
+knows = [
+  "browsergym-knows"
+]
 all = [
   "browsergym-experiment[miniwob]",
   "browsergym-experiment[workarena]",
@@ -54,6 +57,7 @@ all = [
   "browsergym-experiment[assistantbench]",
   "browsergym-experiment[weblinx]",
   "browsergym-experiment[timewarp]",
+  "browsergym-experiment[knows]",
 ]
 
 [project.urls]
