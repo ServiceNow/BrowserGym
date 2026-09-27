@@ -1,2 +1,2 @@
-browsergym-core==0.14.3
+browsergym-core==0.14.4
 webarena-verified
