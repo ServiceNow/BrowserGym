@@ -82,7 +82,7 @@ Finally, each benchmark comes with its own specific setup that requires to follo
  - for AssistantBench, see [assistantbench/README.md](browsergym/assistantbench/README.md)
  - for OpenApps, see [OpenApps docs](https://facebookresearch.github.io/OpenApps/)
   - for TimeWarp, see [timewarp/README.md](https://github.com/sparklabutah/timewarp)
-  - for Knows, see [knows/README.md](https://github.com/alexgill321/Agent-Benchmark) (requires a Google account and a Google Cloud service account)
+  - for Knows, see [knows/README.md](https://github.com/alexgill321/KNOWS-benchmark#setup-required-for-all-options) (requires a Google account and a Google Cloud service account)
 
 ### 🏗️ Development setup
 
