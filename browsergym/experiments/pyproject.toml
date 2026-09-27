@@ -57,7 +57,7 @@ all = [
   "browsergym-experiment[assistantbench]",
   "browsergym-experiment[weblinx]",
   "browsergym-experiment[timewarp]",
-  "browsergym-experiment[knows]",
+  "browsergym-experiments[knows]",
 ]
 
 [project.urls]
