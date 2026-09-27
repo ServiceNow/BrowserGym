@@ -50,13 +50,13 @@ knows = [
   "browsergym-knows"
 ]
 all = [
-  "browsergym-experiment[miniwob]",
-  "browsergym-experiment[workarena]",
-  "browsergym-experiment[webarena]",
-  "browsergym-experiment[visualwebarena]",
-  "browsergym-experiment[assistantbench]",
-  "browsergym-experiment[weblinx]",
-  "browsergym-experiment[timewarp]",
+  "browsergym-experiments[miniwob]",
+  "browsergym-experiments[workarena]",
+  "browsergym-experiments[webarena]",
+  "browsergym-experiments[visualwebarena]",
+  "browsergym-experiments[assistantbench]",
+  "browsergym-experiments[weblinx]",
+  "browsergym-experiments[timewarp]",
   "browsergym-experiments[knows]",
 ]
 
