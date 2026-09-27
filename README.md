@@ -46,7 +46,7 @@ BrowserGym includes the following benchmarks by default:
  - [WebLINX](https://github.com/McGill-NLP/weblinx) (static benchmark)
  - [OpenApps](https://facebookresearch.github.io/OpenApps/)
  - [TimeWarp](https://timewarp-web.github.io)
- - [Knows](https://github.com/alexgill321/Agent-Benchmark)
+ - [Knows](https://alexgill321.github.io/KNOWS-benchmark/)
 
 Designing new web benchmarks with BrowserGym is easy, and simply requires to inherit the [`AbstractBrowserTask`](https://github.com/ServiceNow/BrowserGym/blob/main/browsergym/core/src/browsergym/core/task.py#L7C7-L7C26) class.
 
