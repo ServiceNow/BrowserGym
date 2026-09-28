@@ -8,7 +8,7 @@ from typing import Optional
 
 import playwright.sync_api
 
-from browsergym.webarena.task import GenericWebArenaTask
+from browsergym.webarena.task import GenericWebArenaTask, substitute_urls
 
 logger = logging.getLogger(__name__)
 
@@ -40,16 +40,7 @@ class WebArenaLiteTask(GenericWebArenaTask):
             .joinpath("test_webarena_lite.raw.json")
             .read_text()
         )
-        # substitute URLs
-        for pattern, url_key in {
-            "__GITLAB__": "gitlab",
-            "__REDDIT__": "reddit",
-            "__SHOPPING__": "shopping",
-            "__SHOPPING_ADMIN__": "shopping_admin",
-            "__WIKIPEDIA__": "wikipedia",
-            "__MAP__": "map",
-        }.items():
-            all_configs_str = all_configs_str.replace(pattern, self.webarena_instance.urls[url_key])
+        all_configs_str = substitute_urls(all_configs_str, self.webarena_instance.urls)
 
         # load all task configs to JSON
         all_configs = json.loads(all_configs_str)

@@ -29,7 +29,7 @@ python -c "import nltk; nltk.download('punkt_tab')"
 BASE_URL=<YOUR_SERVER_URL_HERE>  # example: "http://myazuremachine.eastus.cloudapp.azure.com"
 
 # webarena environment variables (change ports as needed)
-export WA_SHOPPING="$BASE_URL:8082/"
+export WA_SHOPPING="$BASE_URL:8082"
 export WA_SHOPPING_ADMIN="$BASE_URL:8083/admin"
 export WA_REDDIT="$BASE_URL:8080"
 export WA_GITLAB="$BASE_URL:9001"

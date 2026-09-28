@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 ENV_VARS = ("SHOPPING", "SHOPPING_ADMIN", "REDDIT", "GITLAB", "WIKIPEDIA", "MAP", "HOMEPAGE")
 
 
+def _strip_trailing_slashes(urls: dict) -> dict:
+    return {site: url.rstrip("/") for site, url in urls.items()}
+
+
 class WebArenaInstance:
     """
     Utility class to access a WebArena instance.
@@ -44,15 +48,17 @@ class WebArenaInstance:
             WIKIPEDIA,
         )
 
-        self.urls = {
-            "reddit": REDDIT,
-            "gitlab": GITLAB,
-            "shopping": SHOPPING,
-            "shopping_admin": SHOPPING_ADMIN,
-            "wikipedia": WIKIPEDIA,
-            "map": MAP,
-        }
-        self.home_url = HOMEPAGE
+        self.urls = _strip_trailing_slashes(
+            {
+                "reddit": REDDIT,
+                "gitlab": GITLAB,
+                "shopping": SHOPPING,
+                "shopping_admin": SHOPPING_ADMIN,
+                "wikipedia": WIKIPEDIA,
+                "map": MAP,
+            }
+        )
+        self.home_url = HOMEPAGE.rstrip("/")
 
         self.credentials = ACCOUNTS
 

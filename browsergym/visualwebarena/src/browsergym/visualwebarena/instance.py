@@ -4,7 +4,7 @@ import os
 import playwright.sync_api
 
 # we inherit some code base from webarena to avoid too much duplication
-from browsergym.webarena.instance import WebArenaInstance
+from browsergym.webarena.instance import WebArenaInstance, _strip_trailing_slashes
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +46,15 @@ class VisualWebArenaInstance(WebArenaInstance):
             WIKIPEDIA,
         )
 
-        self.urls = {
-            "reddit": REDDIT,
-            "shopping": SHOPPING,
-            "wikipedia": WIKIPEDIA,
-            "classifieds": CLASSIFIEDS,
-        }
-        self.home_url = HOMEPAGE
+        self.urls = _strip_trailing_slashes(
+            {
+                "reddit": REDDIT,
+                "shopping": SHOPPING,
+                "wikipedia": WIKIPEDIA,
+                "classifieds": CLASSIFIEDS,
+            }
+        )
+        self.home_url = HOMEPAGE.rstrip("/")
         self.classifieds_reset_token = CLASSIFIEDS_RESET_TOKEN
 
         self.credentials = ACCOUNTS

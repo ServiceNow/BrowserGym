@@ -17,6 +17,22 @@ from .instance import WebArenaInstance
 logger = logging.getLogger(__name__)
 
 
+URL_PATTERNS = {
+    "__GITLAB__": "gitlab",
+    "__REDDIT__": "reddit",
+    "__SHOPPING__": "shopping",
+    "__SHOPPING_ADMIN__": "shopping_admin",
+    "__WIKIPEDIA__": "wikipedia",
+    "__MAP__": "map",
+}
+
+
+def substitute_urls(configs_str: str, urls: dict) -> str:
+    for pattern, url_key in URL_PATTERNS.items():
+        configs_str = configs_str.replace(pattern, urls[url_key])
+    return configs_str
+
+
 class GenericWebArenaTask(AbstractBrowserTask):
     """
     Base class for all WebArena tasks.
@@ -54,16 +70,7 @@ class GenericWebArenaTask(AbstractBrowserTask):
 
         all_configs_str = importlib.resources.files(webarena).joinpath("test.raw.json").read_text()
 
-        # substitute URLs
-        for pattern, url_key in {
-            "__GITLAB__": "gitlab",
-            "__REDDIT__": "reddit",
-            "__SHOPPING__": "shopping",
-            "__SHOPPING_ADMIN__": "shopping_admin",
-            "__WIKIPEDIA__": "wikipedia",
-            "__MAP__": "map",
-        }.items():
-            all_configs_str = all_configs_str.replace(pattern, self.webarena_instance.urls[url_key])
+        all_configs_str = substitute_urls(all_configs_str, self.webarena_instance.urls)
 
         # load all task configs to JSON
         all_configs = json.loads(all_configs_str)
