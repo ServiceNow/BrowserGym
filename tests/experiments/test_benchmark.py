@@ -60,6 +60,7 @@ def test_build_benchmarks():
         "assistantbench": 214,
         "weblinx": 31586,
         "timewarp": 231,
+        "knows": 110,
     }
     for name, benchmark_builder in DEFAULT_BENCHMARKS.items():
         benchmark = benchmark_builder()
