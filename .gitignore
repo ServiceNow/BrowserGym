@@ -106,7 +106,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -138,12 +137,10 @@ error_logs.txt
 # tests
 tests/results
 tmp.py
-.vscode/**
 
 # demo and results
 results/
 
-.vscode/launch.json
 
 # assistantbench
 tests/assistantbench/assistantbench-predictions-test.jsonl
@@ -158,3 +155,5 @@ uv.lock
 
 # webarena verified metadata (constructed automatically)
 browsergym/experiments/src/browsergym/experiments/benchmark/metadata/webarena_verified.csv
+config.bat
+node_modules
