@@ -46,7 +46,19 @@ def _build_highlevel_action_parser() -> pp.ParserElement:
     def literal_eval(toks):
         return ast.literal_eval(toks[0])
 
-    string = pp.python_quoted_string().set_parse_action(literal_eval)
+    # string = pp.python_quoted_string().set_parse_action(literal_eval)
+    # string = (
+    #     pp.QuotedString(quote_char='"""', esc_char="\\", multiline=True, unquote_results=False).set_parse_action(literal_eval)
+    #     | pp.QuotedString(quote_char="'''", esc_char="\\", multiline=True, unquote_results=False).set_parse_action(literal_eval)
+    #     | pp.QuotedString(quote_char='"', esc_char="\\", multiline=True, unquote_results=False).set_parse_action(literal_eval)
+    #     | pp.QuotedString(quote_char="'", esc_char="\\", multiline=True, unquote_results=False).set_parse_action(literal_eval)
+    # )
+    string = (
+        pp.QuotedString(quote_char='"""', esc_char="\\", multiline=True, unquote_results=True)
+        | pp.QuotedString(quote_char="'''", esc_char="\\", multiline=True, unquote_results=True)
+        | pp.QuotedString(quote_char='"', esc_char="\\", multiline=True, unquote_results=True)
+        | pp.QuotedString(quote_char="'", esc_char="\\", multiline=True, unquote_results=True)
+    )
     number = pp.pyparsing_common.number()
     dict = pp.Forward().set_name("dict")  # will be defined later
     list = pp.Forward().set_name("list")  # will be defined later

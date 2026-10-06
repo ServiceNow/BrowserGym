@@ -109,6 +109,21 @@ def test_action_parser():
         NamedArgument(name="y", value={"aaa": 23}),
     ]
 
+def test_action_parser_hash_and_escaped_quotes():
+    """Regression test for issue #296: content containing '#' or escaped quotes
+    inside a string argument was silently dropped by the parser."""
+    parser = highlevel_action_parser
+
+    # A '#' inside a string must not be treated as a comment
+    function_calls = parser.parse_string('send_msg_to_user("text with ## markdown header")', parseAll=True)
+    _, function_args = function_calls[0]
+    assert function_args == ["text with ## markdown header"]
+
+    # Escaped quotes and newlines inside a multiline string must survive
+    msg = 'send_msg_to_user("Lee\'s Market serves \\"specific\\" communities.\n\n## Header\n")'
+    function_calls = parser.parse_string(msg, parseAll=True)
+    _, function_args = function_calls[0]
+    assert function_args == ['Lee\'s Market serves "specific" communities.\n\n## Header\n']
 
 def test_valid_action():
     action_set = HighLevelActionSet()
