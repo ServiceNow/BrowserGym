@@ -264,7 +264,14 @@ class HTMLContentEvaluator(Evaluator):
             # navigate to that url
             if target_url != "last":
                 page.goto(target_url)
-                time.sleep(3)  # TODO [shuyanzh]: fix this hard-coded sleep
+                try:
+                    # networkidle avoids evaluating while the page is still loading resources.
+                    # We tolerate timeouts because some target websites have background
+                    # activity that never truly reaches networkidle. In these cases, we
+                    # fall through and attempt evaluation anyway.
+                    page.wait_for_load_state("networkidle", timeout=3000)
+                except playwright.sync_api.TimeoutError:
+                    pass
 
             # empty, use the full page
             if not locator.strip():
@@ -282,8 +289,8 @@ class HTMLContentEvaluator(Evaluator):
                     if not selected_element:
                         selected_element = ""
                 except Exception:
-                    # the page is wrong, return empty
-                    selected_element = ""
+                    # JavaScript evaluation failed; distinguish evaluator failure from a valid empty result.
+                    selected_element = None
             elif locator.startswith("lambda:"):
                 try:
                     locator = locator.lstrip("lambda:")
@@ -291,7 +298,7 @@ class HTMLContentEvaluator(Evaluator):
                     if not selected_element:
                         selected_element = None
                 except Exception:
-                    # the page is wrong, return empty
+                    # JavaScript evaluation failed; distinguish evaluator failure from a valid empty result.
                     selected_element = None
             # run program to call API
             elif locator.startswith("func:"):  # a helper function
