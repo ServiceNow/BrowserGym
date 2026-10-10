@@ -42,11 +42,11 @@ from browsergym.experiments.benchmark.metadata.utils import task_metadata
 domains = ["shopping", "reddit"]  # only consider 'shopping' or 'reddit' tasks
 task_list = []
 for domain in domains:
-    task_list.extend(task_metadata("webarena_verified").groupby("sites").get_group(domain).task_name.to_list())
+    task_list.extend(
+        task_metadata("webarena_verified").groupby("sites").get_group(domain).task_name.to_list()
+    )
 benchmark = bgym.DEFAULT_BENCHMARKS["webarena_verified"]()  # type: bgym.Benchmark
-benchmark = benchmark.subset_from_list(
-    task_list, benchmark_name_suffix=f"_{'-'.join(DOMAINS)}"
-)
+benchmark = benchmark.subset_from_list(task_list, benchmark_name_suffix=f"_{'-'.join(DOMAINS)}")
 ```
 
 #### 3. Task gym ID format

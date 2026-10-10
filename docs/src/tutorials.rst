@@ -21,6 +21,6 @@ This section provides tutorials to help build new environments and tasks.
 .. toctree::
     :maxdepth: 1
     :hidden:
-    
+
     examples/walkthrough.rst
     examples/create_custom_task.rst

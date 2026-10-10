@@ -63,7 +63,7 @@ Next, we need to compute a reward. For this, we'll implement our validation crit
                 return 0.0, False, "", {}
 
 
-We can also implement the code for completing the task, it's an oracle (a.k.a. cheat) version. For this, we'll fill out the `cheat()` function. 
+We can also implement the code for completing the task, it's an oracle (a.k.a. cheat) version. For this, we'll fill out the `cheat()` function.
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ Finally, the `teardown()` function. This function allows to clean resources befo
         # ...
         # Code above
         # ...
-        
+
         def teardown(self) -> None:
             # Nothing to do for this task.
             pass
@@ -130,4 +130,3 @@ Now that the task is registered it can be called via this code that you can put 
         action = "noop()"
         obs, reward, terminated, truncated, info = env.step(action)
         print(f"Reward: {reward}, Done: {done}, Info: {info}")
-    

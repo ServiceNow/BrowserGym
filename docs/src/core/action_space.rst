@@ -1,8 +1,8 @@
 Action space
 ____________
 
-The action space is a set of primitives that the agent can use to interact with the environment. 
-The primitives are divided into categories based on the type of interaction they perform. 
+The action space is a set of primitives that the agent can use to interact with the environment.
+The primitives are divided into categories based on the type of interaction they perform.
 Below a list of the primitives supported by BrowserGym:
 
 +----------+-----------------------------------------------------------+----------------------------------------------------------------------------------------------+

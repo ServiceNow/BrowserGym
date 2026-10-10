@@ -18,7 +18,7 @@
 [![Code Format](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/code_format.yml)
 [![Tests](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ServiceNow/BrowserGym/actions/workflows/unit_tests.yml)
 
-```python
+```sh
 pip install browsergym
 ```
 
@@ -194,7 +194,7 @@ OpenApps
 from open_apps.apps.start_page.main import app  # need to import apps to serve
 from open_apps.launcher import OpenAppsLauncher
 
-config = ... # configure a namespace with task, agent, envrionment, and server configs
+config = ...  # configure a namespace with task, agent, envrionment, and server configs
 
 launcher = OpenAppsLauncher(config)
 launcher.launch()
@@ -265,7 +265,7 @@ python demo_agent/run_demo.py --task_name visualwebarena.398
 
 You can customize your experience by changing the `model_name` to your preferred LLM (it uses `gpt-4o-mini` by default), adding screenshots for your VLMs with `use_screenshot`, and much more!
 
-```python
+```sh
 python demo_agent/run_demo.py --help
 ```
 

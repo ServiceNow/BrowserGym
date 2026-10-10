@@ -21,4 +21,3 @@ Task
 .. autoclass:: browsergym.core.task.AbstractBrowserTask
    :members:
    :show-inheritance:
-
