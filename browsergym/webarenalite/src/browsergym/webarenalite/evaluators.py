@@ -15,7 +15,7 @@ from typing import Union
 
 from beartype import beartype
 from nltk.tokenize import word_tokenize  # type: ignore
-from playwright.sync_api import CDPSession, Page
+from playwright.sync_api import CDPSession, Page, TimeoutError
 from .helper_functions import (
     PseudoPage,
     gitlab_get_project_memeber_role,
@@ -270,7 +270,7 @@ class HTMLContentEvaluator(Evaluator):
                     # activity that never truly reaches networkidle. In these cases, we
                     # fall through and attempt evaluation anyway.
                     page.wait_for_load_state("networkidle", timeout=3000)
-                except playwright.sync_api.TimeoutError:
+                except TimeoutError:
                     pass
 
             # empty, use the full page
