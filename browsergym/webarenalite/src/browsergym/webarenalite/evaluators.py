@@ -230,9 +230,15 @@ class URLEvaluator(Evaluator):
 
 
 class HTMLContentEvaluator(Evaluator):
-    """Check whether the contents appear in the page"""
+    """Check whether the contents appear in the page.
 
-    """Check whether the contents appear in the page"""
+    Note on evaluation provenance / error handling:
+    When JavaScript locator evaluation raises an exception (e.g. element not found
+    or syntax error), `selected_element` is set to `None`, resulting in a score of 0.0.
+    The evaluator returns the same numeric score (0.0) for a locator exception as it does
+    for a genuine content mismatch. This limitation preserves standard benchmark scoring
+    semantics while distinguishing locator exceptions from legitimate empty string results.
+    """
 
     @staticmethod
     @beartype
@@ -290,6 +296,7 @@ class HTMLContentEvaluator(Evaluator):
                         selected_element = ""
                 except Exception:
                     # JavaScript evaluation failed; distinguish evaluator failure from a valid empty result.
+                    # Note: yields score 0.0, matching a content mismatch (evaluation-provenance limitation).
                     selected_element = None
             elif locator.startswith("lambda:"):
                 try:
@@ -299,6 +306,7 @@ class HTMLContentEvaluator(Evaluator):
                         selected_element = None
                 except Exception:
                     # JavaScript evaluation failed; distinguish evaluator failure from a valid empty result.
+                    # Note: yields score 0.0, matching a content mismatch (evaluation-provenance limitation).
                     selected_element = None
             # run program to call API
             elif locator.startswith("func:"):  # a helper function
