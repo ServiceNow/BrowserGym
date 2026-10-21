@@ -1,4 +1,5 @@
 import dataclasses
+import importlib.metadata
 import os
 import random
 import re
@@ -353,3 +354,74 @@ def test_dependency_graphs():
     assert [{k: set(v) for k, v in deps.items()} for deps in env_args_dependencies] == [
         {k: set(v) for k, v in {0: [], 1: [], 2: [1], 3: [0, 2], 4: [3], 5: [3, 4]}.items()}
     ]
+
+
+def test_benchmark_get_version():
+    from unittest.mock import MagicMock, patch
+
+    mock_dist = MagicMock()
+    mock_dist.version = "1.2.3"
+
+    # Test standard benchmarks with mocked distributions
+    with patch("importlib.metadata.distribution", return_value=mock_dist) as mock_metadata:
+        miniwob_bench = DEFAULT_BENCHMARKS["miniwob"]()
+        assert miniwob_bench.get_version() == "1.2.3"
+        mock_metadata.assert_called_with("browsergym.miniwob")
+
+    with patch("importlib.metadata.distribution", return_value=mock_dist) as mock_metadata:
+        webarena_bench = DEFAULT_BENCHMARKS["webarena"]()
+        assert webarena_bench.get_version() == "1.2.3"
+        mock_metadata.assert_called_with("browsergym.webarena")
+
+    workarena_bench = Benchmark(
+        name="workarena_l1",
+        high_level_action_set_args=DEFAULT_BENCHMARKS["miniwob_tiny_test"]().high_level_action_set_args,
+        is_multi_tab=False,
+        supports_parallel_seeds=True,
+        env_args_list=DEFAULT_BENCHMARKS["miniwob_tiny_test"]().env_args_list,
+        backends=["workarena"],
+    )
+    with patch("importlib.metadata.distribution", return_value=mock_dist) as mock_metadata:
+        assert workarena_bench.get_version() == "1.2.3"
+        mock_metadata.assert_called_with("browsergym.workarena")
+
+    with patch("importlib.metadata.distribution", return_value=mock_dist) as mock_metadata:
+        visualwebarena_bench = DEFAULT_BENCHMARKS["visualwebarena"]()
+        assert visualwebarena_bench.get_version() == "1.2.3"
+        mock_metadata.assert_called_with("browsergym.visualwebarena")
+
+    with patch("importlib.metadata.distribution", return_value=mock_dist) as mock_metadata:
+        assistantbench = DEFAULT_BENCHMARKS["assistantbench"]()
+        assert assistantbench.get_version() == "1.2.3"
+        mock_metadata.assert_called_with("browsergym.assistantbench")
+
+    # Test weblinx fallback to 0.0.1rc1 when not found
+    with patch(
+        "importlib.metadata.distribution",
+        side_effect=importlib.metadata.PackageNotFoundError("weblinx_browsergym"),
+    ):
+        weblinx_bench = DEFAULT_BENCHMARKS["weblinx"]()
+        assert weblinx_bench.get_version() == "0.0.1rc1"
+
+    # Test weblinx returns version when package is found
+    with patch("importlib.metadata.distribution", return_value=mock_dist):
+        weblinx_bench = DEFAULT_BENCHMARKS["weblinx"]()
+        assert weblinx_bench.get_version() == "1.2.3"
+
+    # Test unknown benchmark raises ValueError
+    fake_bench = Benchmark(
+        name="unknown_benchmark",
+        high_level_action_set_args=DEFAULT_BENCHMARKS["miniwob_tiny_test"]().high_level_action_set_args,
+        is_multi_tab=False,
+        supports_parallel_seeds=True,
+        env_args_list=DEFAULT_BENCHMARKS["miniwob_tiny_test"]().env_args_list,
+        backends=[],
+    )
+    with pytest.raises(ValueError, match="Unknown benchmark unknown_benchmark"):
+        fake_bench.get_version()
+
+    # Test benchmark subset preserves get_version
+    with patch("importlib.metadata.distribution", return_value=mock_dist):
+        sub_bench = miniwob_bench.subset_from_regexp(column="task_name", regexp="click")
+        assert sub_bench.get_version() == "1.2.3"
+
