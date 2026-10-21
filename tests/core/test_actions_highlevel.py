@@ -6,6 +6,7 @@ import re
 
 import bs4
 import gymnasium as gym
+import playwright.sync_api
 import pytest
 from pyparsing.exceptions import ParseException
 
@@ -33,6 +34,9 @@ LONG_PAGE_URL = f"file://{__DATA_DIR}/long_page.html"
 TEXT_INPUT_URL = f"file://{__DATA_DIR}/input_type/text_input.html"
 URL_INPUT_URL = f"file://{__DATA_DIR}/input_type/url_input.html"
 CHECKBOX_URL = f"file://{__DATA_DIR}/input_type/checkbox_input.html"
+SELECT_URL = f"file://{__DATA_DIR}/input_type/select_input.html"
+SELECT_IN_IFRAME_URL = f"file://{__DATA_DIR}/input_type/select_in_iframe.html"
+SELECT_IN_SHADOW_DOM_URL = f"file://{__DATA_DIR}/input_type/select_in_shadow_dom.html"
 MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
 OBSTRUCTED_CHECKBOX_URL = f"file://{__DATA_DIR}/obstructed_checkbox_page.html"
 LOTS_OF_IFRAMES_URL = f"file://{__DATA_DIR}/lots_of_iframes.html"
@@ -1269,6 +1273,129 @@ mouse_up({repr(x)}, {repr(y)})
     # box not checked
     assert not obs["last_action_error"]
     assert not checkbox.has_attr("checked")
+
+
+def test_mouse_select_option():
+    action_set = HighLevelActionSet(subsets=["coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SELECT_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    obs, info = env.reset()
+    assert not obs["last_action_error"]
+
+    # query the live page for the select bbox so the test does not depend on
+    # the device pixel ratio of the host (DOM-observation coords can be in
+    # device pixels on retina displays, which would silently miss-click).
+    page = env.unwrapped.page
+    box = page.locator("select#color").bounding_box()
+    x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
+    def selected_value():
+        return page.evaluate("() => document.getElementById('color').value")
+
+    # select by visible label
+    obs, reward, term, trunc, info = env.step(f"mouse_select_option({repr(x)}, {repr(y)}, 'Blue')")
+    assert not obs["last_action_error"]
+    assert selected_value() == "blue"
+
+    # select by value
+    obs, reward, term, trunc, info = env.step(f"mouse_select_option({repr(x)}, {repr(y)}, 'red')")
+    assert not obs["last_action_error"]
+    assert selected_value() == "red"
+
+    # coordinates not over a <select> should raise
+    obs, reward, term, trunc, info = env.step("mouse_select_option(0, 0, 'red')")
+    assert "ValueError" in obs["last_action_error"]
+
+    env.close()
+
+
+@pytest.mark.parametrize(
+    "start_url",
+    [SELECT_IN_IFRAME_URL, SELECT_IN_SHADOW_DOM_URL],
+    ids=["iframe", "shadow-dom"],
+)
+def test_mouse_select_option_nested(start_url):
+    action_set = HighLevelActionSet(subsets=["coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": start_url},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    obs, info = env.reset()
+    assert not obs["last_action_error"]
+
+    page = env.unwrapped.page
+    # ensure nested document(s) have finished loading; only swallow the
+    # narrow Playwright timeout/navigation error class.
+    for frame in page.frames:
+        try:
+            frame.wait_for_load_state("domcontentloaded")
+        except playwright.sync_api.Error:
+            pass
+
+    # The select lives inside either a same-origin iframe or an open shadow
+    # root. Resolve its viewport-relative bbox and current value via a JS
+    # walker that descends into both.
+    def select_bbox_and_value():
+        return page.evaluate(
+            """() => {
+                function findSelect(root) {
+                    if (root.querySelector) {
+                        const s = root.querySelector('select');
+                        if (s) return s;
+                    }
+                    const all = root.querySelectorAll ? root.querySelectorAll('*') : [];
+                    for (const el of all) {
+                        if (el.shadowRoot) {
+                            const s = findSelect(el.shadowRoot);
+                            if (s) return s;
+                        }
+                        if ((el.tagName === 'IFRAME' || el.tagName === 'FRAME') && el.contentDocument) {
+                            const s = findSelect(el.contentDocument);
+                            if (s) {
+                                const r = el.getBoundingClientRect();
+                                const ir = s.getBoundingClientRect();
+                                return {
+                                    rect: { x: r.left + ir.left, y: r.top + ir.top, w: ir.width, h: ir.height },
+                                    value: s.value,
+                                    _inIframe: true,
+                                };
+                            }
+                        }
+                    }
+                    return null;
+                }
+                const s = findSelect(document);
+                if (!s) return null;
+                if (s._inIframe) return s;
+                const r = s.getBoundingClientRect();
+                return { rect: { x: r.left, y: r.top, w: r.width, h: r.height }, value: s.value };
+            }"""
+        )
+
+    info_before = select_bbox_and_value()
+    assert info_before is not None
+    r = info_before["rect"]
+    x, y = r["x"] + r["w"] / 2, r["y"] + r["h"] / 2
+
+    obs, reward, term, trunc, info = env.step(f"mouse_select_option({repr(x)}, {repr(y)}, 'Blue')")
+    assert not obs["last_action_error"]
+    assert select_bbox_and_value()["value"] == "blue"
+
+    env.close()
 
 
 # test that forced action can click an obstructed element
