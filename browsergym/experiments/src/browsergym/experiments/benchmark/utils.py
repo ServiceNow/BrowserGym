@@ -144,7 +144,12 @@ def prepare_backend(backend: str):
             from browsergym.webarena.instance import WebArenaInstance
 
             default_instance = WebArenaInstance()
-            default_instance.full_reset()
+            if default_instance.full_reset():
+                logging.info(f"Environment reset: DONE")
+            else:
+                logging.warning(
+                    f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
+                )
 
             logging.info(
                 f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
@@ -173,7 +178,12 @@ def prepare_backend(backend: str):
             from browsergym.webarena.instance import WebArenaInstance
 
             default_instance = WebArenaInstance()
-            default_instance.full_reset()
+            if default_instance.full_reset():
+                logging.info(f"Environment reset: DONE")
+            else:
+                logging.warning(
+                    f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
+                )
 
             logging.info(
                 f"Initiating WebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
@@ -202,7 +212,12 @@ def prepare_backend(backend: str):
             from browsergym.visualwebarena.instance import VisualWebArenaInstance
 
             default_instance = VisualWebArenaInstance()
-            default_instance.full_reset()
+            if default_instance.full_reset():
+                logging.info(f"Environment reset: DONE")
+            else:
+                logging.warning(
+                    f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
+                )
 
             logging.info(
                 f"Initiating VisualWebArena instance warm-up. Some tasks will be pre-loaded (massaged) to trigger some caching mechanisms and make the server more responsive."
