@@ -49,6 +49,11 @@ benchmark = benchmark.subset_from_list(
 )
 ```
 
+Alternatively, you can benchmark on the **hard tasks subset** (258 curated challenging tasks from the [official dataset subset](https://github.com/ServiceNow/webarena-verified/blob/main/assets/dataset/subsets/webarena-verified-hard.json)):
+```python
+benchmark = bgym.DEFAULT_BENCHMARKS["webarena_verified_hard"]()  # type: bgym.Benchmark
+```
+
 #### 3. Task gym ID format
 
 Tasks are registered to gym with this template: `webarena_verified.{intent_template_id}.{task_id}.{revision}`
