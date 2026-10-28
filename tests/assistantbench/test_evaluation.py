@@ -69,6 +69,9 @@ def test_evaluate(original_id: str):
         ("1,000", "1000"),
         ("1,234", "1234"),
         ("-1,000", "-1000"),  # negative thousands
+        # Single comma + 3 digits + decimal part → thousands separator with decimals
+        ("1,000.50", "1000.50"),
+        ("1,234.56", "1234.56"),
         # Single comma + 1–2 digits → European decimal comma
         ("14,2", "14.2"),
         ("3,14", "3.14"),
@@ -95,6 +98,9 @@ def test_fix_comma(number_str: str, expected: str):
         ("1,010,000", "1010000", 1.0),
         # Simple thousands
         ("1,000", "1000", 1.0),
+        # Thousands separator with decimal part
+        ("1,000.50", "1000.50", 1.0),
+        ("1,234.56", "1234.56", 1.0),
         # ── Previously broken: wrong answers scored 1.0 ──────────────────────
         # "1,000" → 1.0 which matched gold 1 — 1000x error scored as perfect
         ("1,000", "1", 0.0),

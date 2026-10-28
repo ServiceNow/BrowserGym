@@ -36,7 +36,8 @@ def _fix_comma(number: str) -> str:
     * **Multiple commas** → US grouping style; strip all commas.
       ``"3,080,000"`` → ``"3080000"``, ``"12,34,567"`` → ``"1234567"``
     * **Single comma, group of exactly 3 digits after** → thousands separator;
-      strip the comma.  ``"1,000"`` → ``"1000"``, ``"1,234"`` → ``"1234"``
+      strip the comma.  ``"1,000"`` → ``"1000"``, ``"1,234"`` → ``"1234"``.
+      An optional decimal part is also handled: ``"1,000.50"`` → ``"1000.50"``.
     * **Single comma, 1–2 digits after** → European decimal comma; replace
       with a period.  ``"14,2"`` → ``"14.2"``, ``"3,14"`` → ``"3.14"``
     * **Anything else** → return unchanged (non-numeric strings fall back to
@@ -56,7 +57,7 @@ def _fix_comma(number: str) -> str:
         # Multiple commas → US grouping (e.g. "3,080,000", "12,34,567")
         return number.replace(",", "")
 
-    match = re.fullmatch(r"(-?\d+),(\d+)", number)
+    match = re.fullmatch(r"(-?\d+),(\d+)(\.\d+)?", number)
     if match:
         decimal_digits = match.group(2)
         if len(decimal_digits) == 3:
