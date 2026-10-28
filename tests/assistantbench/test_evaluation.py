@@ -163,4 +163,3 @@ def test_evaluate_within_env(original_id: str):
     assert reward == expected_score
 
     env.close()
-
