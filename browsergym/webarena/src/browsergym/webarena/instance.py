@@ -56,7 +56,17 @@ class WebArenaInstance:
 
         self.credentials = ACCOUNTS
 
-    def full_reset(self, skip_if_not_set: bool = True):
+    def full_reset(self, skip_if_not_set: bool = True) -> bool:
+        """
+        Reset the instance to its initial state.
+
+        Args:
+            skip_if_not_set: If True, skips the reset if the reset environment variable is not set.
+                If False, raises a RuntimeError if the variable is not set.
+
+        Returns:
+            bool: True if the automated reset was executed, False if skipped.
+        """
         base_url = os.environ.get(self.RESET_URL_VAR, None)
 
         if not base_url:
@@ -68,6 +78,7 @@ class WebArenaInstance:
                 logger.warning(
                     f"Skipping automated reset. Make sure the instance has been manually reset."
                 )
+                was_reset = False
             else:
                 raise RuntimeError(f"Could not reset instance, aborting.")
 
@@ -117,6 +128,8 @@ class WebArenaInstance:
                 # wait a bit before next retry
                 time.sleep(retry_after)
 
+            was_reset = True
+
         # warm-start the instance (navigate to every domain)
         retries_left = 3
         while retries_left:
@@ -132,6 +145,8 @@ class WebArenaInstance:
                 logger.info(
                     f"Instance unresponsive after reset, retrying ({retries_left} retries left)\n{e}"
                 )
+
+        return was_reset
 
     def check_status(self):
         """
