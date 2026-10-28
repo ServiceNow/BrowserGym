@@ -145,7 +145,7 @@ def prepare_backend(backend: str):
 
             default_instance = WebArenaInstance()
             if default_instance.full_reset():
-                logging.info(f"Environment reset: DONE")
+                logging.info("Environment reset: DONE")
             else:
                 logging.warning(
                     f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
@@ -179,7 +179,7 @@ def prepare_backend(backend: str):
 
             default_instance = WebArenaInstance()
             if default_instance.full_reset():
-                logging.info(f"Environment reset: DONE")
+                logging.info("Environment reset: DONE")
             else:
                 logging.warning(
                     f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
@@ -213,7 +213,7 @@ def prepare_backend(backend: str):
 
             default_instance = VisualWebArenaInstance()
             if default_instance.full_reset():
-                logging.info(f"Environment reset: DONE")
+                logging.info("Environment reset: DONE")
             else:
                 logging.warning(
                     f"Environment reset: SKIPPED ({default_instance.RESET_URL_VAR} unset)"
