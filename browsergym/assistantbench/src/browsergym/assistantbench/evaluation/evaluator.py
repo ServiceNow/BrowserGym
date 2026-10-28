@@ -5,6 +5,7 @@ import json
 import numpy as np
 
 from .evaluate_utils.evaluate_factory import get_evaluator
+from .evaluate_utils.utils import _fix_comma
 
 
 def find_isnan(samp):
@@ -60,7 +61,8 @@ def fix_number(number):
             " ".join(" ".join(copy_ans.split("$")).split("%")).split("sqft")
         ).strip()
         copy_ans = copy_ans.strip()
-        copy_ans = copy_ans.replace(",", ".").replace(" square kilometers", "")
+        copy_ans = copy_ans.replace(" square kilometers", "")
+        copy_ans = _fix_comma(copy_ans)
         try:
             return float(copy_ans), True
         except:

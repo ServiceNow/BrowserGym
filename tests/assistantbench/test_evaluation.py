@@ -53,6 +53,36 @@ def test_evaluate(original_id: str):
 
 
 @pytest.mark.parametrize(
+    "prediction, gold_answer, expected_score",
+    [
+        # US thousands separators must be removed before parsing (#404)
+        ("3,080,000", "3080000", 1.0),
+        ("1,000", "1000", 1.0),
+        # European decimal commas must keep scoring 1.0
+        ("14,2", "14.2", 1.0),
+        # 1000x errors must no longer score 1.0 (#404)
+        ("1,000", "1", 0.0),
+        ("1,010", "1.01", 0.0),
+    ],
+)
+def test_evaluate_comma_numbers(prediction, gold_answer, expected_score):
+
+    score, _ = question_scorer(prediction, gold_answer)
+
+    assert score == expected_score
+
+
+def test_evaluate_comma_numbers_in_dicts():
+
+    prediction = '[{"sender": "DHL", "price": "1,000"}]'
+    gold_answer = '{"sender": "DHL", "price": 1000}'
+
+    score, _ = question_scorer(prediction, gold_answer)
+
+    assert score == 1.0
+
+
+@pytest.mark.parametrize(
     "original_id",
     [id for id in data_points.keys() if isinstance(data_points[id]["answer"], (str, float, int))],
 )
