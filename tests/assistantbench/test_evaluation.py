@@ -1,3 +1,5 @@
+"""Tests for AssistantBench evaluation utilities (issue #404: comma disambiguation)."""
+
 import json
 import pathlib
 
