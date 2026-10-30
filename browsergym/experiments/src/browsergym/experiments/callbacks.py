@@ -111,6 +111,23 @@ class AbstractCallback(ABC):
         """
 
 
+class EpisodeAbortedError(RuntimeError):
+    """Base exception raised by guardrail callbacks wishing to abort an episode.
+
+    Unlike general monitoring exceptions which are swallowed by :class:`CallbackList`,
+    exceptions inheriting from this class are re-raised so that ``ExpArgs.run()``
+    safely halts the episode and saves summary info.
+    """
+
+
+class BudgetExceededError(EpisodeAbortedError):
+    """Raised by :class:`BudgetLimitCallback` when the token budget is breached.
+
+    Caught by ``ExpArgs.run()``'s generic ``except Exception`` handler, which
+    records it as ``err_msg`` and proceeds to clean up gracefully.
+    """
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CallbackList — internal dispatcher
 # ─────────────────────────────────────────────────────────────────────────────
@@ -120,9 +137,11 @@ class CallbackList:
     """Fan-out dispatcher that broadcasts every lifecycle event to a list of
     :class:`AbstractCallback` instances in registration order.
 
-    **Fail-safe**: exceptions raised inside any individual callback are caught,
-    logged as a warning, and execution continues.  A misbehaving monitoring
-    callback will never crash or corrupt a running benchmark.
+    **Fail-safe**: exceptions raised inside any individual monitoring callback
+    are caught, logged as a warning, and execution continues.  A misbehaving
+    monitoring callback will never crash or corrupt a running benchmark.
+    Guardrail exceptions (:class:`EpisodeAbortedError`) are propagated so that
+    budget limits and abort conditions take effect immediately.
     """
 
     def __init__(self, callbacks: list[AbstractCallback]) -> None:
@@ -137,6 +156,8 @@ class CallbackList:
         for cb in self._callbacks:
             try:
                 getattr(cb, method_name)(*args, **kwargs)
+            except EpisodeAbortedError:
+                raise
             except Exception as exc:  # noqa: BLE001
                 logger.warning(
                     "Callback %s.%s raised an exception (ignored): %s",
@@ -299,7 +320,24 @@ class ConsoleProgressCallback(AbstractCallback):
         """Write to stderr so progress lines don't pollute captured stdout."""
         import sys
 
-        print(msg, end=end, file=sys.stderr, flush=True)
+        try:
+            print(msg, end=end, file=sys.stderr, flush=True)
+        except UnicodeEncodeError:
+            # Fallback for Windows consoles using non-UTF8 charmaps (e.g. cp1252)
+            safe_text = (msg + end).encode(
+                getattr(sys.stderr, "encoding", "ascii") or "ascii",
+                errors="replace",
+            )
+            if hasattr(sys.stderr, "buffer"):
+                sys.stderr.buffer.write(safe_text)
+                sys.stderr.buffer.flush()
+            else:
+                print(
+                    msg.encode("ascii", "replace").decode("ascii"),
+                    end=end,
+                    file=sys.stderr,
+                    flush=True,
+                )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -369,9 +407,522 @@ class BudgetLimitCallback(AbstractCallback):
             )
 
 
-class BudgetExceededError(RuntimeError):
-    """Raised by :class:`BudgetLimitCallback` when the token budget is breached.
+# ─────────────────────────────────────────────────────────────────────────────
+# Built-in callback: WandbCallback
+# ─────────────────────────────────────────────────────────────────────────────
 
-    Caught by ``ExpArgs.run()``'s generic ``except Exception`` handler, which
-    records it as ``err_msg`` and proceeds to clean up gracefully.
+
+class WandbCallback(AbstractCallback):
+    """Streams live BrowserGym experiment events to **Weights & Biases**.
+
+    Each step emits a ``wandb.log()`` call with step metrics (reward, tokens,
+    latency).  Experiment metadata is stored as W&B *config* at start time, and
+    a run summary is written at the end.
+
+    **Optional dependency** — ``wandb`` is NOT a hard requirement of
+    BrowserGym.  If it is not installed, constructing this callback raises an
+    :class:`ImportError` with a clear installation hint rather than failing
+    silently at runtime.
+
+    Typical usage::
+
+        from browsergym.experiments.callbacks import WandbCallback
+
+        exp_args = ExpArgs(
+            agent_args=...,
+            env_args=...,
+            callbacks=[
+                WandbCallback(
+                    project="browsergym-evals",
+                    entity="my-lab",             # optional W&B team name
+                    tags=["gpt-4o", "webarena"],
+                ),
+            ],
+        )
+
+    Args:
+        project: W&B project name.  Defaults to ``"browsergym"``.
+        entity: W&B entity (username or team).  ``None`` uses the default
+            entity configured in your W&B account.
+        name: Human-readable run name.  When ``None``, auto-generated from
+            ``<agent>_on_<task>`` at experiment start.
+        tags: List of string tags attached to the run.
+        group: W&B run group (useful for grouping benchmark sweeps).
+        notes: Free-text notes stored on the W&B run.
+        log_step_metrics: When ``True`` (default), calls ``wandb.log()`` with
+            per-step metrics after every step.
+        reinit: Passed directly to ``wandb.init(reinit=...)``.  Set to
+            ``True`` if running multiple experiments sequentially in the same
+            process.
     """
+
+    def __init__(
+        self,
+        project: str = "browsergym",
+        entity: Optional[str] = None,
+        name: Optional[str] = None,
+        tags: Optional[list[str]] = None,
+        group: Optional[str] = None,
+        notes: Optional[str] = None,
+        log_step_metrics: bool = True,
+        reinit: bool = True,
+    ) -> None:
+        try:
+            import wandb  # noqa: F401
+        except ImportError as exc:
+            raise ImportError(
+                "WandbCallback requires the 'wandb' package. " "Install it with: pip install wandb"
+            ) from exc
+
+        self._project = project
+        self._entity = entity
+        self._name = name
+        self._tags = tags or []
+        self._group = group
+        self._notes = notes
+        self._log_step_metrics = log_step_metrics
+        self._reinit = reinit
+
+        self._run = None
+        self._step_start_time: float = 0.0
+        self._exp_start_time: float = 0.0
+        self._cumulative_reward: float = 0.0
+        self._cumulative_tokens: int = 0
+
+    # ------------------------------------------------------------------
+    # Lifecycle hooks
+    # ------------------------------------------------------------------
+
+    def on_exp_start(self, exp_args: "ExpArgs") -> None:
+        import wandb
+
+        self._exp_start_time = time.monotonic()
+        self._cumulative_reward = 0.0
+        self._cumulative_tokens = 0
+
+        run_name = self._name or (
+            f"{getattr(exp_args.agent_args, 'agent_name', 'agent')}"
+            f"_on_{exp_args.env_args.task_name}"
+        )
+
+        config = {
+            "agent_name": getattr(exp_args.agent_args, "agent_name", None),
+            "task_name": exp_args.env_args.task_name,
+            "task_seed": getattr(exp_args.env_args, "task_seed", None),
+            "max_steps": exp_args.env_args.max_steps,
+            "exp_id": getattr(exp_args, "exp_id", None),
+        }
+
+        self._run = wandb.init(
+            project=self._project,
+            entity=self._entity,
+            name=run_name,
+            tags=self._tags,
+            group=self._group,
+            notes=self._notes,
+            config=config,
+            reinit=self._reinit,
+        )
+        logger.info("WandbCallback: run started → %s", self._run.url)
+
+    def on_step_start(self, step: int) -> None:
+        self._step_start_time = time.monotonic()
+
+    def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
+        if not self._log_step_metrics or self._run is None:
+            return
+
+        import wandb
+
+        reward = step_info.reward or 0.0
+        self._cumulative_reward += reward
+
+        step_tokens: int = 0
+        if step_info.stats:
+            step_tokens = step_info.stats.get("n_token_agent_messages", 0) or 0
+        self._cumulative_tokens += step_tokens
+
+        step_elapsed = time.monotonic() - self._step_start_time
+        total_elapsed = time.monotonic() - self._exp_start_time
+
+        metrics = {
+            # Per-step raw values
+            "step/reward": reward,
+            "step/tokens": step_tokens,
+            "step/latency_sec": step_elapsed,
+            # Cumulative episode values
+            "episode/cumulative_reward": self._cumulative_reward,
+            "episode/cumulative_tokens": self._cumulative_tokens,
+            "episode/elapsed_sec": total_elapsed,
+            "episode/is_done": int(is_done),
+        }
+
+        # Forward any extra stats the agent/env reported
+        if step_info.stats:
+            for key, val in step_info.stats.items():
+                if isinstance(val, (int, float)) and key not in (
+                    "n_token_agent_messages",
+                    "step_elapsed",
+                    "agent_elapsed",
+                ):
+                    metrics[f"step/env_{key}"] = val
+
+        wandb.log(metrics, step=step_info.step)
+
+    def on_exp_end(self, exp_dir, err_msg: Optional[str] = None) -> None:
+        if self._run is None:
+            return
+
+        import wandb
+
+        summary = {
+            "final/cumulative_reward": self._cumulative_reward,
+            "final/cumulative_tokens": self._cumulative_tokens,
+            "final/total_elapsed_sec": time.monotonic() - self._exp_start_time,
+            "final/success": int(not bool(err_msg)),
+            "final/exp_dir": str(exp_dir),
+        }
+        if err_msg:
+            summary["final/error"] = err_msg
+
+        for key, val in summary.items():
+            self._run.summary[key] = val
+
+        self._run.finish(exit_code=1 if err_msg else 0)
+        logger.info("WandbCallback: run finished → %s", self._run.url)
+        self._run = None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Built-in callback: MLflowCallback
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class MLflowCallback(AbstractCallback):
+    """Streams live BrowserGym experiment events to **MLflow Tracking**.
+
+    Works with any MLflow backend — local filesystem, a self-hosted MLflow
+    server, or a managed service (Databricks, Azure ML, etc.).
+
+    **Optional dependency** — ``mlflow`` is NOT a hard requirement of
+    BrowserGym.  If it is not installed, constructing this callback raises an
+    :class:`ImportError` with a clear installation hint.
+
+    Typical usage::
+
+        from browsergym.experiments.callbacks import MLflowCallback
+
+        exp_args = ExpArgs(
+            agent_args=...,
+            env_args=...,
+            callbacks=[
+                MLflowCallback(
+                    experiment_name="browsergym-webarena",
+                    tracking_uri="http://localhost:5000",   # or omit for local
+                ),
+            ],
+        )
+
+    Args:
+        experiment_name: MLflow experiment name.  Created automatically if it
+            does not exist.  Defaults to ``"browsergym"``.
+        tracking_uri: URI of the MLflow tracking server.  ``None`` uses the
+            default (``MLFLOW_TRACKING_URI`` env var or ``./mlruns``).
+        run_name: Human-readable run name.  ``None`` auto-generates from
+            ``<agent>_on_<task>``.
+        tags: Dict of string key/value tags stored on the MLflow run.
+        log_step_metrics: When ``True`` (default), calls
+            ``mlflow.log_metrics()`` after every step.
+        nested: When ``True``, creates a *nested* run inside the active run
+            (useful when using MLflow Projects or when running inside a sweep).
+    """
+
+    def __init__(
+        self,
+        experiment_name: str = "browsergym",
+        tracking_uri: Optional[str] = None,
+        run_name: Optional[str] = None,
+        tags: Optional[dict[str, str]] = None,
+        log_step_metrics: bool = True,
+        nested: bool = False,
+    ) -> None:
+        try:
+            import mlflow  # noqa: F401
+        except ImportError as exc:
+            raise ImportError(
+                "MLflowCallback requires the 'mlflow' package. "
+                "Install it with: pip install mlflow"
+            ) from exc
+
+        self._experiment_name = experiment_name
+        self._tracking_uri = tracking_uri
+        self._run_name = run_name
+        self._tags = tags or {}
+        self._log_step_metrics = log_step_metrics
+        self._nested = nested
+
+        self._active_run = None
+        self._step_start_time: float = 0.0
+        self._exp_start_time: float = 0.0
+        self._cumulative_reward: float = 0.0
+        self._cumulative_tokens: int = 0
+
+    # ------------------------------------------------------------------
+    # Lifecycle hooks
+    # ------------------------------------------------------------------
+
+    def on_exp_start(self, exp_args: "ExpArgs") -> None:
+        import mlflow
+
+        self._exp_start_time = time.monotonic()
+        self._cumulative_reward = 0.0
+        self._cumulative_tokens = 0
+
+        if self._tracking_uri:
+            mlflow.set_tracking_uri(self._tracking_uri)
+
+        mlflow.set_experiment(self._experiment_name)
+
+        run_name = self._run_name or (
+            f"{getattr(exp_args.agent_args, 'agent_name', 'agent')}"
+            f"_on_{exp_args.env_args.task_name}"
+        )
+
+        tags = {
+            "agent_name": str(getattr(exp_args.agent_args, "agent_name", "")),
+            "task_name": str(exp_args.env_args.task_name),
+            **self._tags,
+        }
+
+        self._active_run = mlflow.start_run(
+            run_name=run_name,
+            tags=tags,
+            nested=self._nested,
+        )
+
+        # Store static params as MLflow params (not metrics — they are scalars logged once)
+        params = {
+            "agent_name": str(getattr(exp_args.agent_args, "agent_name", "")),
+            "task_name": str(exp_args.env_args.task_name),
+            "max_steps": str(exp_args.env_args.max_steps or ""),
+            "task_seed": str(getattr(exp_args.env_args, "task_seed", "") or ""),
+            "exp_id": str(getattr(exp_args, "exp_id", "") or ""),
+        }
+        mlflow.log_params(params)
+        logger.info("MLflowCallback: run started — id=%s", self._active_run.info.run_id)
+
+    def on_step_start(self, step: int) -> None:
+        self._step_start_time = time.monotonic()
+
+    def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
+        if not self._log_step_metrics or self._active_run is None:
+            return
+
+        import mlflow
+
+        reward = step_info.reward or 0.0
+        self._cumulative_reward += reward
+
+        step_tokens: int = 0
+        if step_info.stats:
+            step_tokens = step_info.stats.get("n_token_agent_messages", 0) or 0
+        self._cumulative_tokens += step_tokens
+
+        step_elapsed = time.monotonic() - self._step_start_time
+        total_elapsed = time.monotonic() - self._exp_start_time
+
+        metrics = {
+            "step_reward": reward,
+            "step_tokens": float(step_tokens),
+            "step_latency_sec": step_elapsed,
+            "episode_reward": self._cumulative_reward,
+            "episode_tokens": float(self._cumulative_tokens),
+            "episode_elapsed_sec": total_elapsed,
+        }
+
+        # Forward any extra numeric stats
+        if step_info.stats:
+            for key, val in step_info.stats.items():
+                if isinstance(val, (int, float)) and key not in (
+                    "n_token_agent_messages",
+                    "step_elapsed",
+                    "agent_elapsed",
+                ):
+                    metrics[f"env_{key}"] = float(val)
+
+        mlflow.log_metrics(metrics, step=step_info.step)
+
+    def on_exp_end(self, exp_dir, err_msg: Optional[str] = None) -> None:
+        if self._active_run is None:
+            return
+
+        import mlflow
+
+        final_metrics = {
+            "final_reward": self._cumulative_reward,
+            "final_tokens": float(self._cumulative_tokens),
+            "final_elapsed_sec": time.monotonic() - self._exp_start_time,
+            "success": 0.0 if err_msg else 1.0,
+        }
+        mlflow.log_metrics(final_metrics)
+        mlflow.log_param("exp_dir", str(exp_dir))
+
+        if err_msg:
+            mlflow.set_tag("error", err_msg[:250])  # MLflow tag max ~500 chars
+
+        mlflow.end_run(status="FAILED" if err_msg else "FINISHED")
+        logger.info(
+            "MLflowCallback: run finished — id=%s status=%s",
+            self._active_run.info.run_id,
+            "FAILED" if err_msg else "FINISHED",
+        )
+        self._active_run = None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Built-in callback: JsonlStreamCallback
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class JsonlStreamCallback(AbstractCallback):
+    """Emits structured **newline-delimited JSON** (JSONL) lifecycle events to
+    any writable stream (file, stdout, a named pipe, or a network socket).
+
+    This is the universal "glue" callback for custom web UIs and dashboards:
+
+    * A **Streamlit** or **Gradio** app can tail the JSONL file and redraw
+      charts on every new line.
+    * A **WebSocket server** (e.g. FastAPI + ``websockets``) can read from the
+      stream and push events to a browser in real time.
+    * Any **CI dashboard** that understands structured logs can parse the output
+      without additional adapters.
+
+    Every event is a JSON object with at minimum:
+
+    .. code-block:: json
+
+        {"event": "<name>", "ts": 1234567890.123, ...fields}
+
+    **No extra dependencies** — uses only Python's ``json`` and ``time`` stdlib.
+
+    Typical usage (write to a file that a web app tails)::
+
+        import sys
+        from browsergym.experiments.callbacks import JsonlStreamCallback
+
+        # Stream to a file
+        with open("events.jsonl", "w") as f:
+            exp_args = ExpArgs(
+                agent_args=...,
+                env_args=...,
+                callbacks=[JsonlStreamCallback(stream=f)],
+            )
+            exp_args.run()
+
+        # Or stream to stdout for piping / CI logs
+        exp_args = ExpArgs(
+            ...,
+            callbacks=[JsonlStreamCallback(stream=sys.stdout)],
+        )
+
+    Args:
+        stream: Any writable file-like object.  Defaults to ``sys.stdout``.
+        include_obs_keys: When provided, only these keys from
+            ``step_info.obs`` are included in the ``step_end`` event.  Pass
+            ``[]`` to omit observation data entirely (default).  Pass
+            ``["goal", "url"]`` to include just those fields.
+        flush: When ``True`` (default), calls ``stream.flush()`` after every
+            write so the consumer sees events immediately.
+    """
+
+    def __init__(
+        self,
+        stream=None,
+        include_obs_keys: Optional[list[str]] = None,
+        flush: bool = True,
+    ) -> None:
+        import sys
+
+        self._stream = stream if stream is not None else sys.stdout
+        self._include_obs_keys: list[str] = include_obs_keys if include_obs_keys is not None else []
+        self._flush = flush
+
+    # ------------------------------------------------------------------
+    # Internal helper
+    # ------------------------------------------------------------------
+
+    def _emit(self, event_name: str, payload: dict) -> None:
+        """Serialise *payload* as a JSONL line with event name and timestamp."""
+        import json
+
+        record = {"event": event_name, "ts": time.time(), **payload}
+        self._stream.write(json.dumps(record, default=str) + "\n")
+        if self._flush:
+            self._stream.flush()
+
+    # ------------------------------------------------------------------
+    # Lifecycle hooks
+    # ------------------------------------------------------------------
+
+    def on_exp_start(self, exp_args: "ExpArgs") -> None:
+        self._emit(
+            "exp_start",
+            {
+                "agent_name": getattr(exp_args.agent_args, "agent_name", None),
+                "task_name": exp_args.env_args.task_name,
+                "task_seed": getattr(exp_args.env_args, "task_seed", None),
+                "max_steps": exp_args.env_args.max_steps,
+                "exp_id": getattr(exp_args, "exp_id", None),
+                "exp_dir": str(getattr(exp_args, "exp_dir", "")),
+            },
+        )
+
+    def on_step_start(self, step: int) -> None:
+        self._emit("step_start", {"step": step})
+
+    def on_action_selected(self, step: int, action: Optional[str], agent_info: dict) -> None:
+        # Only include serialisable scalar fields from agent_info to keep the
+        # JSONL compact.  Complex objects (images, embeddings) are skipped.
+        safe_info = {
+            k: v
+            for k, v in agent_info.items()
+            if isinstance(v, (str, int, float, bool, type(None)))
+        }
+        self._emit(
+            "action_selected",
+            {
+                "step": step,
+                "action": action,
+                "agent_info": safe_info,
+            },
+        )
+
+    def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
+        payload: dict = {
+            "step": step_info.step,
+            "reward": step_info.reward,
+            "terminated": step_info.terminated,
+            "truncated": step_info.truncated,
+            "is_done": is_done,
+            "stats": step_info.stats,
+        }
+
+        # Optionally include selective observation fields
+        if self._include_obs_keys and step_info.obs:
+            payload["obs"] = {
+                k: step_info.obs[k]
+                for k in self._include_obs_keys
+                if k in step_info.obs and isinstance(step_info.obs[k], (str, int, float, bool))
+            }
+
+        self._emit("step_end", payload)
+
+    def on_exp_end(self, exp_dir, err_msg: Optional[str] = None) -> None:
+        self._emit(
+            "exp_end",
+            {
+                "exp_dir": str(exp_dir),
+                "success": err_msg is None,
+                "err_msg": err_msg,
+            },
+        )
