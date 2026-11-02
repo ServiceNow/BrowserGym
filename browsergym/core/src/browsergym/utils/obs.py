@@ -41,7 +41,7 @@ def flatten_dom_to_str(
     filter_with_bid_only: bool = False,
     filter_som_only: bool = False,
     coord_decimals: int = 0,
-    hide_bid_if_invisible: int = False,
+    hide_bid_if_invisible: bool = False,
     hide_all_bids: bool = False,
 ) -> str:
     """Formats a DOM snapshot into a string text"""
@@ -131,10 +131,14 @@ def flatten_dom_to_str(
                     filter_with_bid_only=filter_with_bid_only,
                     filter_som_only=filter_som_only,
                     coord_decimals=coord_decimals,
+                    hide_bid_if_invisible=hide_bid_if_invisible,
                 )
 
                 # insert extra attributes before regular attributes
                 attributes = extra_attributes_to_print + attributes
+
+                # a bid with no recorded visibility is kept, the way _process_bid keeps it
+                bid_visibility = (extra_properties or {}).get(bid, {}).get("visibility")
 
                 # insert bid as first attribute
                 if not (
@@ -142,7 +146,8 @@ def flatten_dom_to_str(
                     or bid is None
                     or (
                         hide_bid_if_invisible
-                        and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
+                        and bid_visibility is not None
+                        and bid_visibility < 0.5
                     )
                 ):
                     attributes.insert(0, f'bid="{bid}"')
@@ -205,6 +210,7 @@ def _process_bid(
     filter_with_bid_only: bool = False,
     filter_som_only: bool = False,
     coord_decimals: int = 0,
+    hide_bid_if_invisible: bool = False,
 ):
     """
     Process extra attributes and attribute-based filters, for the element with the given bid.
@@ -225,6 +231,7 @@ def _process_bid(
                 filter_visible_only,
                 filter_with_bid_only,
                 filter_som_only,
+                hide_bid_if_invisible,
             )
         ):
             raise ValueError("extra_properties argument required")
@@ -371,6 +378,7 @@ def flatten_axtree_to_str(
                     filter_with_bid_only=filter_with_bid_only,
                     filter_som_only=filter_som_only,
                     coord_decimals=coord_decimals,
+                    hide_bid_if_invisible=hide_bid_if_invisible,
                 )
 
                 # if either is True, skip the node
@@ -386,12 +394,16 @@ def flatten_axtree_to_str(
                 else:
                     node_str = f"{node_role} {repr(node_name.strip())}"
 
+                # a bid with no recorded visibility is kept, the way _process_bid keeps it
+                bid_visibility = (extra_properties or {}).get(bid, {}).get("visibility")
+
                 if not (
                     hide_all_bids
                     or bid is None
                     or (
                         hide_bid_if_invisible
-                        and extra_properties.get(bid, {}).get("visibility", 0) < 0.5
+                        and bid_visibility is not None
+                        and bid_visibility < 0.5
                     )
                 ):
                     node_str = f"[{bid}] " + node_str
