@@ -31,6 +31,8 @@ def calc_recall(pred: Dict, gold: Dict, use_gold_for_eval: bool):
                 recall.append(0)
                 continue
             recall.append(evaluator(pred_value, gold_value))
+    if not recall:
+        return 0
     avg_recall = np.average(recall)
     return avg_recall
 
@@ -62,7 +64,7 @@ def evaluate_pair_of_dicts(pred: Dict, gold: Dict):
 
 
 def evaluate_dicts(pred: List[Dict], gold: List[Dict]):
-    if not (type(pred) == dict or len(pred) == 0 or (type(pred) == list and type(pred[0]) == dict)):
+    if not (type(pred) == dict or len(pred) == 0 or (type(pred) == list and all(type(p) == dict for p in pred))):
         return 0
     max_alignment_scores = _align_bags(pred, gold, evaluate_pair_of_dicts)
     return np.average(max_alignment_scores)

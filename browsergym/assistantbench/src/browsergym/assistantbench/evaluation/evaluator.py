@@ -114,12 +114,12 @@ def question_scorer(prediction, gold_answer):
     prediction, run_eval = fix_prediction(prediction, gold_answer, evaluator)
 
     has_ans = 1.0
-    if (type(prediction) != float and len(prediction) == 0) or find_isnan(prediction):
+    if (hasattr(prediction, "__len__") and len(prediction) == 0) or find_isnan(prediction):
         has_ans = 0.0
 
     if type(prediction) == list:
         if all(
-            (type(pred) not in {float, int} and len(pred) == 0) or find_isnan(pred)
+            (hasattr(pred, "__len__") and len(pred) == 0) or find_isnan(pred)
             for pred in prediction
         ):
             has_ans = 0
