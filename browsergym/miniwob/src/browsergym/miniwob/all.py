@@ -411,6 +411,7 @@ class EnterTimeTask(AbstractMiniwobTask):
 class FindGreatestTask(AbstractMiniwobTask):
     desc = "Find the card with the greatest number."
     subdomain = "find-greatest"
+    success_threshold = 0.5
 
 
 class FindMidpointTask(AbstractMiniwobTask):
