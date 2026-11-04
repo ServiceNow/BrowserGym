@@ -5,6 +5,7 @@ import json
 import numpy as np
 
 from .evaluate_utils.evaluate_factory import get_evaluator
+from .evaluate_utils.utils import _fix_comma
 
 
 def find_isnan(samp):
@@ -60,10 +61,11 @@ def fix_number(number):
             " ".join(" ".join(copy_ans.split("$")).split("%")).split("sqft")
         ).strip()
         copy_ans = copy_ans.strip()
-        copy_ans = copy_ans.replace(",", ".").replace(" square kilometers", "")
+        copy_ans = copy_ans.replace(" square kilometers", "")
+        copy_ans = _fix_comma(copy_ans)
         try:
             return float(copy_ans), True
-        except:
+        except (ValueError, TypeError):
             return number, False
     elif type(number) == int:
         return float(number), True
@@ -102,7 +104,7 @@ def fix_prediction(prediction, gold_answer, evaluator):
 def question_scorer(prediction, gold_answer):
     try:
         prediction = json.loads(prediction)
-    except:
+    except (json.JSONDecodeError, TypeError, ValueError):
         prediction = prediction
 
     answer_list = (
