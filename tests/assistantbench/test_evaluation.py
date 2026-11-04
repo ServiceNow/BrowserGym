@@ -32,7 +32,9 @@ with open(file_path, "r") as f:
         has_ans = data_point["has_ans"]
 
         data_points[original_id] = {
-            "task_id": task_list_from_metadata(metadata, {"original_id": original_id})[0],
+            "task_id": task_list_from_metadata(metadata, {"original_id": original_id})[
+                0
+            ],
             "answer": answer,
             "gold_answer": gold_answer,
             "score": score,
@@ -116,7 +118,9 @@ def test_fix_comma(number_str: str, expected: str):
         ("3080000", "3080000", 1.0),
     ],
 )
-def test_evaluate_comma_numbers(prediction: str, gold_answer: str, expected_score: float):
+def test_evaluate_comma_numbers(
+    prediction: str, gold_answer: str, expected_score: float
+):
     """End-to-end question_scorer test for comma-formatted numeric answers."""
     score, _ = question_scorer(prediction, gold_answer)
     assert score == expected_score, (
@@ -150,7 +154,11 @@ def test_evaluate_comma_numbers_negative():
 
 @pytest.mark.parametrize(
     "original_id",
-    [id for id in data_points.keys() if isinstance(data_points[id]["answer"], (str, float, int))],
+    [
+        id
+        for id in data_points.keys()
+        if isinstance(data_points[id]["answer"], (str, float, int))
+    ],
 )
 @pytest.mark.slow
 def test_evaluate_within_env(original_id: str):
@@ -165,7 +173,9 @@ def test_evaluate_within_env(original_id: str):
     obs, info = env.reset()
     assert not obs["last_action_error"]
 
-    obs, reward, terminated, truncated, info = env.step(f"send_msg_to_user({repr(str(answer))})")
+    obs, reward, terminated, truncated, info = env.step(
+        f"send_msg_to_user({repr(str(answer))})"
+    )
     assert not obs["last_action_error"]
     assert terminated
     assert reward == expected_score
