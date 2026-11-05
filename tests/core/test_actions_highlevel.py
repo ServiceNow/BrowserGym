@@ -110,6 +110,52 @@ def test_action_parser():
     ]
 
 
+def _custom_click_twice(bid: str, times: int = 2):
+    """
+    Clicks an element several times.
+
+    Examples:
+        _custom_click_twice('a51', 3)
+    """
+    pass
+
+
+def click(bid: str, note: str = ""):
+    """
+    A custom action that reuses the name of a built-in action.
+
+    Examples:
+        click('a51', 'submit')
+    """
+    pass
+
+
+def test_tool_description_custom_actions():
+    action_set = HighLevelActionSet(subsets=["custom"], custom_actions=[_custom_click_twice])
+    tools = {tool["name"]: tool for tool in action_set.to_tool_description()}
+    assert set(tools) == {"noop", "_custom_click_twice"}
+    assert tools["_custom_click_twice"]["parameters"] == {
+        "type": "object",
+        "properties": {
+            "bid": {"type": "string"},
+            "times": {"type": "number", "default": 2},
+        },
+        "required": ["bid"],
+    }
+
+    # a custom action named like a built-in one must be described with its own signature
+    action_set = HighLevelActionSet(subsets=["custom"], custom_actions=[click])
+    tools = {tool["name"]: tool for tool in action_set.to_tool_description(api="anthropic")}
+    assert tools["click"]["input_schema"] == {
+        "type": "object",
+        "properties": {
+            "bid": {"type": "string"},
+            "note": {"type": "string", "default": ""},
+        },
+        "required": ["bid"],
+    }
+
+
 def test_valid_action():
     action_set = HighLevelActionSet()
 
