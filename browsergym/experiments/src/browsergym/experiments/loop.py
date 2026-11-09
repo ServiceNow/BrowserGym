@@ -28,6 +28,7 @@ from browsergym.core.action.parsers import highlevel_action_parser
 from browsergym.core.chat import Chat
 
 from .agent import Agent
+from .callbacks import AbstractCallback, CallbackList
 from .utils import count_messages_token, count_tokens
 
 logger = logging.getLogger(__name__)
@@ -334,6 +335,8 @@ class ExpArgs:
     depends_on: tuple[str] = ()
     save_screenshot: bool = True
     save_som: bool = False
+    # Callback system -- zero overhead when empty (default).
+    callbacks: list = field(default_factory=list)
 
     def make_id(self):
         """Create a unique id for the experiment."""
@@ -386,6 +389,9 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
+        # Build the callback dispatcher (no-op when callbacks=[]).
+        _cbs = CallbackList(self.callbacks)
+
         # start writing logs to run logfile
         self._set_logger()
 
@@ -396,6 +402,7 @@ class ExpArgs:
         env, step_info, err_msg, stack_trace = None, None, None, None
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
+            _cbs.on_exp_start(self)
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
 
@@ -415,8 +422,10 @@ class ExpArgs:
 
             while not step_info.is_done:  # set a limit
                 logger.debug(f"Starting step {step_info.step}.")
+                _cbs.on_step_start(step_info.step)
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
+                _cbs.on_action_selected(step_info.step, action, step_info.agent_info.copy())
 
                 if action is None:
                     # will end the episode after saving the step info.
@@ -426,6 +435,7 @@ class ExpArgs:
                     self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
                 )
                 logger.debug(f"Step info saved.")
+                _cbs.on_step_end(step_info, is_done=step_info.is_done)
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
@@ -482,6 +492,10 @@ class ExpArgs:
                 self._unset_logger()  # stop writing logs to run logfile
             except Exception as e:
                 logger.error(f"Error while unsetting the logger in the finally block: {e}")
+            try:
+                _cbs.on_exp_end(self.exp_dir, err_msg)
+            except Exception as e:
+                logger.error(f"Error while firing on_exp_end callbacks: {e}")
 
     def _set_logger(self):
         # output logging traces to a log file
