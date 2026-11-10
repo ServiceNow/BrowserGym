@@ -267,8 +267,12 @@ class HTMLContentEvaluator(Evaluator):
 
             locator: str = target["locator"]  # js element locator
 
-            # navigate to that url
+            # navigate to that url, in a new tab so the agent's page is left untouched
+            # (validate() runs after every step, not only at the end of the episode)
+            prev_page = None
             if target_url != "last":
+                prev_page = page
+                page = page.context.new_page()
                 page.goto(target_url)
                 try:
                     # networkidle avoids evaluating while the page is still loading resources.
@@ -315,6 +319,11 @@ class HTMLContentEvaluator(Evaluator):
                 selected_element = eval(func)
             else:
                 raise ValueError(f"Unknown locator: {locator}")
+
+            # close the evaluation tab and go back to the agent's page
+            if prev_page is not None:
+                page.close()
+                page = prev_page
 
             # If the selected element is None, then the page is wrong
             if selected_element is None:
