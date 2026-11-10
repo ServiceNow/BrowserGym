@@ -11,8 +11,11 @@ from browsergym.core.action.base import AbstractActionSet
 from browsergym.experiments.agent import Agent
 from browsergym.experiments.benchmark import Benchmark, HighLevelActionSetArgs
 from browsergym.experiments.benchmark.configs import DEFAULT_BENCHMARKS
-from browsergym.experiments.benchmark.utils import make_env_args_list_from_fixed_seeds
-from browsergym.experiments.loop import AbstractAgentArgs, ExpArgs, get_exp_result
+from browsergym.experiments.benchmark.utils import (
+    make_env_args_list_from_fixed_seeds,
+    make_env_args_list_from_repeat_tasks,
+)
+from browsergym.experiments.loop import SEED_MAX, AbstractAgentArgs, ExpArgs, get_exp_result
 from browsergym.utils.obs import flatten_axtree_to_str
 
 
@@ -354,3 +357,17 @@ def test_dependency_graphs():
     assert [{k: set(v) for k, v in deps.items()} for deps in env_args_dependencies] == [
         {k: set(v) for k, v in {0: [], 1: [], 2: [1], 3: [0, 2], 4: [3], 5: [3, 4]}.items()}
     ]
+
+
+def test_repeat_tasks_seeds_cover_full_range():
+    # regression: SEED_MAX used to be `2 ^ 32` (XOR, == 34), so repeated seeds were common
+    assert SEED_MAX == 2**32
+    env_args_list = make_env_args_list_from_repeat_tasks(
+        task_list=["miniwob.click-test"],
+        max_steps=5,
+        n_repeats=1000,
+        seeds_rng=np.random.RandomState(42),
+    )
+    seeds = [env_args.task_seed for env_args in env_args_list]
+    assert len(set(seeds)) == len(seeds)
+    assert all(isinstance(seed, int) and 0 <= seed < SEED_MAX for seed in seeds)

@@ -32,7 +32,7 @@ from .utils import count_messages_token, count_tokens
 
 logger = logging.getLogger(__name__)
 
-SEED_MAX = 2 ^ 32  # arbitrary max value (exclusive), seems large enough
+SEED_MAX = 2**32  # max value (exclusive), matches the range accepted by np.random.RandomState
 
 
 @dataclass
@@ -346,7 +346,7 @@ class ExpArgs:
         This enables inspecting experiments that are not run yet.
         """
         if self.env_args.task_seed is None:
-            self.env_args.task_seed = np.random.randint(0, SEED_MAX)
+            self.env_args.task_seed = int(np.random.randint(0, SEED_MAX, dtype=np.int64))
 
         if self.exp_name is None:
             task_name = self.env_args.task_name

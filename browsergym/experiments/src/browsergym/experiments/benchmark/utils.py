@@ -59,7 +59,7 @@ def make_env_args_list_from_repeat_tasks(
     """
     env_args_list = []
     for task in task_list:
-        for seed in seeds_rng.randint(low=0, high=SEED_MAX, size=n_repeats):
+        for seed in seeds_rng.randint(low=0, high=SEED_MAX, size=n_repeats, dtype=np.int64):
             env_args_list.append(
                 EnvArgs(
                     task_name=task,
