@@ -192,7 +192,8 @@ class StepInfo:
 
         self.task_info = env_info.get("task_info", None)
 
-        self.raw_reward = env_info.get("RAW_REWARD_GLOBAL", None)
+        # task-specific info (e.g. MiniWoB's RAW_REWARD_GLOBAL) is nested under "task_info"
+        self.raw_reward = (self.task_info or {}).get("RAW_REWARD_GLOBAL", None)
 
         t.action_exec_start = env_info["action_exec_start"]  # start
         t.action_exect_after_timeout = env_info["action_exec_stop"]

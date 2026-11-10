@@ -59,6 +59,10 @@ def test_run_exp():
 
         assert len(exp_result.steps_info) == 2
 
+        # MiniWoB's raw reward is reported by the env under info["task_info"]
+        assert exp_result.steps_info[-1].raw_reward == 1
+        assert exp_record["cum_raw_reward"] == 1
+
         for key, target_val in target.items():
             assert key in exp_record
             assert exp_record[key] == target_val
