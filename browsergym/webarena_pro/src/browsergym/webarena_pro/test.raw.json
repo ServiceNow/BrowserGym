@@ -1,0 +1,175 @@
+[
+  {
+    "task_id": 0,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Find the most recent message in the deployments channel of the Engineering team and tell me who posted it.",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["bob.wilson"]
+      }
+    }
+  },
+  {
+    "task_id": 1,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "How many public channels are there in the Engineering team?",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["8"]
+      }
+    }
+  },
+  {
+    "task_id": 2,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Post the message 'Weekly sync moved to Thursday 3pm' in the announcements channel of the TechCorp General team.",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 3,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Send a direct message to jane.smith saying 'Can you review PR #42 when you get a chance?'",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 4,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Create a new public channel called 'project-gamma' in the Engineering team with the purpose 'Tracking Project Gamma milestones'.",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 5,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Find all pinned posts in the announcements channel and tell me how many there are.",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["1"]
+      }
+    }
+  },
+  {
+    "task_id": 6,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Who is the DevOps Engineer in the Engineering team? Find their username.",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["bob.wilson"]
+      }
+    }
+  },
+  {
+    "task_id": 7,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Search for messages mentioning 'Safari' across all channels and tell me which channel has the discussion about a Safari bug.",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["bugs-and-issues"]
+      }
+    }
+  },
+  {
+    "task_id": 8,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "Reply to the most recent message in the standup-notes channel with 'Looks good, thanks for the update!'",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 9,
+    "sites": ["mattermost"],
+    "start_url": "__MATTERMOST__",
+    "intent": "List all members of the Marketing team and tell me how many there are.",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["5"]
+      }
+    }
+  },
+  {
+    "task_id": 10,
+    "sites": ["mattermost"],
+    "requires_audio": true,
+    "start_url": "__MATTERMOST__/engineering/channels/town-square",
+    "intent": "Listen to the first voice message (audio attachment) in the Town Square channel of the Engineering team. What day and time is the deployment scheduled for?",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["Friday", "3"]
+      }
+    }
+  },
+  {
+    "task_id": 11,
+    "sites": ["mattermost"],
+    "requires_audio": true,
+    "start_url": "__MATTERMOST__/engineering/channels/town-square",
+    "intent": "Listen to the second voice message (audio attachment) in the Town Square channel of the Engineering team. Which project does the sender need help reviewing?",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["Alpha"]
+      }
+    }
+  },
+  {
+    "task_id": 12,
+    "sites": ["mattermost"],
+    "requires_audio": true,
+    "start_url": "__MATTERMOST__/engineering/channels/town-square",
+    "intent": "Listen to the second voice message in the Town Square channel of the Engineering team. The sender is asking for a review. Navigate to the channel that matches the project mentioned in the voice message and post: 'I can review the API changes today.'",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 13,
+    "sites": ["mattermost"],
+    "requires_audio": true,
+    "start_url": "__MATTERMOST__/engineering/channels/town-square",
+    "intent": "Listen to the first voice message in the Town Square channel of the Engineering team. Based on what you hear, post a summary of the deadline in the Deployments channel. Format: 'Reminder: [what was said about the deadline]'",
+    "eval": {
+      "eval_types": ["manual"],
+      "reference_answers": {}
+    }
+  },
+  {
+    "task_id": 14,
+    "sites": ["mattermost"],
+    "requires_audio": true,
+    "start_url": "__MATTERMOST__/engineering/channels/town-square",
+    "intent": "Watch the video posted in the Town Square channel of the Engineering team. What are the two text messages shown in the video?",
+    "eval": {
+      "eval_types": ["string_match"],
+      "reference_answers": {
+        "must_include": ["Project Alpha", "Friday"]
+      }
+    }
+  }
+]
