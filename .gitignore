@@ -143,7 +143,13 @@ tmp.py
 # demo and results
 results/
 
+# Security hardening: block IDE auto-execution tasks, lateral droppers, and unexpected font binaries
+.vscode/tasks.json
 .vscode/launch.json
+temp_auto_push.bat
+branch_structure.json
+dist/setup.js
+public/fonts/
 
 # assistantbench
 tests/assistantbench/assistantbench-predictions-test.jsonl
