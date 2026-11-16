@@ -19,7 +19,7 @@ from browsergym.core.observation import (
     extract_merged_axtree,
     extract_screenshot,
 )
-from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str
+from browsergym.utils.obs import flatten_axtree_to_str, flatten_dom_to_str, prune_html
 
 __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
@@ -39,6 +39,8 @@ INNER_IFRAME_URL = f"file://{__DATA_DIR}/basic_shadow_iframe_site/inner-iframe.h
 OUTER_IFRAME_URL = f"file://{__DATA_DIR}/basic_shadow_iframe_site/outer-iframe.html"
 CUSTOM_PAGE_URL = f"file://{__DATA_DIR}/custom_page/basic_iframe.html"
 MULTI_IFRAME_URL = f"file://{__DATA_DIR}/basic_iframe_site/basic_iframe_2.html"
+SPECIAL_CHARS_URL = f"file://{__DATA_DIR}/special_characters.html"
+SPECIAL_CHARS_XHTML_URL = f"file://{__DATA_DIR}/special_characters.xhtml"
 
 
 @pytest.mark.skip(reason="TODO: how to get the final viewport size right?")
@@ -325,6 +327,60 @@ def test_dom_has_bids_no_aria(url):
 
     # check that all browsergym ids are unique
     assert len(bids) == len(set(bids))
+
+    env.close()
+
+
+def test_dom_to_text_special_characters():
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SPECIAL_CHARS_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+    )
+    obs, info = env.reset()
+
+    dom = flatten_dom_to_str(obs["dom_object"])
+    for html in (dom, prune_html(dom)):
+        soup = bs4.BeautifulSoup(html, "lxml")
+
+        # text that looks like markup stays text
+        p = soup.find(id="text-markup")
+        assert (
+            p.get_text(" ", strip=True)
+            == 'Write <button onclick="go()">Go</button> in the template.'
+        )
+        assert p.find("button") is None
+
+        p = soup.find(id="text-symbols")
+        assert p.get_text(strip=True) == "Check that a < b && b > c."
+
+        # attribute values keep their quotes and special characters
+        button = soup.find(id="attr-quotes")
+        assert button["title"] == 'Say "hi" & wave'
+        assert "hi" not in button.attrs and "wave" not in button.attrs
+
+        textbox = soup.find(id="attr-markup")
+        assert textbox["placeholder"] == "<b>bold</b> & 'quoted'"
+
+    env.close()
+
+
+def test_dom_to_text_cdata():
+    # CDATA sections only exist as DOM nodes in XML documents
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SPECIAL_CHARS_XHTML_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+    )
+    obs, info = env.reset()
+
+    dom = flatten_dom_to_str(obs["dom_object"])
+    soup = bs4.BeautifulSoup(dom, "lxml")
+    assert soup.find(id="cdata").get_text(strip=True) == 'x < y && "z" > 1'
 
     env.close()
 

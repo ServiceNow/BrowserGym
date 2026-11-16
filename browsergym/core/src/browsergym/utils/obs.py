@@ -1,4 +1,5 @@
 import ast
+import html as html_lib
 import logging
 import math
 import re
@@ -77,14 +78,16 @@ def flatten_dom_to_str(
             skip_node = False
 
             # text nodes: print text content only if parent was not skipped
+            # (escaped, so that text which looks like markup is not parsed as markup)
             if node_type == 3:  # node_name == "#text"
                 if not parent_node_skipped and node_value is not None:
-                    html_before += node_value
+                    html_before += html_lib.escape(node_value, quote=False)
 
-            # CData nodes: print content only if parent was not skipped
+            # CData nodes: print content as escaped text only if parent was not skipped
+            # (the HTML parser used below does not support CDATA sections)
             elif node_type == 4:  # node_name == "#cdata-section":
                 if not parent_node_skipped and node_value is not None:
-                    html_before += f"<!CDATA[[{node_value}]]>"
+                    html_before += html_lib.escape(node_value, quote=False)
 
             # processing instructions, comments, documents, doctypes, document fragments: don't print
             elif node_type in (7, 8, 9, 10, 11):
@@ -117,7 +120,7 @@ def flatten_dom_to_str(
                             attributes.append(f"{attr_name}")
                         else:
                             # attribute value present
-                            attributes.append(f'{attr_name}="{attr_value}"')
+                            attributes.append(f'{attr_name}="{html_lib.escape(attr_value)}"')
 
                 skip_node, extra_attributes_to_print = _process_bid(
                     bid,
