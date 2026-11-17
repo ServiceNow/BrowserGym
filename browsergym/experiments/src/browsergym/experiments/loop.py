@@ -435,13 +435,13 @@ class ExpArgs:
                     self.exp_dir, save_screenshot=self.save_screenshot, save_som=self.save_som
                 )
                 logger.debug(f"Step info saved.")
-                _cbs.on_step_end(step_info, is_done=step_info.is_done)
 
                 _send_chat_info(env.unwrapped.chat, action, step_info.agent_info)
                 logger.debug(f"Chat info sent.")
 
                 if action is None:
                     logger.debug(f"Agent returned None action. Ending episode.")
+                    _cbs.on_step_end(step_info, is_done=True)
                     break
 
                 step_info = StepInfo(step=step_info.step + 1)
@@ -450,6 +450,7 @@ class ExpArgs:
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
+                _cbs.on_step_end(step_info, is_done=step_info.is_done)
 
         except Exception as e:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"

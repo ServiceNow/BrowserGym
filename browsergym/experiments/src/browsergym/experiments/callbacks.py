@@ -145,7 +145,7 @@ class CallbackList:
     """
 
     def __init__(self, callbacks: list[AbstractCallback]) -> None:
-        self._callbacks: list[AbstractCallback] = list(callbacks)
+        self._callbacks: list[AbstractCallback] = list(callbacks) if callbacks is not None else []
 
     # ------------------------------------------------------------------
     # Internal helper
@@ -381,13 +381,13 @@ class BudgetLimitCallback(AbstractCallback):
         self._warned = False
 
     def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
-        if is_done:
-            return  # episode already ending; no need to enforce budget.
-
         step_tokens: int = 0
         if step_info.stats:
             step_tokens = step_info.stats.get("n_token_agent_messages", 0) or 0
         self._cumulative_tokens += step_tokens
+
+        if is_done:
+            return  # episode already ending; no need to enforce budget.
 
         # Warn once when approaching the limit.
         if not self._warned and self._cumulative_tokens >= self._warn_threshold:
@@ -579,7 +579,7 @@ class WandbCallback(AbstractCallback):
             "final/cumulative_reward": self._cumulative_reward,
             "final/cumulative_tokens": self._cumulative_tokens,
             "final/total_elapsed_sec": time.monotonic() - self._exp_start_time,
-            "final/success": int(not bool(err_msg)),
+            "final/success": int(not bool(err_msg) and self._cumulative_reward > 0.0),
             "final/exp_dir": str(exp_dir),
         }
         if err_msg:
@@ -762,7 +762,7 @@ class MLflowCallback(AbstractCallback):
             "final_reward": self._cumulative_reward,
             "final_tokens": float(self._cumulative_tokens),
             "final_elapsed_sec": time.monotonic() - self._exp_start_time,
-            "success": 0.0 if err_msg else 1.0,
+            "success": 1.0 if (not err_msg and self._cumulative_reward > 0.0) else 0.0,
         }
         mlflow.log_metrics(final_metrics)
         mlflow.log_param("exp_dir", str(exp_dir))

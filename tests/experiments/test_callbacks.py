@@ -367,3 +367,96 @@ class TestExpArgsCallbacksField:
         )
         assert len(exp.callbacks) == 1
         assert isinstance(exp.callbacks[0], ConsoleProgressCallback)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Unit: CallbackList(None) must not raise TypeError
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestCallbackListNoneGraceful:
+    def test_callback_list_accepts_none(self):
+        """CallbackList(None) should produce an empty list, not raise TypeError."""
+        cb_list = CallbackList(None)
+        cb_list.on_step_start(0)
+
+    def test_callback_list_accepts_empty_list(self):
+        cb_list = CallbackList([])
+        cb_list.on_step_start(0)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Unit: BudgetLimitCallback accumulates tokens on terminal step
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestBudgetLimitCallbackTerminalAccumulation:
+    def test_terminal_step_tokens_are_accumulated(self):
+        """Tokens from the final step (is_done=True) must be counted in
+        _cumulative_tokens even though the budget guard is not enforced."""
+        cb = BudgetLimitCallback(max_tokens=10_000)
+        cb.on_exp_start(_make_exp_args())
+
+        cb.on_step_end(_make_step_info(step=0, tokens=100), is_done=False)
+        assert cb._cumulative_tokens == 100
+
+        # Terminal step: tokens must still accumulate
+        cb.on_step_end(_make_step_info(step=1, tokens=50, terminated=True), is_done=True)
+        assert cb._cumulative_tokens == 150, (
+            "Terminal step tokens were dropped; _cumulative_tokens should be 150"
+        )
+
+    def test_terminal_step_does_not_raise_budget_error(self):
+        """Even if terminal step pushes cumulative tokens over budget,
+        BudgetExceededError must NOT be raised (episode is already ending)."""
+        cb = BudgetLimitCallback(max_tokens=100)
+        cb.on_exp_start(_make_exp_args())
+
+        cb.on_step_end(_make_step_info(step=0, tokens=90), is_done=False)
+        # Over budget but it's the final step — should not raise
+        cb.on_step_end(_make_step_info(step=1, tokens=200, terminated=True), is_done=True)
+        assert cb._cumulative_tokens == 290
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Integration: loop calls on_step_end with is_done=True on the final step
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestLoopOnStepEndFinalStep:
+    """Verify that CallbackList.on_step_end(is_done=True) is fired on the
+    terminal step of an episode, using a lightweight mock of the loop internals.
+
+    Strategy: exercise the CallbackList dispatch path directly (without
+    launching a real browser env) by simulating the corrected loop sequence.
+    """
+
+    def test_on_step_end_receives_is_done_true(self):
+        """After fix, the last on_step_end call must have is_done=True."""
+
+        class TrackingCallback(AbstractCallback):
+            def __init__(self):
+                self.calls = []
+
+            def on_step_end(self, step_info, is_done: bool) -> None:
+                self.calls.append((step_info.step, is_done))
+
+        cb = TrackingCallback()
+        cb_list = CallbackList([cb])
+
+        # Simulate a 2-step episode: step 0 (non-terminal), step 1 (terminal)
+        si0 = _make_step_info(step=0, tokens=5, reward=0.0, terminated=False)
+        si1 = _make_step_info(step=1, tokens=10, reward=1.0, terminated=True)
+
+        # Corrected loop order: from_step first, then on_step_end
+        cb_list.on_step_start(0)
+        # (agent picks action, env steps → si0 populated)
+        cb_list.on_step_end(si0, is_done=si0.is_done)
+
+        cb_list.on_step_start(1)
+        # (env steps → si1 populated, si1.is_done is True)
+        cb_list.on_step_end(si1, is_done=si1.is_done)
+
+        assert cb.calls == [(0, False), (1, True)], (
+            f"Expected [(0, False), (1, True)], got {cb.calls}"
+        )
