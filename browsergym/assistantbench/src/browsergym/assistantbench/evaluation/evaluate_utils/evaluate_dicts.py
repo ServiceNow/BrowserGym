@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import numpy as np
 
-from .utils import _align_bags
+from .utils import _align_bags, _fix_comma
 
 
 def calculate_f1_score(precision, recall):
@@ -43,10 +43,10 @@ def fix_number(number):
             " ".join(" ".join(copy_ans.split("$")).split("%")).split("sqft")
         ).strip()
         copy_ans = copy_ans.strip()
-        copy_ans = copy_ans.replace(",", ".")
+        copy_ans = _fix_comma(copy_ans)
         try:
             return float(copy_ans)
-        except:
+        except (ValueError, TypeError):
             return number
     elif type(number) == int:
         return float(number)
