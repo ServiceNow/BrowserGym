@@ -402,9 +402,9 @@ class TestBudgetLimitCallbackTerminalAccumulation:
 
         # Terminal step: tokens must still accumulate
         cb.on_step_end(_make_step_info(step=1, tokens=50, terminated=True), is_done=True)
-        assert cb._cumulative_tokens == 150, (
-            "Terminal step tokens were dropped; _cumulative_tokens should be 150"
-        )
+        assert (
+            cb._cumulative_tokens == 150
+        ), "Terminal step tokens were dropped; _cumulative_tokens should be 150"
 
     def test_terminal_step_does_not_raise_budget_error(self):
         """Even if terminal step pushes cumulative tokens over budget,
@@ -457,6 +457,7 @@ class TestLoopOnStepEndFinalStep:
         # (env steps → si1 populated, si1.is_done is True)
         cb_list.on_step_end(si1, is_done=si1.is_done)
 
-        assert cb.calls == [(0, False), (1, True)], (
-            f"Expected [(0, False), (1, True)], got {cb.calls}"
-        )
+        assert cb.calls == [
+            (0, False),
+            (1, True),
+        ], f"Expected [(0, False), (1, True)], got {cb.calls}"
