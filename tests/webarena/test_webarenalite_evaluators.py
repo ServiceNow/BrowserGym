@@ -125,11 +125,13 @@ class TestWebArenaLiteEvaluators:
             }
         }
 
+        # The evaluator opens its own tab for target urls
+        eval_page = mock_page.context.new_page.return_value
         # Simulate wait_for_load_state throwing a TimeoutError
-        mock_page.wait_for_load_state.side_effect = playwright.sync_api.TimeoutError(
+        eval_page.wait_for_load_state.side_effect = playwright.sync_api.TimeoutError(
             "Timeout exceeded"
         )
-        mock_page.evaluate.return_value = "Hello World"
+        eval_page.evaluate.return_value = "Hello World"
 
         evaluator, config_file = self._create_evaluator(config, tmp_path)
         score = evaluator(
@@ -138,9 +140,39 @@ class TestWebArenaLiteEvaluators:
             page=mock_page,
         )
 
-        mock_page.goto.assert_called_with("http://example.com/target")
-        mock_page.wait_for_load_state.assert_called_with("networkidle", timeout=3000)
+        eval_page.goto.assert_called_with("http://example.com/target")
+        eval_page.wait_for_load_state.assert_called_with("networkidle", timeout=3000)
         assert score == 1.0  # The timeout was tolerated and evaluation proceeded
+
+    def test_target_url_does_not_navigate_agent_page(self, mock_page, tmp_path):
+        # validate() runs after every step, so the evaluator must not move the agent's page.
+        config = {
+            "eval": {
+                "eval_types": ["program_html"],
+                "program_html": [
+                    {
+                        "url": "http://example.com/target",
+                        "locator": "document.querySelector('foo').innerText",
+                        "required_contents": {"exact_match": "Hello World"},
+                    }
+                ],
+            }
+        }
+        eval_page = mock_page.context.new_page.return_value
+        eval_page.evaluate.return_value = "Hello World"
+
+        evaluator, config_file = self._create_evaluator(config, tmp_path)
+        score = evaluator(
+            trajectory=[{"action_type": "none"}],
+            config_file=config_file,
+            page=mock_page,
+        )
+
+        assert score == 1.0
+        mock_page.goto.assert_not_called()
+        mock_page.evaluate.assert_not_called()
+        eval_page.goto.assert_called_once_with("http://example.com/target")
+        eval_page.close.assert_called_once()
 
     def test_locator_exception_vs_content_mismatch_score(self, mock_page, tmp_path):
         # Documents evaluation-provenance limitation: both locator exception and
