@@ -365,8 +365,17 @@ class ExpArgs:
         self._make_dir(exp_root)
 
         self.exp_dir.mkdir(parents=True, exist_ok=True)
-        with open(self.exp_dir / "exp_args.pkl", "wb") as f:
-            pickle.dump(self, f)
+        # Temporarily clear callbacks before pickling: file handles and stream
+        # objects (e.g. JsonlStreamCallback holding sys.stdout) are not
+        # picklable and would crash pickle.dump().  Restore them in finally so
+        # the caller's list is never permanently mutated.
+        _saved_callbacks = self.callbacks
+        try:
+            self.callbacks = []
+            with open(self.exp_dir / "exp_args.pkl", "wb") as f:
+                pickle.dump(self, f)
+        finally:
+            self.callbacks = _saved_callbacks
 
     def _make_dir(self, exp_root):
         """Create a unique directory for the experiment."""
@@ -444,13 +453,34 @@ class ExpArgs:
                     _cbs.on_step_end(step_info, is_done=True)
                     break
 
+                prev_step_info = step_info
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
 
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
-                _cbs.on_step_end(step_info, is_done=step_info.is_done)
+
+                # Build a merged snapshot for callbacks: identity fields
+                # (step, action, agent_info, stats) come from prev_step_info
+                # because from_action() populated them there; env result fields
+                # (obs, reward, raw_reward, terminated, truncated, profiling,
+                # task_info) come from the new step_info.  Neither object is
+                # mutated — this snapshot is only passed to callbacks.
+                _cb_snapshot = StepInfo(
+                    step=prev_step_info.step,
+                    action=prev_step_info.action,
+                    agent_info=prev_step_info.agent_info,
+                    stats=prev_step_info.stats,
+                    obs=step_info.obs,
+                    reward=step_info.reward,
+                    raw_reward=step_info.raw_reward,
+                    terminated=step_info.terminated,
+                    truncated=step_info.truncated,
+                    profiling=step_info.profiling,
+                    task_info=step_info.task_info,
+                )
+                _cbs.on_step_end(_cb_snapshot, is_done=step_info.is_done)
 
         except Exception as e:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"

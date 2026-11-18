@@ -529,11 +529,8 @@ class WandbCallback(AbstractCallback):
         self._step_start_time = time.monotonic()
 
     def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
-        if not self._log_step_metrics or self._run is None:
-            return
-
-        import wandb
-
+        # Always accumulate so on_exp_end summaries are correct even when
+        # per-step logging is disabled.
         reward = step_info.reward or 0.0
         self._cumulative_reward += reward
 
@@ -541,6 +538,11 @@ class WandbCallback(AbstractCallback):
         if step_info.stats:
             step_tokens = step_info.stats.get("n_token_agent_messages", 0) or 0
         self._cumulative_tokens += step_tokens
+
+        if not self._log_step_metrics or self._run is None:
+            return
+
+        import wandb
 
         step_elapsed = time.monotonic() - self._step_start_time
         total_elapsed = time.monotonic() - self._exp_start_time
@@ -715,11 +717,8 @@ class MLflowCallback(AbstractCallback):
         self._step_start_time = time.monotonic()
 
     def on_step_end(self, step_info: "StepInfo", is_done: bool) -> None:
-        if not self._log_step_metrics or self._active_run is None:
-            return
-
-        import mlflow
-
+        # Always accumulate so on_exp_end summaries are correct even when
+        # per-step logging is disabled.
         reward = step_info.reward or 0.0
         self._cumulative_reward += reward
 
@@ -727,6 +726,11 @@ class MLflowCallback(AbstractCallback):
         if step_info.stats:
             step_tokens = step_info.stats.get("n_token_agent_messages", 0) or 0
         self._cumulative_tokens += step_tokens
+
+        if not self._log_step_metrics or self._active_run is None:
+            return
+
+        import mlflow
 
         step_elapsed = time.monotonic() - self._step_start_time
         total_elapsed = time.monotonic() - self._exp_start_time

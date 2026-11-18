@@ -419,45 +419,201 @@ class TestBudgetLimitCallbackTerminalAccumulation:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Integration: loop calls on_step_end with is_done=True on the final step
+# Integration: real ExpArgs.prepare() + ExpArgs.run() with mocked env/agent
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class TestLoopOnStepEndFinalStep:
-    """Verify that CallbackList.on_step_end(is_done=True) is fired on the
-    terminal step of an episode, using a lightweight mock of the loop internals.
+# ---------------------------------------------------------------------------
+# Shared helpers for integration tests
+# ---------------------------------------------------------------------------
 
-    Strategy: exercise the CallbackList dispatch path directly (without
-    launching a real browser env) by simulating the corrected loop sequence.
+
+def _make_env_info():
+    """Return a minimal env_info dict that from_step() / from_reset() need."""
+    now = 0.0
+    return {
+        "task_info": {},
+        "RAW_REWARD_GLOBAL": None,
+        "action_exec_start": now,
+        "action_exec_stop": now,
+        "action_exec_timeout": 0.0,
+    }
+
+
+def _make_obs():
+    return {
+        "goal_object": [],
+        "last_action": "",
+        "last_action_error": "",
+        "open_pages_urls": ["about:blank"],
+        "open_pages_titles": ["Blank"],
+        "active_page_index": {"index": 0},
+        "url": "about:blank",
+        "screenshot": None,
+        "screenshot_som": None,
+        "dom_txt": "",
+        "axtree_txt": "",
+        "pruned_html": "",
+        "last_comm": "",
+        "focused_element_bid": "",
+        "extra_element_infos": {},
+        "scroll_position": {"x": 0, "y": 0},
+    }
+
+
+def _build_mock_env(*, reward=1.0, terminated=True):
+    """Return a mock gym.Env-like object that terminates after one step."""
+    env = MagicMock()
+    obs = _make_obs()
+    env.reset.return_value = (obs, _make_env_info())
+    env.step.return_value = (obs, reward, terminated, False, _make_env_info())
+    env.unwrapped = MagicMock()
+    env.unwrapped.chat = MagicMock()
+    env.unwrapped.chat.messages = []
+    return env
+
+
+def _build_mock_agent(*, tokens=42):
+    """Return a mock agent that returns one real action with token stats."""
+    agent = MagicMock()
+    agent.obs_preprocessor = None
+    agent.action_set = MagicMock()
+    agent.action_set.to_python_code = MagicMock(return_value="")
+    # agent_info must include chat_messages so make_stats() counts tokens.
+    chat_messages = [{"role": "user", "content": "x" * tokens}]
+    agent.get_action.return_value = ("click('#btn')", {"chat_messages": chat_messages})
+    return agent
+
+
+def _run_exp(callbacks, exp_dir, *, reward=1.0, terminated=True, tokens=42, max_steps=5):
     """
+    Build and run an ExpArgs with mocked env/agent.
+    prepare() is also called with pickle.dump patched to a no-op so that
+    MagicMock agent_args / env_args don't trigger a PicklingError.
+    Returns the ExpArgs instance after run() completes.
+    """
+    from browsergym.experiments.loop import ExpArgs
 
-    def test_on_step_end_receives_is_done_true(self):
-        """After fix, the last on_step_end call must have is_done=True."""
+    mock_env = _build_mock_env(reward=reward, terminated=terminated)
 
-        class TrackingCallback(AbstractCallback):
-            def __init__(self):
-                self.calls = []
+    mock_agent = _build_mock_agent(tokens=tokens)
+    mock_agent_args = MagicMock()
+    mock_agent_args.agent_name = "test_agent"
+    mock_agent_args.make_agent.return_value = mock_agent
 
-            def on_step_end(self, step_info, is_done: bool) -> None:
-                self.calls.append((step_info.step, is_done))
+    mock_env_args = MagicMock()
+    mock_env_args.task_name = "mock.task"
+    mock_env_args.task_seed = 0
+    mock_env_args.max_steps = max_steps
+    # make_env is called as self.env_args.make_env(...) so patch the mock directly
+    mock_env_args.make_env.return_value = mock_env
 
-        cb = TrackingCallback()
-        cb_list = CallbackList([cb])
+    exp = ExpArgs(
+        agent_args=mock_agent_args,
+        env_args=mock_env_args,
+        exp_dir=exp_dir,
+        callbacks=callbacks,
+        save_screenshot=False,
+    )
+    exp.exp_name = "test_exp"
 
-        # Simulate a 2-step episode: step 0 (non-terminal), step 1 (terminal)
-        si0 = _make_step_info(step=0, tokens=5, reward=0.0, terminated=False)
-        si1 = _make_step_info(step=1, tokens=10, reward=1.0, terminated=True)
+    with (
+        patch("browsergym.experiments.loop.save_package_versions"),
+        # Patch pickle.dump so MagicMock objects don't cause PicklingError.
+        patch("browsergym.experiments.loop.pickle.dump"),
+    ):
+        exp.prepare(exp_dir)
+        exp.run()
 
-        # Corrected loop order: from_step first, then on_step_end
-        cb_list.on_step_start(0)
-        # (agent picks action, env steps → si0 populated)
-        cb_list.on_step_end(si0, is_done=si0.is_done)
+    return exp
 
-        cb_list.on_step_start(1)
-        # (env steps → si1 populated, si1.is_done is True)
-        cb_list.on_step_end(si1, is_done=si1.is_done)
 
-        assert cb.calls == [
-            (0, False),
-            (1, True),
-        ], f"Expected [(0, False), (1, True)], got {cb.calls}"
+# ---------------------------------------------------------------------------
+# Tracking callback
+# ---------------------------------------------------------------------------
+
+
+class _TrackingCallback(AbstractCallback):
+    """Records every on_step_end call: (step, is_done, tokens, reward)."""
+
+    def __init__(self):
+        self.calls = []  # list of (step, is_done, tokens, reward)
+
+    def on_step_end(self, step_info, is_done: bool) -> None:
+        tokens = (step_info.stats or {}).get("n_token_agent_messages", 0) or 0
+        self.calls.append((step_info.step, is_done, tokens, step_info.reward))
+
+
+class TestLoopIntegration:
+    """Integration tests that run ExpArgs.prepare() + ExpArgs.run() with a
+    fully mocked env and agent (no browser required)."""
+
+    # ------------------------------------------------------------------
+    # 1. on_step_end receives non-zero tokens and correct final reward
+    # ------------------------------------------------------------------
+    def test_on_step_end_tokens_and_reward(self, tmp_path):
+        """on_step_end must carry the agent's token count AND the env reward."""
+        cb = _TrackingCallback()
+        exp = _run_exp([cb], tmp_path, reward=1.0, terminated=True, tokens=42)
+
+        # The only on_step_end call is for the terminal step.
+        assert len(cb.calls) >= 1, "on_step_end was never called"
+        step, is_done, tokens, reward = cb.calls[-1]
+        assert is_done is True, f"Last on_step_end should have is_done=True; got {cb.calls}"
+        assert tokens > 0, f"Token count should be non-zero; got {tokens}. calls={cb.calls}"
+        assert reward == 1.0, f"Reward should be 1.0; got {reward}. calls={cb.calls}"
+
+    # ------------------------------------------------------------------
+    # 2. BudgetLimitCallback aborts a real run mid-episode
+    # ------------------------------------------------------------------
+    def test_budget_limit_aborts_run(self, tmp_path):
+        """BudgetLimitCallback must abort the run when the token budget is
+        exceeded (env never terminates naturally; budget must cut it short)."""
+        budget_cb = BudgetLimitCallback(max_tokens=100)
+        # tokens=200 per step, budget=100 → aborted after first step
+        exp = _run_exp(
+            [budget_cb], tmp_path, reward=0.0, terminated=False, tokens=200, max_steps=100
+        )
+
+        assert exp.err_msg is not None, "BudgetLimitCallback should have aborted the run"
+        assert (
+            "budget" in exp.err_msg.lower() or "token" in exp.err_msg.lower()
+        ), f"Unexpected err_msg: {exp.err_msg}"
+
+    # ------------------------------------------------------------------
+    # 3. JsonlStreamCallback survives prepare() (callbacks restored)
+    # ------------------------------------------------------------------
+    def test_jsonl_callback_survives_prepare(self, tmp_path):
+        """prepare() must not crash when JsonlStreamCallback holds sys.stdout,
+        and the callback list must be fully restored afterwards."""
+        import sys
+
+        from browsergym.experiments.callbacks import JsonlStreamCallback
+        from browsergym.experiments.loop import ExpArgs
+
+        mock_agent_args = MagicMock()
+        mock_agent_args.agent_name = "test_agent"
+        mock_env_args = MagicMock()
+        mock_env_args.task_name = "mock.task"
+        mock_env_args.task_seed = 0
+        mock_env_args.max_steps = 5
+
+        jsonl_cb = JsonlStreamCallback(stream=sys.stdout)
+        exp = ExpArgs(
+            agent_args=mock_agent_args,
+            env_args=mock_env_args,
+            exp_dir=tmp_path,
+            callbacks=[jsonl_cb],
+            save_screenshot=False,
+        )
+        exp.exp_name = "test_jsonl"
+
+        # Patch pickle.dump so MagicMock agent/env args don't block the test.
+        with patch("browsergym.experiments.loop.pickle.dump"):
+            exp.prepare(tmp_path)
+
+        # Callback list must be fully restored after prepare()
+        assert (
+            len(exp.callbacks) == 1
+        ), "callbacks must be restored to original list after prepare()"
+        assert exp.callbacks[0] is jsonl_cb
