@@ -372,6 +372,7 @@ class HighLevelActionSet(AbstractActionSet):
 
         # parse the actions and build the action space
         self.action_set: dict[str, HighLevelAction] = {}
+        self._action_functions: dict[str, callable] = {}
         self.python_includes = ""
 
         # include playwright imports
@@ -427,6 +428,7 @@ if demo_mode is None:
             if func.__name__ in self.action_set:
                 raise ValueError(f"Duplicated action '{func.__name__}'")
 
+            self._action_functions[func.__name__] = func
             self.action_set[func.__name__] = HighLevelAction(
                 # entrypoint=func,
                 signature=signature,
@@ -574,7 +576,9 @@ Only a single action can be provided at once."""
         for tool_name, action in self.action_set.items():
             # Parse the signature to extract parameter names and types
             parameters = {"type": "object", "properties": {}, "required": []}
-            signature = inspect.signature(globals()[tool_name])
+            # use the function registered in this action set, so that custom actions
+            # (including ones that reuse a built-in action name) are described correctly
+            signature = inspect.signature(self._action_functions[tool_name])
             for param_name, param in signature.parameters.items():
                 param_type = "string"  # Default to string if type is not specified
                 if param.annotation != inspect.Parameter.empty:
