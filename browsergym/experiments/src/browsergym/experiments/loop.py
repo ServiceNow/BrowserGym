@@ -28,6 +28,7 @@ from browsergym.core.action.parsers import highlevel_action_parser
 from browsergym.core.chat import Chat
 
 from .agent import Agent
+from .callbacks import AbstractCallback, CallbackList
 from .utils import count_messages_token, count_tokens
 
 logger = logging.getLogger(__name__)
@@ -334,6 +335,8 @@ class ExpArgs:
     depends_on: tuple[str] = ()
     save_screenshot: bool = True
     save_som: bool = False
+    # Callback system -- zero overhead when empty (default).
+    callbacks: list = field(default_factory=list)
 
     def make_id(self):
         """Create a unique id for the experiment."""
@@ -362,8 +365,17 @@ class ExpArgs:
         self._make_dir(exp_root)
 
         self.exp_dir.mkdir(parents=True, exist_ok=True)
-        with open(self.exp_dir / "exp_args.pkl", "wb") as f:
-            pickle.dump(self, f)
+        # Temporarily clear callbacks before pickling: file handles and stream
+        # objects (e.g. JsonlStreamCallback holding sys.stdout) are not
+        # picklable and would crash pickle.dump().  Restore them in finally so
+        # the caller's list is never permanently mutated.
+        _saved_callbacks = self.callbacks
+        try:
+            self.callbacks = []
+            with open(self.exp_dir / "exp_args.pkl", "wb") as f:
+                pickle.dump(self, f)
+        finally:
+            self.callbacks = _saved_callbacks
 
     def _make_dir(self, exp_root):
         """Create a unique directory for the experiment."""
@@ -386,6 +398,9 @@ class ExpArgs:
     def run(self):
         """Run the experiment and save the results"""
 
+        # Build the callback dispatcher (no-op when callbacks=[]).
+        _cbs = CallbackList(self.callbacks)
+
         # start writing logs to run logfile
         self._set_logger()
 
@@ -396,6 +411,7 @@ class ExpArgs:
         env, step_info, err_msg, stack_trace = None, None, None, None
         try:
             logger.info(f"Running experiment {self.exp_name} in:\n  {self.exp_dir}")
+            _cbs.on_exp_start(self)
             agent = self.agent_args.make_agent()
             logger.debug(f"Agent created.")
 
@@ -415,8 +431,10 @@ class ExpArgs:
 
             while not step_info.is_done:  # set a limit
                 logger.debug(f"Starting step {step_info.step}.")
+                _cbs.on_step_start(step_info.step)
                 action = step_info.from_action(agent)
                 logger.debug(f"Agent chose action:\n {action}")
+                _cbs.on_action_selected(step_info.step, action, step_info.agent_info.copy())
 
                 if action is None:
                     # will end the episode after saving the step info.
@@ -432,14 +450,37 @@ class ExpArgs:
 
                 if action is None:
                     logger.debug(f"Agent returned None action. Ending episode.")
+                    _cbs.on_step_end(step_info, is_done=True)
                     break
 
+                prev_step_info = step_info
                 step_info = StepInfo(step=step_info.step + 1)
                 episode_info.append(step_info)
 
                 logger.debug(f"Sending action to environment.")
                 step_info.from_step(env, action, obs_preprocessor=agent.obs_preprocessor)
                 logger.debug(f"Environment stepped.")
+
+                # Build a merged snapshot for callbacks: identity fields
+                # (step, action, agent_info, stats) come from prev_step_info
+                # because from_action() populated them there; env result fields
+                # (obs, reward, raw_reward, terminated, truncated, profiling,
+                # task_info) come from the new step_info.  Neither object is
+                # mutated — this snapshot is only passed to callbacks.
+                _cb_snapshot = StepInfo(
+                    step=prev_step_info.step,
+                    action=prev_step_info.action,
+                    agent_info=prev_step_info.agent_info,
+                    stats=prev_step_info.stats,
+                    obs=step_info.obs,
+                    reward=step_info.reward,
+                    raw_reward=step_info.raw_reward,
+                    terminated=step_info.terminated,
+                    truncated=step_info.truncated,
+                    profiling=step_info.profiling,
+                    task_info=step_info.task_info,
+                )
+                _cbs.on_step_end(_cb_snapshot, is_done=step_info.is_done)
 
         except Exception as e:
             err_msg = f"Exception uncaught by agent or environment in task {self.env_args.task_name}.\n{type(e).__name__}:\n{e}"
@@ -482,6 +523,10 @@ class ExpArgs:
                 self._unset_logger()  # stop writing logs to run logfile
             except Exception as e:
                 logger.error(f"Error while unsetting the logger in the finally block: {e}")
+            try:
+                _cbs.on_exp_end(self.exp_dir, err_msg)
+            except Exception as e:
+                logger.error(f"Error while firing on_exp_end callbacks: {e}")
 
     def _set_logger(self):
         # output logging traces to a log file
