@@ -121,10 +121,7 @@ class WebArenaVerifiedEvaluator:
             logger.info(
                 f"- {result.evaluator_name}: status: {result.status}, score: {result.score}, error_msg: {result.error_msg}"
             )
-        # return average score if multiple evaluators are present, otherwise return the aggregated score
-        return (
-            sum(result.score for result in results.evaluators_results)
-            / len(results.evaluators_results)
-            if results.evaluators_results
-            else results.score
-        )
+        # webarena_verified scores a task 1.0 only when every evaluator passes, and 0.0 when any
+        # evaluator fails or errors. Return that task score instead of averaging the evaluators,
+        # which would give partial credit to tasks the benchmark counts as failed.
+        return results.score
