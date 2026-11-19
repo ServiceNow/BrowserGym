@@ -13,6 +13,7 @@ class AbstractMiniwobTask(AbstractBrowserTask):
 
     # gym metadata (default value, can be overloaded per task)
     nondeterministic: bool = False
+    success_threshold: float = 0.0
 
     @classmethod
     def get_task_id(cls):
@@ -185,7 +186,7 @@ core.startEpisodeReal();
             return 0, True, "", {"error": "invalid url, terminating task"}
 
         info = self._get_info()
-        reward = float(info["RAW_REWARD_GLOBAL"] > 0)  # TODO: shouldn't it be 0.5?
+        reward = float(info["RAW_REWARD_GLOBAL"] > self.success_threshold)
         done = info["DONE_GLOBAL"]
         msg = ""
         return reward, done, msg, info

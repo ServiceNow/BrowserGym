@@ -1,4 +1,6 @@
 import os
+from types import SimpleNamespace
+
 import pytest
 import time
 import gymnasium as gym
@@ -10,6 +12,7 @@ from browsergym.miniwob.all import (
     ClickButtonTask,
     ClickOptionTask,
     DrawLineTask,
+    FindGreatestTask,
     LoginUserTask,
 )
 
@@ -17,6 +20,32 @@ __SLOW_MO = 1000 if "DISPLAY_BROWSER" in os.environ else None
 __HEADLESS = False if "DISPLAY_BROWSER" in os.environ else True
 
 TASKS = [ClickButtonTask, ClickOptionTask, DrawLineTask, LoginUserTask]
+
+
+@pytest.mark.parametrize(
+    ("task_cls", "raw_reward", "expected_reward"),
+    [
+        (FindGreatestTask, 0.1, 0.0),
+        (FindGreatestTask, 1.0, 1.0),
+        (ClickButtonTask, 0.75, 1.0),
+    ],
+)
+def test_validate_respects_task_success_threshold(
+    monkeypatch, task_cls, raw_reward, expected_reward
+):
+    task = task_cls(seed=42, base_url="https://example.test/")
+    page = SimpleNamespace(url=task.url)
+    task.page = page
+    monkeypatch.setattr(
+        task,
+        "_get_info",
+        lambda: {"RAW_REWARD_GLOBAL": raw_reward, "DONE_GLOBAL": True},
+    )
+
+    reward, done, _, _ = task.validate(page, [])
+
+    assert reward == expected_reward
+    assert done is True
 
 
 @pytest.mark.parametrize("task_cls", TASKS)
