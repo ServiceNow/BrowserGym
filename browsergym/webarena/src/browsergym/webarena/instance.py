@@ -30,7 +30,8 @@ class WebArenaInstance:
                 + "Please set the following environment variables to use WebArena through BrowserGym:\n"
                 + "\n".join([append_wa(x) for x in ENV_VARS])
             )
-            os.environ[key] = os.environ[append_wa(key)]
+            # no trailing slash, or "__SHOPPING__/path" becomes "host//path" (#366)
+            os.environ[key] = os.environ[append_wa(key)].rstrip("/")
 
         # import webarena on instanciation
         from webarena.browser_env.env_config import (
