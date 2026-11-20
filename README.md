@@ -28,6 +28,15 @@ pip install browsergym
 > BrowserGym is meant to provide an open, easy-to-use and extensible framework to accelerate the field of web agent research.
 > It is not meant to be a consumer product. Use with caution!
 
+> [!NOTE]
+> **BrowserGym is not deprecated**, existing code keeps working and PRs are still
+> welcome, but there's no official maintainer actively driving new features right now.
+> If you're wrapping a new benchmark or building eval/training infra, check out
+> **[CUBE](https://github.com/The-AI-Alliance/cube-standard)**, a community protocol
+> from the same lineage that generalizes BrowserGym's benchmark-wrapping idea beyond
+> the browser to any agentic benchmark, and works across eval, RL training, and any
+> infra. CUBE is where the team's active energy is going.
+
 > [!TIP]
 > 🚀 Check out [AgentLab](https://github.com/ServiceNow/AgentLab)✨ !
 > A seamless framework to implement, test, and evaluate your web agents on all BrowserGym benchmarks.
