@@ -30,6 +30,7 @@ HOVER_URL = f"file://{__DATA_DIR}/hover.html"
 DBLCLICK_URL = f"file://{__DATA_DIR}/dblclick.html"
 INEXISTANT_FILE_URL = f"file://{__DATA_DIR}/no_file_here.html"
 LONG_PAGE_URL = f"file://{__DATA_DIR}/long_page.html"
+SCROLL_LIST_URL = f"file://{__DATA_DIR}/scroll_list.html"
 TEXT_INPUT_URL = f"file://{__DATA_DIR}/input_type/text_input.html"
 URL_INPUT_URL = f"file://{__DATA_DIR}/input_type/url_input.html"
 CHECKBOX_URL = f"file://{__DATA_DIR}/input_type/checkbox_input.html"
@@ -1132,6 +1133,63 @@ def test_scroll():
     # movement
     assert prev_top_x == top_x and prev_top_y > top_y
     assert prev_bottom_x == bottom_x and prev_bottom_y > bottom_y
+
+    env.close()
+
+
+def test_scroll_in_sub_element():
+    action_set = HighLevelActionSet(subsets=["bid", "coord"])
+
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": SCROLL_LIST_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def get_bid(obs, tag, elem_id):
+        soup = bs4.BeautifulSoup(
+            flatten_dom_to_str(obs["dom_object"], obs["extra_element_properties"]),
+            "lxml",
+        )
+        elem = soup.find(tag, attrs={"id": elem_id})
+        assert elem is not None, f"Element <{tag} id={elem_id}> not found"
+        return elem.get(BID_ATTR)
+
+    def page_scroll_y():
+        return env.unwrapped.page.evaluate("window.scrollY")
+
+    def elem_scroll_top(selector):
+        return env.unwrapped.page.evaluate(f"document.querySelector({selector!r}).scrollTop")
+
+    obs, info = env.reset()
+    listbox_bid = get_bid(obs, "select", "listbox")
+    scrollable_bid = get_bid(obs, "div", "scrollable")
+
+    # baseline: nothing has been scrolled
+    assert page_scroll_y() == 0
+    assert elem_scroll_top("#listbox") == 0
+    assert elem_scroll_top("#scrollable") == 0
+
+    # scrolling the div by bid leaves the page alone
+    obs, _, _, _, _ = env.step(f"scroll(0, 200, bid={scrollable_bid!r})")
+    assert not obs["last_action_error"]
+    assert elem_scroll_top("#scrollable") > 0
+    assert page_scroll_y() == 0
+
+    # same for the listbox
+    obs, _, _, _, _ = env.step(f"scroll(0, 500, bid={listbox_bid!r})")
+    assert not obs["last_action_error"]
+    assert elem_scroll_top("#listbox") > 0
+    assert page_scroll_y() == 0
+
+    # plain scroll (no bid) still scrolls the page
+    prev_page_y = page_scroll_y()
+    obs, _, _, _, _ = env.step("scroll(0, 300)")
+    assert not obs["last_action_error"]
+    assert page_scroll_y() > prev_page_y
 
     env.close()
 
