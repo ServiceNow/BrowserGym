@@ -70,6 +70,8 @@ rejects duplicate run/task/revision identities. Paths must resolve within the
 manifest directory. JSON files are bounded at 1MiB and 32 levels of nesting;
 the manifest is bounded at 10,000 records and its own 1MiB limit.
 
+Supported package versions are `1.2.3` and the pinned historical `1.0.0rc12`
+demo format. Other versions require explicit conformance before admission.
 Supported result shapes are individual `TaskEvalResult` JSON objects, not
 batch summaries, text logs, traces, or arbitrary future schema versions.
 Required fields, exact task identity, checksums, evaluator inventory,
@@ -85,7 +87,7 @@ summaries, truncated results, and unknown fields are rejected.
 The CLI exits `0` only when every manifest entry validates. It exits `2` for
 an invalid manifest or any invalid record. `input_records`, `valid_records`
 and `invalid_records` reconcile; task-level errors remain valid scored records,
-with a separate error count. Aggregates group by package version, evaluator
+with a separate error count. Aggregates group by run ID, package version, evaluator
 checksum and dataset checksum. **Any invalid row suppresses every mean** so a
 partial dataset cannot quietly produce an inflated headline. Validated rows
 and changed-row counts remain available for diagnosis, with coverage explicit.

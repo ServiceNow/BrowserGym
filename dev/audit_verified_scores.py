@@ -16,6 +16,7 @@ import re
 MAX_BYTES = 1024 * 1024
 MAX_DEPTH = 32
 MAX_RECORDS = 10000
+SUPPORTED_VERSIONS = {"1.0.0rc12", "1.2.3"}
 IDENTITY_FIELDS = (
     "task_id", "intent_template_id", "task_revision", "sites",
     "webarena_verified_version", "webarena_verified_evaluator_checksum",
@@ -129,7 +130,8 @@ def validate_result(value, expected):
     for name in IDENTITY_FIELDS:
         require(type(value[name]) is type(expected[name]) and value[name] == expected[name],
                 "pinned provenance mismatch")
-    require(_text(value["webarena_verified_version"]), "missing package version")
+    require(value["webarena_verified_version"] in SUPPORTED_VERSIONS,
+            "unsupported package version")
     for name in ("webarena_verified_evaluator_checksum", "webarena_verified_data_checksum"):
         require(isinstance(value[name], str) and re.fullmatch(r"[0-9a-f]{64}", value[name]),
                 "invalid provenance checksum")
@@ -216,7 +218,7 @@ def audit_manifest(path):
             identities.add(identity)
             row.update(run_id=entry["run_id"], input_sha256=digest)
             rows.append(row)
-            key = tuple(row["provenance"].values())
+            key = (entry["run_id"], *row["provenance"].values())
             groups.setdefault(key, []).append(row)
         except (ValueError, OSError, TypeError, KeyError) as error:
             # Avoid echoing source values or arbitrary exception text into reports.
@@ -224,7 +226,8 @@ def audit_manifest(path):
     summaries = []
     for group in groups.values():
         counts = Counter(row["status"] for row in group)
-        summaries.append({"provenance": group[0]["provenance"], "valid_records": len(group),
+        summaries.append({"run_id": group[0]["run_id"],
+                          "provenance": group[0]["provenance"], "valid_records": len(group),
                           "status_counts": dict(counts),
                           "changed_records": sum(row["delta"] != 0 for row in group),
                           "mean_old_reward": None if invalid else sum(r["old_reward"] for r in group) / len(group),

@@ -108,6 +108,10 @@ class AuditTests(unittest.TestCase):
         value["task_revision"] += 1
         with self.assertRaises(ValueError):
             audit.validate_result(value, provenance)
+        value = record()
+        value["webarena_verified_version"] = "99.0.0"
+        with self.assertRaises(ValueError):
+            audit.validate_result(value, expected(value))
 
     def test_strict_parser(self):
         for data in [b'{"score":0,"score":1}', b'{"x":NaN}', b'{"x":Infinity}',
@@ -142,6 +146,10 @@ class AuditTests(unittest.TestCase):
             self.assertEqual(report["input_records"], 1)
             self.assertEqual(report["groups"][0]["status_counts"], {"error": 1})
             self.assertEqual(report["groups"][0]["mean_task_score"], 0.0)
+            second = entry | {"run_id": "different-config"}
+            manifest.write_text(json.dumps({"schema": 1, "records": [entry, second]}))
+            report = audit.audit_manifest(manifest)
+            self.assertEqual(len(report["groups"]), 2)
             manifest.write_text(json.dumps({"schema": 1, "records": [entry, entry]}))
             report = audit.audit_manifest(manifest)
             self.assertFalse(report["complete"])
