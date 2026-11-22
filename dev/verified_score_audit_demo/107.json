@@ -1,0 +1,50 @@
+{
+  "task_id": 107,
+  "intent_template_id": 270,
+  "sites": ["shopping_admin"],
+  "task_revision": 2,
+  "status": "failure",
+  "score": 0.0,
+  "evaluators_results": [
+    {
+      "evaluator_name": "AgentResponseEvaluator",
+      "status": "failure",
+      "score": 0.0,
+      "actual": "{\n  \"task_type\": \"NAVIGATE\",\n  \"status\": \"SUCCESS\",\n  \"retrieved_data\": null,\n  \"error_details\": null\n}",
+      "actual_normalized": {"status": "success", "retrieved_data": null, "task_type": "navigate"},
+      "expected": {
+        "task_type": "retrieve",
+        "status": "success",
+        "retrieved_data": [
+          { "month": "May"      , "count":  8.0 },
+          { "month": "June"     , "count": 13.0 },
+          { "month": "July"     , "count":  9.0 },
+          { "month": "August"   , "count":  8.0 },
+          { "month": "September", "count": 10.0 },
+          { "month": "October"  , "count":  4.0 },
+          { "month": "November" , "count":  5.0 },
+          { "month": "December" , "count": 10.0 }
+        ]
+      },
+      "assertions": [
+        {
+          "assertion_name": "agent_response.task_type_mismatch",
+          "status": "failure",
+          "assertion_msgs": ["Expected retrieve, got navigate"]
+        },
+        {
+          "assertion_name": "retrieved_data_missing_or_null",
+          "status": "failure",
+          "assertion_msgs": [
+            "Expected retrieved_data to be ({'month': Month('May'), 'count': Number(8.0)}, {'month': Month('June'), 'count': Number(13.0)}, {'month': Month('July'), 'count': Number(9.0)}, {'month': Month('August'), 'count': Number(8.0)}, {'month': Month('September'), 'count': Number(10.0)}, {'month': Month('October'), 'count': Number(4.0)}, {'month': Month('November'), 'count': Number(5.0)}, {'month': Month('December'), 'count': Number(10.0)}), but got None or empty"
+          ]
+        }
+      ],
+      "error_msg": null,
+      "should_not_exist": null
+    }
+  ],
+  "webarena_verified_version": "1.0.0rc12",
+  "webarena_verified_evaluator_checksum": "ac4a4732f03bf564e97c3b27718e5dd0f9b44d4775abeb96ef666fad92c2e225",
+  "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+}
