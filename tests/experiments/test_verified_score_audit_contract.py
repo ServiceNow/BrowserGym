@@ -11,20 +11,26 @@ from test_verified_score_audit import audit, expected
 class PackageContractTests(unittest.TestCase):
     def test_real_package_aggregation(self):
         self.assertEqual(version("webarena-verified"), "1.2.3")
-        for statuses in [("success", "success"), ("success", "failure"),
-                         ("success", "error")]:
+        for statuses in [("success", "success"), ("success", "failure"), ("success", "error")]:
             evaluators = []
             for i, status in enumerate(statuses):
                 assertion = EvalAssertion.create(
-                    assertion_name="synthetic_check", status=status,
+                    assertion_name="synthetic_check",
+                    status=status,
                     error_msg="synthetic assertion error" if status == "error" else None,
                 )
-                evaluators.append(EvaluatorResult.create(
-                    evaluator_name=f"Evaluator{i}", assertions=[assertion],
-                ))
+                evaluators.append(
+                    EvaluatorResult.create(
+                        evaluator_name=f"Evaluator{i}",
+                        assertions=[assertion],
+                    )
+                )
             result = TaskEvalResult.create(
-                task_id=44, intent_template_id=1, task_revision=2,
-                sites=("shopping",), data_checksum="b" * 64,
+                task_id=44,
+                intent_template_id=1,
+                task_revision=2,
+                sites=("shopping",),
+                data_checksum="b" * 64,
                 evaluators_results=evaluators,
             )
             value = result.model_dump(mode="json")
@@ -36,9 +42,13 @@ class PackageContractTests(unittest.TestCase):
 
     def test_real_task_error_keeps_zero_and_denominator(self):
         result = TaskEvalResult.create(
-            task_id=44, intent_template_id=1, task_revision=2,
-            sites=("shopping",), data_checksum="b" * 64,
-            is_error=True, error_msg="synthetic task-level failure",
+            task_id=44,
+            intent_template_id=1,
+            task_revision=2,
+            sites=("shopping",),
+            data_checksum="b" * 64,
+            is_error=True,
+            error_msg="synthetic task-level failure",
         )
         value = result.model_dump(mode="json")
         provenance = expected(value)
