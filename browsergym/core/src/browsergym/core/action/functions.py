@@ -73,7 +73,7 @@ def fill(bid: str, value: str, enable_autocomplete_menu: bool = False):
     def do(force: bool):
         if demo_mode != "off":
             # Demo mode: full typing for visual effect
-            delay = max(2000 / len(value), 10)
+            delay = max(2000 / max(len(value), 1), 10)
             elem.clear(force=force, timeout=500)
             elem.type(value, delay=delay, timeout=0)
         elif enable_autocomplete_menu:
@@ -484,7 +484,7 @@ def keyboard_type(text: str):
         keyboard_type('Hello world!')
     """
     if demo_mode != "off":
-        delay = max(2000 / len(text), 10)
+        delay = max(2000 / max(len(text), 1), 10)
     else:
         delay = None
     page.keyboard.type(text, delay=delay)
