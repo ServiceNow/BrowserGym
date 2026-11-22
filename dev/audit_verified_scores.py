@@ -104,7 +104,8 @@ def _text(value):
 
 
 def _score(value):
-    require(type(value) in (int, float) and math.isfinite(value) and value in (0, 1),
+    # Test membership before any float conversion: JSON integers are unbounded.
+    require(type(value) in (int, float) and value in (0, 1),
             "score must be a finite binary number")
 
 

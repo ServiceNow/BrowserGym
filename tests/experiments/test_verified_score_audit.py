@@ -4,6 +4,8 @@ import importlib.util
 import hashlib
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -167,6 +169,36 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report["valid_records"], 2)
         self.assertEqual(len(report["groups"]), 2)
         self.assertTrue(all(g["changed_records"] == 0 for g in report["groups"]))
+
+    def test_huge_integer_is_invalid_row_and_cli_fails_closed(self):
+        with self.assertRaises(ValueError):
+            audit._score(10 ** 400)
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            records = []
+            for index in range(2):
+                value = record()
+                provenance = expected(value)
+                if index:
+                    value["score"] = 10 ** 400
+                data = json.dumps(value).encode()
+                name = f"result-{index}.json"
+                (root / name).write_bytes(data)
+                records.append({"run_id": f"synthetic-{index}", "path": name,
+                                "sha256": hashlib.sha256(data).hexdigest(),
+                                "expected": provenance})
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps({"schema": 1, "records": records}))
+            report = audit.audit_manifest(manifest)
+            self.assertEqual(report["valid_records"], 1)
+            self.assertEqual(report["invalid_records"], 1)
+            self.assertIsNone(report["groups"][0]["mean_old_reward"])
+            self.assertIsNone(report["groups"][0]["mean_task_score"])
+            result = subprocess.run([sys.executable, str(TOOL), str(manifest)],
+                                    capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(json.loads(result.stdout)["invalid_records"], 1)
+            self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":
