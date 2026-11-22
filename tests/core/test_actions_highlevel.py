@@ -827,6 +827,44 @@ keyboard_type('Reno')
     env.close()
 
 
+# test that empty text can be filled and typed in demo mode too
+@pytest.mark.parametrize("demo_mode", ["off", "default"])
+def test_fill_type_empty_text(demo_mode):
+    action_set = HighLevelActionSet(subsets=["bid", "coord"], demo_mode=demo_mode)
+    env = gym.make(
+        "browsergym/openended",
+        task_kwargs={"start_url": TEXT_INPUT_URL},
+        headless=__HEADLESS,
+        slow_mo=__SLOW_MO,
+        timeout=__TIMEOUT,
+        action_mapping=action_set.to_python_code,
+    )
+
+    def get_fname_elem(obs):
+        soup = bs4.BeautifulSoup(flatten_dom_to_str(obs["dom_object"]), "lxml")
+        return soup.find("input", attrs={"id": "fname"})
+
+    obs, info = env.reset()
+    fname_bid = get_fname_elem(obs).get(BID_ATTR)
+
+    for action in [
+        f"fill({repr(fname_bid)}, 'Christian') fill({repr(fname_bid)}, '')",
+        f"fill({repr(fname_bid)}, 'Christian') fill({repr(fname_bid)}, '', True)",
+    ]:
+        obs, reward, terminated, truncated, info = env.step(action)
+
+        assert not obs["last_action_error"]
+        assert get_fname_elem(obs).get("value") == ""
+
+    action = f"fill({repr(fname_bid)}, 'Christian') focus({repr(fname_bid)}) keyboard_type('')"
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    assert not obs["last_action_error"]
+    assert get_fname_elem(obs).get("value") == "Christian"
+
+    env.close()
+
+
 def test_dblclick():
     action_set = HighLevelActionSet(subsets=["bid"])
 
