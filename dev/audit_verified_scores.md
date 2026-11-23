@@ -26,6 +26,17 @@ uv run --no-project --with webarena-verified==1.2.3 python -m unittest discover 
   -s tests/experiments -p 'test_verified_score_audit*.py' -v
 ```
 
+Also check the repository's normal pytest package collection mode, after its
+development setup (including BrowserGym core and pytest-playwright):
+
+```sh
+python -m pytest tests/experiments/test_verified_score_audit.py \
+  tests/experiments/test_verified_score_audit_contract.py -q
+```
+
+Both runners load the shared controls by their fixed sibling file path; no
+working-directory import assumption or additional `PYTHONPATH` is required.
+
 In this check, `TaskEvalResult.create` constructs pass/pass, pass/fail,
 pass/error, and task-level error examples. The old aggregation returns `0.5`
 for the two mixed cases while the authoritative task score is `0.0`.

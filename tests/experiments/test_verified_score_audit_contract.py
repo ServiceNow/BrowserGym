@@ -1,11 +1,17 @@
 """Mandatory real-package conformance check: webarena-verified==1.2.3."""
 
+import importlib.util
 from importlib.metadata import version
+from pathlib import Path
 import unittest
 
 from webarena_verified.types.eval import EvalAssertion, EvaluatorResult, TaskEvalResult
 
-from test_verified_score_audit import audit, expected
+HELPER_PATH = Path(__file__).resolve().with_name("test_verified_score_audit.py")
+HELPER_SPEC = importlib.util.spec_from_file_location("verified_audit_controls", HELPER_PATH)
+HELPERS = importlib.util.module_from_spec(HELPER_SPEC)
+HELPER_SPEC.loader.exec_module(HELPERS)
+audit, expected = HELPERS.audit, HELPERS.expected
 
 
 class PackageContractTests(unittest.TestCase):
