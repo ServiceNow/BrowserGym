@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "run_id": "official-demo-107",
+      "path": "107.json",
+      "sha256": "ca0d29f089908059ad9bb77c5bcc8b2d05764981a65fb9b696333368b1ba2ff3",
+      "expected": {
+        "task_id": 107,
+        "intent_template_id": 270,
+        "task_revision": 2,
+        "sites": [
+          "shopping_admin"
+        ],
+        "webarena_verified_version": "1.0.0rc12",
+        "webarena_verified_evaluator_checksum": "ac4a4732f03bf564e97c3b27718e5dd0f9b44d4775abeb96ef666fad92c2e225",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+        "evaluator_names": [
+          "AgentResponseEvaluator"
+        ]
+      }
+    },
+    {
+      "run_id": "official-demo-108",
+      "path": "108.json",
+      "sha256": "4561a87569be2219f64f36b1dc220f808b6411fbfb517271f4445c5eff7867b4",
+      "expected": {
+        "task_id": 108,
+        "intent_template_id": 270,
+        "task_revision": 2,
+        "sites": [
+          "shopping_admin"
+        ],
+        "webarena_verified_version": "1.0.0rc12",
+        "webarena_verified_evaluator_checksum": "fd1cd731136728cbee497842e0685282843ea5cd88791cc2cf2d3d7abf185738",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+        "evaluator_names": [
+          "AgentResponseEvaluator"
+        ]
+      }
+    }
+  ]
+}

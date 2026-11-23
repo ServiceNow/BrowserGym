@@ -1,0 +1,44 @@
+{
+  "task_id": 108,
+  "intent_template_id": 270,
+  "sites": ["shopping_admin"],
+  "task_revision": 2,
+  "status": "success",
+  "score": 1.0,
+  "evaluators_results": [
+    {
+      "evaluator_name": "AgentResponseEvaluator",
+      "status": "success",
+      "score": 1.0,
+      "actual": "{\n  \"task_type\": \"RETRIEVE\",\n  \"status\": \"SUCCESS\",\n  \"retrieved_data\": [\n    { \"month\": \"Jan\", \"count\": 12 },\n    { \"month\": \"Feb\", \"count\": 7 },\n    { \"month\": \"March\", \"count\": 5 },\n    { \"month\": \"April\", \"count\": 9 },\n    { \"month\": \"May\", \"count\": 5 }\n  ],\n  \"error_details\": null\n}\n",
+      "actual_normalized": {
+        "task_type": "retrieve",
+        "retrieved_data": [
+          { "month": "January" , "count": 12.0 },
+          { "month": "February", "count":  7.0 },
+          { "month": "March"   , "count":  5.0 },
+          { "month": "April"   , "count":  9.0 },
+          { "month": "May"     , "count":  5.0 }
+        ],
+        "status": "success"
+      },
+      "expected": {
+        "task_type": "retrieve",
+        "status": "success",
+        "retrieved_data": [
+          { "month": "January" , "count": 12.0 },
+          { "month": "February", "count":  7.0 },
+          { "month": "March"   , "count":  5.0 },
+          { "month": "April"   , "count":  9.0 },
+          { "month": "May"     , "count":  5.0 }
+        ]
+      },
+      "assertions": null,
+      "error_msg": null,
+      "should_not_exist": null
+    }
+  ],
+  "webarena_verified_version": "1.0.0rc12",
+  "webarena_verified_evaluator_checksum": "fd1cd731136728cbee497842e0685282843ea5cd88791cc2cf2d3d7abf185738",
+  "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+}
