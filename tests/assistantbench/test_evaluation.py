@@ -6,6 +6,9 @@ import pathlib
 import gymnasium as gym
 import pytest
 
+from browsergym.assistantbench.evaluation.evaluate_utils.evaluate_numbers import (
+    distance_function_log,
+)
 from browsergym.assistantbench.evaluation.evaluate_utils.utils import _fix_comma
 from browsergym.assistantbench.evaluation.evaluator import question_scorer
 from browsergym.experiments.benchmark.metadata.utils import (
@@ -146,6 +149,54 @@ def test_evaluate_comma_numbers_negative():
     """Negative numbers with thousands separators should be handled."""
     score, _ = question_scorer("-1,000", "-1000")
     assert score == 1.0
+
+
+# ---------------------------------------------------------------------------
+# Non-finite and negative numeric evaluation tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "pred, gold, expected_score",
+    [
+        ("-inf", "20", 0.0),
+        ("-inf", "$55", 0.0),
+        ("inf", "20", 0.0),
+        ("-5000", "-5", 0.0),
+        ("-5", "-5000", 0.0),
+        ("-5", "-5", 1.0),
+        ("-5", "5", 0.0),
+        ("5", "-5", 0.0),
+        ("0", "-5", 0.0),
+        ("-5", "0", 0.0),
+    ],
+)
+def test_evaluate_nonfinite_and_negative(pred: str, gold: str, expected_score: float):
+    score, _ = question_scorer(pred, gold)
+    assert score == expected_score
+    assert 0.0 <= score <= 1.0
+
+
+def test_distance_function_log():
+    # Non-finite values
+    assert distance_function_log(float("-inf"), 20.0) == 0.0
+    assert distance_function_log(float("inf"), 20.0) == 0.0
+    assert distance_function_log(float("nan"), 20.0) == 0.0
+    assert distance_function_log(20.0, float("-inf")) == 0.0
+    assert distance_function_log(20.0, float("inf")) == 0.0
+    assert distance_function_log(20.0, float("nan")) == 0.0
+
+    # Negative values
+    assert distance_function_log(-5000.0, -5.0) == 0.0
+    assert distance_function_log(-5.0, -5.0) == 1.0
+    assert distance_function_log(-10.0, -5.0) == distance_function_log(10.0, 5.0)
+    assert distance_function_log(-5.0, -10.0) == distance_function_log(5.0, 10.0)
+
+    # Opposite-sign values
+    assert distance_function_log(-5.0, 5.0) == 0.0
+    assert distance_function_log(5.0, -5.0) == 0.0
+    assert distance_function_log(0.0, -5.0) == 0.0
+    assert distance_function_log(-5.0, 0.0) == 0.0
 
 
 # ---------------------------------------------------------------------------
