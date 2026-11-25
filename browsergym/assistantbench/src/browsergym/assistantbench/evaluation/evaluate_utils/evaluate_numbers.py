@@ -5,8 +5,14 @@ import numpy as np
 
 # Renamed calc_z function to distance_function_log
 def distance_function_log(pred: float, gold: float):
+    if not np.isfinite(pred) or not np.isfinite(gold):
+        return 0
     if pred == gold == 0:
         return 1
+    if pred < 0 and gold < 0:
+        pred, gold = -pred, -gold
+    elif pred < 0 or gold < 0:
+        return 0
     if pred == 0:
         pred = 1e-4
     if gold == 0:
