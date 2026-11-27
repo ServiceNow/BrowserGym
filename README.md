@@ -164,7 +164,7 @@ print("\n".join(env_ids))
 VisualWebArena
 ```python
 import gymnasium as gym
-import browsergym.webarena  # register webarena tasks as gym environments
+import browsergym.visualwebarena  # register visualwebarena tasks as gym environments
 
 # start a visualwebarena task
 env = gym.make("browsergym/visualwebarena.721")
@@ -178,14 +178,14 @@ print("\n".join(env_ids))
 AssistantBench
 ```python
 import gymnasium as gym
-import browsergym.workarena  # register assistantbench tasks as gym environments
+import browsergym.assistantbench  # register assistantbench tasks as gym environments
 
 # start an assistantbench task
 env = gym.make("browsergym/assistantbench.validation.3")
 ...
 
 # list all the available assistantbench tasks
-env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/workarena")]
+env_ids = [id for id in gym.envs.registry.keys() if id.startswith("browsergym/assistantbench")]
 print("\n".join(env_ids))
 ```
 
