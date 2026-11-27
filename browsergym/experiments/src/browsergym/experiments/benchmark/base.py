@@ -1,4 +1,5 @@
 import fnmatch
+import importlib.metadata
 import logging
 import random
 import typing
@@ -64,6 +65,31 @@ BenchmarkBackend = Literal[
     "knows",
 ]
 
+_BACKEND_TO_DISTRIBUTIONS: dict[BenchmarkBackend, tuple[str, ...]] = {
+    "miniwob": ("browsergym.miniwob", "browsergym-miniwob"),
+    "workarena": ("browsergym.workarena", "browsergym-workarena"),
+    "webarena": ("browsergym.webarena", "browsergym-webarena"),
+    "webarena_verified": ("browsergym.webarena_verified", "browsergym-webarena-verified"),
+    "visualwebarena": ("browsergym.visualwebarena", "browsergym-visualwebarena"),
+    "assistantbench": ("browsergym.assistantbench", "browsergym-assistantbench"),
+    "weblinx": ("weblinx_browsergym", "weblinx-browsergym"),
+    "timewarp": ("browsergym.timewarp", "browsergym-timewarp"),
+    "knows": ("browsergym.knows", "browsergym-knows"),
+}
+
+_PREFIX_TO_DISTRIBUTIONS: list[tuple[str, tuple[str, ...]]] = [
+    ("webarena_verified", ("browsergym.webarena_verified", "browsergym-webarena-verified")),
+    ("visualwebarena", ("browsergym.visualwebarena", "browsergym-visualwebarena")),
+    ("webarena", ("browsergym.webarena", "browsergym-webarena")),
+    ("webarenalite", ("browsergym.webarena", "browsergym-webarena")),
+    ("miniwob", ("browsergym.miniwob", "browsergym-miniwob")),
+    ("workarena", ("browsergym.workarena", "browsergym-workarena")),
+    ("assistantbench", ("browsergym.assistantbench", "browsergym-assistantbench")),
+    ("weblinx", ("weblinx_browsergym", "weblinx-browsergym")),
+    ("timewarp", ("browsergym.timewarp", "browsergym-timewarp")),
+    ("knows", ("browsergym.knows", "browsergym-knows")),
+]
+
 
 @dataclass
 class Benchmark(DataClassJsonMixin):
@@ -103,6 +129,43 @@ class Benchmark(DataClassJsonMixin):
             logger.info(f"Preparing {backend} backend...")
             prepare_backend(backend)
             logger.info(f"{backend} backend ready")
+
+    def get_version(self) -> str:
+        """
+        Return the version of the benchmark based on its backend or name.
+        """
+        dist_names = None
+        is_weblinx = False
+
+        for backend in self.backends:
+            if backend in _BACKEND_TO_DISTRIBUTIONS:
+                dist_names = _BACKEND_TO_DISTRIBUTIONS[backend]
+                if backend == "weblinx":
+                    is_weblinx = True
+                break
+
+        if dist_names is None:
+            name_lower = self.name.lower()
+            for prefix, dists in _PREFIX_TO_DISTRIBUTIONS:
+                if name_lower.startswith(prefix):
+                    dist_names = dists
+                    if prefix == "weblinx":
+                        is_weblinx = True
+                    break
+
+        if dist_names is None:
+            raise ValueError(f"Unknown benchmark {self.name}")
+
+        for dist_name in dist_names:
+            try:
+                return importlib.metadata.distribution(dist_name).version
+            except importlib.metadata.PackageNotFoundError:
+                continue
+
+        if is_weblinx:
+            return "0.0.1rc1"
+
+        raise importlib.metadata.PackageNotFoundError(dist_names[0])
 
     def subset_from_split(self, split: Literal["train", "valid", "test"]):
         split_column = "browsergym_split"
