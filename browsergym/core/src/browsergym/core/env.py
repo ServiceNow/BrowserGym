@@ -15,6 +15,8 @@ from .action.base import execute_python_code
 from .action.highlevel import HighLevelActionSet
 from .chat import Chat
 from .constants import BROWSERGYM_ID_ATTRIBUTE, EXTRACT_OBS_MAX_TRIES
+from .audio import extract_audio, install_audio_capture, transcribe_audio
+from .video import extract_video_frames
 from .observation import (
     MarkingError,
     _post_extract,
@@ -78,6 +80,12 @@ class BrowserEnv(gym.Env, ABC):
         action_mapping: Optional[callable] = HighLevelActionSet().to_python_code,
         use_raw_page_output: bool = False,
         pre_observation_delay: float = 0.5,  # seconds
+        # multimodal arguments
+        enable_audio: bool = False,
+        audio_duration: float = 5.0,  # seconds of audio to capture per step
+        audio_transcribe: bool = True,  # also run Whisper transcription
+        enable_video: bool = False,
+        video_num_frames: int = 10,  # number of frames to extract from video
     ):
         """
         Instantiate a ready to use BrowserEnv gym environment.
@@ -120,6 +128,11 @@ class BrowserEnv(gym.Env, ABC):
         self.action_mapping = action_mapping
         self.use_raw_page_output = use_raw_page_output
         self.pre_observation_delay = pre_observation_delay
+        self.enable_audio = enable_audio
+        self.audio_duration = audio_duration
+        self.audio_transcribe = audio_transcribe
+        self.enable_video = enable_video
+        self.video_num_frames = video_num_frames
 
         # check argument values
         assert tags_to_mark in ("all", "standard_html")
@@ -196,6 +209,21 @@ class BrowserEnv(gym.Env, ABC):
                     "elapsed_time": gym.spaces.Box(
                         low=0, high=np.inf, dtype=float
                     ),  # TODO: change to a Float (breaking change for users)
+                    **(
+                        {
+                            "audio_segment": Anything(),  # raw WAV bytes (for omni models)
+                            "audio_transcript": Unicode(),  # Whisper transcription (for LLM agents)
+                        }
+                        if self.enable_audio
+                        else {}
+                    ),
+                    **(
+                        {
+                            "video_frames": Anything(),  # list of frame dicts (base64 JPEG + timestamp)
+                        }
+                        if self.enable_video
+                        else {}
+                    ),
                 }
             )
 
@@ -686,5 +714,25 @@ document.addEventListener("visibilitychange", () => {
             "last_action_error": self.last_action_error,
             "elapsed_time": np.asarray([time.time() - self.start_time]),
         }
+
+        # capture audio if enabled
+        if self.enable_audio:
+            audio_bytes = extract_audio(self.page, duration=self.audio_duration)
+            obs["audio_segment"] = audio_bytes  # raw audio bytes for omni models
+            if self.audio_transcribe and audio_bytes:
+                try:
+                    obs["audio_transcript"] = transcribe_audio(audio_bytes)
+                except Exception as e:
+                    logger.warning(f"Audio transcription failed: {e}")
+                    obs["audio_transcript"] = ""
+            else:
+                obs["audio_transcript"] = ""
+
+        # capture video frames if enabled
+        if self.enable_video:
+            frames = extract_video_frames(
+                self.page, num_frames=self.video_num_frames
+            )
+            obs["video_frames"] = frames  # list of {timestamp, base64, image} dicts
 
         return obs
